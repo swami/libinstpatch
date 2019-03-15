@@ -1428,7 +1428,7 @@ ipatch_file_real_identify (IpatchFile *file, gboolean byext, GError **err)
 
   children = type_all_children (IPATCH_TYPE_FILE, NULL);
 
-  for (p = children; *p; p++)
+  for (p = children; p && *p; p++)
   {
     file_class = g_type_class_ref (*p);
     if (!file_class) continue;
