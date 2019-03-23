@@ -26,7 +26,13 @@
  * This interface provides a basic API for accessing audio of sample objects.
  */
 #include <stdio.h>
+
+#ifdef _WIN32
+#include <io.h>
+#else
 #include <unistd.h>
+#endif
+
 #include <string.h>
 #include <glib.h>
 #include <glib-object.h>
@@ -1157,7 +1163,7 @@ ipatch_sample_handle_read (IpatchSampleHandle *handle, guint offset,
 
       frames -= readframes;
       offset += readframes;
-      bufptr += readbytes;
+      bufptr = (guint8 *)bufptr + readbytes;
     }
   }
   else   /* not transforming, do it all in one go */
@@ -1290,7 +1296,7 @@ ipatch_sample_handle_write (IpatchSampleHandle *handle, guint offset, guint fram
 
       frames -= writeframes;
       offset += writeframes;
-      bufptr += writebytes;
+	  bufptr = (guint8 *)bufptr + writebytes;
     }
   }
   else   /* not transforming, do it all in one go */
