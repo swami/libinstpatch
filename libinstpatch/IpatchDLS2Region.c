@@ -34,7 +34,7 @@
 #include "IpatchRange.h"
 #include "IpatchSample.h"
 #include "IpatchTypeProp.h"
-#include "builtin_enums.h"
+//#include "builtin_enums.h"
 #include "ipatch_priv.h"
 
 enum
@@ -957,9 +957,9 @@ void
 ipatch_dls2_region_set_param_array (IpatchDLS2Region *region,
 				    IpatchDLS2ParamArray *array)
 {
+  int i;
   g_return_if_fail (IPATCH_IS_DLS2_REGION (region));
   g_return_if_fail (array != NULL);
-  int i;
 
   /* Write of each parameter is atomic. */
   for (i = 0; i < IPATCH_DLS2_PARAM_COUNT; i++)
