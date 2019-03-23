@@ -503,7 +503,7 @@ ipatch_sample_list_render (IpatchSampleList *list, gpointer buf,
          IPATCH_SAMPLE_MAP_CHANNEL (0, item->channel), err))
       return (FALSE);
 
-    buf += block * format_size;
+	(guint8 *)buf += block * format_size;
     frames -= block;
 
     p = p->next;
