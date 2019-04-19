@@ -143,8 +143,8 @@ configure_file ( ${CMAKE_SOURCE_DIR}/libinstpatch/version.h.in
 configure_file ( ${CMAKE_SOURCE_DIR}/libinstpatch/libinstpatch.h.in
                  ${CMAKE_CURRENT_BINARY_DIR}/libinstpatch/libinstpatch.h )
 
-if ( UNIX OR MINGW )
-    # pkg-config support
+# pkg-config support
+if ( UNIX OR MINGW OR WIN32)
     set ( prefix "${CMAKE_INSTALL_PREFIX}" )
     set ( exec_prefix "\${prefix}" )
     set ( libdir "\${exec_prefix}/${LIB_INSTALL_DIR}${LIB_SUFFIX}" )
@@ -153,7 +153,7 @@ if ( UNIX OR MINGW )
         ${CMAKE_BINARY_DIR}/libinstpatch-1.0.pc IMMEDIATE @ONLY )
     install ( FILES ${CMAKE_BINARY_DIR}/libinstpatch-1.0.pc
               DESTINATION ${LIB_INSTALL_DIR}${LIB_SUFFIX}/pkgconfig )
-endif ( UNIX OR MINGW )
+endif ( UNIX OR MINGW OR WIN32)
 
 # Extra targets for Unix build environments
 if ( UNIX )
