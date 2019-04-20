@@ -189,3 +189,13 @@ const IpatchSF2GenInfo ipatch_sf2_gen_info[] = {
   /* RootNote */
   { {-1}, {127}, {-1}, IPATCH_UNIT_TYPE_INT, N_("Root Note"), NULL}
 };
+
+/*
+ Getter function returning ipatch_sf2_gen_info table.
+ Useful when libinstpatch library is used as a shared library linked at load time.
+*/
+const IpatchSF2GenInfo * 
+ipatch_sf2_get_gen_info(void)
+{
+    return ipatch_sf2_gen_info;
+}

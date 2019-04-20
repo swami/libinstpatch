@@ -190,7 +190,14 @@ typedef void (*IpatchItemPropDisconnect)(IpatchItem *item, GParamSpec *pspec,
   (func ? func (item, link, userdata) : link)
 
 /* stored publicy for added convenience to derived types */
+/* Useful when libinstpatch library is used as a static library. */
 extern GParamSpec *ipatch_item_pspec_title;
+
+/*
+ Getter function returning title property GParamSpec as a convenience to derived type.
+ Useful when libinstpatch library is used as a shared library linked at load time.
+*/
+GParamSpec *ipatch_item_get_pspec_title(void);
 
 GType ipatch_item_get_type (void);
 int ipatch_item_get_flags (gpointer item);
