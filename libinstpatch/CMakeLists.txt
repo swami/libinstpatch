@@ -20,6 +20,8 @@ include_directories (
 # ************ library ************
 
 set ( instpatch_public_HEADERS
+#jjc
+    builtin_enums.h
     IpatchBase.h
     IpatchContainer.h
     IpatchConverter.h
@@ -121,6 +123,8 @@ set ( instpatch_private_HEADERS
 )
 
 set ( instpatch_SOURCES
+#jjc
+    builtin_enums.c
     IpatchBase.c
     IpatchContainer.c
     IpatchContainer_notify.c
@@ -274,13 +278,17 @@ target_link_libraries ( instpatch-1.0
 install ( FILES
           ${instpatch_public_HEADERS}
           ${public_main_HEADER}
-          ${CMAKE_CURRENT_BINARY_DIR}/builtin_enums.h
+#jjc
+#          ${CMAKE_CURRENT_BINARY_DIR}/builtin_enums.h
+          ${CMAKE_CURRENT_SOURCE_DIR}/builtin_enums.h
           ${CMAKE_CURRENT_BINARY_DIR}/version.h
           DESTINATION include/libinstpatch-1.0/libinstpatch )
 
 find_program (GLIB2_MKENUMS glib-mkenums)
 find_program (SED sed)
 
+#jjc
+#[[
 add_custom_command (
   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/builtin_enums.h
   COMMAND ${GLIB2_MKENUMS}
@@ -321,8 +329,9 @@ add_custom_command (
     > ${CMAKE_CURRENT_BINARY_DIR}/builtin_enums.c
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
   DEPENDS ${instpatch_public_HEADERS} ${CMAKE_CURRENT_BINARY_DIR}/builtin_enums.h
+#jjc
 )
-
+]]
 
 find_program (GLIB2_GENMARSHAL glib-genmarshal)
 
@@ -424,7 +433,9 @@ if (INTROSPECTION_FOUND)
   _list_prefix(_abs_introspection_files introspection_files "${CMAKE_CURRENT_SOURCE_DIR}/")
   list(APPEND _abs_introspection_files
     ${CMAKE_CURRENT_BINARY_DIR}/builtin_enums.c
-    ${CMAKE_CURRENT_BINARY_DIR}/builtin_enums.h
+#jjc
+#    ${CMAKE_CURRENT_BINARY_DIR}/builtin_enums.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/builtin_enums.h
     ${CMAKE_CURRENT_BINARY_DIR}/version.h
   )
   set(Ipatch_1_1_gir_NAMESPACE Ipatch)
