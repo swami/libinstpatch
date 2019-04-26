@@ -20,6 +20,7 @@ include_directories (
 # ************ library ************
 
 set ( instpatch_public_HEADERS
+    builtin_enums.h
     IpatchBase.h
     IpatchContainer.h
     IpatchConverter.h
@@ -121,6 +122,7 @@ set ( instpatch_private_HEADERS
 )
 
 set ( instpatch_SOURCES
+    builtin_enums.c
     IpatchBase.c
     IpatchContainer.c
     IpatchContainer_notify.c
