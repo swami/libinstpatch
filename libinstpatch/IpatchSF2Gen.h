@@ -189,7 +189,15 @@ extern IpatchSF2GenArray *ipatch_sf2_gen_abs_array;
 extern guint64 ipatch_sf2_gen_ofs_valid_mask;
 extern guint64 ipatch_sf2_gen_abs_valid_mask;
 extern guint64 ipatch_sf2_gen_add_mask;
+
+/* Useful when libinstpatch library is used as a static library. */
 extern const IpatchSF2GenInfo ipatch_sf2_gen_info[]; /* IpatchSF2Gen_tables.c */
+/*
+ Getter function returning ipatch_sf2_gen_info table.
+ Useful when libinstpatch library is used as a shared library linked at load time.
+*/
+const IpatchSF2GenInfo * ipatch_sf2_get_gen_info(void);
+
 
 gboolean ipatch_sf2_gen_is_valid (guint genid, IpatchSF2GenPropsType propstype);
 

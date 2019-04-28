@@ -277,7 +277,7 @@ ipatch_sample_transform_set_formats (IpatchSampleTransform *transform,
     transform->max_frames =
       transform->combined_size / (buf1_max_frame + buf2_max_frame);
 
-    transform->buf2 = transform->buf1 + (transform->buf1_max_frame
+    transform->buf2 = (guint8 *)transform->buf1 + (transform->buf1_max_frame
 					 * transform->max_frames);
   }
   else transform->max_frames = 0;
@@ -308,7 +308,7 @@ ipatch_sample_transform_alloc (IpatchSampleTransform *transform, guint frames)
     (transform->buf1_max_frame + transform->buf2_max_frame) * frames;
 
   transform->buf1 = g_malloc (transform->combined_size);
-  transform->buf2 = transform->buf1 + (transform->buf1_max_frame * frames);
+  transform->buf2 = (guint8 *)transform->buf1 + (transform->buf1_max_frame * frames);
   transform->free_buffers = TRUE;
   transform->max_frames = frames;
 }
@@ -347,7 +347,7 @@ ipatch_sample_transform_alloc_size (IpatchSampleTransform *transform,
   {
     transform->max_frames
       = size / (transform->buf1_max_frame + transform->buf2_max_frame);
-    transform->buf2 = transform->buf1 + (transform->buf1_max_frame
+    transform->buf2 = (guint8 *)transform->buf1 + (transform->buf1_max_frame
 					 * transform->max_frames);
   }
 
@@ -411,7 +411,7 @@ ipatch_sample_transform_set_buffers_size (IpatchSampleTransform *transform,
   {
     transform->max_frames
       = size / (transform->buf1_max_frame + transform->buf2_max_frame);
-    transform->buf2 = transform->buf1 + (transform->buf1_max_frame
+    transform->buf2 = (guint8 *)transform->buf1 + (transform->buf1_max_frame
 					 * transform->max_frames);
   }
 
@@ -560,8 +560,8 @@ ipatch_sample_transform_convert (IpatchSampleTransform *transform,
     }
 
     frames -= block_size;
-    src += block_size * src_frame_size;
-    if (dest) dest += block_size * dest_frame_size;
+    src = (guint8 *)src + (block_size * src_frame_size);
+    if (dest) dest = (guint8 *)dest + (block_size * dest_frame_size);
   }
 
   transform->buf1 = buf1;

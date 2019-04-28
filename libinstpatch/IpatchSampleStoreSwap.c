@@ -42,7 +42,13 @@
  * space in the swap file (ipatch_sample_store_swap_get_unused_size()), which
  * can be compacted with ipatch_sample_store_swap_compact().
  */
+
+#ifdef _WIN32
+#include <io.h>
+#else
 #include <unistd.h>
+#endif
+
 #include <fcntl.h>
 #include <errno.h>
 #include <string.h>
@@ -363,9 +369,9 @@ ipatch_sample_store_swap_sample_iface_read (IpatchSampleHandle *handle,
                                             guint offset, guint frames,
                                             gpointer buf, GError **err)
 {
+  unsigned int retval;
   IpatchSampleStoreSwap *store = (IpatchSampleStoreSwap *)(handle->sample);
   guint8 frame_size = GPOINTER_TO_UINT (handle->data1);
-  ssize_t retval;
 
   if (store->ram_location)
   {
@@ -403,9 +409,10 @@ ipatch_sample_store_swap_sample_iface_write (IpatchSampleHandle *handle,
                                              guint offset, guint frames,
                                              gconstpointer buf, GError **err)
 {
+  unsigned int retval;
+
   IpatchSampleStoreSwap *store = (IpatchSampleStoreSwap *)(handle->sample);
   guint8 frame_size = GPOINTER_TO_UINT (handle->data1);
-  ssize_t retval;
 
   if (store->ram_location)
   {

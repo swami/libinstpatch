@@ -20,6 +20,7 @@ include_directories (
 # ************ library ************
 
 set ( instpatch_public_HEADERS
+    builtin_enums.h
     IpatchBase.h
     IpatchContainer.h
     IpatchConverter.h
@@ -121,6 +122,7 @@ set ( instpatch_private_HEADERS
 )
 
 set ( instpatch_SOURCES
+    builtin_enums.c
     IpatchBase.c
     IpatchContainer.c
     IpatchContainer_notify.c
@@ -235,12 +237,22 @@ link_directories (
 
 add_definitions ( -DLOCALEDIR="${DATA_INSTALL_DIR}/locale" )
 
+
+set (DEFINITION_FILE "")
+# Options for WINDOWS only
+if( WIN32 )
+    if (BUILD_SHARED_LIBS)
+        # adding a module definition file for shared libs will export symbols and produce import library
+        set (DEFINITION_FILE libinstpatch.def)
+    endif(BUILD_SHARED_LIBS)
+endif( WIN32 )
+
 add_library ( instpatch-1.0
     ${CMAKE_CURRENT_BINARY_DIR}/builtin_enums.c
     ${CMAKE_CURRENT_BINARY_DIR}/marshals.c
     ${CMAKE_CURRENT_BINARY_DIR}/version.h
-    ${instpatch_SOURCES}
-    ipatch_priv.h
+    ${instpatch_SOURCES} ${DEFINITION_FILE}
+        ipatch_priv.h
 )
 
 target_link_libraries ( instpatch-1.0

@@ -873,10 +873,10 @@ ipatch_xml_from_str (const char *str, GError **err)
 {
   GMarkupParseContext *ctx;
 
-  GMarkupParser parser = {
-    start_element: xml_start_element,
-    end_element: xml_end_element,
-    text: xml_text
+    GMarkupParser parser = {
+    xml_start_element,
+    xml_end_element,
+    xml_text
   };
 
   GNode *root = NULL;
