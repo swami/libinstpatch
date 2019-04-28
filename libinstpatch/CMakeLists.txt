@@ -249,7 +249,6 @@ endif( WIN32 )
 
 
 add_library ( instpatch-1.0
-    ${CMAKE_CURRENT_BINARY_DIR}/builtin_enums.c
     ${CMAKE_CURRENT_BINARY_DIR}/marshals.c
     ${CMAKE_CURRENT_BINARY_DIR}/version.h
     ${instpatch_SOURCES} ${DEFINITION_FILE}
@@ -268,6 +267,43 @@ install ( FILES
           ${CMAKE_CURRENT_BINARY_DIR}/version.h
           DESTINATION include/libinstpatch-1.0/libinstpatch )
 
+
+find_program (GLIB2_MKENUMS glib-mkenums)
+find_program (SED sed)
+
+add_custom_target(enums
+  COMMAND ${GLIB2_MKENUMS}
+    --fhead \"\#ifndef __IPATCH_BUILTIN_ENUMS_H__\\n\"
+    --fhead \"\#define __IPATCH_BUILTIN_ENUMS_H__\\n\\n\"
+    --fhead \"\#include <glib-object.h>\\n\\n\"
+    --fhead \"G_BEGIN_DECLS\\n\"
+    --fprod \"/* enumerations from \\"@filename@\\" */\\n\"
+    --vhead \"GType @enum_name@_get_type \(void\)\;\\n\"
+    --vhead \"\#define IPATCH_TYPE_@ENUMSHORT@ \(@enum_name@_get_type\(\)\)\\n\"
+    --ftail \"G_END_DECLS\\n\\n\"
+    --ftail \"\#endif /* __IPATCH_BUILTIN_ENUMS_H__ */\"
+    ${instpatch_public_HEADERS}
+    | ${SED} 's/dl_s2/dls2/g\;s/DL_S2/DLS2/g'
+    > ${CMAKE_CURRENT_BINARY_DIR}/builtin_enums.h
+    
+  COMMAND ${GLIB2_MKENUMS}
+    --fhead \"\#include \\"libinstpatch.h\\"\\n\"
+    --fhead \"\#include \\"ipatch_priv.h\\"\\n\\n\"
+    --fprod \"/* enumerations from \\"@filename@\\" */\"
+    --vhead \"static const G@Type@Value _@enum_name@_values[] = {\"
+    --vprod \"  { @VALUENAME@, \\"@VALUENAME@\\", \\"@valuenick@\\" },\"
+    --vtail \"  { 0, NULL, NULL }\\n}\;\\n\\n\"
+    --vtail \"GType\\n@enum_name@_get_type \(void\)\\n{\\n\"
+    --vtail \"  static GType type = 0\;\\n\\n\"
+    --vtail \"  if \(G_UNLIKELY \(type == 0\)\)\\n\"
+    --vtail \"    type = g_\@type\@_register_static \(\\"@EnumName@\\", _@enum_name@_values\)\;\\n\\n\"
+    --vtail \"  return type\;\\n}\\n\\n\"
+    ${instpatch_public_HEADERS}
+    | ${SED} 's/dl_s2/dls2/g\;s/DL_S2/DLS2/g'
+    > ${CMAKE_CURRENT_BINARY_DIR}/builtin_enums.c
+  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+  DEPENDS ${instpatch_public_HEADERS}
+)
 
 find_program (GLIB2_GENMARSHAL glib-genmarshal)
 
