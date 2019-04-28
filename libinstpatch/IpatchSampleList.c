@@ -466,12 +466,13 @@ list_item_free_next (IpatchSampleList *list, GList *itemp)
  * Returns: %TRUE on success, %FALSE otherwise (in which case @err may be set).
  */
 gboolean
-ipatch_sample_list_render (IpatchSampleList *list, gpointer buf,
+ipatch_sample_list_render (IpatchSampleList *list, gpointer b,
                            guint pos, guint frames, int format, GError **err)
 {
   IpatchSampleListItem *item = NULL;
   guint startofs, block, format_size;
   GList *p;
+  guint8* buf = b; // cannot use void* for pointer arithmetic below
 
   g_return_val_if_fail (list != NULL, FALSE);
   g_return_val_if_fail (ipatch_sample_format_verify (format), FALSE);
@@ -503,7 +504,7 @@ ipatch_sample_list_render (IpatchSampleList *list, gpointer buf,
          IPATCH_SAMPLE_MAP_CHANNEL (0, item->channel), err))
       return (FALSE);
 
-	(guint8 *)buf += block * format_size;
+	buf += block * format_size;
     frames -= block;
 
     p = p->next;
