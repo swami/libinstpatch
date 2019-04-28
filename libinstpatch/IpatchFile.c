@@ -32,7 +32,12 @@
 /* for stat and fstat */
 #include <sys/types.h>
 #include <sys/stat.h>
+
+#ifdef _WIN32
+#include <io.h>
+#else
 #include <unistd.h>
+#endif
 
 #include <glib.h>
 #include <glib/gstdio.h>
@@ -815,12 +820,14 @@ ipatch_file_replace (IpatchFile *newfile, IpatchFile *oldfile, GError **err)
   // Steal filename from oldfile and delete file (on Windows)
   IPATCH_ITEM_WLOCK (oldfile);
 
+  // filename must be valid before calling de g_unlink().
+  filename = oldfile->file_name;        // ++ filename takes over allocation
+
 #ifdef G_OS_WIN32
   // Just blindly unlink the file
   g_unlink (filename);
 #endif
 
-  filename = oldfile->file_name;        // ++ filename takes over allocation
   oldfile->file_name = NULL;
 
   IPATCH_ITEM_WUNLOCK (oldfile);

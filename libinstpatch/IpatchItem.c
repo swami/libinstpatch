@@ -109,8 +109,18 @@ static GHashTable *unique_prop_cache = NULL;
 static UniqueBag no_unique_props;
 
 /* store title property GParamSpec as a convenience to derived types */
+/* Useful when libinstpatch library is used as a static library. */
 GParamSpec *ipatch_item_pspec_title = NULL;
 
+/*
+ Getter function returning title property GParamSpec as a convenience to derived type.
+ Useful when libinstpatch library is used as a shared library linked at load time.
+*/
+GParamSpec *
+ipatch_item_get_pspec_title(void)
+{
+    return ipatch_item_pspec_title;
+}
 
 GType
 ipatch_item_get_type (void)

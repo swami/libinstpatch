@@ -234,7 +234,7 @@ ipatch_sample_store_virtual_sample_iface_read (IpatchSampleHandle *handle,
       return (FALSE);
 
     if (!ipatch_sample_list_render (store->lists[1],
-                                    interbuf + IPATCH_SAMPLE_TRANS_BUFFER_SIZE / 2,
+         (guint8 *)interbuf + IPATCH_SAMPLE_TRANS_BUFFER_SIZE / 2,
                                     offset, block, format, err))
       return (FALSE);
 
@@ -243,7 +243,7 @@ ipatch_sample_store_virtual_sample_iface_read (IpatchSampleHandle *handle,
     {
       bbuf = (guint8 *)buf;
       bleft = (guint8 *)interbuf;
-      bright = (guint8 *)(interbuf + IPATCH_SAMPLE_TRANS_BUFFER_SIZE / 2);
+      bright = (guint8 *)((guint8 *)interbuf + IPATCH_SAMPLE_TRANS_BUFFER_SIZE / 2);
 
       for (mi = 0, si = 0; mi < block; mi++, si += 2)
       {
@@ -257,7 +257,7 @@ ipatch_sample_store_virtual_sample_iface_read (IpatchSampleHandle *handle,
     {
       wbuf = (guint16 *)buf;
       wleft = (guint16 *)interbuf;
-      wright = (guint16 *)(interbuf + IPATCH_SAMPLE_TRANS_BUFFER_SIZE / 2);
+      wright = (guint16 *)((guint8 *)interbuf + IPATCH_SAMPLE_TRANS_BUFFER_SIZE / 2);
 
       for (mi = 0, si = 0; mi < block; mi++, si += 2)
       {
@@ -271,7 +271,7 @@ ipatch_sample_store_virtual_sample_iface_read (IpatchSampleHandle *handle,
     {
       bbuf = (guint8 *)buf;
       bleft = (guint8 *)interbuf;
-      bright = (guint8 *)(interbuf + IPATCH_SAMPLE_TRANS_BUFFER_SIZE / 2);
+      bright = (guint8 *)((guint8 *)interbuf + IPATCH_SAMPLE_TRANS_BUFFER_SIZE / 2);
 
       for (mi = 0, si = 0; mi < block; mi += 3, si += 6)
       {
@@ -287,7 +287,7 @@ ipatch_sample_store_virtual_sample_iface_read (IpatchSampleHandle *handle,
     {
       dbuf = (guint32 *)buf;
       dleft = (guint32 *)interbuf;
-      dright = (guint32 *)(interbuf + IPATCH_SAMPLE_TRANS_BUFFER_SIZE / 2);
+      dright = (guint32 *)((guint8 *)interbuf + IPATCH_SAMPLE_TRANS_BUFFER_SIZE / 2);
 
       for (mi = 0, si = 0; mi < block; mi++, si += 2)
       {
@@ -301,7 +301,7 @@ ipatch_sample_store_virtual_sample_iface_read (IpatchSampleHandle *handle,
     {
       qbuf = (guint64 *)buf;
       qleft = (guint64 *)interbuf;
-      qright = (guint64 *)(interbuf + IPATCH_SAMPLE_TRANS_BUFFER_SIZE / 2);
+      qright = (guint64 *)((guint8 *)interbuf + IPATCH_SAMPLE_TRANS_BUFFER_SIZE / 2);
 
       for (mi = 0, si = 0; mi < block; mi++, si += 2)
       {

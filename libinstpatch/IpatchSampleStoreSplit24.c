@@ -196,7 +196,7 @@ ipatch_sample_store_split24_sample_iface_read (IpatchSampleHandle *handle,
     if (!ipatch_file_read (fhandle, readbuf, thissize * 2, err))
       return (FALSE);
 
-    i8p = buf + samplepos * 4;
+    i8p = (guint8 *)buf + samplepos * 4;
 
     if (lilendian)
     {
@@ -237,7 +237,7 @@ ipatch_sample_store_split24_sample_iface_read (IpatchSampleHandle *handle,
     if (!ipatch_file_read (fhandle, readbuf, thissize, err))
       return (FALSE);
 
-    i8p = buf + samplepos * 4;
+    i8p = (guint8 *)buf + samplepos * 4;
 
     if (lilendian)
     {
