@@ -150,9 +150,9 @@ if ( UNIX OR MINGW OR WIN32)
     set ( exec_prefix "\${prefix}" )
     set ( libdir "\${exec_prefix}/${LIB_INSTALL_DIR}${LIB_SUFFIX}" )
     set ( includedir "\${prefix}/${INCLUDE_INSTALL_DIR}" )
-    configure_file ( libinstpatch-1.0.pc.in
-        ${CMAKE_BINARY_DIR}/libinstpatch-1.0.pc IMMEDIATE @ONLY )
-    install ( FILES ${CMAKE_BINARY_DIR}/libinstpatch-1.0.pc
+    configure_file ( libinstpatch.pc.in
+        ${CMAKE_BINARY_DIR}/libinstpatch.pc IMMEDIATE @ONLY )
+    install ( FILES ${CMAKE_BINARY_DIR}/libinstpatch.pc
               DESTINATION ${LIB_INSTALL_DIR}${LIB_SUFFIX}/pkgconfig )
 endif ( UNIX OR MINGW OR WIN32)
 

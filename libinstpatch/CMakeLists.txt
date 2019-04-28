@@ -247,8 +247,8 @@ if( WIN32 )
     endif(BUILD_SHARED_LIBS)
 endif( WIN32 )
 
+
 add_library ( instpatch-1.0
-    ${CMAKE_CURRENT_BINARY_DIR}/builtin_enums.c
     ${CMAKE_CURRENT_BINARY_DIR}/marshals.c
     ${CMAKE_CURRENT_BINARY_DIR}/version.h
     ${instpatch_SOURCES} ${DEFINITION_FILE}
@@ -264,17 +264,15 @@ target_link_libraries ( instpatch-1.0
 install ( FILES
           ${instpatch_public_HEADERS}
           ${public_main_HEADER}
-          ${CMAKE_CURRENT_BINARY_DIR}/builtin_enums.h
           ${CMAKE_CURRENT_BINARY_DIR}/version.h
           DESTINATION include/libinstpatch-1.0/libinstpatch )
+
 
 find_program (GLIB2_MKENUMS glib-mkenums)
 find_program (SED sed)
 
-add_custom_command (
-  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/builtin_enums.h
+add_custom_target(enums
   COMMAND ${GLIB2_MKENUMS}
-  ARGS
     --fhead \"\#ifndef __IPATCH_BUILTIN_ENUMS_H__\\n\"
     --fhead \"\#define __IPATCH_BUILTIN_ENUMS_H__\\n\\n\"
     --fhead \"\#include <glib-object.h>\\n\\n\"
@@ -287,14 +285,8 @@ add_custom_command (
     ${instpatch_public_HEADERS}
     | ${SED} 's/dl_s2/dls2/g\;s/DL_S2/DLS2/g'
     > ${CMAKE_CURRENT_BINARY_DIR}/builtin_enums.h
-  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-  DEPENDS ${instpatch_public_HEADERS}
-)
-
-add_custom_command (
-  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/builtin_enums.c
+    
   COMMAND ${GLIB2_MKENUMS}
-  ARGS
     --fhead \"\#include \\"libinstpatch.h\\"\\n\"
     --fhead \"\#include \\"ipatch_priv.h\\"\\n\\n\"
     --fprod \"/* enumerations from \\"@filename@\\" */\"
@@ -310,9 +302,8 @@ add_custom_command (
     | ${SED} 's/dl_s2/dls2/g\;s/DL_S2/DLS2/g'
     > ${CMAKE_CURRENT_BINARY_DIR}/builtin_enums.c
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-  DEPENDS ${instpatch_public_HEADERS} ${CMAKE_CURRENT_BINARY_DIR}/builtin_enums.h
+  DEPENDS ${instpatch_public_HEADERS}
 )
-
 
 find_program (GLIB2_GENMARSHAL glib-genmarshal)
 
@@ -413,8 +404,8 @@ if (INTROSPECTION_FOUND)
   set(Ipatch_1_1_gir_PROGRAM ${CMAKE_CURRENT_BINARY_DIR}/gir_prog)
   _list_prefix(_abs_introspection_files introspection_files "${CMAKE_CURRENT_SOURCE_DIR}/")
   list(APPEND _abs_introspection_files
-    ${CMAKE_CURRENT_BINARY_DIR}/builtin_enums.c
-    ${CMAKE_CURRENT_BINARY_DIR}/builtin_enums.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/builtin_enums.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/builtin_enums.h
     ${CMAKE_CURRENT_BINARY_DIR}/version.h
   )
   set(Ipatch_1_1_gir_NAMESPACE Ipatch)
