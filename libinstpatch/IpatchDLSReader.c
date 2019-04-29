@@ -357,7 +357,7 @@ ipatch_dls_reader_fixup (IpatchDLSReader *reader, GError **err)
   IpatchGigRegion *gig_region;
   IpatchGigSubRegion *sub_region;
   IpatchIter inst_iter, region_iter;
-  int i;
+  guint i;
 
   g_return_val_if_fail (IPATCH_IS_DLS_READER (reader), FALSE);
   g_return_val_if_fail (!err || !*err, FALSE);
@@ -368,7 +368,7 @@ ipatch_dls_reader_fixup (IpatchDLSReader *reader, GError **err)
 
   /* create pool table index -> sample hash */
   i = 0;
-  while ((guint)i < reader->pool_table_size)
+  while (i < reader->pool_table_size)
     {
       sample = g_hash_table_lookup (reader->wave_hash,
 				    GINT_TO_POINTER (reader->pool_table[i]));

@@ -176,7 +176,7 @@ ipatch_sample_store_split24_sample_iface_read (IpatchSampleHandle *handle,
   IpatchFileHandle *fhandle = (IpatchFileHandle *)(handle->data1);
   guint8 *readbuf = (guint8 *)(handle->data2);
   guint8 *i8p;
-  int i;
+  guint i;
 
   lilendian = (ipatch_sample_store_get_format (split24_store)
 	       & IPATCH_SAMPLE_ENDIAN_MASK) == IPATCH_SAMPLE_LENDIAN;
@@ -200,7 +200,7 @@ ipatch_sample_store_split24_sample_iface_read (IpatchSampleHandle *handle,
 
     if (lilendian)
     {
-      for (i = 0; (guint)i < thissize; i++)
+      for (i = 0; i < thissize; i++)
       {
         i8p[i * 4 + 1] = readbuf[i * 2];
         i8p[i * 4 + 2] = readbuf[i * 2 + 1];
@@ -209,7 +209,7 @@ ipatch_sample_store_split24_sample_iface_read (IpatchSampleHandle *handle,
     }
     else
     {
-      for (i = 0; (guint)i < thissize; i++)
+      for (i = 0; i < thissize; i++)
       {
         i8p[i * 4 + 2] = readbuf[i * 2];
         i8p[i * 4 + 1] = readbuf[i * 2 + 1];
@@ -241,12 +241,12 @@ ipatch_sample_store_split24_sample_iface_read (IpatchSampleHandle *handle,
 
     if (lilendian)
     {
-      for (i = 0; (guint)i < thissize; i++)
+      for (i = 0; i < thissize; i++)
         i8p[i * 4] = readbuf[i];
     }
     else
     {
-      for (i = 0; (guint)i < thissize; i++)
+      for (i = 0; i < thissize; i++)
         i8p[i * 4 + 3] = readbuf[i];
     }
 

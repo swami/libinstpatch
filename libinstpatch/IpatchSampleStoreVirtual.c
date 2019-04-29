@@ -96,7 +96,7 @@ ipatch_sample_store_virtual_set_property (GObject *object, guint property_id,
   IpatchSampleStoreVirtual *store = IPATCH_SAMPLE_STORE_VIRTUAL (object);
   IpatchSampleList *list;
   GValueArray *array;
-  int chan;
+  guint chan;
 
   switch (property_id)
   {
@@ -105,7 +105,7 @@ ipatch_sample_store_virtual_set_property (GObject *object, guint property_id,
 
       for (chan = 0; chan < 2; chan++)
       {
-        if (array && (guint)chan < array->n_values)
+        if (array && chan < array->n_values)
           list = g_value_dup_boxed (g_value_array_get_nth (array, chan));
         else list = NULL;
 
@@ -210,8 +210,7 @@ ipatch_sample_store_virtual_sample_iface_read (IpatchSampleHandle *handle,
   guint16 *wbuf, *wleft, *wright;
   guint32 *dbuf, *dleft, *dright;
   guint64 *qbuf, *qleft, *qright;
-  int mi, si;
-  int block;
+  guint block, mi, si;
 
   if (!interbuf)   /* Store is mono? - Just render it */
   {
@@ -228,7 +227,7 @@ ipatch_sample_store_virtual_sample_iface_read (IpatchSampleHandle *handle,
 
   while (frames > 0)
   {
-    if ((guint)block > frames) block = frames;
+    if (block > frames) block = frames;
 
     if (!ipatch_sample_list_render (store->lists[0], interbuf, offset, block, format, err))
       return (FALSE);

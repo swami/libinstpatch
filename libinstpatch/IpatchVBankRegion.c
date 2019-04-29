@@ -144,7 +144,7 @@ ipatch_vbank_region_set_property (GObject *object, guint property_id,
   GValueArray *valarray;
   IpatchRange *range;
   char **strv;
-  int i;
+  guint i;
 
   switch (property_id)
   {
@@ -160,7 +160,7 @@ ipatch_vbank_region_set_property (GObject *object, guint property_id,
       {
 	strv = g_new (char *, valarray->n_values + 1);	/* ++ alloc */
 
-	for (i = 0; (guint)i < valarray->n_values; i++)
+	for (i = 0; i < valarray->n_values; i++)
 	  strv[i] = (char *)g_value_get_string (g_value_array_get_nth (valarray, i));
 
 	strv[valarray->n_values] = NULL;
@@ -202,7 +202,7 @@ ipatch_vbank_region_get_property (GObject *object, guint property_id,
   guint n_elements;
   char **strv;
   GValue val = { 0 };
-  int i;
+  guint i;
 
   switch (property_id)
   {
@@ -220,7 +220,7 @@ ipatch_vbank_region_get_property (GObject *object, guint property_id,
 	valarray = g_value_array_new (n_elements);	/* ++ alloc */
 	g_value_init (&val, G_TYPE_STRING);
 
-	for (i = 0; (guint)i < n_elements; i++)
+	for (i = 0; i < n_elements; i++)
 	{
 	  g_value_set_string (&val, strv[i]);	/* ++ alloc */
 	  g_value_array_append (valarray, &val);

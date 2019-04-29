@@ -499,14 +499,14 @@ sfload_infos (IpatchSF2Reader *reader, GError **err)
 	    }
 	  else if (ipatch_sf2_info_id_is_valid (chunk->id))	/* regular string based info chunk */
 	    {
-	      int maxsize, size;
+	      guint32 maxsize, size;
 	      char *s;
 
 	      if (chunk->size > 0)
 		{
 		  maxsize = ipatch_sf2_get_info_max_size (chunk->id);
 
-		  if (chunk->size > (guint32)maxsize)
+		  if (chunk->size > maxsize)
 		    {
 		      g_warning (_("Invalid size %d for INFO chunk \"%.4s\""),
 				 chunk->size, chunk->idstr);
@@ -636,7 +636,7 @@ sfload_pbags (IpatchSF2Reader *reader, GError **err)
   guint16 *bag_table;
   guint16 genndx, modndx;
   guint16 pgenndx, pmodndx;
-  int i;
+  guint i;
 
   if (!ipatch_riff_read_chunk_verify (riff, IPATCH_RIFF_CHUNK_SUB,
 				      IPATCH_SFONT_FOURCC_PBAG, err))
@@ -657,7 +657,7 @@ sfload_pbags (IpatchSF2Reader *reader, GError **err)
   pgenndx = IPATCH_FILE_SWAP16 (riff->handle->file, &bag_table[0]);
   pmodndx = IPATCH_FILE_SWAP16 (riff->handle->file, &bag_table[1]);
 
-  for (i=0; (guint)i < reader->pbag_count; i++)
+  for (i=0; i < reader->pbag_count; i++)
     {
       genndx = IPATCH_FILE_SWAP16 (riff->handle->file, &bag_table[(i+1)*2]);
       modndx = IPATCH_FILE_SWAP16 (riff->handle->file, &bag_table[(i+1)*2+1]);
@@ -962,7 +962,7 @@ sfload_ibags (IpatchSF2Reader *reader, GError **err)
   guint16 *bag_table;
   guint16 genndx, modndx;
   guint16 pgenndx, pmodndx;
-  int i;
+  guint i;
 
   if (!ipatch_riff_read_chunk_verify (riff, IPATCH_RIFF_CHUNK_SUB,
 				      IPATCH_SFONT_FOURCC_IBAG, err))
@@ -983,7 +983,7 @@ sfload_ibags (IpatchSF2Reader *reader, GError **err)
   pgenndx = IPATCH_FILE_SWAP16 (riff->handle->file, &bag_table[0]);
   pmodndx = IPATCH_FILE_SWAP16 (riff->handle->file, &bag_table[1]);
 
-  for (i=0; (guint)i < reader->ibag_count; i++)
+  for (i=0; i < reader->ibag_count; i++)
     {
       genndx = IPATCH_FILE_SWAP16 (riff->handle->file, &bag_table[(i+1)*2]);
       modndx = IPATCH_FILE_SWAP16 (riff->handle->file, &bag_table[(i+1)*2+1]);
@@ -1201,7 +1201,7 @@ sfload_shdrs (IpatchSF2Reader *reader, GError **err)
   guint samchunk_pos, samchunk_size, sam24chunk_pos;
   guint openlink_count = 0;
   char *filename;
-  int i, count;
+  guint32 i, count;
 
   if (!ipatch_riff_read_chunk_verify (riff, IPATCH_RIFF_CHUNK_SUB,
 				      IPATCH_SFONT_FOURCC_SHDR, err))
@@ -1384,7 +1384,7 @@ sfload_shdrs (IpatchSF2Reader *reader, GError **err)
   if (openlink_count > 0)	/* any unresolved linked stereo samples? */
     {
       count = reader->sample_count;
-      for (i = 0; (guint)i < reader->sample_count; i++)
+      for (i = 0; i < reader->sample_count; i++)
 	{
 	  sample = reader->sample_table[i];
 	  if ((ipatch_item_get_flags (sample) & (1 << 31)) && !ipatch_sf2_sample_peek_linked (sample))

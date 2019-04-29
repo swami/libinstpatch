@@ -779,11 +779,11 @@ ipatch_xml_to_str_recurse (GString *str, GNode *node, guint indent, guint inc)
   IpatchXmlNode *xmlnode;
   char *esc;
   GNode *n;
-  int i;
+  guint i;
 
   xmlnode = (IpatchXmlNode *)(node->data);
 
-  for (i = 0; (guint)i < indent; i++)
+  for (i = 0; i < indent; i++)
     g_string_append_c (str, ' ');
 
   g_string_append_printf (str, "<%s", xmlnode->name);
@@ -823,7 +823,7 @@ ipatch_xml_to_str_recurse (GString *str, GNode *node, guint indent, guint inc)
     for (n = node->children; n; n = n->next)
       ipatch_xml_to_str_recurse (str, n, indent + inc, inc);
 
-    for (i = 0; (guint)i < indent; i++)
+    for (i = 0; i < indent; i++)
       g_string_append_c (str, ' ');
   }
 

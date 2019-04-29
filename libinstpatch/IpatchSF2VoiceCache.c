@@ -124,11 +124,11 @@ ipatch_sf2_voice_cache_finalize (GObject *gobject)
 {
   IpatchSF2VoiceCache *cache = IPATCH_SF2_VOICE_CACHE (gobject);
   IpatchSF2Voice *voice;
-  int i;
+  guint i;
 
   g_free (cache->sel_info);
 
-  for (i = 0; (guint)i < cache->voices->len; i++)
+  for (i = 0; i < cache->voices->len; i++)
     {
       voice = &g_array_index (cache->voices, IpatchSF2Voice, i);
 

@@ -878,7 +878,7 @@ sfont_write_samples24 (IpatchSF2Writer *writer, GError **err)
   guint8 zerobuf[46 * 2]; /* 46 zero values to write at end of each sample */
   guint samsize, size, start, ofs, total_size, totalofs = 0;
   guint index = 0;
-  int i;
+  guint i;
 
   memset (&zerobuf, 0, sizeof (zerobuf));
 
@@ -966,11 +966,11 @@ sfont_write_samples24 (IpatchSF2Writer *writer, GError **err)
             goto error_close_handle;
 
 	  /* copy the LS bytes of the 24 bit samples */
-	  for (i = 0; (guint)i < size; i++)
+	  for (i = 0; i < size; i++)
 	    ((guint8 *)lsbuf)[i] = ((guint8 *)buf)[i * 4];
 
 	  /* compact the 16 bit portion of the 24 bit samples */
-	  for (i = 0; (guint)i < size; i++)
+	  for (i = 0; i < size; i++)
 	    {
 	      ((guint8 *)buf)[i * 2] = ((guint8 *)buf)[i * 4 + 1];
 	      ((guint8 *)buf)[i * 2 + 1] = ((guint8 *)buf)[i * 4 + 2];	      

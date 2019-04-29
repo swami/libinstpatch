@@ -570,7 +570,7 @@ ipatch_sf2_base_find_unused_locale (IpatchBase *base, int *bank,
   GSList *locale_list = NULL;
   IpatchSF2Preset *pset;
   GSList *p;
-  int b, n;			/* Stores current bank and program number */
+  guint b, n;			/* Stores current bank and program number */
   guint lbank, lprogram;
 
   if (percussion) *bank = 128;
@@ -606,8 +606,8 @@ ipatch_sf2_base_find_unused_locale (IpatchBase *base, int *bank,
       lbank = lprogram >> 16;
       lprogram &= 0xFFFF;
 
-      if (lbank > (guint)b || (lbank == b && lprogram > (guint)n)) break;
-      if (lbank >= (guint)b)
+      if (lbank > b || (lbank == b && lprogram > n)) break;
+      if (lbank >= b)
 	{
 	  if (++n > 127)
 	    {
@@ -780,12 +780,12 @@ ipatch_sf2_real_set_info (IpatchSF2 *sf, IpatchSF2InfoType id,
 			  const char *val)
 {
   char *newval = NULL;
-  int maxlen;
+  guint maxlen;
 
   maxlen = ipatch_sf2_get_info_max_size (id);
 
   /* value exceeds max length? */
-  if (maxlen > 0 && val && (int)strlen (val) > maxlen - 1)
+  if (maxlen > 0 && val && strlen (val) > maxlen - 1)
     {
       g_warning ("IpatchSF2Info string with id '%.4s' truncated",
 		 (char *)&id);

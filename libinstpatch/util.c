@@ -145,11 +145,11 @@ ipatch_util_value_array_hash (GValueArray *valarray)
 {
   GValue *value;
   guint hashval = 0;
-  int i;
+  guint i;
 
   if (!valarray) return (0);
 
-  for (i = 0; (guint)i < valarray->n_values; i++)
+  for (i = 0; i < valarray->n_values; i++)
     {
       value = g_value_array_get_nth (valarray, i);
       hashval += ipatch_util_value_hash (value);

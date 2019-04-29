@@ -632,9 +632,9 @@ ipatch_compact_sample_store_swap (GError **err)
   int newfd;
   GArray *position_array;
   GSList *p;
-  guint size, ofs, this_size;
-  int retval;
-  int i;
+  guint size, ofs;
+  int retval, this_size;
+  guint i;
 
   g_return_val_if_fail (!err || !*err, FALSE);
 
@@ -696,7 +696,7 @@ ipatch_compact_sample_store_swap (GError **err)
                      _("Error reading from sample store swap file: %s"), g_strerror (errno));
         goto error;
       }
-      else if ((guint)retval < this_size)
+      else if (retval < this_size)
       {
         g_set_error (err, IPATCH_ERROR, IPATCH_ERROR_IO,
                      _("Short read from sample store swap file, expected %d but got %d"),
@@ -712,7 +712,7 @@ ipatch_compact_sample_store_swap (GError **err)
                      _("Error writing to new sample store swap file: %s"), g_strerror (errno));
         goto error;
       }
-      else if ((guint)retval < this_size)
+      else if (retval < this_size)
       {
         g_set_error (err, IPATCH_ERROR, IPATCH_ERROR_IO,
                      _("Short write to new sample store swap file, expected %d but got %d"),
@@ -745,7 +745,7 @@ ipatch_compact_sample_store_swap (GError **err)
   }
 
   // Fixup locations
-  for (i = 0, p = swap_list; (guint)i < position_array->len; i++, p = p->next)
+  for (i = 0, p = swap_list; i < position_array->len; i++, p = p->next)
   {
     store = (IpatchSampleStoreSwap *)(p->data);
     store->location = g_array_index (position_array, guint, i);

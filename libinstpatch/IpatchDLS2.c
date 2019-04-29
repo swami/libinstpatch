@@ -433,7 +433,7 @@ ipatch_dls2_base_find_unused_locale (IpatchBase *base, int *bank,
   GSList *locale_list = NULL;
   IpatchDLS2Inst *inst;
   GSList *p;
-  int b, n;			/* Stores current bank and preset number */
+  guint32 b, n;			/* Stores current bank and preset number */
   guint32 lbank, lprogram;
 
   /* fill array with bank and preset numbers */
@@ -459,8 +459,8 @@ ipatch_dls2_base_find_unused_locale (IpatchBase *base, int *bank,
 
   locale_list = g_slist_sort (locale_list, (GCompareFunc)locale_gcompare_func);
 
-  b = *bank;
-  n = *program;
+  b = (guint32)*bank;
+  n = (guint32)*program;
 
   /* loop through sorted list of bank:programs */
   p = locale_list;
@@ -470,7 +470,7 @@ ipatch_dls2_base_find_unused_locale (IpatchBase *base, int *bank,
       lbank = lprogram >> 16;
       lprogram &= 0xFFFF;
 
-      if (lbank > (guint32)b || (lbank == b && lprogram > (guint32)n)) break;
+      if (lbank > b || (lbank == b && lprogram > n)) break;
       if (lbank >= (guint32)b)
 	{
 	  if (++n > 127)
