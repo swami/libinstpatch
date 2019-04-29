@@ -122,7 +122,7 @@ _dls2_inst_to_sf2_voice_cache_convert (IpatchConverter *converter, GError **err)
           voice->loop_start = sample_info->loop_start;
           voice->loop_end = sample_info->loop_end;
           voice->root_note = sample_info->root_note;
-          voice->fine_tune = sample_info->fine_tune;
+          voice->fine_tune = (guint8)sample_info->fine_tune;
   
           switch (sample_info->options & IPATCH_DLS2_SAMPLE_LOOP_MASK)
             {
@@ -203,7 +203,7 @@ _dls2_sample_to_sf2_voice_cache_convert (IpatchConverter *converter,
       voice->loop_start = sample->sample_info->loop_start;
       voice->loop_end = sample->sample_info->loop_end;
       voice->root_note = sample->sample_info->root_note;
-      voice->fine_tune = sample->sample_info->fine_tune;
+      voice->fine_tune = (guint8)sample->sample_info->fine_tune;
 
       switch (sample->sample_info->options & IPATCH_DLS2_SAMPLE_LOOP_MASK)
         {

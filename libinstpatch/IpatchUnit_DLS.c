@@ -235,7 +235,7 @@ ipatch_unit_dls_percent_to_percent (int dls_percent)
 int
 ipatch_unit_percent_to_dls_percent (double percent)
 {
-  return (percent * 655360.0 + 0.5);	/* +0.5 for rounding */
+  return (int)(percent * 655360.0 + 0.5);	/* +0.5 for rounding */
 }
 
 /**
@@ -267,7 +267,7 @@ ipatch_unit_dls_gain_to_decibels (int dls_gain)
 int
 ipatch_unit_decibels_to_dls_gain (double db)
 {
-  return (db * 655360.0 + 0.5);
+  return (int)(db * 655360.0 + 0.5);
 }
 
 /**
@@ -304,7 +304,7 @@ ipatch_unit_seconds_to_dls_abs_time (double seconds)
 {
   if (seconds == 0.0) return (IPATCH_UNIT_DLS_ABS_TIME_0SECS);
 
-  return ((double)1200.0 * (log (seconds) / log (2.0)) * 65536.0 + 0.5);
+  return (gint32)((double)1200.0 * (log (seconds) / log (2.0)) * 65536.0 + 0.5);
 }
 
 /**
@@ -334,7 +334,7 @@ ipatch_unit_dls_rel_time_to_time_cents (int dls_rel_time)
 int
 ipatch_unit_time_cents_to_dls_rel_time (double time_cents)
 {
-  return (time_cents * 65536.0 + 0.5);
+  return (int)(time_cents * 65536.0 + 0.5);
 }
 
 /**
@@ -364,7 +364,7 @@ ipatch_unit_dls_abs_pitch_to_hertz (int dls_abs_pitch)
 int
 ipatch_unit_hertz_to_dls_abs_pitch (double hertz)
 {
-  return (((double)1200.0 * (log (hertz / 440.0) / log (2)) + 6900.0) * 65536.0 + 0.5);
+  return (int)(((double)1200.0 * (log (hertz / 440.0) / log (2)) + 6900.0) * 65536.0 + 0.5);
 }
 
 /**
@@ -394,7 +394,7 @@ ipatch_unit_dls_rel_pitch_to_cents (int dls_rel_pitch)
 int
 ipatch_unit_cents_to_dls_rel_pitch (double cents)
 {
-  return (cents * 65536.0 + 0.5);
+  return (int)(cents * 65536.0 + 0.5);
 }
 
 
@@ -416,7 +416,7 @@ ipatch_unit_percent_to_dls_percent_value (const GValue *src_val,
 					  GValue *dest_val)
 {
   double percent = g_value_get_double (src_val);
-  g_value_set_int (dest_val, percent * 655360.0 + 0.5);
+  g_value_set_int (dest_val, (gint)(percent * 655360.0 + 0.5));
 }
 
 static void
@@ -430,7 +430,7 @@ static void
 ipatch_unit_decibels_to_dls_gain_value (const GValue *src_val, GValue *dest_val)
 {
   double db = g_value_get_double (src_val);
-  g_value_set_int (dest_val, db * 655360.0 + 0.5);
+  g_value_set_int (dest_val, (gint)(db * 655360.0 + 0.5));
 }
 
 static void
@@ -455,7 +455,7 @@ ipatch_unit_seconds_to_dls_abs_time_value (const GValue *src_val,
   int dls_abs_time;
 
   if (secs != 0.0)
-    dls_abs_time = (double)1200.0 * (log (secs) / log (2.0)) * 65536.0 + 0.5;
+    dls_abs_time = (int)((double)1200.0 * (log (secs) / log (2.0)) * 65536.0 + 0.5);
   else dls_abs_time = IPATCH_UNIT_DLS_ABS_TIME_0SECS;
 
   g_value_set_int (dest_val, dls_abs_time);
@@ -474,7 +474,7 @@ ipatch_unit_time_cents_to_dls_rel_time_value (const GValue *src_val,
 					      GValue *dest_val)
 {
   double time_cents = g_value_get_double (src_val);
-  g_value_set_int (dest_val, time_cents * 65536.0 + 0.5);
+  g_value_set_int (dest_val, (gint)(time_cents * 65536.0 + 0.5));
 }
 
 static void
@@ -491,8 +491,8 @@ ipatch_unit_hertz_to_dls_abs_pitch_value (const GValue *src_val,
 					  GValue *dest_val)
 {
   double hertz = g_value_get_double (src_val);
-  g_value_set_int (dest_val, ((double)1200.0 * (log (hertz / 440.0) / log (2))
-			      + 6900.0) * 65536.0 + 0.5);
+  g_value_set_int (dest_val, (gint)(((double)1200.0 * (log (hertz / 440.0) / log (2))
+			      + 6900.0) * 65536.0 + 0.5));
 }
 
 static void
@@ -508,5 +508,5 @@ ipatch_unit_cents_to_dls_rel_pitch_value (const GValue *src_val,
 					  GValue *dest_val)
 {
   double cents = g_value_get_double (src_val);
-  g_value_set_int (dest_val, cents * 65536.0 + 0.5);
+  g_value_set_int (dest_val, (gint)(cents * 65536.0 + 0.5));
 }
