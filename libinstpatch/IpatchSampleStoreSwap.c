@@ -45,6 +45,10 @@
 
 #ifdef _WIN32
 #include <io.h>
+#define lseek _lseek
+#define read _read
+#define write _write
+#define close _close
 #else
 #include <unistd.h>
 #endif
