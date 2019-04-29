@@ -966,11 +966,11 @@ sfont_write_samples24 (IpatchSF2Writer *writer, GError **err)
             goto error_close_handle;
 
 	  /* copy the LS bytes of the 24 bit samples */
-	  for (i = 0; i < size; i++)
+	  for (i = 0; (guint)i < size; i++)
 	    ((guint8 *)lsbuf)[i] = ((guint8 *)buf)[i * 4];
 
 	  /* compact the 16 bit portion of the 24 bit samples */
-	  for (i = 0; i < size; i++)
+	  for (i = 0; (guint)i < size; i++)
 	    {
 	      ((guint8 *)buf)[i * 2] = ((guint8 *)buf)[i * 4 + 1];
 	      ((guint8 *)buf)[i * 2 + 1] = ((guint8 *)buf)[i * 4 + 2];	      

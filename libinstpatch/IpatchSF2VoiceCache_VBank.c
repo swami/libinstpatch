@@ -137,7 +137,7 @@ _vbank_inst_to_sf2_voice_cache_convert (IpatchConverter *converter,
     note_high = region->note_range.high;
 
     /* loop over voices in item's voice cache */
-    for (voicendx = 0; voicendx < item_vcache->voices->len; voicendx++)
+    for (voicendx = 0; (guint)voicendx < item_vcache->voices->len; voicendx++)
     {
       item_voice = IPATCH_SF2_VOICE_CACHE_GET_VOICE (item_vcache, voicendx);
 

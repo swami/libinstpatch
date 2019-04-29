@@ -282,7 +282,7 @@ ipatch_snd_file_sample_format_to_sub_format (int sample_format, int file_format)
 
     if (!formats) return (-1);  /* Invalid file_format value */
 
-    for (i = 0; i < size; i++)
+    for (i = 0; (guint)i < size; i++)
       if (formats[i] == sub_format)
         break;
 
