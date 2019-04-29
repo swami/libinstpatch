@@ -182,7 +182,7 @@ void
 ipatch_xml_set_data (GNode *node, const char *key, gpointer data)
 {
   g_return_if_fail (node != NULL);
-  return (g_datalist_set_data (QDATA (node), key, data));
+  g_datalist_set_data (QDATA (node), key, data);
 }
 
 /**
@@ -200,7 +200,7 @@ ipatch_xml_set_data_full (GNode *node, const char *key, gpointer data,
                           GDestroyNotify destroy_func)
 {
   g_return_if_fail (node != NULL);
-  return (g_datalist_set_data_full (QDATA (node), key, data, destroy_func));
+  g_datalist_set_data_full (QDATA (node), key, data, destroy_func);
 }
 
 /**
@@ -261,7 +261,7 @@ void
 ipatch_xml_set_qdata (GNode *node, GQuark quark, gpointer data)
 {
   g_return_if_fail (node != NULL);
-  return (g_datalist_id_set_data (QDATA (node), quark, data));
+  g_datalist_id_set_data (QDATA (node), quark, data);
 }
 
 /**
@@ -281,7 +281,7 @@ ipatch_xml_set_qdata_full (GNode *node, GQuark quark, gpointer data,
                            GDestroyNotify destroy_func)
 {
   g_return_if_fail (node != NULL);
-  return (g_datalist_id_set_data_full (QDATA (node), quark, data, destroy_func));
+  g_datalist_id_set_data_full (QDATA (node), quark, data, destroy_func);
 }
 
 /**
@@ -783,7 +783,7 @@ ipatch_xml_to_str_recurse (GString *str, GNode *node, guint indent, guint inc)
 
   xmlnode = (IpatchXmlNode *)(node->data);
 
-  for (i = 0; i < indent; i++)
+  for (i = 0; (guint)i < indent; i++)
     g_string_append_c (str, ' ');
 
   g_string_append_printf (str, "<%s", xmlnode->name);
@@ -823,7 +823,7 @@ ipatch_xml_to_str_recurse (GString *str, GNode *node, guint indent, guint inc)
     for (n = node->children; n; n = n->next)
       ipatch_xml_to_str_recurse (str, n, indent + inc, inc);
 
-    for (i = 0; i < indent; i++)
+    for (i = 0; (guint)i < indent; i++)
       g_string_append_c (str, ' ');
   }
 
