@@ -171,12 +171,12 @@ ipatch_util_value_array_hash (GValueArray *valarray)
 guint64
 ipatch_util_file_size (const char *fname, GError **err)
 {
-  struct stat st;
+  GStatBuf st;
 
   g_return_val_if_fail (fname != NULL, 0);
   g_return_val_if_fail (!err || !*err, 0);
 
-  if (g_stat (fname, (GStatBuf *)&st) != 0)
+  if (g_stat (fname, &st) != 0)
     {
       g_set_error (err, IPATCH_ERROR, IPATCH_ERROR_IO,
 		   _("Error stating file '%s': %s"), fname, g_strerror (errno));
