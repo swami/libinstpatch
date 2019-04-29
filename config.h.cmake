@@ -7,6 +7,9 @@
 /* Define to 1 if you have the <fcntl.h> header file. */
 #cmakedefine HAVE_FCNTL_H @HAVE_FCNTL_H@
 
+/* Define to 1 if you have the <io.h> header file. */
+#cmakedefine HAVE_IO_H @HAVE_IO_H@
+
 /* Define to 1 if you have the <math.h> header file. */
 #cmakedefine HAVE_MATH_H @HAVE_MATH_H@
 

@@ -43,16 +43,6 @@
  * can be compacted with ipatch_sample_store_swap_compact().
  */
 
-#ifdef _WIN32
-#include <io.h>
-#define lseek _lseek
-#define read _read
-#define write _write
-#define close _close
-#else
-#include <unistd.h>
-#endif
-
 #include <fcntl.h>
 #include <errno.h>
 #include <string.h>
@@ -385,7 +375,7 @@ ipatch_sample_store_swap_sample_iface_read (IpatchSampleHandle *handle,
 
   G_LOCK (swap);        // ++ lock swap
 
-  if (lseek (swap_fd, store->location + offset * frame_size, SEEK_SET) == -1)
+  if (_lseek (swap_fd, store->location + offset * frame_size, SEEK_SET) == -1)
   {
     G_UNLOCK (swap);    // -- unlock swap
     g_set_error (err, G_FILE_ERROR, g_file_error_from_errno (errno),
@@ -393,7 +383,7 @@ ipatch_sample_store_swap_sample_iface_read (IpatchSampleHandle *handle,
     return (FALSE);
   }
 
-  retval = read (swap_fd, buf, frames * frame_size);
+  retval = IPATCH_FD_READ (swap_fd, buf, frames * frame_size);
 
   if (retval == -1)
     g_set_error (err, G_FILE_ERROR, g_file_error_from_errno (errno),
@@ -426,7 +416,7 @@ ipatch_sample_store_swap_sample_iface_write (IpatchSampleHandle *handle,
 
   G_LOCK (swap);        // ++ lock swap
 
-  if (lseek (swap_fd, store->location + offset * frame_size, SEEK_SET) == -1)
+  if (IPATCH_FD_LSEEK (swap_fd, store->location + offset * frame_size, SEEK_SET) == -1)
   {
     G_UNLOCK (swap);    // -- unlock swap
     g_set_error (err, G_FILE_ERROR, g_file_error_from_errno (errno),
@@ -434,7 +424,7 @@ ipatch_sample_store_swap_sample_iface_write (IpatchSampleHandle *handle,
     return (FALSE);
   }
 
-  retval = write (swap_fd, buf, frames * frame_size);
+  retval = IPATCH_FD_WRITE (swap_fd, buf, frames * frame_size);
 
   if (retval == -1)
     g_set_error (err, G_FILE_ERROR, g_file_error_from_errno (errno),
@@ -549,7 +539,7 @@ ipatch_sample_store_swap_close (void)
 
   if (swap_fd != -1)
   {
-    close (swap_fd);
+    IPATCH_FD_CLOSE (swap_fd);
     swap_fd = -1;
 
     // Just blindly delete the swap file
@@ -679,7 +669,7 @@ ipatch_compact_sample_store_swap (GError **err)
 
       swap_position += this_size;
 
-      if (lseek (swap_fd, store->location + ofs, SEEK_SET) == -1)
+      if (IPATCH_FD_LSEEK (swap_fd, store->location + ofs, SEEK_SET) == -1)
       {
         g_set_error (err, G_FILE_ERROR, g_file_error_from_errno (errno),
                      _("Error seeking in sample store swap file: %s"), g_strerror (errno));
@@ -688,7 +678,7 @@ ipatch_compact_sample_store_swap (GError **err)
 
       ofs += this_size;
 
-      retval = read (swap_fd, buf, this_size);
+      retval = IPATCH_FD_READ (swap_fd, buf, this_size);
 
       if (retval == -1)
       {
@@ -704,7 +694,7 @@ ipatch_compact_sample_store_swap (GError **err)
         goto error;
       }
 
-      retval = write (newfd, buf, this_size);
+      retval = IPATCH_FD_WRITE (newfd, buf, this_size);
 
       if (retval == -1)
       {
@@ -730,7 +720,7 @@ ipatch_compact_sample_store_swap (GError **err)
 
   g_atomic_int_set (&swap_unused_size, 0);      // Set unused size back to 0
 
-  close (swap_fd);
+  IPATCH_FD_CLOSE (swap_fd);
   g_unlink (swap_file_name);    // unlink old file
   swap_fd = newfd;
 
@@ -761,7 +751,7 @@ ipatch_compact_sample_store_swap (GError **err)
 
 error:
   G_UNLOCK (swap);      // -- unlock swap
-  close (newfd);        // -- close new swap file
+  IPATCH_FD_CLOSE (newfd);        // -- close new swap file
   g_unlink (newname);   // -- unlink new swap file
   g_free (newname);     // -- free newname
   g_free (buf);         // -- free buffer

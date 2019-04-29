@@ -29,6 +29,22 @@
 #include "misc.h"
 #include "i18n.h"
 
+#if HAVE_IO_H
+#include <io.h> // _lseek(), _close(), _read(), _write() on windows
+#define IPATCH_FD_LSEEK(fd, offset,origin) _lseek(fd, offset, origin)
+#define IPATCH_FD_READ(fd, bufdst, count)  _read(fd, bufdst, count)
+#define IPATCH_FD_WRITE(fd, bufsrc, count) _write(fd, bufsrc, count)
+#define IPATCH_FD_CLOSE(fd) _close(fd)
+#endif
+
+#if HAVE_UNISTD_H
+#include <unistd.h>
+#define IPATCH_FD_LSEEK(fd, offset,origin) lseek(fd, offset, origin)
+#define IPATCH_FD_READ(fd, bufdst, count)  read(fd, bufdst, count)
+#define IPATCH_FD_WRITE(fd, bufsrc, count) write(fd, bufsrc, count)
+#define IPATCH_FD_CLOSE(fd) close(fd)
+#endif
+
 #define IPATCH_UNTITLED		_("Untitled")
 
 /* macro for getting a GParamSpec property ID (FIXME - its a private field!) */
