@@ -526,7 +526,7 @@ ipatch_file_buf_seek (IpatchFileHandle *handle, int offset, GSeekType type)
   }
   else if (type == G_SEEK_SET)
   {
-    g_return_if_fail (offset >= 0 && offset < handle->buf->len);
+    g_return_if_fail (offset >= 0 && (guint)offset < handle->buf->len);
     handle->position += offset - handle->buf_position;
     handle->buf_position = offset;
   }

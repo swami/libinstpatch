@@ -200,7 +200,7 @@ ipatch_sample_store_split24_sample_iface_read (IpatchSampleHandle *handle,
 
     if (lilendian)
     {
-      for (i = 0; i < thissize; i++)
+      for (i = 0; (guint)i < thissize; i++)
       {
         i8p[i * 4 + 1] = readbuf[i * 2];
         i8p[i * 4 + 2] = readbuf[i * 2 + 1];
@@ -209,7 +209,7 @@ ipatch_sample_store_split24_sample_iface_read (IpatchSampleHandle *handle,
     }
     else
     {
-      for (i = 0; i < thissize; i++)
+      for (i = 0; (guint)i < thissize; i++)
       {
         i8p[i * 4 + 2] = readbuf[i * 2];
         i8p[i * 4 + 1] = readbuf[i * 2 + 1];
@@ -241,12 +241,12 @@ ipatch_sample_store_split24_sample_iface_read (IpatchSampleHandle *handle,
 
     if (lilendian)
     {
-      for (i = 0; i < thissize; i++)
+      for (i = 0; (guint)i < thissize; i++)
         i8p[i * 4] = readbuf[i];
     }
     else
     {
-      for (i = 0; i < thissize; i++)
+      for (i = 0; (guint)i < thissize; i++)
         i8p[i * 4 + 3] = readbuf[i];
     }
 

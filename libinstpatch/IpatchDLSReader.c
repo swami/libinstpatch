@@ -368,7 +368,7 @@ ipatch_dls_reader_fixup (IpatchDLSReader *reader, GError **err)
 
   /* create pool table index -> sample hash */
   i = 0;
-  while (i < reader->pool_table_size)
+  while ((guint)i < reader->pool_table_size)
     {
       sample = g_hash_table_lookup (reader->wave_hash,
 				    GINT_TO_POINTER (reader->pool_table[i]));
@@ -1404,10 +1404,10 @@ ipatch_dls_load_region_header (IpatchRiff *riff,
 
   if (!ipatch_file_buf_load (riff->handle, chunk->size, err)) return (FALSE);
 
-  region->note_range_low = ipatch_file_buf_read_u16 (riff->handle);
-  region->note_range_high = ipatch_file_buf_read_u16 (riff->handle);
-  region->velocity_range_low = ipatch_file_buf_read_u16 (riff->handle);
-  region->velocity_range_high = ipatch_file_buf_read_u16 (riff->handle);
+  region->note_range_low = (guint8)ipatch_file_buf_read_u16 (riff->handle);
+  region->note_range_high = (guint8)ipatch_file_buf_read_u16 (riff->handle);
+  region->velocity_range_low = (guint8)ipatch_file_buf_read_u16 (riff->handle);
+  region->velocity_range_high = (guint8)ipatch_file_buf_read_u16 (riff->handle);
 
   /* ISOK? Undefined flags are discarded! */
   options = ipatch_file_buf_read_u16 (riff->handle);
@@ -1455,10 +1455,10 @@ ipatch_gig_load_region_header (IpatchRiff *riff,
 
   if (!ipatch_file_buf_load (riff->handle, chunk->size, err)) return (FALSE);
 
-  region->note_range_low = ipatch_file_buf_read_u16 (riff->handle);
-  region->note_range_high = ipatch_file_buf_read_u16 (riff->handle);
-  region->velocity_range_low = ipatch_file_buf_read_u16 (riff->handle);
-  region->velocity_range_high = ipatch_file_buf_read_u16 (riff->handle);
+  region->note_range_low = (guint8)ipatch_file_buf_read_u16 (riff->handle);
+  region->note_range_high = (guint8)ipatch_file_buf_read_u16 (riff->handle);
+  region->velocity_range_low = (guint8)ipatch_file_buf_read_u16 (riff->handle);
+  region->velocity_range_high = (guint8)ipatch_file_buf_read_u16 (riff->handle);
 
   /* ISOK? Undefined flags are discarded! */
   options = ipatch_file_buf_read_u16 (riff->handle);

@@ -626,7 +626,7 @@ ipatch_iter_array_next (IpatchIter *iter)
   pos = IPATCH_ITER_ARRAY_GET_POS (iter);
   size = IPATCH_ITER_ARRAY_GET_SIZE (iter);
 
-  if (pos >= 0 && (pos + 1) < size) pos++;
+  if (pos >= 0 && (guint)(pos + 1) < size) pos++;
   else pos = -1;
 
   IPATCH_ITER_ARRAY_SET_POS (iter, pos); /* update position */
@@ -716,7 +716,7 @@ ipatch_iter_array_index (IpatchIter *iter, int index)
   g_return_val_if_fail (array != NULL, NULL);
 
   size = IPATCH_ITER_ARRAY_GET_SIZE (iter);
-  if (index < 0 || index >= size) index = -1;
+  if (index < 0 || (guint)index >= size) index = -1;
 
   IPATCH_ITER_ARRAY_SET_POS (iter, index);
 

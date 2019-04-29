@@ -478,7 +478,7 @@ ipatch_item_set_parent (IpatchItem *item, IpatchItem *parent)
       /* lock it the number of times old mutex was locked, we don't use
 	 g_static_rec_mutex_lock_full because it could set depth rather than
 	 add to it */
-      for (i = 0; i < depth; i++)
+      for (i = 0; (guint)i < depth; i++)
 	g_static_rec_mutex_lock (item->mutex);
     }
 

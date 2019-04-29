@@ -128,7 +128,7 @@ ipatch_sf2_voice_cache_finalize (GObject *gobject)
 
   g_free (cache->sel_info);
 
-  for (i = 0; i < cache->voices->len; i++)
+  for (i = 0; (guint)i < cache->voices->len; i++)
     {
       voice = &g_array_index (cache->voices, IpatchSF2Voice, i);
 
@@ -305,7 +305,7 @@ ipatch_sf2_voice_cache_set_voice_range (IpatchSF2VoiceCache *cache,
 
   g_return_if_fail (IPATCH_IS_SF2_VOICE_CACHE (cache));
   g_return_if_fail (voice != NULL);
-  g_return_if_fail (sel_index < cache->sel_count);
+  g_return_if_fail (sel_index < (guint)cache->sel_count);
   g_return_if_fail (low <= high);
 
   rangep = (int *)(cache->ranges->data);

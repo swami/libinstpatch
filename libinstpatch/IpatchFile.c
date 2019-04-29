@@ -1891,7 +1891,7 @@ ipatch_file_default_get_size_method (IpatchFile *file, GError **err)
 
   if (file->file_name)
   {
-    if (g_stat (file->file_name, &info) != 0)
+    if (g_stat (file->file_name, (GStatBuf *)&info) != 0)
     {
       g_set_error (err, IPATCH_ERROR, IPATCH_ERROR_IO,
                    _("Error during call to stat(\"%s\"): %s"),

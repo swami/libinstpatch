@@ -219,7 +219,7 @@ ipatch_riff_get_chunk (IpatchRiff *riff, int level)
   ipatch_riff_update_positions (riff);
 
   if (level == -1) level = riff->chunks->len - 1;
-  g_return_val_if_fail (level >= -1 && level < riff->chunks->len, NULL);
+  g_return_val_if_fail (level >= -1 && (guint)level < riff->chunks->len, NULL);
 
   return (&g_array_index (riff->chunks, IpatchRiffChunk, level));
 }
@@ -480,7 +480,7 @@ ipatch_riff_read_chunk (IpatchRiff *riff, GError **err)
 
       /* current chunk is sub chunk, or pos past end? */
       if (chunk->type == IPATCH_RIFF_CHUNK_SUB
-	  || chunk->position >= chunk->size)
+	  || (guint32)chunk->position >= chunk->size)
 	{
 	  riff->status = IPATCH_RIFF_STATUS_CHUNK_END;
 	  return (NULL);
@@ -812,7 +812,7 @@ ipatch_riff_close_chunk (IpatchRiff *riff, int level, GError **err)
   g_return_val_if_fail (!err || !*err, FALSE);
 
   if (level == -1) level = riff->chunks->len - 1;
-  g_return_val_if_fail (level >= -1 && level < riff->chunks->len, FALSE);
+  g_return_val_if_fail (level >= -1 && (guint)level < riff->chunks->len, FALSE);
 
   /* Update the chunk positions */
   ipatch_riff_update_positions (riff);
@@ -986,7 +986,7 @@ ipatch_riff_message_detail (IpatchRiff *riff, int level,
 
   /* level will be -1 if already -1 and no chunks */
   if (level == -1) level = riff->chunks->len - 1;
-  g_return_val_if_fail (level >= -1 && level < riff->chunks->len, NULL);
+  g_return_val_if_fail (level >= -1 && (guint)level < riff->chunks->len, NULL);
 
   va_start (args, format);
   msg = g_strdup_vprintf (format, args);

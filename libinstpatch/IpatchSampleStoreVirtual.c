@@ -105,7 +105,7 @@ ipatch_sample_store_virtual_set_property (GObject *object, guint property_id,
 
       for (chan = 0; chan < 2; chan++)
       {
-        if (array && chan < array->n_values)
+        if (array && (guint)chan < array->n_values)
           list = g_value_dup_boxed (g_value_array_get_nth (array, chan));
         else list = NULL;
 
@@ -228,7 +228,7 @@ ipatch_sample_store_virtual_sample_iface_read (IpatchSampleHandle *handle,
 
   while (frames > 0)
   {
-    if (block > frames) block = frames;
+    if ((guint)block > frames) block = frames;
 
     if (!ipatch_sample_list_render (store->lists[0], interbuf, offset, block, format, err))
       return (FALSE);

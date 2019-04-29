@@ -243,7 +243,7 @@ ipatch_sample_store_swap_sample_iface_open (IpatchSampleHandle *handle,
     // Check if allocating sample in RAM would exceed max allowed
     if (new_ram_used > g_atomic_int_get (&swap_ram_max))
     { // RAM swap is maxed out - correct swap_ram_used
-      g_atomic_int_add (&swap_ram_used, -sample_size);
+      g_atomic_int_add (&swap_ram_used, -(gint)sample_size);
 
       if (swap_fd == -1)   /* Swap file not yet created? */
         ipatch_sample_store_swap_open_file ();
@@ -267,7 +267,7 @@ ipatch_sample_store_swap_sample_iface_open (IpatchSampleHandle *handle,
 
           recover->size -= sample_size;
           recover->location += sample_size;
-          g_atomic_int_add (&swap_unused_size, -sample_size);
+          g_atomic_int_add (&swap_unused_size, -(gint)sample_size);
 
           // Remove the node from the size recover list
           if (prevprev) prevprev->next = prev->next;
@@ -462,7 +462,7 @@ ipatch_sample_store_swap_finalize (GObject *gobject)
 
   if (store->ram_location)                      // Allocated in RAM?
   {
-    g_atomic_int_add (&swap_ram_used, -size);   // Subtract size from RAM usage
+    g_atomic_int_add (&swap_ram_used, -(gint)size);   // Subtract size from RAM usage
     g_free (store->ram_location);               // -- free allocated RAM
   }
   else
@@ -692,7 +692,7 @@ ipatch_compact_sample_store_swap (GError **err)
                      _("Error reading from sample store swap file: %s"), g_strerror (errno));
         goto error;
       }
-      else if (retval < this_size)
+      else if ((guint)retval < this_size)
       {
         g_set_error (err, IPATCH_ERROR, IPATCH_ERROR_IO,
                      _("Short read from sample store swap file, expected %d but got %d"),
@@ -708,7 +708,7 @@ ipatch_compact_sample_store_swap (GError **err)
                      _("Error writing to new sample store swap file: %s"), g_strerror (errno));
         goto error;
       }
-      else if (retval < this_size)
+      else if ((guint)retval < this_size)
       {
         g_set_error (err, IPATCH_ERROR, IPATCH_ERROR_IO,
                      _("Short write to new sample store swap file, expected %d but got %d"),
@@ -741,7 +741,7 @@ ipatch_compact_sample_store_swap (GError **err)
   }
 
   // Fixup locations
-  for (i = 0, p = swap_list; i < position_array->len; i++, p = p->next)
+  for (i = 0, p = swap_list; (guint)i < position_array->len; i++, p = p->next)
   {
     store = (IpatchSampleStoreSwap *)(p->data);
     store->location = g_array_index (position_array, guint, i);

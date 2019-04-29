@@ -470,8 +470,8 @@ ipatch_dls2_base_find_unused_locale (IpatchBase *base, int *bank,
       lbank = lprogram >> 16;
       lprogram &= 0xFFFF;
 
-      if (lbank > b || (lbank == b && lprogram > n)) break;
-      if (lbank >= b)
+      if (lbank > (guint32)b || (lbank == b && lprogram > (guint32)n)) break;
+      if (lbank >= (guint32)b)
 	{
 	  if (++n > 127)
 	    {

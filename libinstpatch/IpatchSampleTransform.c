@@ -532,7 +532,7 @@ ipatch_sample_transform_convert (IpatchSampleTransform *transform,
 
   while (frames > 0)
   {
-    if (block_size > frames) block_size = frames;
+    if ((guint)block_size > frames) block_size = frames;
 
     transform->frames = block_size;
     transform->samples = block_size * srcchan;

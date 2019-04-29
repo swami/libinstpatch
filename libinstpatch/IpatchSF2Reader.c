@@ -506,7 +506,7 @@ sfload_infos (IpatchSF2Reader *reader, GError **err)
 		{
 		  maxsize = ipatch_sf2_get_info_max_size (chunk->id);
 
-		  if (chunk->size > maxsize)
+		  if (chunk->size > (guint32)maxsize)
 		    {
 		      g_warning (_("Invalid size %d for INFO chunk \"%.4s\""),
 				 chunk->size, chunk->idstr);
@@ -657,7 +657,7 @@ sfload_pbags (IpatchSF2Reader *reader, GError **err)
   pgenndx = IPATCH_FILE_SWAP16 (riff->handle->file, &bag_table[0]);
   pmodndx = IPATCH_FILE_SWAP16 (riff->handle->file, &bag_table[1]);
 
-  for (i=0; i < reader->pbag_count; i++)
+  for (i=0; (guint)i < reader->pbag_count; i++)
     {
       genndx = IPATCH_FILE_SWAP16 (riff->handle->file, &bag_table[(i+1)*2]);
       modndx = IPATCH_FILE_SWAP16 (riff->handle->file, &bag_table[(i+1)*2+1]);
@@ -983,7 +983,7 @@ sfload_ibags (IpatchSF2Reader *reader, GError **err)
   pgenndx = IPATCH_FILE_SWAP16 (riff->handle->file, &bag_table[0]);
   pmodndx = IPATCH_FILE_SWAP16 (riff->handle->file, &bag_table[1]);
 
-  for (i=0; i < reader->ibag_count; i++)
+  for (i=0; (guint)i < reader->ibag_count; i++)
     {
       genndx = IPATCH_FILE_SWAP16 (riff->handle->file, &bag_table[(i+1)*2]);
       modndx = IPATCH_FILE_SWAP16 (riff->handle->file, &bag_table[(i+1)*2+1]);
@@ -1384,7 +1384,7 @@ sfload_shdrs (IpatchSF2Reader *reader, GError **err)
   if (openlink_count > 0)	/* any unresolved linked stereo samples? */
     {
       count = reader->sample_count;
-      for (i = 0; i < reader->sample_count; i++)
+      for (i = 0; (guint)i < reader->sample_count; i++)
 	{
 	  sample = reader->sample_table[i];
 	  if ((ipatch_item_get_flags (sample) & (1 << 31)) && !ipatch_sf2_sample_peek_linked (sample))
