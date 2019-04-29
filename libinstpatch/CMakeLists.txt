@@ -241,6 +241,8 @@ add_definitions ( -DLOCALEDIR="${DATA_INSTALL_DIR}/locale" )
 set (DEFINITION_FILE "")
 # Options for WINDOWS only
 if( WIN32 )
+    # disable deprecation warnings 
+    add_definitions ( -D_CRT_SECURE_NO_WARNINGS )
     if (BUILD_SHARED_LIBS)
         # adding a module definition file for shared libs will export symbols and produce import library
         set (DEFINITION_FILE libinstpatch.def)
