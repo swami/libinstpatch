@@ -1887,7 +1887,7 @@ ipatch_file_default_getfd_method (IpatchFileHandle *handle)
 int
 ipatch_file_default_get_size_method (IpatchFile *file, GError **err)
 {
-  struct stat info;
+  GStatBuf info;
 
   if (file->file_name)
   {

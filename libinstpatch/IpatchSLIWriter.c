@@ -669,10 +669,10 @@ ipatch_sli_writer_write_zone_header (IpatchFileHandle *handle, IpatchSLIZone *zo
   ipatch_file_buf_write_u32 (handle, 0); /* unknown2 */
 
   ipatch_sf2_gen_item_get_amount (item, IPATCH_SF2_GEN_COARSE_TUNE, &amount);
-  ipatch_file_buf_write_s8 (handle, amount.sword); /* coarse_tune1 */
+  ipatch_file_buf_write_s8 (handle, (guint8)amount.sword); /* coarse_tune1 */
 
   ipatch_sf2_gen_item_get_amount (item, IPATCH_SF2_GEN_FINE_TUNE_OVERRIDE, &amount);
-  ipatch_file_buf_write_s8 (handle, amount.sword); /* fine_tune1 */
+  ipatch_file_buf_write_s8 (handle, (guint8)amount.sword); /* fine_tune1 */
 
   ipatch_sf2_gen_item_get_amount (item, IPATCH_SF2_GEN_SAMPLE_MODES, &amount);
   if (amount.uword & IPATCH_SF2_GEN_SAMPLE_MODE_LOOP)
@@ -681,17 +681,17 @@ ipatch_sli_writer_write_zone_header (IpatchFileHandle *handle, IpatchSLIZone *zo
 
   if (!ipatch_sf2_gen_item_get_amount (item, IPATCH_SF2_GEN_ROOT_NOTE_OVERRIDE, &amount))
     amount.sword = 0;
-  ipatch_file_buf_write_s8 (handle, amount.sword); /* root_note */
+  ipatch_file_buf_write_s8 (handle, (guint8)amount.sword); /* root_note */
 
   if (!ipatch_sf2_gen_item_get_amount (item, IPATCH_SF2_GEN_SCALE_TUNE, &amount))
     amount.uword = 0;
   ipatch_file_buf_write_u16 (handle, amount.uword); /* scale_tuning */
 
   ipatch_sf2_gen_item_get_amount (item, IPATCH_SF2_GEN_COARSE_TUNE, &amount);
-  ipatch_file_buf_write_s8 (handle, amount.sword); /* coarse_tune2 */
+  ipatch_file_buf_write_s8 (handle, (guint8)amount.sword); /* coarse_tune2 */
 
   ipatch_sf2_gen_item_get_amount (item, IPATCH_SF2_GEN_FINE_TUNE_OVERRIDE, &amount);
-  ipatch_file_buf_write_s8 (handle, amount.sword); /* fine_tune2 */
+  ipatch_file_buf_write_s8 (handle, (guint8)amount.sword); /* fine_tune2 */
 
   ipatch_sf2_gen_item_get_amount (item, IPATCH_SF2_GEN_MOD_LFO_TO_PITCH, &amount);
   ipatch_file_buf_write_s16 (handle, amount.sword); /* modLfoToPitch */

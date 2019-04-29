@@ -176,7 +176,7 @@ ipatch_sample_store_split24_sample_iface_read (IpatchSampleHandle *handle,
   IpatchFileHandle *fhandle = (IpatchFileHandle *)(handle->data1);
   guint8 *readbuf = (guint8 *)(handle->data2);
   guint8 *i8p;
-  int i;
+  guint i;
 
   lilendian = (ipatch_sample_store_get_format (split24_store)
 	       & IPATCH_SAMPLE_ENDIAN_MASK) == IPATCH_SAMPLE_LENDIAN;

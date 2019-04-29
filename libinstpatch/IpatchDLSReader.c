@@ -357,7 +357,7 @@ ipatch_dls_reader_fixup (IpatchDLSReader *reader, GError **err)
   IpatchGigRegion *gig_region;
   IpatchGigSubRegion *sub_region;
   IpatchIter inst_iter, region_iter;
-  int i;
+  guint i;
 
   g_return_val_if_fail (IPATCH_IS_DLS_READER (reader), FALSE);
   g_return_val_if_fail (!err || !*err, FALSE);
@@ -1404,10 +1404,10 @@ ipatch_dls_load_region_header (IpatchRiff *riff,
 
   if (!ipatch_file_buf_load (riff->handle, chunk->size, err)) return (FALSE);
 
-  region->note_range_low = ipatch_file_buf_read_u16 (riff->handle);
-  region->note_range_high = ipatch_file_buf_read_u16 (riff->handle);
-  region->velocity_range_low = ipatch_file_buf_read_u16 (riff->handle);
-  region->velocity_range_high = ipatch_file_buf_read_u16 (riff->handle);
+  region->note_range_low = (guint8)ipatch_file_buf_read_u16 (riff->handle);
+  region->note_range_high = (guint8)ipatch_file_buf_read_u16 (riff->handle);
+  region->velocity_range_low = (guint8)ipatch_file_buf_read_u16 (riff->handle);
+  region->velocity_range_high = (guint8)ipatch_file_buf_read_u16 (riff->handle);
 
   /* ISOK? Undefined flags are discarded! */
   options = ipatch_file_buf_read_u16 (riff->handle);
@@ -1455,10 +1455,10 @@ ipatch_gig_load_region_header (IpatchRiff *riff,
 
   if (!ipatch_file_buf_load (riff->handle, chunk->size, err)) return (FALSE);
 
-  region->note_range_low = ipatch_file_buf_read_u16 (riff->handle);
-  region->note_range_high = ipatch_file_buf_read_u16 (riff->handle);
-  region->velocity_range_low = ipatch_file_buf_read_u16 (riff->handle);
-  region->velocity_range_high = ipatch_file_buf_read_u16 (riff->handle);
+  region->note_range_low = (guint8)ipatch_file_buf_read_u16 (riff->handle);
+  region->note_range_high = (guint8)ipatch_file_buf_read_u16 (riff->handle);
+  region->velocity_range_low = (guint8)ipatch_file_buf_read_u16 (riff->handle);
+  region->velocity_range_high = (guint8)ipatch_file_buf_read_u16 (riff->handle);
 
   /* ISOK? Undefined flags are discarded! */
   options = ipatch_file_buf_read_u16 (riff->handle);

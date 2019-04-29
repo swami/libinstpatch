@@ -70,7 +70,7 @@ _vbank_inst_to_sf2_voice_cache_convert (IpatchConverter *converter,
   int *note_range;
   int note_low, note_high;
   GError *localerr = NULL;
-  int voicendx;
+  guint voicendx;
   int root_note;
 
   obj = IPATCH_CONVERTER_INPUT (converter);

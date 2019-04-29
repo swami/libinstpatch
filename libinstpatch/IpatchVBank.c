@@ -305,7 +305,7 @@ ipatch_vbank_base_find_unused_locale (IpatchBase *base, int *bank,
   GSList *locale_list = NULL;
   IpatchVBankInst *inst;
   GSList *p;
-  int b, n;			/* Stores current bank and program number */
+  guint b, n;			/* Stores current bank and program number */
   guint lbank, lprogram;
 
   /* fill array with bank and program numbers */

@@ -45,6 +45,10 @@
 
 #ifdef _WIN32
 #include <io.h>
+#define lseek _lseek
+#define read _read
+#define write _write
+#define close _close
 #else
 #include <unistd.h>
 #endif
@@ -243,7 +247,7 @@ ipatch_sample_store_swap_sample_iface_open (IpatchSampleHandle *handle,
     // Check if allocating sample in RAM would exceed max allowed
     if (new_ram_used > g_atomic_int_get (&swap_ram_max))
     { // RAM swap is maxed out - correct swap_ram_used
-      g_atomic_int_add (&swap_ram_used, -sample_size);
+      g_atomic_int_add (&swap_ram_used, -(gint)sample_size);
 
       if (swap_fd == -1)   /* Swap file not yet created? */
         ipatch_sample_store_swap_open_file ();
@@ -267,7 +271,7 @@ ipatch_sample_store_swap_sample_iface_open (IpatchSampleHandle *handle,
 
           recover->size -= sample_size;
           recover->location += sample_size;
-          g_atomic_int_add (&swap_unused_size, -sample_size);
+          g_atomic_int_add (&swap_unused_size, -(gint)sample_size);
 
           // Remove the node from the size recover list
           if (prevprev) prevprev->next = prev->next;
@@ -462,7 +466,7 @@ ipatch_sample_store_swap_finalize (GObject *gobject)
 
   if (store->ram_location)                      // Allocated in RAM?
   {
-    g_atomic_int_add (&swap_ram_used, -size);   // Subtract size from RAM usage
+    g_atomic_int_add (&swap_ram_used, -(gint)size);   // Subtract size from RAM usage
     g_free (store->ram_location);               // -- free allocated RAM
   }
   else
@@ -628,9 +632,9 @@ ipatch_compact_sample_store_swap (GError **err)
   int newfd;
   GArray *position_array;
   GSList *p;
-  guint size, ofs, this_size;
-  int retval;
-  int i;
+  guint size, ofs;
+  int retval, this_size;
+  guint i;
 
   g_return_val_if_fail (!err || !*err, FALSE);
 

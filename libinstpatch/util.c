@@ -95,9 +95,9 @@ ipatch_util_value_hash (GValue *val)
     case G_TYPE_ULONG:
       return (g_value_get_ulong (val));
     case G_TYPE_INT64:
-      return (g_value_get_int64 (val));
+      return (guint)(g_value_get_int64 (val));
     case G_TYPE_UINT64:
-      return (g_value_get_uint64 (val));
+      return (guint)(g_value_get_uint64 (val));
     case G_TYPE_ENUM:
       return (g_value_get_enum (val));
     case G_TYPE_FLAGS:
@@ -106,7 +106,7 @@ ipatch_util_value_hash (GValue *val)
       fval.f = g_value_get_float (val);
       return (fval.i);	/* use the raw float data as hash */
     case G_TYPE_DOUBLE:
-      fval.f = g_value_get_double (val);	/* convert double to float */
+      fval.f = (gfloat)g_value_get_double (val);	/* convert double to float */
       return (fval.i);		/* use the raw float data as hash */
     case G_TYPE_STRING:
       sval = g_value_get_string (val);
@@ -145,7 +145,7 @@ ipatch_util_value_array_hash (GValueArray *valarray)
 {
   GValue *value;
   guint hashval = 0;
-  int i;
+  guint i;
 
   if (!valarray) return (0);
 
@@ -171,7 +171,7 @@ ipatch_util_value_array_hash (GValueArray *valarray)
 guint64
 ipatch_util_file_size (const char *fname, GError **err)
 {
-  struct stat st;
+  GStatBuf st;
 
   g_return_val_if_fail (fname != NULL, 0);
   g_return_val_if_fail (!err || !*err, 0);

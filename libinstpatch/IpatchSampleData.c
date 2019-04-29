@@ -1299,7 +1299,7 @@ ipatch_sample_cache_clean (guint64 max_unused_size, guint max_unused_age)
     /* Once size drops below max_unused_size and max_unused_age is 0 or this
      * sample was used more recent than max_unused_age - we're done */
     if (cur_unused_size <= max_unused_size
-        && (max_unused_age == 0 || time.tv_sec - last_open <= max_unused_age))
+        && (max_unused_age == 0 || time.tv_sec - last_open <= (glong)max_unused_age))
       break;
 
     ipatch_sample_data_remove (sampledata, (IpatchSampleStore *)store);

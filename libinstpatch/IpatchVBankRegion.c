@@ -144,7 +144,7 @@ ipatch_vbank_region_set_property (GObject *object, guint property_id,
   GValueArray *valarray;
   IpatchRange *range;
   char **strv;
-  int i;
+  guint i;
 
   switch (property_id)
   {
@@ -202,7 +202,7 @@ ipatch_vbank_region_get_property (GObject *object, guint property_id,
   guint n_elements;
   char **strv;
   GValue val = { 0 };
-  int i;
+  guint i;
 
   switch (property_id)
   {

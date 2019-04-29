@@ -691,7 +691,7 @@ ipatch_gig_region_remove_dimension (IpatchGigRegion *region, int dim_index,
     }
 
   max_split_index = 1 << region->dimensions[dim_index]->split_count;
-  if (log_if_fail (split_index > 0 && split_index < max_split_index))
+  if (log_if_fail (split_index > 0 && (guint)split_index < max_split_index))
     {
       IPATCH_ITEM_WUNLOCK (region);
       return;

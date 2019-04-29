@@ -244,9 +244,9 @@ ipatch_snd_file_format_get_sub_formats (int format, guint *size)
 int
 ipatch_snd_file_sample_format_to_sub_format (int sample_format, int file_format)
 {
-  int sub_format, i;
+  int sub_format;
   int *formats;
-  guint size;
+  guint i,size;
   
   g_return_val_if_fail (ipatch_sample_format_verify (sample_format), -1);
 

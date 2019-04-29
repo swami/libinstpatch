@@ -499,7 +499,7 @@ sfload_infos (IpatchSF2Reader *reader, GError **err)
 	    }
 	  else if (ipatch_sf2_info_id_is_valid (chunk->id))	/* regular string based info chunk */
 	    {
-	      int maxsize, size;
+	      guint32 maxsize, size;
 	      char *s;
 
 	      if (chunk->size > 0)
@@ -636,7 +636,7 @@ sfload_pbags (IpatchSF2Reader *reader, GError **err)
   guint16 *bag_table;
   guint16 genndx, modndx;
   guint16 pgenndx, pmodndx;
-  int i;
+  guint i;
 
   if (!ipatch_riff_read_chunk_verify (riff, IPATCH_RIFF_CHUNK_SUB,
 				      IPATCH_SFONT_FOURCC_PBAG, err))
@@ -962,7 +962,7 @@ sfload_ibags (IpatchSF2Reader *reader, GError **err)
   guint16 *bag_table;
   guint16 genndx, modndx;
   guint16 pgenndx, pmodndx;
-  int i;
+  guint i;
 
   if (!ipatch_riff_read_chunk_verify (riff, IPATCH_RIFF_CHUNK_SUB,
 				      IPATCH_SFONT_FOURCC_IBAG, err))
@@ -1201,7 +1201,7 @@ sfload_shdrs (IpatchSF2Reader *reader, GError **err)
   guint samchunk_pos, samchunk_size, sam24chunk_pos;
   guint openlink_count = 0;
   char *filename;
-  int i, count;
+  guint32 i, count;
 
   if (!ipatch_riff_read_chunk_verify (riff, IPATCH_RIFF_CHUNK_SUB,
 				      IPATCH_SFONT_FOURCC_SHDR, err))

@@ -878,7 +878,7 @@ sfont_write_samples24 (IpatchSF2Writer *writer, GError **err)
   guint8 zerobuf[46 * 2]; /* 46 zero values to write at end of each sample */
   guint samsize, size, start, ofs, total_size, totalofs = 0;
   guint index = 0;
-  int i;
+  guint i;
 
   memset (&zerobuf, 0, sizeof (zerobuf));
 

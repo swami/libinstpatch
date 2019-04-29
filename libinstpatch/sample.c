@@ -56,7 +56,7 @@ void TFF_ ## NAME (IpatchSampleTransform *transform) \
 /* float transforms */
 
 TRANS_FUNC (floattodouble, gfloat, gdouble, NOP, { outp[i] = inp[i]; }, NOP)
-TRANS_FUNC (doubletofloat, gdouble, gfloat, NOP, { outp[i] = inp[i]; }, NOP)
+TRANS_FUNC (doubletofloat, gdouble, gfloat, NOP, { outp[i] = (gfloat)inp[i]; }, NOP)
 
 
 /* signed bit width change funcs */
@@ -94,22 +94,22 @@ TRANS_FUNC (s32todouble, gint32, gdouble, NOP,
             { outp[i] = inp[i] / (double)2147483648.0; }, NOP)
 
 TRANS_FUNC (floattos8, gfloat, gint8, NOP,
-            { outp[i] = inp[i] * 127.0; }, NOP)
+            { outp[i] = (gint8)(inp[i] * 127.0); }, NOP)
 TRANS_FUNC (floattos16, gfloat, gint16, NOP,
-            { outp[i] = inp[i] * 32767.0; }, NOP)
+            { outp[i] = (gint16)(inp[i] * 32767.0); }, NOP)
 TRANS_FUNC (floattos24, gfloat, gint32, NOP,
-            { outp[i] = inp[i] * 8388607.0; }, NOP)
+            { outp[i] = (gint32)(inp[i] * 8388607.0); }, NOP)
 TRANS_FUNC (floattos32, gfloat, gint32, NOP,
-            { outp[i] = inp[i] * 2147483647.0; }, NOP)
+            { outp[i] = (gint32)(inp[i] * 2147483647.0); }, NOP)
 
 TRANS_FUNC (doubletos8, gdouble, gint8, NOP,
-            { outp[i] = inp[i] * 127.0; }, NOP)
+            { outp[i] = (gint8)(inp[i] * 127.0); }, NOP)
 TRANS_FUNC (doubletos16, gdouble, gint16, NOP,
-            { outp[i] = inp[i] * 32767.0; }, NOP)
+            { outp[i] = (gint16)(inp[i] * 32767.0); }, NOP)
 TRANS_FUNC (doubletos24, gdouble, gint32, NOP,
-            { outp[i] = inp[i] * 8388607.0; }, NOP)
+            { outp[i] = (gint32)(inp[i] * 8388607.0); }, NOP)
 TRANS_FUNC (doubletos32, gdouble, gint32, NOP,
-            { outp[i] = inp[i] * 2147483647.0; }, NOP)
+            { outp[i] = (gint32)(inp[i] * 2147483647.0); }, NOP)
 
 
 /* unsigned bit width change funcs */
@@ -147,22 +147,22 @@ TRANS_FUNC (u32todouble, guint32, gdouble, NOP,
             { outp[i] = (gint32)(inp[i] ^ 0x80000000) / (double)2147483648.0; }, NOP)
 
 TRANS_FUNC (floattou8, gfloat, guint8, NOP,
-            { outp[i] = (inp[i] + 1.0) * 127.5 + 0.5; }, NOP)
+            { outp[i] = (guint8)((inp[i] + 1.0) * 127.5 + 0.5); }, NOP)
 TRANS_FUNC (floattou16, gfloat, guint16, NOP,
-            { outp[i] = (inp[i] + 1.0) * 32767.5 + 0.5; }, NOP)
+            { outp[i] = (guint16)((inp[i] + 1.0) * 32767.5 + 0.5); }, NOP)
 TRANS_FUNC (floattou24, gfloat, guint32, NOP,
-            { outp[i] = (inp[i] + 1.0) * 8388607.5 + 0.5; }, NOP)
+            { outp[i] = (guint32)((inp[i] + 1.0) * 8388607.5 + 0.5); }, NOP)
 TRANS_FUNC (floattou32, gfloat, guint32, NOP,
-            { outp[i] = (inp[i] + 1.0) * 2147483647.5 + 0.5; }, NOP)
+            { outp[i] = (guint32)((inp[i] + 1.0) * 2147483647.5 + 0.5); }, NOP)
 
 TRANS_FUNC (doubletou8, gdouble, guint8, NOP,
-            { outp[i] = (inp[i] + 1.0) * 127.5 + 0.5; }, NOP)
+            { outp[i] = (guint8)((inp[i] + 1.0) * 127.5 + 0.5); }, NOP)
 TRANS_FUNC (doubletou16, gdouble, guint16, NOP,
-            { outp[i] = (inp[i] + 1.0) * 32767.5 + 0.5; }, NOP)
+            { outp[i] = (guint16)((inp[i] + 1.0) * 32767.5 + 0.5); }, NOP)
 TRANS_FUNC (doubletou24, gdouble, guint32, NOP,
-            { outp[i] = (inp[i] + 1.0) * 8388607.5 + 0.5; }, NOP)
+            { outp[i] = (guint32)((inp[i] + 1.0) * 8388607.5 + 0.5); }, NOP)
 TRANS_FUNC (doubletou32, gdouble, guint32, NOP,
-            { outp[i] = (inp[i] + 1.0) * 2147483647.5 + 0.5; }, NOP)
+            { outp[i] = (guint32)((inp[i] + 1.0) * 2147483647.5 + 0.5); }, NOP)
 
 
 /* sign changer funcs (24 bit in 4 byte integers requires 2 separate funcs) */
@@ -475,7 +475,7 @@ ipatch_sample_format_transform_verify (int src_format, int dest_format,
   dest_chans = IPATCH_SAMPLE_FORMAT_GET_CHANNEL_COUNT (dest_format);
 
   for (i = 0; i < dest_chans; i++)
-    if (((channel_map >> (i * 3)) & 0x07) >= src_chans)
+    if (((channel_map >> (i * 3)) & 0x07) >= (guint32)src_chans)
       return (FALSE);
 
   return (TRUE);

@@ -442,7 +442,7 @@ ipatch_item_set_parent (IpatchItem *item, IpatchItem *parent)
   gboolean is_container;
   SetParentBag bag;
   guint depth;
-  int i;
+  guint i;
 
   g_return_if_fail (IPATCH_IS_ITEM (item));
   g_return_if_fail (IPATCH_IS_ITEM (parent));

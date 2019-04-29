@@ -96,7 +96,7 @@ ipatch_sample_store_virtual_set_property (GObject *object, guint property_id,
   IpatchSampleStoreVirtual *store = IPATCH_SAMPLE_STORE_VIRTUAL (object);
   IpatchSampleList *list;
   GValueArray *array;
-  int chan;
+  guint chan;
 
   switch (property_id)
   {
@@ -210,8 +210,7 @@ ipatch_sample_store_virtual_sample_iface_read (IpatchSampleHandle *handle,
   guint16 *wbuf, *wleft, *wright;
   guint32 *dbuf, *dleft, *dright;
   guint64 *qbuf, *qleft, *qright;
-  int mi, si;
-  int block;
+  guint block, mi, si;
 
   if (!interbuf)   /* Store is mono? - Just render it */
   {

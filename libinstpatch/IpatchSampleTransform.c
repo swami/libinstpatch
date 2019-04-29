@@ -497,7 +497,8 @@ gpointer
 ipatch_sample_transform_convert (IpatchSampleTransform *transform,
 				 gconstpointer src, gpointer dest, guint frames)
 {
-  int i, func_count, block_size;
+  int i, func_count;
+  guint  block_size;
   gpointer buf1, buf2;
   int src_frame_size, dest_frame_size, srcchan;
 

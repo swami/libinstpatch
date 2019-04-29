@@ -570,7 +570,7 @@ ipatch_sf2_base_find_unused_locale (IpatchBase *base, int *bank,
   GSList *locale_list = NULL;
   IpatchSF2Preset *pset;
   GSList *p;
-  int b, n;			/* Stores current bank and program number */
+  guint b, n;			/* Stores current bank and program number */
   guint lbank, lprogram;
 
   if (percussion) *bank = 128;
@@ -780,7 +780,7 @@ ipatch_sf2_real_set_info (IpatchSF2 *sf, IpatchSF2InfoType id,
 			  const char *val)
 {
   char *newval = NULL;
-  int maxlen;
+  guint maxlen;
 
   maxlen = ipatch_sf2_get_info_max_size (id);
 
