@@ -267,7 +267,7 @@ install ( FILES
           ${instpatch_public_HEADERS}
           ${public_main_HEADER}
           ${CMAKE_CURRENT_BINARY_DIR}/version.h
-          DESTINATION include/${INSTPATCH_TARGET}/libinstpatch )
+          DESTINATION ${INCLUDE_INSTALL_DIR}/${INSTPATCH_TARGET})
 
 
 find_program (GLIB2_MKENUMS glib-mkenums)
