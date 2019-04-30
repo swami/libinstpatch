@@ -347,6 +347,7 @@ else ( MACOSX_FRAMEWORK )
   set_target_properties ( ${INSTPATCH_TARGET}
     PROPERTIES
       PREFIX "lib"
+      IMPORT_PREFIX "lib"
       OUTPUT_NAME "instpatch-${LIB_VERSION_CURRENT}"
       VERSION ${LIB_VERSION_INFO}
       SOVERSION ${LIB_VERSION_CURRENT}
