@@ -31,20 +31,33 @@
 
 #if HAVE_IO_H
 #include <io.h> // _lseek(), _close(), _read(), _write() on windows
-#define IPATCH_FD_LSEEK(fd, offset,origin) _lseek(fd, offset, origin)
-#define IPATCH_FD_READ(fd, bufdst, count)  _read(fd, bufdst, count)
-#define IPATCH_FD_WRITE(fd, bufsrc, count) _write(fd, bufsrc, count)
-#define IPATCH_FD_CLOSE(fd) _close(fd)
 #endif
 
 #if HAVE_UNISTD_H
 #include <unistd.h>
+#endif
+
+/*
+   In case of cross compiling from Linux to Win32, unistd.h and io.h
+   may be both present.
+   So, we provide here exclusive macros definition for files i/o. 
+*/
+#ifdef _WIN32
+/* seek in file described by its file descriptor fd */
+#define IPATCH_FD_LSEEK(fd, offset,origin) _lseek(fd, offset, origin)
+/* read from file described by its file descriptor fd */
+#define IPATCH_FD_READ(fd, bufdst, count)  _read(fd, bufdst, count)
+/* read to file described by its file descriptor fd */
+#define IPATCH_FD_WRITE(fd, bufsrc, count) _write(fd, bufsrc, count)
+/* close a file described by its file descriptor fd */
+#define IPATCH_FD_CLOSE(fd) _close(fd)
+#else
 #define IPATCH_FD_LSEEK(fd, offset,origin) lseek(fd, offset, origin)
 #define IPATCH_FD_READ(fd, bufdst, count)  read(fd, bufdst, count)
 #define IPATCH_FD_WRITE(fd, bufsrc, count) write(fd, bufsrc, count)
 #define IPATCH_FD_CLOSE(fd) close(fd)
 #endif
-
+   
 #define IPATCH_UNTITLED		_("Untitled")
 
 /* macro for getting a GParamSpec property ID (FIXME - its a private field!) */
