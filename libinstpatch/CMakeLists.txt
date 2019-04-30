@@ -267,7 +267,7 @@ install ( FILES
           ${instpatch_public_HEADERS}
           ${public_main_HEADER}
           ${CMAKE_CURRENT_BINARY_DIR}/version.h
-          DESTINATION include/libinstpatch-1.0/libinstpatch )
+          DESTINATION include/${INSTPATCH_TARGET}/libinstpatch )
 
 
 find_program (GLIB2_MKENUMS glib-mkenums)
@@ -335,7 +335,7 @@ if ( MACOSX_FRAMEWORK )
      )
     set_target_properties ( ${INSTPATCH_TARGET}
       PROPERTIES
-        OUTPUT_NAME "libinstpatch-1.0"
+        OUTPUT_NAME "libinstpatch-${LIB_VERSION_CURRENT}"
         FRAMEWORK TRUE
         PUBLIC_HEADER "${public_main_HEADER}"
         FRAMEWORK_VERSION "${LIB_VERSION_CURRENT}"
@@ -347,7 +347,7 @@ else ( MACOSX_FRAMEWORK )
   set_target_properties ( ${INSTPATCH_TARGET}
     PROPERTIES
       PREFIX "lib"
-      OUTPUT_NAME "instpatch-1.0"
+      OUTPUT_NAME "instpatch-${LIB_VERSION_CURRENT}"
       VERSION ${LIB_VERSION_INFO}
       SOVERSION ${LIB_VERSION_CURRENT}
   )
