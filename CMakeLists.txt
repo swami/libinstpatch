@@ -68,7 +68,6 @@ check_include_file ( stdarg.h HAVE_STDARG_H )
 check_include_file ( unistd.h HAVE_UNISTD_H )
 
 if ( WIN32 )
-  include ( CheckIncludeFiles )
   # Check presence of MS include files
   check_include_file ( io.h HAVE_IO_H )
 endif( WIN32 )
