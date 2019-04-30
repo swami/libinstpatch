@@ -33,12 +33,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#ifdef _WIN32
-#include <io.h>
-#else
-#include <unistd.h>
-#endif
-
 #include <glib.h>
 #include <glib/gstdio.h>
 #include <glib-object.h>

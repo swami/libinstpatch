@@ -65,7 +65,13 @@ check_include_file ( stdio.h HAVE_STDIO_H )
 check_include_file ( math.h HAVE_MATH_H ) 
 check_include_file ( errno.h HAVE_ERRNO_H ) 
 check_include_file ( stdarg.h HAVE_STDARG_H ) 
-check_include_file ( unistd.h HAVE_UNISTD_H ) 
+check_include_file ( unistd.h HAVE_UNISTD_H )
+
+if ( WIN32 )
+  # Check presence of MS include files
+  check_include_file ( io.h HAVE_IO_H )
+endif( WIN32 )
+
 
 unset ( IPATCH_CPPFLAGS CACHE )
 unset ( IPATCH_LIBS CACHE )
