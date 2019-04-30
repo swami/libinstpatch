@@ -375,7 +375,7 @@ ipatch_sample_store_swap_sample_iface_read (IpatchSampleHandle *handle,
 
   G_LOCK (swap);        // ++ lock swap
 
-  if (_lseek (swap_fd, store->location + offset * frame_size, SEEK_SET) == -1)
+  if (IPATCH_FD_LSEEK (swap_fd, store->location + offset * frame_size, SEEK_SET) == -1)
   {
     G_UNLOCK (swap);    // -- unlock swap
     g_set_error (err, G_FILE_ERROR, g_file_error_from_errno (errno),
