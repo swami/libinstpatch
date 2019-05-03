@@ -335,7 +335,7 @@ if ( MACOSX_FRAMEWORK )
      )
     set_target_properties ( ${INSTPATCH_TARGET}
       PROPERTIES
-        OUTPUT_NAME "libinstpatch-${LIB_VERSION_CURRENT}"
+        OUTPUT_NAME "libinstpatch-1.0"
         FRAMEWORK TRUE
         PUBLIC_HEADER "${public_main_HEADER}"
         FRAMEWORK_VERSION "${LIB_VERSION_CURRENT}"
@@ -343,16 +343,21 @@ if ( MACOSX_FRAMEWORK )
         VERSION ${LIB_VERSION_INFO}
         SOVERSION ${LIB_VERSION_CURRENT}
     )
-else ( MACOSX_FRAMEWORK )
+elseif( MINGW OR WIN32)
+  set_target_properties ( ${INSTPATCH_TARGET}
+    PROPERTIES
+      OUTPUT_NAME ${lib_output_name}
+      VERSION ${LIB_VERSION_INFO}
+  )
+else(MINGW OR WIN32)
   set_target_properties ( ${INSTPATCH_TARGET}
     PROPERTIES
       PREFIX "lib"
-      IMPORT_PREFIX "lib"
-      OUTPUT_NAME "instpatch-${LIB_VERSION_CURRENT}"
+      OUTPUT_NAME "instpatch-1.0"
       VERSION ${LIB_VERSION_INFO}
       SOVERSION ${LIB_VERSION_CURRENT}
   )
-endif ( MACOSX_FRAMEWORK )
+endif ( MINGW OR WIN32)
 
 if ( IPATCH_CPPFLAGS )
   set_target_properties ( ${INSTPATCH_TARGET}
