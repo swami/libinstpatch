@@ -157,6 +157,12 @@ if ( UNIX OR MINGW OR WIN32)
     set ( libdir "\${exec_prefix}/${LIB_INSTALL_DIR}${LIB_SUFFIX}" )
     set ( includedir "\${prefix}/${INCLUDE_INSTALL_DIR}" )
     set ( lib_current_version ${LIB_VERSION_CURRENT} )
+    # stamp library name with version current value (for Windows only)
+    if(MINGW OR WIN32)
+        set ( lib_output_name libinstpatch-${LIB_VERSION_CURRENT} )
+    else(MINGW OR WIN32)
+        set ( lib_output_name instpatch-1.0 )
+    endif(MINGW OR WIN32)
     configure_file ( libinstpatch.pc.in
         ${CMAKE_BINARY_DIR}/libinstpatch.pc IMMEDIATE @ONLY )
     install ( FILES ${CMAKE_BINARY_DIR}/libinstpatch.pc
