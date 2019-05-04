@@ -267,7 +267,7 @@ install ( FILES
           ${instpatch_public_HEADERS}
           ${public_main_HEADER}
           ${CMAKE_CURRENT_BINARY_DIR}/version.h
-          DESTINATION ${INCLUDE_INSTALL_DIR}/${INSTPATCH_TARGET})
+          DESTINATION ${INCLUDE_INSTALL_DIR}/libinstpatch)
 
 
 find_program (GLIB2_MKENUMS glib-mkenums)
@@ -343,13 +343,13 @@ if ( MACOSX_FRAMEWORK )
         VERSION ${LIB_VERSION_INFO}
         SOVERSION ${LIB_VERSION_CURRENT}
     )
-elseif( MINGW OR WIN32)
+elseif( MINGW OR WIN32 )
   set_target_properties ( ${INSTPATCH_TARGET}
     PROPERTIES
       OUTPUT_NAME ${lib_output_name}
       VERSION ${LIB_VERSION_INFO}
   )
-else(MINGW OR WIN32)
+else( MINGW OR WIN32 )
   set_target_properties ( ${INSTPATCH_TARGET}
     PROPERTIES
       PREFIX "lib"
@@ -357,7 +357,7 @@ else(MINGW OR WIN32)
       VERSION ${LIB_VERSION_INFO}
       SOVERSION ${LIB_VERSION_CURRENT}
   )
-endif ( MINGW OR WIN32)
+endif ( MACOSX_FRAMEWORK )
 
 if ( IPATCH_CPPFLAGS )
   set_target_properties ( ${INSTPATCH_TARGET}
