@@ -249,15 +249,14 @@ if( WIN32 )
     endif(BUILD_SHARED_LIBS)
 endif( WIN32 )
 
-set (INSTPATCH_TARGET "libinstpatch-${LIB_VERSION_CURRENT}")
-add_library ( ${INSTPATCH_TARGET}
+add_library ( libinstpatch
     ${CMAKE_CURRENT_BINARY_DIR}/marshals.c
     ${CMAKE_CURRENT_BINARY_DIR}/version.h
     ${instpatch_SOURCES} ${DEFINITION_FILE}
         ipatch_priv.h
 )
 
-target_link_libraries ( ${INSTPATCH_TARGET}
+target_link_libraries ( libinstpatch
     ${GOBJECT_LIBRARIES}
     ${SNDFILE_LIBRARIES}
     ${IPATCH_LIBS}
@@ -267,8 +266,7 @@ install ( FILES
           ${instpatch_public_HEADERS}
           ${public_main_HEADER}
           ${CMAKE_CURRENT_BINARY_DIR}/version.h
-#          DESTINATION ${INCLUDE_INSTALL_DIR}/libinstpatch)
-           DESTINATION include/${INSTPATCH_TARGET}/libinstpatch )
+         DESTINATION ${INCLUDE_INSTALL_DIR}/${INSTPATCH_INSTALL_TARGET}/libinstpatch)
 
 find_program (GLIB2_MKENUMS glib-mkenums)
 find_program (SED sed)
@@ -333,7 +331,7 @@ if ( MACOSX_FRAMEWORK )
      set_property ( SOURCE ${instpatch_public_HEADERS} 
          PROPERTY MACOSX_PACKAGE_LOCATION Headers/libinstpatch
      )
-    set_target_properties ( ${INSTPATCH_TARGET}
+    set_target_properties ( libinstpatch
       PROPERTIES
         OUTPUT_NAME "libinstpatch-1.0"
         FRAMEWORK TRUE
@@ -344,27 +342,28 @@ if ( MACOSX_FRAMEWORK )
         SOVERSION ${LIB_VERSION_CURRENT}
     )
 elseif( MINGW OR WIN32 )
-  set_target_properties ( ${INSTPATCH_TARGET}
+  set_target_properties ( libinstpatch
     PROPERTIES
-      OUTPUT_NAME ${lib_output_name}
+      PREFIX ""
+      OUTPUT_NAME ${INSTPATCH_INSTALL_TARGET}
       VERSION ${LIB_VERSION_INFO}
   )
 else( MINGW OR WIN32 )
-  set_target_properties ( ${INSTPATCH_TARGET}
+  set_target_properties ( libinstpatch
     PROPERTIES
-      PREFIX "lib"
-      OUTPUT_NAME "instpatch-1.0"
+      PREFIX ""
+      OUTPUT_NAME "libinstpatch"
       VERSION ${LIB_VERSION_INFO}
       SOVERSION ${LIB_VERSION_CURRENT}
   )
 endif ( MACOSX_FRAMEWORK )
 
 if ( IPATCH_CPPFLAGS )
-  set_target_properties ( ${INSTPATCH_TARGET}
+  set_target_properties ( libinstpatch
     PROPERTIES COMPILE_FLAGS ${IPATCH_CPPFLAGS} )
 endif ( IPATCH_CPPFLAGS ) 
 
-install ( TARGETS ${INSTPATCH_TARGET}
+install ( TARGETS libinstpatch
   RUNTIME DESTINATION ${BIN_INSTALL_DIR}
   LIBRARY DESTINATION ${LIB_INSTALL_DIR}${LIB_SUFFIX}
   ARCHIVE DESTINATION ${LIB_INSTALL_DIR}${LIB_SUFFIX}
@@ -386,7 +385,7 @@ if (INTROSPECTION_FOUND)
   add_executable ( gir_prog gir_prog.c )
 
   target_link_libraries ( gir_prog
-    ${INSTPATCH_TARGET}
+    libinstpatch
     ${GOBJECT_LIBRARIES}
     ${SNDFILE_LIBRARIES}
     ${IPATCH_LIBS}
@@ -403,9 +402,9 @@ if (INTROSPECTION_FOUND)
   set(INTROSPECTION_COMPILER_ARGS "--includedir=${CMAKE_CURRENT_SOURCE_DIR}")
 
   set(introspection_files ${instpatch_SOURCES} ${instpatch_public_HEADERS})
-  set(Ipatch_1_1_gir ${INSTPATCH_TARGET})
+  set(Ipatch_1_1_gir ${INSTPATCH_INSTALL_TARGET})
   set(Ipatch_1_1_gir_INCLUDES GObject-2.0)
-  set(Ipatch_1_1_gir_LIBS ${INSTPATCH_TARGET})
+  set(Ipatch_1_1_gir_LIBS ${INSTPATCH_INSTALL_TARGET})
   get_directory_property(_tmp_includes INCLUDE_DIRECTORIES)
   _list_prefix(_includes _tmp_includes "-I")
   set(Ipatch_1_1_gir_CFLAGS ${_includes})
