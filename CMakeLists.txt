@@ -150,12 +150,20 @@ configure_file ( ${CMAKE_SOURCE_DIR}/libinstpatch/version.h.in
 configure_file ( ${CMAKE_SOURCE_DIR}/libinstpatch/libinstpatch.h.in
                  ${CMAKE_CURRENT_BINARY_DIR}/libinstpatch/libinstpatch.h )
 
+set (INSTPATCH_INSTALL_TARGET "libinstpatch-${LIB_VERSION_CURRENT}")
+
 # pkg-config support
 if ( UNIX OR MINGW OR WIN32)
     set ( prefix "${CMAKE_INSTALL_PREFIX}" )
     set ( exec_prefix "\${prefix}" )
     set ( libdir "\${exec_prefix}/${LIB_INSTALL_DIR}${LIB_SUFFIX}" )
     set ( includedir "\${prefix}/${INCLUDE_INSTALL_DIR}" )
+    # stamp library name with version current value (for Windows only)
+    if(MINGW OR WIN32)
+        set ( lib_output_name ${INSTPATCH_INSTALL_TARGET} )
+    else(MINGW OR WIN32)
+        set ( lib_output_name libinstpatch )
+    endif(MINGW OR WIN32)
     configure_file ( libinstpatch.pc.in
         ${CMAKE_BINARY_DIR}/libinstpatch.pc IMMEDIATE @ONLY )
     install ( FILES ${CMAKE_BINARY_DIR}/libinstpatch.pc

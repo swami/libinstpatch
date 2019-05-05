@@ -15,7 +15,6 @@ link_directories (
     ${SNDFILE_LIBDIR}
     ${SNDFILE_LIBRARY_DIRS}
 )
-
 add_executable ( riff_dump riff_dump.c )
-add_dependencies( riff_dump instpatch-1.0 )
-target_link_libraries( riff_dump instpatch-1.0 )
+add_dependencies( riff_dump libinstpatch )
+target_link_libraries( riff_dump libinstpatch )
