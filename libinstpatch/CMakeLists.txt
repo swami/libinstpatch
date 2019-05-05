@@ -21,6 +21,7 @@ include_directories (
 
 set ( instpatch_public_HEADERS
     builtin_enums.h
+	compat.h
     IpatchBase.h
     IpatchContainer.h
     IpatchConverter.h
