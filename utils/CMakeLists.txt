@@ -9,6 +9,14 @@ include_directories (
     ${SNDFILE_INCLUDE_DIRS}
 )
 
+#adding installed getopt support for Windows 
+if (WIN32)
+    pkg_check_modules ( GETOPT getopt )
+    if(GETOPT_FOUND)
+	    include_directories ( ${GETOPT_INCLUDEDIR} )
+    endif(GETOPT_FOUND)
+endif(WIN32)
+
 link_directories (
     ${GOBJECT_LIBDIR}
     ${GOBJECT_LIBRARY_DIRS}
