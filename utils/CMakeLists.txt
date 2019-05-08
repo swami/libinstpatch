@@ -12,14 +12,14 @@ include_directories (
 #adding installed getopt support for Windows 
 if ( WIN32 )
     #let the user choosing additionnal search path
-	set (GETOPT_INCLUDE_PATH "d:\\freesw\\include\\getopt" 
-	     CACHE FILEPATH "Path of getopt.h" )
-	set (CMAKE_REQUIRED_INCLUDES ${GETOPT_INCLUDE_PATH})
-	unset (HAVE_GETOPT_H CACHE)
-	check_include_file ( getopt.h HAVE_GETOPT_H )
-	if ( HAVE_GETOPT_H )
-		include_directories ( ${CMAKE_REQUIRED_INCLUDES} )
-	endif( HAVE_GETOPT_H )
+    set (GETOPT_INCLUDE_PATH "d:\\freesw\\include\\getopt" 
+        CACHE FILEPATH "Path of getopt.h" )
+    set (CMAKE_REQUIRED_INCLUDES ${GETOPT_INCLUDE_PATH})
+    unset (HAVE_GETOPT_H CACHE)
+    check_include_file ( getopt.h HAVE_GETOPT_H )
+    if ( HAVE_GETOPT_H )
+        include_directories ( ${CMAKE_REQUIRED_INCLUDES} )
+    endif( HAVE_GETOPT_H )
 endif( WIN32 )
 
 link_directories (
