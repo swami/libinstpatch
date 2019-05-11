@@ -1,7 +1,6 @@
 LIBRARY
 EXPORTS
 
-
 _ipatch_code_error
 _ipatch_code_errorv
 _ipatch_convert_DLS2_init
@@ -557,6 +556,7 @@ ipatch_riff_message_detail
 ;ipatch_riff_parser_error_quark
 ;ipatch_riff_parser_get_type
 ;ipatch_riff_parser_new
+ipatch_riff_new
 ipatch_riff_pop_state
 ipatch_riff_push_state
 ipatch_riff_read_chunk
