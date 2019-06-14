@@ -9,6 +9,9 @@ pool:
 steps:
 - script: |
     sudo apt-get update
+    sudo apt-get -y \
+      libglib2.0-0 \
+      libsndfile-dev
   displayName: 'Prerequisites'
 
 - script: |
