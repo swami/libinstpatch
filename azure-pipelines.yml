@@ -16,11 +16,6 @@ steps:
 
 - script: |
     mkdir build && cd build
-    cmake ..
+    cmake -DCMAKE_INSTALL_PREFIX=$HOME/libinstpatch_install -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_VERBOSE_MAKEFILE=0 ..
     make
   displayName: 'Compile libinstpatch'
-
-  
-- script: |
-    sudo make install
-  displayName: 'Install'
