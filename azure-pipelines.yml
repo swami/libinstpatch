@@ -24,7 +24,8 @@ jobs:
     vmImage: 'macOS-10.14'
   steps:
     - script: |
-        brew update || true
+        brew update
+        brew install glib libsndfile pkg-config
       displayName: 'Prerequisites'
     - script: |
         mkdir build && cd build
