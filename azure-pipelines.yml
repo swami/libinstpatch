@@ -8,7 +8,16 @@ pool:
 
 steps:
 - script: |
+    sudo apt-get update
+  displayName: 'Prerequisites'
+
+- script: |
     mkdir build && cd build
     cmake ..
     make
-  displayName: 'make'
+  displayName: 'Compile libinstpatch'
+
+  
+- script: |
+    sudo make install
+  displayName: 'Install'
