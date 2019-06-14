@@ -14,7 +14,6 @@ jobs:
           libglib2.0-0 \
           libsndfile-dev
       displayName: 'Prerequisites'
-
     - script: |
         mkdir build && cd build
         cmake -DCMAKE_INSTALL_PREFIX=$HOME/libinstpatch_install -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_VERBOSE_MAKEFILE=0 ..
@@ -24,7 +23,14 @@ jobs:
   pool:
     vmImage: 'macOS-10.14'
   steps:
-  - script: echo hello from macOS
+    - script: |
+        brew update || true
+      displayName: 'Prerequisites'
+    - script: |
+        mkdir build && cd build
+        cmake -DCMAKE_INSTALL_PREFIX=$HOME/libinstpatch_install -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_VERBOSE_MAKEFILE=0 ..
+        make
+      displayName: 'Compile libinstpatch'
 - job: Windows
   pool:
     vmImage: 'windows-2019'
