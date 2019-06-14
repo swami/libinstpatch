@@ -4,18 +4,34 @@
 # https://docs.microsoft.com/azure/devops/pipelines/apps/c-cpp/gcc
 
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: ''
 
-steps:
-- script: |
-    sudo apt-get update
-    sudo apt-get -y install \
-      libglib2.0-0 \
-      libsndfile-dev
-  displayName: 'Prerequisites'
 
-- script: |
-    mkdir build && cd build
-    cmake -DCMAKE_INSTALL_PREFIX=$HOME/libinstpatch_install -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_VERBOSE_MAKEFILE=0 ..
-    make
-  displayName: 'Compile libinstpatch'
+
+jobs:
+- job: Linux
+  pool:
+    vmImage: 'ubuntu-latest'
+    steps:
+    - script: |
+        sudo apt-get update
+        sudo apt-get -y install \
+          libglib2.0-0 \
+          libsndfile-dev
+      displayName: 'Prerequisites'
+
+    - script: |
+        mkdir build && cd build
+        cmake -DCMAKE_INSTALL_PREFIX=$HOME/libinstpatch_install -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_VERBOSE_MAKEFILE=0 ..
+        make
+      displayName: 'Compile libinstpatch'
+- job: macOS
+  pool:
+    vmImage: 'macOS-10.14'
+  steps:
+  - script: echo hello from macOS
+- job: Windows
+  pool:
+    vmImage: 'windows-2019'
+  steps:
+  - script: echo hello from Windows
