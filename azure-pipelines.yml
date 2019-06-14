@@ -25,7 +25,7 @@ jobs:
   steps:
     - script: |
         brew update
-        brew install glib libsndfile pkg-config
+        brew install glib gobject libsndfile pkg-config
       displayName: 'Prerequisites'
     - script: |
         mkdir build && cd build
@@ -36,4 +36,8 @@ jobs:
   pool:
     vmImage: 'windows-2019'
   steps:
-  - script: echo hello from Windows
+    - script: |
+        mkdir build && cd build
+        cmake -DCMAKE_INSTALL_PREFIX=$HOME/libinstpatch_install -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_VERBOSE_MAKEFILE=0 ..
+        make
+      displayName: 'Compile libinstpatch'
