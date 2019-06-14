@@ -25,7 +25,7 @@ jobs:
   steps:
     - script: |
         brew update
-        brew install glib gobject-introspectio libsndfile pkg-config
+        brew install glib gobject-introspection libsndfile pkg-config
       displayName: 'Prerequisites'
     - script: |
         mkdir build && cd build
