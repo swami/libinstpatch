@@ -25,10 +25,11 @@ jobs:
   steps:
     - script: |
         brew update
-        brew install glib gobject-introspection libffi libsndfile pkg-config
+        brew install glib gobject-introspectio libsndfile pkg-config
       displayName: 'Prerequisites'
     - script: |
         mkdir build && cd build
+        export PKG_CONFIG_PATH="/usr/local/opt/libffi/lib/pkgconfig"
         cmake -DCMAKE_INSTALL_PREFIX=$HOME/libinstpatch_install -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_VERBOSE_MAKEFILE=0 ..
         make
       displayName: 'Compile libinstpatch'
