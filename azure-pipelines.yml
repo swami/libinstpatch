@@ -3,11 +3,6 @@
 # Add steps that publish test results, save build artifacts, deploy, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/apps/c-cpp/gcc
 
-pool:
-  vmImage: ''
-
-
-
 jobs:
 - job: Linux
   pool:
