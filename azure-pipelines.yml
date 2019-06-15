@@ -46,16 +46,16 @@ jobs:
     proxy-libintl-dev-url: 'http://ftp.gnome.org/pub/gnome/binaries/win32/dependencies/proxy-libintl-dev_20100902_win32.zip'
     libsndfile-url: 'http://www.mega-nerd.com/libsndfile/files/libsndfile-1.0.28-w32.zip'
   steps:
-    - script: |
-        @ECHO ON
+    - bash: |
+        set -ex
         mkdir c:\deps
         cd c:\deps
         curl -fsS -o glib.zip $(glib-url)
-        curl -fsS -o glib-dev.zip %glib-dev-url%
-        curl -fsS -o pkg-config.zip %pkg-config-url%
-        curl -fsS -o gettext.zip %gettext-url%
-        curl -fsS -o libintl-dev.zip %proxy-libintl-dev-url%
-        curl -fsS -o libsndfile-dev.zip %libsndfile-url%
+        curl -fsS -o glib-dev.zip $(glib-dev-url)
+        curl -fsS -o pkg-config.zip $(pkg-config-url)
+        curl -fsS -o gettext.zip $(gettext-url)
+        curl -fsS -o libintl-dev.zip $(proxy-libintl-dev-url)
+        curl -fsS -o libsndfile-dev.zip $(libsndfile-url)
         7z x glib.zip > NUL
         7z x glib-dev.zip > NUL
         7z x pkg-config.zip > NUL
@@ -84,16 +84,16 @@ jobs:
     proxy-libintl-dev-url: 'http://ftp.gnome.org/pub/gnome/binaries/win64/dependencies/proxy-libintl-dev_20100902_win64.zip'
     libsndfile-url: 'http://www.mega-nerd.com/libsndfile/files/libsndfile-1.0.28-w64.zip'
   steps:
-    - script: |
-        @ECHO ON
+    - bash: |
+        set -ex
         mkdir c:\deps
         cd c:\deps
-        curl -fsS -o glib.zip %glib-url%
-        curl -fsS -o glib-dev.zip %glib-dev-url%
-        curl -fsS -o pkg-config.zip %pkg-config-url%
-        curl -fsS -o gettext.zip %gettext-url%
-        curl -fsS -o libintl-dev.zip %proxy-libintl-dev-url%
-        curl -fsS -o libsndfile-dev.zip %libsndfile-url%
+        curl -fsS -o glib.zip $(glib-url)
+        curl -fsS -o glib-dev.zip $(glib-dev-url)
+        curl -fsS -o pkg-config.zip $(pkg-config-url)
+        curl -fsS -o gettext.zip $(gettext-url)
+        curl -fsS -o libintl-dev.zip $(proxy-libintl-dev-url)
+        curl -fsS -o libsndfile-dev.zip $(libsndfile-url)
         7z x glib.zip > NUL
         7z x glib-dev.zip > NUL
         7z x pkg-config.zip > NUL
