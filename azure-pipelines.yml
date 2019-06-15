@@ -60,8 +60,6 @@ jobs:
       displayName: 'Prerequisites'
     - script: |
         @ECHO ON
-        dir \
-        cd d:\deps
         SET "PATH=d:\deps\bin;%PATH%"
         mkdir build && cd build || exit -1
         cmake -DCMAKE_INSTALL_PREFIX=$HOME/libinstpatch_install -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_VERBOSE_MAKEFILE=0 .. || exit -1
@@ -89,10 +87,12 @@ jobs:
         REM need to fix the naming of libsndfile otherwise the linker won't find it
         mv lib\libsndfile-1.lib lib\sndfile.lib || exit -1
         mv lib\libsndfile-1.def lib\sndfile.def || exit -1
+        dir \
       displayName: 'Prerequisites'
     - script: |
-        cd d:\deps
+        @ECHO ON
         SET "PATH=d:\deps\bin;%PATH%"
+        dir \
         mkdir build && cd build || exit -1
         cmake -DCMAKE_INSTALL_PREFIX=$HOME/libinstpatch_install -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_VERBOSE_MAKEFILE=0 .. || exit -1
         make || exit -1
