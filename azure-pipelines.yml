@@ -35,7 +35,7 @@ jobs:
         make
       displayName: 'Compile libinstpatch'
 
-- job: Windows x86
+- job: Windows_x86
   pool:
     vmImage: 'windows-2019'
   variables:
@@ -72,7 +72,7 @@ jobs:
         make
       displayName: 'Compile libinstpatch'
 
-- job: Windows x64
+- job: Windows_x64
   pool:
     vmImage: 'windows-2019'
   variables:
