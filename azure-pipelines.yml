@@ -57,6 +57,8 @@ jobs:
         mv lib\libsndfile-1.lib lib\sndfile.lib || exit -1
         mv lib\libsndfile-1.def lib\sndfile.def || exit -1
         SET "PATH=C:\deps\bin;%PATH%"
+        dir /s c:\deps
+        pkg-config --list-all
       displayName: 'Prerequisites'
     - script: |
         mkdir build && cd build || exit -1
@@ -86,6 +88,8 @@ jobs:
         mv lib\libsndfile-1.lib lib\sndfile.lib || exit -1
         mv lib\libsndfile-1.def lib\sndfile.def || exit -1
         SET "PATH=C:\deps\bin;%PATH%"
+        dir /s c:\deps
+        pkg-config --list-all
       displayName: 'Prerequisites'
     - script: |
         mkdir build && cd build || exit -1
