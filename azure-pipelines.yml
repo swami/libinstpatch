@@ -35,12 +35,73 @@ jobs:
         make
       displayName: 'Compile libinstpatch'
 
-- job: Windows
+- job: Windows x86
   pool:
     vmImage: 'windows-2019'
+  variables:
+    glib-url: 'http://ftp.gnome.org/pub/gnome/binaries/win32/glib/2.28/glib_2.28.8-1_win32.zip'
+    glib-dev-url: 'http://ftp.gnome.org/pub/gnome/binaries/win32/glib/2.28/glib-dev_2.28.8-1_win32.zip'
+    pkg-config-url: 'http://ftp.gnome.org/pub/gnome/binaries/win32/dependencies/pkg-config_0.26-1_win32.zip'
+    gettext-url: 'http://ftp.gnome.org/pub/gnome/binaries/win32/dependencies/gettext-runtime_0.18.1.1-2_win32.zip'
+    proxy-libintl-dev-url: 'http://ftp.gnome.org/pub/gnome/binaries/win32/dependencies/proxy-libintl-dev_20100902_win32.zip'
+    libsndfile-url: 'http://www.mega-nerd.com/libsndfile/files/libsndfile-1.0.28-w32.zip'
   steps:
     - script: |
-        choco install pkgconfiglite
+        mkdir c:\deps
+        cd c:\deps
+        curl -fsS -o glib.zip %glib-url%
+        curl -fsS -o glib-dev.zip %glib-dev-url%
+        curl -fsS -o pkg-config.zip %pkg-config-url%
+        curl -fsS -o gettext.zip %gettext-url%
+        curl -fsS -o libintl-dev.zip %proxy-libintl-dev-url%
+        curl -fsS -o libsndfile-dev.zip %libsndfile-url%
+        7z x glib.zip > NUL
+        7z x glib-dev.zip > NUL
+        7z x pkg-config.zip > NUL
+        7z x gettext.zip > NUL
+        7z x libintl-dev.zip > NUL
+        7z x libsndfile-dev.zip > NUL
+        # need to fix the naming of libsndfile otherwise the linker won't find it
+        move lib\libsndfile-1.lib lib\sndfile.lib
+        move lib\libsndfile-1.def lib\sndfile.def
+        SET "PATH=C:\deps\bin;%PATH%"
+      displayName: 'Prerequisites'
+    - script: |
+        mkdir build && cd build
+        cmake -DCMAKE_INSTALL_PREFIX=$HOME/libinstpatch_install -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_VERBOSE_MAKEFILE=0 ..
+        make
+      displayName: 'Compile libinstpatch'
+
+- job: Windows x64
+  pool:
+    vmImage: 'windows-2019'
+  variables:
+    glib-url: 'http://ftp.gnome.org/pub/gnome/binaries/win64/glib/2.26/glib_2.26.1-1_win64.zip'
+    glib-dev-url: 'http://ftp.gnome.org/pub/gnome/binaries/win64/glib/2.26/glib-dev_2.26.1-1_win64.zip'
+    pkg-config-url: 'http://ftp.gnome.org/pub/gnome/binaries/win64/dependencies/pkg-config_0.23-2_win64.zip'
+    gettext-url: 'http://ftp.gnome.org/pub/gnome/binaries/win64/dependencies/gettext-runtime_0.18.1.1-2_win64.zip'
+    proxy-libintl-dev-url: 'http://ftp.gnome.org/pub/gnome/binaries/win64/dependencies/proxy-libintl-dev_20100902_win64.zip'
+    libsndfile-url: 'http://www.mega-nerd.com/libsndfile/files/libsndfile-1.0.28-w64.zip'
+  steps:
+    - script: |
+        mkdir c:\deps
+        cd c:\deps
+        curl -fsS -o glib.zip %glib-url%
+        curl -fsS -o glib-dev.zip %glib-dev-url%
+        curl -fsS -o pkg-config.zip %pkg-config-url%
+        curl -fsS -o gettext.zip %gettext-url%
+        curl -fsS -o libintl-dev.zip %proxy-libintl-dev-url%
+        curl -fsS -o libsndfile-dev.zip %libsndfile-url%
+        7z x glib.zip > NUL
+        7z x glib-dev.zip > NUL
+        7z x pkg-config.zip > NUL
+        7z x gettext.zip > NUL
+        7z x libintl-dev.zip > NUL
+        7z x libsndfile-dev.zip > NUL
+        # need to fix the naming of libsndfile otherwise the linker won't find it
+        move lib\libsndfile-1.lib lib\sndfile.lib
+        move lib\libsndfile-1.def lib\sndfile.def
+        SET "PATH=C:\deps\bin;%PATH%"
       displayName: 'Prerequisites'
     - script: |
         mkdir build && cd build
