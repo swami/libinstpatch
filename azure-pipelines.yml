@@ -47,9 +47,10 @@ jobs:
     libsndfile-url: 'http://www.mega-nerd.com/libsndfile/files/libsndfile-1.0.28-w32.zip'
   steps:
     - script: |
+        @ECHO ON
         mkdir c:\deps
         cd c:\deps
-        curl -fsS -o glib.zip %glib-url%
+        curl -fsS -o glib.zip $(glib-url)
         curl -fsS -o glib-dev.zip %glib-dev-url%
         curl -fsS -o pkg-config.zip %pkg-config-url%
         curl -fsS -o gettext.zip %gettext-url%
@@ -84,6 +85,7 @@ jobs:
     libsndfile-url: 'http://www.mega-nerd.com/libsndfile/files/libsndfile-1.0.28-w64.zip'
   steps:
     - script: |
+        @ECHO ON
         mkdir c:\deps
         cd c:\deps
         curl -fsS -o glib.zip %glib-url%
