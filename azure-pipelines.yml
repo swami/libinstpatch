@@ -50,7 +50,7 @@ jobs:
         curl -fsS -o gtk-bundle-dev.zip $(gtk-bundle) || exit -1
         curl -fsS -o pkg-config.zip $(pkg-config-url) || exit -1t -1
         curl -fsS -o libsndfile-dev.zip $(libsndfile-url) || exit -1
-        7z x -aos -- gtk-bundle-dev > NUL || exit -1
+        7z x -aos -- gtk-bundle-dev.zip > NUL || exit -1
         7z x -aos -- pkg-config.zip > NUL || exit -1
         7z x -aos -- libsndfile-dev.zip > NUL || exit -1
         REM need to fix the naming of libsndfile otherwise the linker won't find it
@@ -79,7 +79,7 @@ jobs:
         curl -fsS -o gtk-bundle-dev.zip $(gtk-bundle) || exit -1
         curl -fsS -o pkg-config.zip $(pkg-config-url) || exit -1t -1
         curl -fsS -o libsndfile-dev.zip $(libsndfile-url) || exit -1
-        7z x -aos -- gtk-bundle-dev > NUL || exit -1
+        7z x -aos -- gtk-bundle-dev.zip > NUL || exit -1
         7z x -aos -- pkg-config.zip > NUL || exit -1
         7z x -aos -- libsndfile-dev.zip > NUL || exit -1
         REM need to fix the naming of libsndfile otherwise the linker won't find it
