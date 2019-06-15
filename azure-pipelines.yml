@@ -37,7 +37,7 @@ jobs:
 
 - job: Windows_x86
   pool:
-    vmImage: 'windows-2019'
+    vmImage: 'vs2017-win2016'
   variables:
     gtk-bundle: 'http://ftp.gnome.org/pub/gnome/binaries/win32/gtk+/2.24/gtk+-bundle_2.24.10-20120208_win32.zip'
     pkg-config-url: 'http://ftp.gnome.org/pub/gnome/binaries/win32/dependencies/pkg-config_0.26-1_win32.zip'
@@ -61,13 +61,13 @@ jobs:
         @ECHO ON
         SET "PATH=d:\deps\bin;%PATH%"
         mkdir build && cd build || exit -1
-        cmake -G "Visual Studio 16 2019" -T "v142_xp" -DCMAKE_INSTALL_PREFIX=$HOME/libinstpatch_install -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_VERBOSE_MAKEFILE=0 .. || exit -1
+        cmake -G "Visual Studio 15 2017" -T "v141_xp" -DCMAKE_INSTALL_PREFIX=$HOME/libinstpatch_install -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_VERBOSE_MAKEFILE=0 .. || exit -1
         cmake --build . || exit 1
       displayName: 'Compile libinstpatch'
 
 - job: Windows_x64
   pool:
-    vmImage: 'windows-2019'
+    vmImage: 'vs2017-win2016'
   variables:
     gtk-bundle: 'http://ftp.gnome.org/pub/gnome/binaries/win64/gtk+/2.22/gtk+-bundle_2.22.1-20101229_win64.zip'
     pkg-config-url: 'http://ftp.gnome.org/pub/gnome/binaries/win64/dependencies/pkg-config_0.23-2_win64.zip'
@@ -91,6 +91,6 @@ jobs:
         @ECHO ON
         SET "PATH=d:\deps\bin;%PATH%"
         mkdir build && cd build || exit -1
-        cmake -G "Visual Studio 16 2019 Win64" -T "v142_xp" -DCMAKE_INSTALL_PREFIX=$HOME/libinstpatch_install -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_VERBOSE_MAKEFILE=0 .. || exit -1
+        cmake -G "Visual Studio 15 2017 Win64" -T "v141_xp" -DCMAKE_INSTALL_PREFIX=$HOME/libinstpatch_install -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_VERBOSE_MAKEFILE=0 .. || exit -1
         cmake --build . || exit 1
       displayName: 'Compile libinstpatch'
