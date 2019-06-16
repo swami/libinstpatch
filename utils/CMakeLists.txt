@@ -9,18 +9,20 @@ include_directories (
     ${SNDFILE_INCLUDE_DIRS}
 )
 
-#adding installed getopt support for Windows 
-if ( WIN32 )
-    #let the user choosing additionnal search path
+unset (HAVE_GETOPT_H CACHE)
+check_include_file ( getopt.h HAVE_GETOPT_H )
+
+# adding installed getopt support for Windows 
+if ( WIN32 AND NOT HAVE_GETOPT_H )
+    # let the user choosing additionnal search path
     set (GETOPT_INCLUDE_PATH "" 
         CACHE FILEPATH "Path of getopt.h" )
     set (CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES} ${GETOPT_INCLUDE_PATH})
-    unset (HAVE_GETOPT_H CACHE)
     check_include_file ( getopt.h HAVE_GETOPT_H )
     if ( HAVE_GETOPT_H )
-        include_directories ( ${CMAKE_REQUIRED_INCLUDES} )
+        include_directories ( ${GETOPT_INCLUDE_PATH} )
     endif( HAVE_GETOPT_H )
-endif( WIN32 )
+endif( WIN32 AND NOT HAVE_GETOPT_H )
 
 link_directories (
     ${GOBJECT_LIBDIR}
@@ -28,6 +30,9 @@ link_directories (
     ${SNDFILE_LIBDIR}
     ${SNDFILE_LIBRARY_DIRS}
 )
-add_executable ( riff_dump riff_dump.c )
-add_dependencies( riff_dump libinstpatch )
-target_link_libraries( riff_dump libinstpatch )
+
+if ( HAVE_GETOPT_H )
+    add_executable ( riff_dump riff_dump.c )
+    add_dependencies( riff_dump libinstpatch )
+    target_link_libraries( riff_dump libinstpatch )
+endif ( HAVE_GETOPT_H )
