@@ -777,5 +777,6 @@ dump_object_info (GObject *object, char *indent, FILE *file)
 void
 ipatch_glist_unref_free (GList *objlist)
 {
-  g_list_free_full (objlist, g_object_unref);
+  g_list_foreach (objlist, (GFunc) g_object_unref, NULL);
+  g_list_free (objlist);
 }
