@@ -22,7 +22,7 @@ if ( WIN32 AND NOT HAVE_GETOPT_H )
     if ( HAVE_GETOPT_H )
         include_directories ( ${GETOPT_INCLUDE_PATH} )
     endif( HAVE_GETOPT_H )
-endif( WIN32 )
+endif( WIN32 AND NOT HAVE_GETOPT_H )
 
 link_directories (
     ${GOBJECT_LIBDIR}
