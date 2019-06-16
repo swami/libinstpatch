@@ -2,6 +2,8 @@
 ###	Copyright (C) 1999-2019 Element Green and others
 http://www.swamiproject.org
 
+[![Build Status](https://dev.azure.com/tommbrt/tommbrt/_apis/build/status/swami.libinstpatch?branchName=master)](https://dev.azure.com/tommbrt/tommbrt/_build/latest?definitionId=1&branchName=master)
+
 ## 1. What is libInstPatch?
 
 libInstPatch stands for lib-Instrument-Patch and is a library for processing digital sample based MIDI instrument "patch" files.
