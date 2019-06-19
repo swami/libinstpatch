@@ -313,7 +313,7 @@ add_custom_command (
   COMMAND ${GLIB2_GENMARSHAL}
   ARGS
     --body --prefix=ipatch_marshal
-    ${CMAKE_CURRENT_SOURCE_DIR}/marshals.list >${CMAKE_CURRENT_BINARY_DIR}/marshals.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/marshals.list > ${CMAKE_CURRENT_BINARY_DIR}/marshals.c
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
   DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/marshals.list ${CMAKE_CURRENT_BINARY_DIR}/marshals.h
 )
@@ -323,7 +323,7 @@ add_custom_command (
   COMMAND ${GLIB2_GENMARSHAL}
   ARGS
     --header --prefix=ipatch_marshal
-    ${CMAKE_CURRENT_SOURCE_DIR}/marshals.list >${CMAKE_CURRENT_BINARY_DIR}/marshals.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/marshals.list > ${CMAKE_CURRENT_BINARY_DIR}/marshals.h
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
   DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/marshals.list
 )
