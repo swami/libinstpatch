@@ -437,7 +437,7 @@ ipatch_item_first
 ;ipatch_item_flags_get_type
 ipatch_item_get_atomic
 ipatch_item_get_base
-;ipatch_item_get_flags
+ipatch_item_get_flags
 ipatch_item_get_type
 ipatch_item_next
 ;ipatch_item_peek_ancestor_type
@@ -642,6 +642,7 @@ ipatch_sample_save_to_file
 ;ipatch_sample_store_activate
 ;ipatch_sample_store_alloc
 ;ipatch_sample_store_copy
+ipatch_sample_store_cache_get_type
 ;ipatch_sample_store_duplicate
 ;ipatch_sample_store_file_get_location
 
