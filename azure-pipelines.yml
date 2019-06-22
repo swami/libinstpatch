@@ -60,11 +60,11 @@ jobs:
         mkdir build && cd build || exit -1
         cmake -G "Visual Studio 15 2017" -T "v141_xp" -DCMAKE_INSTALL_PREFIX=$(Build.ArtifactStagingDirectory) -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_VERBOSE_MAKEFILE=0 .. || exit -1
         cmake --build . --config release || exit -1
+        cmake --build . --target install || exit -1
       displayName: 'Compile libinstpatch'
     - bash: |
         set -ex
         art_dir=$(echo "$(Build.ArtifactStagingDirectory)" | sed 's/\\/\//g' | sed 's|\([a-zA-Z]\):|/\1|')
-        cmake --build . --target install || exit -1
         cp d:/deps/bin/libglib*.dll d:/deps/bin/libgobject*.dll d:/deps/bin/libgthread*.dll d:/deps/bin/*intl*.dll d:/deps/bin/libsndfile*.dll $art_dir/bin
       displayName: 'Copy Artifacts'
     - task: PublishBuildArtifacts@1
@@ -97,11 +97,11 @@ jobs:
         mkdir build && cd build || exit -1
         cmake -G "Visual Studio 15 2017 Win64" -T "v141_xp" -DCMAKE_INSTALL_PREFIX=$(Build.ArtifactStagingDirectory) -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_VERBOSE_MAKEFILE=0 .. || exit -1
         cmake --build . --config release || exit 1
+        cmake --build . --target install || exit -1
       displayName: 'Compile libinstpatch'
     - bash: |
         set -ex
         art_dir=$(echo "$(Build.ArtifactStagingDirectory)" | sed 's/\\/\//g' | sed 's|\([a-zA-Z]\):|/\1|')
-        cmake --build . --target install || exit -1
         cp d:/deps/bin/libglib*.dll d:/deps/bin/libgobject*.dll d:/deps/bin/libgthread*.dll d:/deps/bin/*intl*.dll d:/deps/bin/libsndfile*.dll $art_dir/bin
       displayName: 'Copy Artifacts'
     - task: PublishBuildArtifacts@1
