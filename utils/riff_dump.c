@@ -12,7 +12,11 @@
 #include <libinstpatch/libinstpatch.h>
 
 #define _GNU_SOURCE
+//jjc
 #include <getopt.h>
+//#include <D:/Freesw/include/getopt/getopt.h>
+#include <locale.h>
+
 
 void usage (void);
 gboolean recurse_riff_chunks (IpatchRiff *riff, char *indent,
@@ -22,27 +26,33 @@ gboolean dump_chunk (IpatchRiff *riff, GError **err);
 
 /* chunk index - so commands can be run on specific chunks */
 int chunk_index = 0;
-int dump_index = -1;	 /* set to chunk index if chunk dump requested */
-char *dump_type = NULL;	/* set to 4 char string if dumping a chunk type */
+gint dump_index = -1;	 /* set to chunk index if chunk dump requested */
+gchar *dump_type = NULL;	/* set to 4 char string if dumping a chunk type */
 gboolean raw_dump = FALSE;	/* set to TRUE for raw byte dumps */
 gboolean display = TRUE;      /* set to FALSE to not display chunks */
 gboolean stop = FALSE;		/* set to TRUE to stop recursion */
 
+// definie ds getopt.h
 extern char *optarg;
 extern int optind, opterr, optopt;
 
 int
 main (int argc, char *argv[])
 {
+
   IpatchRiff *riff;
   IpatchRiffChunk *chunk;
   IpatchFile *file;
   IpatchFileHandle *fhandle;
   char indent_buf[256] = "";
+
   GError *err = NULL;
   char *file_name = NULL;
   int option_index = 0;
   int c;
+
+//jjc
+#if 1
 
   static struct option long_options[] =
     {
@@ -53,40 +63,40 @@ main (int argc, char *argv[])
     };
 
   while (TRUE)
-    {
+  {
       c = getopt_long (argc, argv, "rd:t:", long_options, &option_index);
       if (c == -1) break;
 
       switch (c)
-	{
-	case 'd':		/* dump chunk? */
-	  dump_index = atoi (optarg); /* get chunk index */
-	  display = FALSE;  /* we enable display when we find chunk */
-	  break;
-	case 't':
-	  dump_type = g_strndup (optarg, 4);
-	  display = FALSE;
-	  break;
-	case 'r':
-	  raw_dump = TRUE;
-	  break;
-	case ':':		/* missing option */
-	  fprintf (stderr, "Missing parameter for option '-%c, %s'\n",
-		   (char)(long_options[option_index].val),
-		   long_options[option_index].name);
-	  usage();
-	  exit (1);
-	  break;
-	case '?':		/* unknown switch */
-	  usage();
-	  exit(1);
-	  break;
-	default:
-	  fprintf (stderr, "Unknown getopt return val '%d'\n", c);
-	  exit (1);
-	  break;
-	}
-    }
+      {
+          case 'd':		/* dump chunk? */
+	          dump_index = atoi (optarg); /* get chunk index */
+	          display = FALSE;  /* we enable display when we find chunk */
+	          break;
+	      case 't':
+	          dump_type = g_strndup (optarg, 4);
+	          display = FALSE;
+	          break;
+	      case 'r':
+	          raw_dump = TRUE;
+	          break;
+	      case ':':		/* missing option */
+	          fprintf (stderr, "Missing parameter for option '-%c, %s'\n",
+		              (char)(long_options[option_index].val),
+                      long_options[option_index].name);
+              usage();
+              exit (1);
+              break;
+          case '?':		/* unknown switch */
+              usage();
+              exit(1);
+              break;
+          default:
+              fprintf (stderr, "Unknown getopt return val '%d'\n", c);
+              exit (1);
+          break;
+       }
+  }
 
   if (optind >= argc)
     {
@@ -95,6 +105,46 @@ main (int argc, char *argv[])
     }
 
   file_name = argv[optind];
+#else
+  // utilisation de glib
+
+  GOptionContext *context = NULL;
+
+  static GOptionEntry entries[] =
+  {
+      { "dump", 'd', 0, G_OPTION_ARG_INT, &dump_index, "Dump a chunk by CHUNK_INDEX index", "CHUNK_INDEX" },
+      { "dump-type", 't', 0, G_OPTION_ARG_STRING, &dump_type, "Dump a chunk by RIFF FOURCC CHNK", "CHNK" },
+      { "raw", 'r', 0, G_OPTION_ARG_NONE, &raw_dump, "Do raw dump rather than formatted hex dump", NULL },
+      { NULL }
+  };
+  
+  setlocale( LC_ALL, "" );
+//  g_type_init ();
+  if (!g_thread_supported ())
+    g_thread_init (NULL);
+
+
+  printf("argc:%d,  argv:%d\n",argc, argv);
+
+    context = g_option_context_new ("...FILE");
+//  context = g_option_context_new (NULL);
+  printf("<g_option_context_new:%d\n",context);
+  g_option_context_add_main_entries (context, entries, NULL);
+  printf("<g_option_context_add_main\n");
+//jjc : context ne doit pas être NULL
+  if (!g_option_context_parse (context, &argc, &argv, &err))
+  {
+      g_print ("option parsing failed: %s\n", err->message);
+   printf("argc:%d,  argv:%d\n",argc, argv);
+     exit (1);
+  }
+
+  g_print ("option parsing Ok: %s\n", err->message);
+  printf("argc:%d,  argv:%d\n",argc, argv);
+ return 0;
+
+
+#endif
 
   g_type_init ();
   ipatch_init ();
