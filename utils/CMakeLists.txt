@@ -18,6 +18,8 @@ if ( WIN32 AND NOT HAVE_GETOPT_H )
     set (GETOPT_INCLUDE_PATH "" 
         CACHE FILEPATH "Path of getopt.h" )
     set (CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES} ${GETOPT_INCLUDE_PATH})
+    # force check_include_file to see if getopth.h exits in CMAKE_REQUIRED_INCLUDES
+    unset (HAVE_GETOPT_H CACHE)
     check_include_file ( getopt.h HAVE_GETOPT_H )
     if ( HAVE_GETOPT_H )
         include_directories ( ${GETOPT_INCLUDE_PATH} )
