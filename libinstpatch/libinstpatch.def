@@ -831,6 +831,7 @@ ipatch_sf2_voice_cache_new
 ipatch_sf2_voice_cache_optimize
 ipatch_sf2_voice_cache_select
 ipatch_sf2_voice_cache_set_voice_range
+ipatch_sf2_voice_cache_set_default_mods
 
 
 ipatch_sf2_voice_cache_sample_data
