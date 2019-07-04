@@ -32,6 +32,7 @@
 #include <stdarg.h>
 #include <string.h>
 #include <errno.h>
+#include <locale.h>
 
 /* for mkdir */
 #include <sys/stat.h>
@@ -120,7 +121,6 @@ static TypePropInit type_props[] =
 /* name of application using libInstPatch (for saving to files) */
 char *ipatch_application_name = NULL;
 
-
 /**
  * ipatch_init:
  *
@@ -142,6 +142,21 @@ ipatch_init (void)
 
   if (!g_thread_supported ())
     g_thread_init (NULL);
+
+  /* set up current locale.
+     
+     Warning: This ensures that when loading preferences, decimal floating values are
+     properly decoded accordling to the LC_NUMERIC separator.
+
+     When using ipatch_xml_xxxx_decode_xxxx_func(),this will ensure that when decoding
+	 float numbers, decimal part values are properly decoded. Otherwise there is risk
+	 that decimal part will be ignored, leading in previous float preferences being
+	 read as integer value.
+  */
+  if(! setlocale( LC_ALL, "" ))
+  {
+	  g_critical("Error setting locale");
+  }
 
   /* bind the gettext domain */
 #if defined(ENABLE_NLS)
