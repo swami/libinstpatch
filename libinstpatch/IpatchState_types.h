@@ -82,50 +82,50 @@ typedef struct _IpatchStateItemChangeClass IpatchStateItemChangeClass;
 /* Add IpatchItem state object */
 struct _IpatchStateItemAdd
 {
-  IpatchStateItem parent_instance; /* derived from IpatchStateItem */
-  IpatchItem *item;		/* item that was added */
+    IpatchStateItem parent_instance; /* derived from IpatchStateItem */
+    IpatchItem *item;		/* item that was added */
 };
 
 /* Add IpatchItem state class */
 struct _IpatchStateItemAddClass
 {
-  IpatchStateItemClass parent_class; /* derived from IpatchStateItem */
+    IpatchStateItemClass parent_class; /* derived from IpatchStateItem */
 };
 
 
 /* Remove IpatchItem state object */
 struct _IpatchStateItemRemove
 {
-  IpatchStateItem parent_instance; /* derived from IpatchStateItem */
-  IpatchItem *item;		/* item that was removed */
-  IpatchItem *parent;		/* parent of item that was removed */
+    IpatchStateItem parent_instance; /* derived from IpatchStateItem */
+    IpatchItem *item;		/* item that was removed */
+    IpatchItem *parent;		/* parent of item that was removed */
 };
 
 /* Remove IpatchItem state class */
 struct _IpatchStateItemRemoveClass
 {
-  IpatchStateItemClass parent_class; /* derived from IpatchStateItem */
+    IpatchStateItemClass parent_class; /* derived from IpatchStateItem */
 };
 
 
 /* IpatchItem property change state object */
 struct _IpatchStateItemChange
 {
-  IpatchStateItem parent_instance; /* derived from IpatchStateItem */
-  IpatchItem *item;		/* item that has changed */
-  GParamSpec *pspec;		/* parameter spec of changed property */
-  GValue value;			/* old property value */
+    IpatchStateItem parent_instance; /* derived from IpatchStateItem */
+    IpatchItem *item;		/* item that has changed */
+    GParamSpec *pspec;		/* parameter spec of changed property */
+    GValue value;			/* old property value */
 };
 
 /* IpatchItem property change state class */
 struct _IpatchStateItemChangeClass
 {
-  IpatchStateItemClass parent_class; /* derived from IpatchStateItem */
+    IpatchStateItemClass parent_class; /* derived from IpatchStateItem */
 };
 
 
-GType ipatch_state_item_add_get_type (void);
-GType ipatch_state_item_remove_get_type (void);
-GType ipatch_state_item_change_get_type (void);
+GType ipatch_state_item_add_get_type(void);
+GType ipatch_state_item_remove_get_type(void);
+GType ipatch_state_item_change_get_type(void);
 
 #endif

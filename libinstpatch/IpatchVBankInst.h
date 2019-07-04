@@ -49,17 +49,17 @@ typedef struct _IpatchVBankInstClass IpatchVBankInstClass;
 /* Virtual bank instrument item */
 struct _IpatchVBankInst
 {
-  IpatchContainer parent_instance;
+    IpatchContainer parent_instance;
 
-  char *name;			/* name of instrument */
-  guint16 bank;			/* MIDI bank map number */
-  guint16 program;		/* MIDI program number */
-  GSList *regions;		/* list of instrument regions */
+    char *name;			/* name of instrument */
+    guint16 bank;			/* MIDI bank map number */
+    guint16 program;		/* MIDI program number */
+    GSList *regions;		/* list of instrument regions */
 };
 
 struct _IpatchVBankInstClass
 {
-  IpatchContainerClass parent_class;
+    IpatchContainerClass parent_class;
 };
 
 /**
@@ -69,24 +69,24 @@ struct _IpatchVBankInstClass
  */
 #define IPATCH_VBANK_INST_NAME_SIZE	64
 
-GType ipatch_vbank_inst_get_type (void);
-IpatchVBankInst *ipatch_vbank_inst_new (void);
+GType ipatch_vbank_inst_get_type(void);
+IpatchVBankInst *ipatch_vbank_inst_new(void);
 
 #define ipatch_vbank_inst_get_regions(inst) \
     ipatch_container_get_children (IPATCH_CONTAINER (inst), \
 				   IPATCH_TYPE_VBANK_REGION)
 
-IpatchVBankInst *ipatch_vbank_inst_first (IpatchIter *iter);
-IpatchVBankInst *ipatch_vbank_inst_next (IpatchIter *iter);
+IpatchVBankInst *ipatch_vbank_inst_first(IpatchIter *iter);
+IpatchVBankInst *ipatch_vbank_inst_next(IpatchIter *iter);
 
-void ipatch_vbank_inst_new_region (IpatchVBankInst *inst, IpatchItem *item);
+void ipatch_vbank_inst_new_region(IpatchVBankInst *inst, IpatchItem *item);
 
-void ipatch_vbank_inst_set_midi_locale (IpatchVBankInst *inst,
-					int bank, int program);
-void ipatch_vbank_inst_get_midi_locale (IpatchVBankInst *inst,
-					int *bank, int *program);
+void ipatch_vbank_inst_set_midi_locale(IpatchVBankInst *inst,
+                                       int bank, int program);
+void ipatch_vbank_inst_get_midi_locale(IpatchVBankInst *inst,
+                                       int *bank, int *program);
 
-int ipatch_vbank_inst_compare (const IpatchVBankInst *p1,
-			       const IpatchVBankInst *p2);
+int ipatch_vbank_inst_compare(const IpatchVBankInst *p1,
+                              const IpatchVBankInst *p2);
 
 #endif

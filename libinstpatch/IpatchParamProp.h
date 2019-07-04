@@ -24,26 +24,26 @@
 #include <glib-object.h>
 
 /* libInstPatch GParamSpec->flags */
-enum 
+enum
 {
-/* Parameter should be unique amongst siblings */
-  IPATCH_PARAM_UNIQUE = (1 << G_PARAM_USER_SHIFT),
+    /* Parameter should be unique amongst siblings */
+    IPATCH_PARAM_UNIQUE = (1 << G_PARAM_USER_SHIFT),
 
-/* Hint that a property should be hidden in user interfaces */
-  IPATCH_PARAM_HIDE = (1 << (G_PARAM_USER_SHIFT + 1)),
+    /* Hint that a property should be hidden in user interfaces */
+    IPATCH_PARAM_HIDE = (1 << (G_PARAM_USER_SHIFT + 1)),
 
-/* Indicates that property affects audio synthesis */
-  IPATCH_PARAM_SYNTH = (1 << (G_PARAM_USER_SHIFT + 2)),
+    /* Indicates that property affects audio synthesis */
+    IPATCH_PARAM_SYNTH = (1 << (G_PARAM_USER_SHIFT + 2)),
 
-/* Indicates that property can be a real time synthesis parameter */
-  IPATCH_PARAM_SYNTH_REALTIME = (1 << (G_PARAM_USER_SHIFT + 3)),
+    /* Indicates that property can be a real time synthesis parameter */
+    IPATCH_PARAM_SYNTH_REALTIME = (1 << (G_PARAM_USER_SHIFT + 3)),
 
-/* Used for properties which don't modify the saveable state of an object.
- * The object's base object save dirty flag wont get set. */
-  IPATCH_PARAM_NO_SAVE_CHANGE = (1 << (G_PARAM_USER_SHIFT + 4)),
+    /* Used for properties which don't modify the saveable state of an object.
+     * The object's base object save dirty flag wont get set. */
+    IPATCH_PARAM_NO_SAVE_CHANGE = (1 << (G_PARAM_USER_SHIFT + 4)),
 
-  /* Indicates that property should not be saved as object state (XML for example) */
-  IPATCH_PARAM_NO_SAVE = (1 << (G_PARAM_USER_SHIFT + 5))
+    /* Indicates that property should not be saved as object state (XML for example) */
+    IPATCH_PARAM_NO_SAVE = (1 << (G_PARAM_USER_SHIFT + 5))
 };
 
 
@@ -51,19 +51,19 @@ enum
 #define IPATCH_PARAM_USER_SHIFT  (G_PARAM_USER_SHIFT + 12)
 
 
-void ipatch_param_install_property (GParamSpec *prop_spec);
-GParamSpec *ipatch_param_find_property (const char *name);
-GParamSpec **ipatch_param_list_properties (guint *n_properties);
-GParamSpec *ipatch_param_set (GParamSpec *spec,
-			      const char *first_property_name, ...);
-void ipatch_param_set_valist (GParamSpec *spec, const char *first_property_name,
-			      va_list args);
-void ipatch_param_set_property (GParamSpec *spec, const char *property_name,
-				const GValue *value);
-void ipatch_param_get (GParamSpec *spec, const char *first_property_name, ...);
-void ipatch_param_get_valist (GParamSpec *spec, const char *first_property_name,
-			      va_list args);
-gboolean ipatch_param_get_property (GParamSpec *spec, const char *property_name,
-				    GValue *value);
+void ipatch_param_install_property(GParamSpec *prop_spec);
+GParamSpec *ipatch_param_find_property(const char *name);
+GParamSpec **ipatch_param_list_properties(guint *n_properties);
+GParamSpec *ipatch_param_set(GParamSpec *spec,
+                             const char *first_property_name, ...);
+void ipatch_param_set_valist(GParamSpec *spec, const char *first_property_name,
+                             va_list args);
+void ipatch_param_set_property(GParamSpec *spec, const char *property_name,
+                               const GValue *value);
+void ipatch_param_get(GParamSpec *spec, const char *first_property_name, ...);
+void ipatch_param_get_valist(GParamSpec *spec, const char *first_property_name,
+                             va_list args);
+gboolean ipatch_param_get_property(GParamSpec *spec, const char *property_name,
+                                   GValue *value);
 
 #endif

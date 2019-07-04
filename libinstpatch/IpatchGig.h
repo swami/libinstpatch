@@ -46,19 +46,19 @@ typedef struct _IpatchGigClass IpatchGigClass;
 /* GigaSampler object */
 struct _IpatchGig
 {
-  IpatchDLS2 parent_instance;	/* derived from DLS2 object */
-  GSList *group_names;		/* sample group names */
+    IpatchDLS2 parent_instance;	/* derived from DLS2 object */
+    GSList *group_names;		/* sample group names */
 };
 
 struct _IpatchGigClass
 {
-  IpatchDLS2Class parent_class;
+    IpatchDLS2Class parent_class;
 };
 
 /* Default GigaSampler sample group name */
 #define IPATCH_GIG_DEFAULT_SAMPLE_GROUP_NAME "Default Sample Group"
 
-GType ipatch_gig_get_type (void);
-IpatchGig *ipatch_gig_new (void);
+GType ipatch_gig_get_type(void);
+IpatchGig *ipatch_gig_new(void);
 
 #endif

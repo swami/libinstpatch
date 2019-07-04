@@ -23,26 +23,26 @@
 #include <glib.h>
 #include <glib-object.h>
 
-int ipatch_unit_sf2_abs_pitch_to_dls_abs_pitch (int sf2_abs_pitch);
-int ipatch_unit_dls_abs_pitch_to_sf2_abs_pitch (int dls_abs_pitch);
-double ipatch_unit_sf2_abs_pitch_to_hertz (int sf2_abs_pitch);
-int ipatch_unit_hertz_to_sf2_abs_pitch (double hz);
-double ipatch_unit_sf2_ofs_pitch_to_multiplier (int sf2_ofs_pitch);
-int ipatch_unit_multiplier_to_sf2_ofs_pitch (double multiplier);
+int ipatch_unit_sf2_abs_pitch_to_dls_abs_pitch(int sf2_abs_pitch);
+int ipatch_unit_dls_abs_pitch_to_sf2_abs_pitch(int dls_abs_pitch);
+double ipatch_unit_sf2_abs_pitch_to_hertz(int sf2_abs_pitch);
+int ipatch_unit_hertz_to_sf2_abs_pitch(double hz);
+double ipatch_unit_sf2_ofs_pitch_to_multiplier(int sf2_ofs_pitch);
+int ipatch_unit_multiplier_to_sf2_ofs_pitch(double multiplier);
 
-int ipatch_unit_sf2_abs_time_to_dls_abs_time (int sf2_abs_time);
-int ipatch_unit_dls_abs_time_to_sf2_abs_time (int dls_abs_time);
-double ipatch_unit_sf2_abs_time_to_seconds (int sf2_abs_time);
-int ipatch_unit_seconds_to_sf2_abs_time (double sec);
-double ipatch_unit_sf2_ofs_time_to_multiplier (int sf2_ofs_time);
-int ipatch_unit_multiplier_to_sf2_ofs_time (double multiplier);
+int ipatch_unit_sf2_abs_time_to_dls_abs_time(int sf2_abs_time);
+int ipatch_unit_dls_abs_time_to_sf2_abs_time(int dls_abs_time);
+double ipatch_unit_sf2_abs_time_to_seconds(int sf2_abs_time);
+int ipatch_unit_seconds_to_sf2_abs_time(double sec);
+double ipatch_unit_sf2_ofs_time_to_multiplier(int sf2_ofs_time);
+int ipatch_unit_multiplier_to_sf2_ofs_time(double multiplier);
 
-int ipatch_unit_centibels_to_dls_gain (int centibel);
-int ipatch_unit_dls_gain_to_centibels (int dls_gain);
-double ipatch_unit_centibels_to_decibels (int cb);
-int ipatch_unit_decibels_to_centibels (double db);
+int ipatch_unit_centibels_to_dls_gain(int centibel);
+int ipatch_unit_dls_gain_to_centibels(int dls_gain);
+double ipatch_unit_centibels_to_decibels(int cb);
+int ipatch_unit_decibels_to_centibels(double db);
 
-double ipatch_unit_tenth_percent_to_percent (int tenth_percent);
-int ipatch_unit_percent_to_tenth_percent (double percent);
+double ipatch_unit_tenth_percent_to_percent(int tenth_percent);
+int ipatch_unit_percent_to_tenth_percent(double percent);
 
 #endif

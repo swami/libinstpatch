@@ -4,34 +4,35 @@
 
 
 int
-main (int argc, char *argv[])
+main(int argc, char *argv[])
 {
-  GError *err = NULL;
-  char *irdump = NULL;
-  GOptionContext *context;
+    GError *err = NULL;
+    char *irdump = NULL;
+    GOptionContext *context;
 
-  GOptionEntry entries[] = {
-    { "introspect-dump", 'i', 0, G_OPTION_ARG_STRING, &irdump, NULL, NULL },
-    { NULL }
-  };
+    GOptionEntry entries[] =
+    {
+        { "introspect-dump", 'i', 0, G_OPTION_ARG_STRING, &irdump, NULL, NULL },
+        { NULL }
+    };
 
-  context = g_option_context_new (NULL);
-  g_option_context_add_main_entries (context, entries, "libinstpatch-gir-program");
+    context = g_option_context_new(NULL);
+    g_option_context_add_main_entries(context, entries, "libinstpatch-gir-program");
 
-  if (!g_option_context_parse (context, &argc, &argv, &err))
-  {
-    g_print ("option parsing failed: %s\n", err->message);
-    return (1);
-  }
+    if(!g_option_context_parse(context, &argc, &argv, &err))
+    {
+        g_print("option parsing failed: %s\n", err->message);
+        return (1);
+    }
 
-  ipatch_init ();
+    ipatch_init();
 
-  if (!g_irepository_dump (irdump, &err))
-  {
-    g_print ("g_irepository_dump() failed: %s\n", err->message);
-    return (1);
-  }
+    if(!g_irepository_dump(irdump, &err))
+    {
+        g_print("g_irepository_dump() failed: %s\n", err->message);
+        return (1);
+    }
 
-  return (0);
+    return (0);
 }
 

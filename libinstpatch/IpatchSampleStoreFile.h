@@ -45,15 +45,15 @@ typedef struct _IpatchSampleStoreFileClass IpatchSampleStoreFileClass;
 /* File sample store instance */
 struct _IpatchSampleStoreFile
 {
-  IpatchSampleStore parent_instance;
-  IpatchFile *file;     /* File object */
-  guint location;       /* Position in file of the sample data */
+    IpatchSampleStore parent_instance;
+    IpatchFile *file;     /* File object */
+    guint location;       /* Position in file of the sample data */
 };
 
 /* File sample store class */
 struct _IpatchSampleStoreFileClass
 {
-  IpatchSampleStoreClass parent_class;
+    IpatchSampleStoreClass parent_class;
 };
 
 /**
@@ -63,7 +63,7 @@ struct _IpatchSampleStoreFileClass
 #define IPATCH_SAMPLE_STORE_FILE_UNUSED_FLAG_SHIFT \
   (IPATCH_SAMPLE_STORE_UNUSED_FLAG_SHIFT + 1)
 
-GType ipatch_sample_store_file_get_type (void);
-IpatchSample *ipatch_sample_store_file_new (IpatchFile *file, guint location);
+GType ipatch_sample_store_file_get_type(void);
+IpatchSample *ipatch_sample_store_file_new(IpatchFile *file, guint location);
 
 #endif

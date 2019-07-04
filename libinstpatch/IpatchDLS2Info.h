@@ -31,54 +31,54 @@ typedef struct _IpatchDLS2InfoBag IpatchDLS2InfoBag;
 /* a container for a INFO ID and value (generally not accessed directly) */
 struct _IpatchDLS2InfoBag
 {
-  guint32 fourcc;		/* FOURCC int ID */
-  char *value;			/* info string value */
+    guint32 fourcc;		/* FOURCC int ID */
+    char *value;			/* info string value */
 };
 
 /* known DLS2 INFO FOURCC IDs */
 typedef enum
 {
-  IPATCH_DLS2_ARCHIVE_LOCATION = IPATCH_DLS_FOURCC_IARL,
-  IPATCH_DLS2_ARTIST           = IPATCH_DLS_FOURCC_IART,
-  IPATCH_DLS2_COMMISSIONED     = IPATCH_DLS_FOURCC_ICMS,
-  IPATCH_DLS2_COMMENT          = IPATCH_DLS_FOURCC_ICMT,
-  IPATCH_DLS2_COPYRIGHT        = IPATCH_DLS_FOURCC_ICOP,
-  IPATCH_DLS2_DATE             = IPATCH_DLS_FOURCC_ICRD,
-  IPATCH_DLS2_ENGINEER         = IPATCH_DLS_FOURCC_IENG,
-  IPATCH_DLS2_GENRE            = IPATCH_DLS_FOURCC_IGNR,
-  IPATCH_DLS2_KEYWORDS         = IPATCH_DLS_FOURCC_IKEY,
-  IPATCH_DLS2_MEDIUM           = IPATCH_DLS_FOURCC_IMED,
-  IPATCH_DLS2_NAME             = IPATCH_DLS_FOURCC_INAM,
-  IPATCH_DLS2_PRODUCT          = IPATCH_DLS_FOURCC_IPRD,
-  IPATCH_DLS2_SUBJECT          = IPATCH_DLS_FOURCC_ISBJ,
-  IPATCH_DLS2_SOFTWARE         = IPATCH_DLS_FOURCC_ISFT,
-  IPATCH_DLS2_SOURCE           = IPATCH_DLS_FOURCC_ISRC,
-  IPATCH_DLS2_SOURCE_FORM      = IPATCH_DLS_FOURCC_ISRF,
-  IPATCH_DLS2_TECHNICIAN       = IPATCH_DLS_FOURCC_ITCH
+    IPATCH_DLS2_ARCHIVE_LOCATION = IPATCH_DLS_FOURCC_IARL,
+    IPATCH_DLS2_ARTIST           = IPATCH_DLS_FOURCC_IART,
+    IPATCH_DLS2_COMMISSIONED     = IPATCH_DLS_FOURCC_ICMS,
+    IPATCH_DLS2_COMMENT          = IPATCH_DLS_FOURCC_ICMT,
+    IPATCH_DLS2_COPYRIGHT        = IPATCH_DLS_FOURCC_ICOP,
+    IPATCH_DLS2_DATE             = IPATCH_DLS_FOURCC_ICRD,
+    IPATCH_DLS2_ENGINEER         = IPATCH_DLS_FOURCC_IENG,
+    IPATCH_DLS2_GENRE            = IPATCH_DLS_FOURCC_IGNR,
+    IPATCH_DLS2_KEYWORDS         = IPATCH_DLS_FOURCC_IKEY,
+    IPATCH_DLS2_MEDIUM           = IPATCH_DLS_FOURCC_IMED,
+    IPATCH_DLS2_NAME             = IPATCH_DLS_FOURCC_INAM,
+    IPATCH_DLS2_PRODUCT          = IPATCH_DLS_FOURCC_IPRD,
+    IPATCH_DLS2_SUBJECT          = IPATCH_DLS_FOURCC_ISBJ,
+    IPATCH_DLS2_SOFTWARE         = IPATCH_DLS_FOURCC_ISFT,
+    IPATCH_DLS2_SOURCE           = IPATCH_DLS_FOURCC_ISRC,
+    IPATCH_DLS2_SOURCE_FORM      = IPATCH_DLS_FOURCC_ISRF,
+    IPATCH_DLS2_TECHNICIAN       = IPATCH_DLS_FOURCC_ITCH
 } IpatchDLS2InfoType;
 
 
-char *ipatch_dls2_info_get (IpatchDLS2Info *info, guint32 fourcc);
-G_CONST_RETURN char *ipatch_dls2_info_peek (IpatchDLS2Info *info,
-					    guint32 fourcc);
-void ipatch_dls2_info_set (IpatchDLS2Info **info, guint32 fourcc,
-			   const char *value);
-void ipatch_dls2_info_free (IpatchDLS2Info *info);
-IpatchDLS2Info *ipatch_dls2_info_duplicate (IpatchDLS2Info *info);
+char *ipatch_dls2_info_get(IpatchDLS2Info *info, guint32 fourcc);
+G_CONST_RETURN char *ipatch_dls2_info_peek(IpatchDLS2Info *info,
+        guint32 fourcc);
+void ipatch_dls2_info_set(IpatchDLS2Info **info, guint32 fourcc,
+                          const char *value);
+void ipatch_dls2_info_free(IpatchDLS2Info *info);
+IpatchDLS2Info *ipatch_dls2_info_duplicate(IpatchDLS2Info *info);
 
-gboolean ipatch_dls2_info_is_defined (guint32 fourcc);
+gboolean ipatch_dls2_info_is_defined(guint32 fourcc);
 
-void ipatch_dls2_info_install_class_properties (GObjectClass *obj_class);
-gboolean ipatch_dls2_info_set_property (IpatchDLS2Info **info_list,
-					guint property_id,
-					const GValue *value);
-gboolean ipatch_dls2_info_get_property (IpatchDLS2Info *info_list,
-					guint property_id,
-					GValue *value);
-void ipatch_dls2_info_notify (IpatchItem *item, guint32 fourcc,
-			      const GValue *new_value, const GValue *old_value);
+void ipatch_dls2_info_install_class_properties(GObjectClass *obj_class);
+gboolean ipatch_dls2_info_set_property(IpatchDLS2Info **info_list,
+                                       guint property_id,
+                                       const GValue *value);
+gboolean ipatch_dls2_info_get_property(IpatchDLS2Info *info_list,
+                                       guint property_id,
+                                       GValue *value);
+void ipatch_dls2_info_notify(IpatchItem *item, guint32 fourcc,
+                             const GValue *new_value, const GValue *old_value);
 
-IpatchDLS2InfoBag *ipatch_dls2_info_bag_new (void);
-void ipatch_dls2_info_bag_free (IpatchDLS2InfoBag *bag);
+IpatchDLS2InfoBag *ipatch_dls2_info_bag_new(void);
+void ipatch_dls2_info_bag_free(IpatchDLS2InfoBag *bag);
 
 #endif

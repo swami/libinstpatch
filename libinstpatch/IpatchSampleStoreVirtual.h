@@ -47,26 +47,26 @@ typedef struct _IpatchSampleStoreVirtualClass IpatchSampleStoreVirtualClass;
 /* Virtual sample store instance */
 struct _IpatchSampleStoreVirtual
 {
-  IpatchSampleStore parent_instance;
+    IpatchSampleStore parent_instance;
 
-  /*< private >*/
+    /*< private >*/
 
-  IpatchSampleList *lists[2];	/* Edit lists, one per channel (max = stereo currently) */
-  int access_speed;             /* Cached access speed value (0 if not yet calculated) */
+    IpatchSampleList *lists[2];	/* Edit lists, one per channel (max = stereo currently) */
+    int access_speed;             /* Cached access speed value (0 if not yet calculated) */
 };
 
 /* Virtual sample store class */
 struct _IpatchSampleStoreVirtualClass
 {
-  IpatchSampleStoreClass parent_class;
+    IpatchSampleStoreClass parent_class;
 };
 
 
-GType ipatch_sample_store_virtual_get_type (void);
-IpatchSample *ipatch_sample_store_virtual_new (void);
+GType ipatch_sample_store_virtual_get_type(void);
+IpatchSample *ipatch_sample_store_virtual_new(void);
 IpatchSampleList *
-ipatch_sample_store_virtual_get_list (IpatchSampleStoreVirtual *store, guint chan);
-void ipatch_sample_store_virtual_set_list (IpatchSampleStoreVirtual *store,
-					   guint chan, IpatchSampleList *list);
+ipatch_sample_store_virtual_get_list(IpatchSampleStoreVirtual *store, guint chan);
+void ipatch_sample_store_virtual_set_list(IpatchSampleStoreVirtual *store,
+        guint chan, IpatchSampleList *list);
 
 #endif

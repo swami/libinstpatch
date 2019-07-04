@@ -20,7 +20,7 @@
 /**
  * SECTION: IpatchSampleList
  * @short_description: Sample list data types and functions
- * @see_also: 
+ * @see_also:
  * @stability: Stable
  *
  * Sample lists define audio data from concatenated segments of other
@@ -35,31 +35,33 @@
 #include "config.h"
 #endif
 
-static GList *list_item_free_next (IpatchSampleList *list, GList *itemp);
+static GList *list_item_free_next(IpatchSampleList *list, GList *itemp);
 
 
 GType
-ipatch_sample_list_get_type (void)
+ipatch_sample_list_get_type(void)
 {
-  static GType type = 0;
+    static GType type = 0;
 
-  if (!type)
-    type = g_boxed_type_register_static ("IpatchSampleList",
-                                (GBoxedCopyFunc)ipatch_sample_list_duplicate,
-                                (GBoxedFreeFunc)ipatch_sample_list_free);
-  return (type);
+    if(!type)
+        type = g_boxed_type_register_static("IpatchSampleList",
+                                            (GBoxedCopyFunc)ipatch_sample_list_duplicate,
+                                            (GBoxedFreeFunc)ipatch_sample_list_free);
+
+    return (type);
 }
 
 GType
-ipatch_sample_list_item_get_type (void)
+ipatch_sample_list_item_get_type(void)
 {
-  static GType type = 0;
+    static GType type = 0;
 
-  if (!type)
-    type = g_boxed_type_register_static ("IpatchSampleListItem",
-                                (GBoxedCopyFunc)ipatch_sample_list_item_duplicate,
-                                (GBoxedFreeFunc)ipatch_sample_list_item_free);
-  return (type);
+    if(!type)
+        type = g_boxed_type_register_static("IpatchSampleListItem",
+                                            (GBoxedCopyFunc)ipatch_sample_list_item_duplicate,
+                                            (GBoxedFreeFunc)ipatch_sample_list_item_free);
+
+    return (type);
 }
 
 /**
@@ -70,9 +72,9 @@ ipatch_sample_list_item_get_type (void)
  * Returns: Newly allocated empty sample list.
  */
 IpatchSampleList *
-ipatch_sample_list_new (void)
+ipatch_sample_list_new(void)
 {
-  return (g_slice_new0 (IpatchSampleList));
+    return (g_slice_new0(IpatchSampleList));
 }
 
 /**
@@ -82,17 +84,19 @@ ipatch_sample_list_new (void)
  * Free a sample list.
  */
 void
-ipatch_sample_list_free (IpatchSampleList *list)
+ipatch_sample_list_free(IpatchSampleList *list)
 {
-  GList *p;
+    GList *p;
 
-  g_return_if_fail (list != NULL);
+    g_return_if_fail(list != NULL);
 
-  /* free the items in the list */
-  for (p = list->items; p; p = g_list_delete_link (p, p))
-    ipatch_sample_list_item_free ((IpatchSampleListItem *)(p->data));
+    /* free the items in the list */
+    for(p = list->items; p; p = g_list_delete_link(p, p))
+    {
+        ipatch_sample_list_item_free((IpatchSampleListItem *)(p->data));
+    }
 
-  g_slice_free (IpatchSampleList, list);
+    g_slice_free(IpatchSampleList, list);
 }
 
 /**
@@ -104,26 +108,26 @@ ipatch_sample_list_free (IpatchSampleList *list)
  * Returns: Newly allocated duplicate of @list.
  */
 IpatchSampleList *
-ipatch_sample_list_duplicate (IpatchSampleList *list)
+ipatch_sample_list_duplicate(IpatchSampleList *list)
 {
-  IpatchSampleListItem *item;
-  IpatchSampleList *newlist;
-  GList *p;
+    IpatchSampleListItem *item;
+    IpatchSampleList *newlist;
+    GList *p;
 
-  g_return_val_if_fail (list != NULL, NULL);
+    g_return_val_if_fail(list != NULL, NULL);
 
-  newlist = ipatch_sample_list_new ();
-  newlist->total_size = list->total_size;
+    newlist = ipatch_sample_list_new();
+    newlist->total_size = list->total_size;
 
-  for (p = list->items; p; p = p->next)
-  {
-    item = ipatch_sample_list_item_duplicate ((IpatchSampleListItem *)(p->data));
-    newlist->items = g_list_prepend (newlist->items, item);
-  }
+    for(p = list->items; p; p = p->next)
+    {
+        item = ipatch_sample_list_item_duplicate((IpatchSampleListItem *)(p->data));
+        newlist->items = g_list_prepend(newlist->items, item);
+    }
 
-  newlist->items = g_list_reverse (newlist->items);
+    newlist->items = g_list_reverse(newlist->items);
 
-  return (newlist);
+    return (newlist);
 }
 
 /**
@@ -135,9 +139,9 @@ ipatch_sample_list_duplicate (IpatchSampleList *list)
  * ipatch_sample_list_item_free() when finished using it.
  */
 IpatchSampleListItem *
-ipatch_sample_list_item_new (void)
+ipatch_sample_list_item_new(void)
 {
-  return (g_slice_new0 (IpatchSampleListItem));
+    return (g_slice_new0(IpatchSampleListItem));
 }
 
 /**
@@ -153,25 +157,25 @@ ipatch_sample_list_item_new (void)
  * ipatch_sample_list_item_free() when done with it.
  */
 IpatchSampleListItem *
-ipatch_sample_list_item_new_init (IpatchSample *sample, guint ofs, guint size,
-				  guint channel)
+ipatch_sample_list_item_new_init(IpatchSample *sample, guint ofs, guint size,
+                                 guint channel)
 {
-  IpatchSampleListItem *item;
-  guint sample_size;
+    IpatchSampleListItem *item;
+    guint sample_size;
 
-  g_return_val_if_fail (IPATCH_IS_SAMPLE (sample), NULL);
-  g_return_val_if_fail (size > 0, NULL);
+    g_return_val_if_fail(IPATCH_IS_SAMPLE(sample), NULL);
+    g_return_val_if_fail(size > 0, NULL);
 
-  sample_size = ipatch_sample_get_size (sample, NULL);
-  g_return_val_if_fail (ofs + size <= sample_size, NULL);
+    sample_size = ipatch_sample_get_size(sample, NULL);
+    g_return_val_if_fail(ofs + size <= sample_size, NULL);
 
-  item = ipatch_sample_list_item_new ();
-  item->sample = g_object_ref (sample);
-  item->size = size;
-  item->ofs = ofs;
-  item->channel = channel;
+    item = ipatch_sample_list_item_new();
+    item->sample = g_object_ref(sample);
+    item->size = size;
+    item->ofs = ofs;
+    item->channel = channel;
 
-  return (item);
+    return (item);
 }
 
 /**
@@ -181,10 +185,14 @@ ipatch_sample_list_item_new_init (IpatchSample *sample, guint ofs, guint size,
  * Free a sample list item previously allocated by ipatch_sample_list_item_new().
  */
 void
-ipatch_sample_list_item_free (IpatchSampleListItem *item)
+ipatch_sample_list_item_free(IpatchSampleListItem *item)
 {
-  if (item->sample) g_object_unref (item->sample);
-  g_slice_free (IpatchSampleListItem, item);
+    if(item->sample)
+    {
+        g_object_unref(item->sample);
+    }
+
+    g_slice_free(IpatchSampleListItem, item);
 }
 
 /**
@@ -196,17 +204,17 @@ ipatch_sample_list_item_free (IpatchSampleListItem *item)
  * Returns: New duplicate sample list item.
  */
 IpatchSampleListItem *
-ipatch_sample_list_item_duplicate (IpatchSampleListItem *item)
+ipatch_sample_list_item_duplicate(IpatchSampleListItem *item)
 {
-  IpatchSampleListItem *newitem;
+    IpatchSampleListItem *newitem;
 
-  newitem = ipatch_sample_list_item_new ();
-  newitem->sample = item->sample ? g_object_ref (item->sample) : NULL;
-  newitem->ofs = item->ofs;
-  newitem->size = item->size;
-  newitem->channel = item->channel;
+    newitem = ipatch_sample_list_item_new();
+    newitem->sample = item->sample ? g_object_ref(item->sample) : NULL;
+    newitem->ofs = item->ofs;
+    newitem->size = item->size;
+    newitem->channel = item->channel;
 
-  return (newitem);
+    return (newitem);
 }
 
 /**
@@ -220,18 +228,18 @@ ipatch_sample_list_item_duplicate (IpatchSampleListItem *item)
  * Append an audio segment to a sample list.
  */
 void
-ipatch_sample_list_append (IpatchSampleList *list, IpatchSample *sample,
-			   guint ofs, guint size, guint channel)
+ipatch_sample_list_append(IpatchSampleList *list, IpatchSample *sample,
+                          guint ofs, guint size, guint channel)
 {
-  IpatchSampleListItem *item;
+    IpatchSampleListItem *item;
 
-  g_return_if_fail (list != NULL);
+    g_return_if_fail(list != NULL);
 
-  item = ipatch_sample_list_item_new_init (sample, ofs, size, channel);
-  g_return_if_fail (item != NULL);
+    item = ipatch_sample_list_item_new_init(sample, ofs, size, channel);
+    g_return_if_fail(item != NULL);
 
-  list->items = g_list_append (list->items, item);
-  list->total_size += size;
+    list->items = g_list_append(list->items, item);
+    list->total_size += size;
 }
 
 /**
@@ -245,18 +253,18 @@ ipatch_sample_list_append (IpatchSampleList *list, IpatchSample *sample,
  * Prepend an audio segment to a sample list.
  */
 void
-ipatch_sample_list_prepend (IpatchSampleList *list, IpatchSample *sample,
-                            guint ofs, guint size, guint channel)
+ipatch_sample_list_prepend(IpatchSampleList *list, IpatchSample *sample,
+                           guint ofs, guint size, guint channel)
 {
-  IpatchSampleListItem *item;
+    IpatchSampleListItem *item;
 
-  g_return_if_fail (list != NULL);
+    g_return_if_fail(list != NULL);
 
-  item = ipatch_sample_list_item_new_init (sample, ofs, size, channel);
-  g_return_if_fail (item != NULL);
+    item = ipatch_sample_list_item_new_init(sample, ofs, size, channel);
+    g_return_if_fail(item != NULL);
 
-  list->items = g_list_prepend (list->items, item);
-  list->total_size += size;
+    list->items = g_list_prepend(list->items, item);
+    list->total_size += size;
 }
 
 /**
@@ -272,19 +280,19 @@ ipatch_sample_list_prepend (IpatchSampleList *list, IpatchSample *sample,
  * @index.
  */
 void
-ipatch_sample_list_insert_index (IpatchSampleList *list, guint index,
-				 IpatchSample *sample, guint ofs,
-				 guint size, guint channel)
+ipatch_sample_list_insert_index(IpatchSampleList *list, guint index,
+                                IpatchSample *sample, guint ofs,
+                                guint size, guint channel)
 {
-  IpatchSampleListItem *item;
+    IpatchSampleListItem *item;
 
-  g_return_if_fail (list != NULL);
+    g_return_if_fail(list != NULL);
 
-  item = ipatch_sample_list_item_new_init (sample, ofs, size, channel);
-  g_return_if_fail (item != NULL);
+    item = ipatch_sample_list_item_new_init(sample, ofs, size, channel);
+    g_return_if_fail(item != NULL);
 
-  list->items = g_list_insert (list->items, item, index);
-  list->total_size += size;
+    list->items = g_list_insert(list->items, item, index);
+    list->total_size += size;
 }
 
 /**
@@ -301,48 +309,59 @@ ipatch_sample_list_insert_index (IpatchSampleList *list, guint index,
  * the inserted segment.
  */
 void
-ipatch_sample_list_insert (IpatchSampleList *list, guint pos,
-			   IpatchSample *sample, guint ofs,
-			   guint size, guint channel)
+ipatch_sample_list_insert(IpatchSampleList *list, guint pos,
+                          IpatchSample *sample, guint ofs,
+                          guint size, guint channel)
 {
-  IpatchSampleListItem *item, *newitem, *splititem;
-  guint startofs, sz;
-  GList *p;
+    IpatchSampleListItem *item, *newitem, *splititem;
+    guint startofs, sz;
+    GList *p;
 
-  g_return_if_fail (list != NULL);
-  g_return_if_fail (pos <= list->total_size);
+    g_return_if_fail(list != NULL);
+    g_return_if_fail(pos <= list->total_size);
 
-  newitem = ipatch_sample_list_item_new_init (sample, ofs, size, channel);
-  g_return_if_fail (newitem != NULL);
+    newitem = ipatch_sample_list_item_new_init(sample, ofs, size, channel);
+    g_return_if_fail(newitem != NULL);
 
-  /* search for segment containing pos */
-  for (p = list->items, startofs = 0; p; p = p->next)
-  {
-    item = (IpatchSampleListItem *)(p->data);
-    if (pos >= startofs && pos < (startofs + item->size)) break;
-    startofs += item->size;
-  }
+    /* search for segment containing pos */
+    for(p = list->items, startofs = 0; p; p = p->next)
+    {
+        item = (IpatchSampleListItem *)(p->data);
 
-  /* if list was exhausted, it means pos is past the end - append */
-  if (!p) list->items = g_list_append (list->items, newitem);
-  else if (pos != startofs)	/* need to split segment? */
-  {
-    sz = pos - startofs;	/* new size of first split segment */
+        if(pos >= startofs && pos < (startofs + item->size))
+        {
+            break;
+        }
 
-    /* create 2nd split segment */
-    splititem = ipatch_sample_list_item_new_init (item->sample, item->ofs + sz,
-						  item->size - sz, item->channel);
-    item->size = sz;
+        startofs += item->size;
+    }
 
-    /* insert new item after 1st split segment (assign to suppress GCC warning) */
-    p = g_list_insert (p, newitem, 1);
+    /* if list was exhausted, it means pos is past the end - append */
+    if(!p)
+    {
+        list->items = g_list_append(list->items, newitem);
+    }
+    else if(pos != startofs)	/* need to split segment? */
+    {
+        sz = pos - startofs;	/* new size of first split segment */
 
-    /* insert 2nd split segment */
-    p = g_list_insert (p, splititem, 2);
-  }	/* position is at the beginning of another segment, insert before */
-  else list->items = g_list_insert_before (list->items, p, newitem);
+        /* create 2nd split segment */
+        splititem = ipatch_sample_list_item_new_init(item->sample, item->ofs + sz,
+                    item->size - sz, item->channel);
+        item->size = sz;
 
-  list->total_size += size;
+        /* insert new item after 1st split segment (assign to suppress GCC warning) */
+        p = g_list_insert(p, newitem, 1);
+
+        /* insert 2nd split segment */
+        p = g_list_insert(p, splititem, 2);
+    }	/* position is at the beginning of another segment, insert before */
+    else
+    {
+        list->items = g_list_insert_before(list->items, p, newitem);
+    }
+
+    list->total_size += size;
 }
 
 /**
@@ -354,101 +373,114 @@ ipatch_sample_list_insert (IpatchSampleList *list, guint pos,
  * Cut a segment of audio from a sample list.
  */
 void
-ipatch_sample_list_cut (IpatchSampleList *list, guint pos, guint size)
+ipatch_sample_list_cut(IpatchSampleList *list, guint pos, guint size)
 {
-  IpatchSampleListItem *item = NULL, *newitem;
-  guint startofs, fsegsize;
-  GList *p;
+    IpatchSampleListItem *item = NULL, *newitem;
+    guint startofs, fsegsize;
+    GList *p;
 
-  g_return_if_fail (list != NULL);
-  g_return_if_fail (pos + size <= list->total_size);
+    g_return_if_fail(list != NULL);
+    g_return_if_fail(pos + size <= list->total_size);
 
-  list->total_size -= size;
+    list->total_size -= size;
 
-  /* search for segment containing pos */
-  for (p = list->items, startofs = 0; p; p = p->next)
-  {
-    item = (IpatchSampleListItem *)(p->data);
-    if (pos >= startofs && pos < (startofs + item->size)) break;
-    startofs += item->size;
-  }
+    /* search for segment containing pos */
+    for(p = list->items, startofs = 0; p; p = p->next)
+    {
+        item = (IpatchSampleListItem *)(p->data);
 
-  g_return_if_fail (p != NULL);	/* means total_size is out of sync! */
+        if(pos >= startofs && pos < (startofs + item->size))
+        {
+            break;
+        }
 
-  if (pos == startofs)	/* position is at start of segment? */
-  {
-    if (size < item->size)	/* size is less than segment size? */
-    {	/* increase segment offset and decrease size, we are done */
-      item->ofs += size;
-      item->size -= size;
-      return;
+        startofs += item->size;
     }
 
-    /* adjust size for remaining after segment removed */
-    size -= item->size;		/* !! must be before item delete! */
+    g_return_if_fail(p != NULL);	/* means total_size is out of sync! */
 
-    /* size is greater or equal to segment - remove segment and advance p */
-    p = list_item_free_next (list, p);
+    if(pos == startofs)	/* position is at start of segment? */
+    {
+        if(size < item->size)	/* size is less than segment size? */
+        {
+            /* increase segment offset and decrease size, we are done */
+            item->ofs += size;
+            item->size -= size;
+            return;
+        }
 
-    if (size == 0) return;	/* only this segment cut? - done */
-  }
-  else if (size < item->size - (pos - startofs))  /* cut within segment? */
-  {
-    fsegsize = pos - startofs;	/* size of first segment before cut */
+        /* adjust size for remaining after segment removed */
+        size -= item->size;		/* !! must be before item delete! */
 
-    /* create new segment for audio after cut */
-    newitem = ipatch_sample_list_item_new_init
-      (item->sample, item->ofs + fsegsize + size, item->size - fsegsize - size,
-       item->channel);
+        /* size is greater or equal to segment - remove segment and advance p */
+        p = list_item_free_next(list, p);
 
-    item->size = fsegsize;
+        if(size == 0)
+        {
+            return;    /* only this segment cut? - done */
+        }
+    }
+    else if(size < item->size - (pos - startofs))   /* cut within segment? */
+    {
+        fsegsize = pos - startofs;	/* size of first segment before cut */
 
-    /* insert 2nd seg after the 1st segment (assign to suppress GCC warning) */
-    p = g_list_insert (p, newitem, 1);
+        /* create new segment for audio after cut */
+        newitem = ipatch_sample_list_item_new_init
+                  (item->sample, item->ofs + fsegsize + size, item->size - fsegsize - size,
+                   item->channel);
 
-    return;	/* done */
-  }
-  else	/* beginning of cut is within segment and continues into more segments */
-  {
-    fsegsize = pos - startofs;		/* new size of truncated segment */
-    size -= (item->size - fsegsize);	/* update size to remaining after seg */
-    item->size = fsegsize;		/* assign new size to segment */
+        item->size = fsegsize;
 
-    p = p->next;			/* next segment */
-    startofs += fsegsize;		/* startofs of next segment */
-  }
+        /* insert 2nd seg after the 1st segment (assign to suppress GCC warning) */
+        p = g_list_insert(p, newitem, 1);
 
-  /* search for last segment which is cut, and remove all segments in between */
-  while (p)
-  {
-    item = (IpatchSampleListItem *)(p->data);
-    if (size < item->size) break;	/* remaining size is within segment? */
+        return;	/* done */
+    }
+    else	/* beginning of cut is within segment and continues into more segments */
+    {
+        fsegsize = pos - startofs;		/* new size of truncated segment */
+        size -= (item->size - fsegsize);	/* update size to remaining after seg */
+        item->size = fsegsize;		/* assign new size to segment */
 
-    /* remaining cut size includes entire segment - remove it */
-    size -= item->size;		/* !! must be before item delete! */
-    p = list_item_free_next (list, p);
-  }
+        p = p->next;			/* next segment */
+        startofs += fsegsize;		/* startofs of next segment */
+    }
 
-  if (p && size > 0)	/* cut goes into this segment? */
-  {
-    item->ofs += size;		/* advance offset to after cut */
-    item->size -= size;		/* decrease segment size by remaining cut size */
-  }
+    /* search for last segment which is cut, and remove all segments in between */
+    while(p)
+    {
+        item = (IpatchSampleListItem *)(p->data);
+
+        if(size < item->size)
+        {
+            break;    /* remaining size is within segment? */
+        }
+
+        /* remaining cut size includes entire segment - remove it */
+        size -= item->size;		/* !! must be before item delete! */
+        p = list_item_free_next(list, p);
+    }
+
+    if(p && size > 0)	/* cut goes into this segment? */
+    {
+        item->ofs += size;		/* advance offset to after cut */
+        item->size -= size;		/* decrease segment size by remaining cut size */
+    }
 }
 
 /* remove the sample item at the given list pointer and return the next item
    in the list */
 static GList *
-list_item_free_next (IpatchSampleList *list, GList *itemp)
+list_item_free_next(IpatchSampleList *list, GList *itemp)
 {
-  GList *retp;
+    GList *retp;
 
-  retp = itemp->next;
+    retp = itemp->next;
 
-  ipatch_sample_list_item_free ((IpatchSampleListItem *)(itemp->data));
-  list->items = g_list_delete_link (list->items, itemp);
+    ipatch_sample_list_item_free((IpatchSampleListItem *)(itemp->data));
+    list->items = g_list_delete_link(list->items, itemp);
 
-  return (retp);
+    return (retp);
 }
 
 /**
@@ -466,61 +498,71 @@ list_item_free_next (IpatchSampleList *list, GList *itemp)
  * Returns: %TRUE on success, %FALSE otherwise (in which case @err may be set).
  */
 gboolean
-ipatch_sample_list_render (IpatchSampleList *list, gpointer b,
-                           guint pos, guint frames, int format, GError **err)
+ipatch_sample_list_render(IpatchSampleList *list, gpointer b,
+                          guint pos, guint frames, int format, GError **err)
 {
-  IpatchSampleListItem *item = NULL;
-  guint startofs, block, format_size;
-  GList *p;
-  guint8* buf = b; // cannot use void* for pointer arithmetic below
+    IpatchSampleListItem *item = NULL;
+    guint startofs, block, format_size;
+    GList *p;
+    guint8 *buf = b; // cannot use void* for pointer arithmetic below
 
-  g_return_val_if_fail (list != NULL, FALSE);
-  g_return_val_if_fail (ipatch_sample_format_verify (format), FALSE);
-  g_return_val_if_fail (pos + frames <= list->total_size, FALSE);
-  g_return_val_if_fail (buf != NULL, FALSE);
-  g_return_val_if_fail (IPATCH_SAMPLE_FORMAT_GET_CHANNEL_COUNT (format) == 1, FALSE);
-  g_return_val_if_fail (!err || !*err, FALSE);
+    g_return_val_if_fail(list != NULL, FALSE);
+    g_return_val_if_fail(ipatch_sample_format_verify(format), FALSE);
+    g_return_val_if_fail(pos + frames <= list->total_size, FALSE);
+    g_return_val_if_fail(buf != NULL, FALSE);
+    g_return_val_if_fail(IPATCH_SAMPLE_FORMAT_GET_CHANNEL_COUNT(format) == 1, FALSE);
+    g_return_val_if_fail(!err || !*err, FALSE);
 
-  /* search for segment containing pos */
-  for (p = list->items, startofs = 0; p; p = p->next)
-  {
-    item = (IpatchSampleListItem *)(p->data);
-    if (pos >= startofs && pos < (startofs + item->size)) break;
-    startofs += item->size;
-  }
-
-  g_return_val_if_fail (p != NULL, FALSE);	/* means total_size is out of sync! */
-
-  block = item->size - (pos - startofs);	/* remaining size of segment */
-  format_size = ipatch_sample_format_size (format);
-
-  while (frames > 0 && p)
-  {
-    if (block > frames) block = frames;
-
-    /* Read sample data and transform (if necessary) */
-    if (!ipatch_sample_read_transform
-        (item->sample, item->ofs + (pos - startofs), block, buf, format,
-         IPATCH_SAMPLE_MAP_CHANNEL (0, item->channel), err))
-      return (FALSE);
-
-	buf += block * format_size;
-    frames -= block;
-
-    p = p->next;
-
-    if (p)
+    /* search for segment containing pos */
+    for(p = list->items, startofs = 0; p; p = p->next)
     {
-      item = (IpatchSampleListItem *)(p->data);
-      block = item->size;
-      startofs += item->size;
-      pos = startofs;
+        item = (IpatchSampleListItem *)(p->data);
+
+        if(pos >= startofs && pos < (startofs + item->size))
+        {
+            break;
+        }
+
+        startofs += item->size;
     }
-  }
 
-  g_return_val_if_fail (frames == 0, FALSE);	/* means total_size is out of sync! */
+    g_return_val_if_fail(p != NULL, FALSE);	/* means total_size is out of sync! */
 
-  return (TRUE);
+    block = item->size - (pos - startofs);	/* remaining size of segment */
+    format_size = ipatch_sample_format_size(format);
+
+    while(frames > 0 && p)
+    {
+        if(block > frames)
+        {
+            block = frames;
+        }
+
+        /* Read sample data and transform (if necessary) */
+        if(!ipatch_sample_read_transform
+                (item->sample, item->ofs + (pos - startofs), block, buf, format,
+                 IPATCH_SAMPLE_MAP_CHANNEL(0, item->channel), err))
+        {
+            return (FALSE);
+        }
+
+        buf += block * format_size;
+        frames -= block;
+
+        p = p->next;
+
+        if(p)
+        {
+            item = (IpatchSampleListItem *)(p->data);
+            block = item->size;
+            startofs += item->size;
+            pos = startofs;
+        }
+    }
+
+    g_return_val_if_fail(frames == 0, FALSE);	/* means total_size is out of sync! */
+
+    return (TRUE);
 }
 
 /**
@@ -540,26 +582,26 @@ ipatch_sample_list_render (IpatchSampleList *list, gpointer b,
  * Since: 1.1.0
  */
 gpointer
-ipatch_sample_list_render_alloc (IpatchSampleList *list, guint pos, guint size,
-                                 int format, GError **err)
+ipatch_sample_list_render_alloc(IpatchSampleList *list, guint pos, guint size,
+                                int format, GError **err)
 {
-  gpointer buf;
-  int frame_size;
+    gpointer buf;
+    int frame_size;
 
-  g_return_val_if_fail (size > 0, NULL);
+    g_return_val_if_fail(size > 0, NULL);
 
-  frame_size = ipatch_sample_format_size (format);
-  g_return_val_if_fail (size % frame_size == 0, NULL);
+    frame_size = ipatch_sample_format_size(format);
+    g_return_val_if_fail(size % frame_size == 0, NULL);
 
-  buf = g_malloc (size);        // ++ alloc
+    buf = g_malloc(size);         // ++ alloc
 
-  if (!ipatch_sample_list_render (list, buf, pos, size / frame_size, format, err))
-  {
-    g_free (buf);               // -- free
-    return (NULL);
-  }
+    if(!ipatch_sample_list_render(list, buf, pos, size / frame_size, format, err))
+    {
+        g_free(buf);                // -- free
+        return (NULL);
+    }
 
-  return (buf);                 // !! caller takes over buffer
+    return (buf);                 // !! caller takes over buffer
 }
 
 #ifdef IPATCH_DEBUG
@@ -569,38 +611,38 @@ ipatch_sample_list_render_alloc (IpatchSampleList *list, guint pos, guint size,
  * For debugging purposes, dumps sample list info to stdout.
  */
 void
-ipatch_sample_list_dump (IpatchSampleList *list)
+ipatch_sample_list_dump(IpatchSampleList *list)
 {
-  IpatchSampleListItem *item;
-  guint startofs = 0;
-  int sample_format;
-  guint sample_size;
-  GList *p;
-  int i = 0;
+    IpatchSampleListItem *item;
+    guint startofs = 0;
+    int sample_format;
+    guint sample_size;
+    GList *p;
+    int i = 0;
 
-  printf ("Dump of sample list with %d segments totaling %d frames\n",
-	  g_list_length (list->items), list->total_size);
+    printf("Dump of sample list with %d segments totaling %d frames\n",
+           g_list_length(list->items), list->total_size);
 
-  for (p = list->items; p; p = p->next, i++)
-  {
-    item = (IpatchSampleListItem *)(p->data);
-
-    if (item->sample)
+    for(p = list->items; p; p = p->next, i++)
     {
-      sample_format = ipatch_sample_get_format (item->sample);
-      sample_size = ipatch_sample_get_size (item->sample, NULL);
-    }
-    else
-    {
-      sample_format = 0;
-      sample_size = 0;
-    }
+        item = (IpatchSampleListItem *)(p->data);
 
-    printf ("%02d-%06x size=%d ofs=%d chan=%d sample=(%p format %03x size=%d)\n",
-	    i, startofs, item->size, item->ofs, item->channel, item->sample,
-	    sample_format, sample_size);
-    startofs += item->size;
-  }
+        if(item->sample)
+        {
+            sample_format = ipatch_sample_get_format(item->sample);
+            sample_size = ipatch_sample_get_size(item->sample, NULL);
+        }
+        else
+        {
+            sample_format = 0;
+            sample_size = 0;
+        }
+
+        printf("%02d-%06x size=%d ofs=%d chan=%d sample=(%p format %03x size=%d)\n",
+               i, startofs, item->size, item->ofs, item->channel, item->sample,
+               sample_format, sample_size);
+        startofs += item->size;
+    }
 }
 
 #endif

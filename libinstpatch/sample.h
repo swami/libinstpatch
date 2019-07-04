@@ -74,14 +74,14 @@
  */
 typedef enum
 {
-  IPATCH_SAMPLE_INVALID = 0,
-  IPATCH_SAMPLE_BIT8    = 1,
-  IPATCH_SAMPLE_BIT16   = 2,
-  IPATCH_SAMPLE_BIT24   = 3,
-  IPATCH_SAMPLE_BIT32   = 4,
-  IPATCH_SAMPLE_FLOAT   = 5,
-  IPATCH_SAMPLE_DOUBLE  = 6,
-  IPATCH_SAMPLE_REAL24BIT = 7
+    IPATCH_SAMPLE_INVALID = 0,
+    IPATCH_SAMPLE_BIT8    = 1,
+    IPATCH_SAMPLE_BIT16   = 2,
+    IPATCH_SAMPLE_BIT24   = 3,
+    IPATCH_SAMPLE_BIT32   = 4,
+    IPATCH_SAMPLE_FLOAT   = 5,
+    IPATCH_SAMPLE_DOUBLE  = 6,
+    IPATCH_SAMPLE_REAL24BIT = 7
 } IpatchSampleWidth;
 
 /* Renamed to be GObject Introspection friendly (symbols can't start with numbers).
@@ -118,8 +118,8 @@ typedef enum
  */
 typedef enum
 {
-  IPATCH_SAMPLE_MONO    = 0 << IPATCH_SAMPLE_CHANNEL_SHIFT,
-  IPATCH_SAMPLE_STEREO  = 1 << IPATCH_SAMPLE_CHANNEL_SHIFT
+    IPATCH_SAMPLE_MONO    = 0 << IPATCH_SAMPLE_CHANNEL_SHIFT,
+    IPATCH_SAMPLE_STEREO  = 1 << IPATCH_SAMPLE_CHANNEL_SHIFT
 } IpatchSampleChannel;
 
 /**
@@ -133,8 +133,8 @@ typedef enum
  */
 typedef enum
 {
-  IPATCH_SAMPLE_LEFT =  0,
-  IPATCH_SAMPLE_RIGHT = 1
+    IPATCH_SAMPLE_LEFT =  0,
+    IPATCH_SAMPLE_RIGHT = 1
 } IpatchSampleChannelType;
 
 /**
@@ -153,8 +153,8 @@ typedef enum
  */
 typedef enum
 {
-  IPATCH_SAMPLE_SIGNED   = 0 << IPATCH_SAMPLE_SIGN_SHIFT,
-  IPATCH_SAMPLE_UNSIGNED = 1 << IPATCH_SAMPLE_SIGN_SHIFT
+    IPATCH_SAMPLE_SIGNED   = 0 << IPATCH_SAMPLE_SIGN_SHIFT,
+    IPATCH_SAMPLE_UNSIGNED = 1 << IPATCH_SAMPLE_SIGN_SHIFT
 } IpatchSampleSign;
 
 /**
@@ -166,8 +166,8 @@ typedef enum
  */
 typedef enum
 {
-  IPATCH_SAMPLE_LENDIAN = 0 << IPATCH_SAMPLE_ENDIAN_SHIFT,
-  IPATCH_SAMPLE_BENDIAN = 1 << IPATCH_SAMPLE_ENDIAN_SHIFT
+    IPATCH_SAMPLE_LENDIAN = 0 << IPATCH_SAMPLE_ENDIAN_SHIFT,
+    IPATCH_SAMPLE_BENDIAN = 1 << IPATCH_SAMPLE_ENDIAN_SHIFT
 } IpatchSampleEndian;
 
 /**
@@ -332,13 +332,13 @@ typedef enum
 
 extern guint ipatch_sample_width_sizes[16];
 
-int ipatch_sample_format_bit_width (int format);
-gboolean ipatch_sample_format_verify (int format);
-gboolean ipatch_sample_format_transform_verify (int src_format, int dest_format,
-                                                guint32 channel_map);
-guint ipatch_sample_get_transform_funcs (int src_format, int dest_format,
-					 guint32 channel_map,
-					 guint *buf1_max_frame,
-					 guint *buf2_max_frame,
-					 IpatchSampleTransformFunc *funcs);
+int ipatch_sample_format_bit_width(int format);
+gboolean ipatch_sample_format_verify(int format);
+gboolean ipatch_sample_format_transform_verify(int src_format, int dest_format,
+        guint32 channel_map);
+guint ipatch_sample_get_transform_funcs(int src_format, int dest_format,
+                                        guint32 channel_map,
+                                        guint *buf1_max_frame,
+                                        guint *buf2_max_frame,
+                                        IpatchSampleTransformFunc *funcs);
 #endif

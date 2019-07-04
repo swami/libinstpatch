@@ -48,26 +48,26 @@ typedef struct _IpatchGigInstParams IpatchGigInstParams;
 /* GigaSampler instrument object */
 struct _IpatchGigInst
 {
-  IpatchDLS2Inst parent_instance;
+    IpatchDLS2Inst parent_instance;
 
-  guint32 attenuate;
-  guint16 effect_send;
-  guint16 fine_tune;
-  guint16 pitch_bend_range;
-  guint8 dim_key_start;		/* bit 1: piano release */
-  guint8 dim_key_end;
+    guint32 attenuate;
+    guint16 effect_send;
+    guint16 fine_tune;
+    guint16 pitch_bend_range;
+    guint8 dim_key_start;		/* bit 1: piano release */
+    guint8 dim_key_end;
 
-  guint8 chunk_3ewg[12];	/* 3ewg chunk - FIXME what is it? */
+    guint8 chunk_3ewg[12];	/* 3ewg chunk - FIXME what is it? */
 };
 
 struct _IpatchGigInstClass
 {
-  IpatchDLS2InstClass parent_class;
+    IpatchDLS2InstClass parent_class;
 };
 
-GType ipatch_gig_inst_get_type (void);
-IpatchGigInst *ipatch_gig_inst_new (void);
-IpatchGigInst *ipatch_gig_inst_first (IpatchIter *iter);
-IpatchGigInst *ipatch_gig_inst_next (IpatchIter *iter);
+GType ipatch_gig_inst_get_type(void);
+IpatchGigInst *ipatch_gig_inst_new(void);
+IpatchGigInst *ipatch_gig_inst_first(IpatchIter *iter);
+IpatchGigInst *ipatch_gig_inst_next(IpatchIter *iter);
 
 #endif

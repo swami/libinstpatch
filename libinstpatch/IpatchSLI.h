@@ -50,20 +50,20 @@ typedef struct _IpatchSLIClass IpatchSLIClass;
 /* Spectralis object */
 struct _IpatchSLI
 {
-  /*< public >*/
-  IpatchBase parent_instance;
-  GSList *insts;		/* list of #IpatchSLIInst objects */
-  GSList *samples;		/* list of #IpatchSLISample objects */
+    /*< public >*/
+    IpatchBase parent_instance;
+    GSList *insts;		/* list of #IpatchSLIInst objects */
+    GSList *samples;		/* list of #IpatchSLISample objects */
 };
 
 /* Spectralis class */
 struct _IpatchSLIClass
 {
-  IpatchBaseClass parent_class;
+    IpatchBaseClass parent_class;
 };
 
-GType ipatch_sli_get_type (void);
-IpatchSLI *ipatch_sli_new (void);
+GType ipatch_sli_get_type(void);
+IpatchSLI *ipatch_sli_new(void);
 
 #define ipatch_sli_get_insts(sli) \
     ipatch_container_get_children (IPATCH_CONTAINER (sli), \
@@ -72,16 +72,16 @@ IpatchSLI *ipatch_sli_new (void);
     ipatch_container_get_children (IPATCH_CONTAINER (sli), \
 				   IPATCH_TYPE_SLI_SAMPLE)
 
-void ipatch_sli_set_file (IpatchSLI *sli, IpatchSLIFile *file);
-IpatchSLIFile *ipatch_sli_get_file (IpatchSLI *sli);
+void ipatch_sli_set_file(IpatchSLI *sli, IpatchSLIFile *file);
+IpatchSLIFile *ipatch_sli_get_file(IpatchSLI *sli);
 
-char *ipatch_sli_make_unique_name (IpatchSLI *sli, GType child_type,
-                                   const char *name,
-                                   const IpatchItem *exclude);
-IpatchSLIInst *ipatch_sli_find_inst (IpatchSLI *sli, const char *name,
-                                     const IpatchSLIInst *exclude);
-IpatchSLISample *ipatch_sli_find_sample (IpatchSLI *sli, const char *name,
-                                         const IpatchSLISample *exclude);
-IpatchList *ipatch_sli_get_zone_references (IpatchSLISample *sample);
+char *ipatch_sli_make_unique_name(IpatchSLI *sli, GType child_type,
+                                  const char *name,
+                                  const IpatchItem *exclude);
+IpatchSLIInst *ipatch_sli_find_inst(IpatchSLI *sli, const char *name,
+                                    const IpatchSLIInst *exclude);
+IpatchSLISample *ipatch_sli_find_sample(IpatchSLI *sli, const char *name,
+                                        const IpatchSLISample *exclude);
+IpatchList *ipatch_sli_get_zone_references(IpatchSLISample *sample);
 
 #endif

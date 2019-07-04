@@ -39,40 +39,40 @@ typedef struct _IpatchRiffChunk IpatchRiffChunk;
 
 typedef enum
 {
-  IPATCH_RIFF_STATUS_FAIL = 0,	/* error occured */
-  IPATCH_RIFF_STATUS_BEGIN,	/* parsing has not yet began */
-  IPATCH_RIFF_STATUS_FINISHED,	/* no more parsing to be done */
-  IPATCH_RIFF_STATUS_NORMAL,	/* normal status */
-  IPATCH_RIFF_STATUS_CHUNK_END	/* end of a chunk */
+    IPATCH_RIFF_STATUS_FAIL = 0,	/* error occured */
+    IPATCH_RIFF_STATUS_BEGIN,	/* parsing has not yet began */
+    IPATCH_RIFF_STATUS_FINISHED,	/* no more parsing to be done */
+    IPATCH_RIFF_STATUS_NORMAL,	/* normal status */
+    IPATCH_RIFF_STATUS_CHUNK_END	/* end of a chunk */
 } IpatchRiffStatus;
 
 typedef enum
 {
-  IPATCH_RIFF_READ,
-  IPATCH_RIFF_WRITE
+    IPATCH_RIFF_READ,
+    IPATCH_RIFF_WRITE
 } IpatchRiffMode;
 
 /* RIFF object */
 struct _IpatchRiff
 {
-  GObject parent_instance;	/* derived from GObject */
+    GObject parent_instance;	/* derived from GObject */
 
-  IpatchRiffStatus status;	/* current status */
-  IpatchRiffMode mode;		/* I/O mode (read/write) */
-  guint flags;			/* some flags */
-  IpatchFileHandle *handle;	/* file object being parsed */
+    IpatchRiffStatus status;	/* current status */
+    IpatchRiffMode mode;		/* I/O mode (read/write) */
+    guint flags;			/* some flags */
+    IpatchFileHandle *handle;	/* file object being parsed */
 
-  GError *err;	 /* error information if status == IPATCH_RIFF_FAIL */
-  char *msg_detail;	      /* last generated message detail string */
+    GError *err;	 /* error information if status == IPATCH_RIFF_FAIL */
+    char *msg_detail;	      /* last generated message detail string */
 
-  GArray *chunks;	/* chunk trail (IpatchRiffChunk structures) */
-  GList *state_stack;		/* saved states (positions) */
+    GArray *chunks;	/* chunk trail (IpatchRiffChunk structures) */
+    GList *state_stack;		/* saved states (positions) */
 };
 
 /* RIFF class */
 struct _IpatchRiffClass
 {
-  GObjectClass parent_class;
+    GObjectClass parent_class;
 };
 
 #define IPATCH_RIFF_NEED_SWAP(riff)  IPATCH_FILE_NEED_SWAP (riff->handle->file)
@@ -80,20 +80,20 @@ struct _IpatchRiffClass
 
 typedef enum
 {
-  IPATCH_RIFF_CHUNK_RIFF,	/* toplevel "RIFF" (or "RIFX") list chunk */
-  IPATCH_RIFF_CHUNK_LIST,	/* a "LIST" chunk */
-  IPATCH_RIFF_CHUNK_SUB		/* a sub chunk */
+    IPATCH_RIFF_CHUNK_RIFF,	/* toplevel "RIFF" (or "RIFX") list chunk */
+    IPATCH_RIFF_CHUNK_LIST,	/* a "LIST" chunk */
+    IPATCH_RIFF_CHUNK_SUB		/* a sub chunk */
 } IpatchRiffChunkType;
 
 /* structure describing a RIFF chunk */
 struct _IpatchRiffChunk
 {
-  IpatchRiffChunkType type;	/* type of chunk */
-  guint32 id;	  /* chunk ID in integer format for easy comparison */
-  char idstr[4];		/* four character chunk ID string */
-  gint32 position; /* current position in chunk (read or write mode) */
-  guint32 size;			/* size of chunk (read mode only) */
-  guint32 filepos;              /* Position in file object of chunk data */
+    IpatchRiffChunkType type;	/* type of chunk */
+    guint32 id;	  /* chunk ID in integer format for easy comparison */
+    char idstr[4];		/* four character chunk ID string */
+    gint32 position; /* current position in chunk (read or write mode) */
+    guint32 size;			/* size of chunk (read mode only) */
+    guint32 filepos;              /* Position in file object of chunk data */
 };
 
 /* error domain for g_set_error */
@@ -101,16 +101,16 @@ struct _IpatchRiffChunk
 
 typedef enum
 {
-  IPATCH_RIFF_ERROR_NOT_RIFF,	/* not a RIFF file */
-  IPATCH_RIFF_ERROR_UNEXPECTED_ID, /* unexpected chunk ID */
-  IPATCH_RIFF_ERROR_UNEXPECTED_CHUNK_END,  /* unexpected LIST chunk end */
-  IPATCH_RIFF_ERROR_INVALID_ID, /* invalid chunk FOURCC ID */
-  IPATCH_RIFF_ERROR_ODD_SIZE,	/* chunk size is ODD */
-  IPATCH_RIFF_ERROR_SIZE_EXCEEDED, /* chunk size exceeded */
+    IPATCH_RIFF_ERROR_NOT_RIFF,	/* not a RIFF file */
+    IPATCH_RIFF_ERROR_UNEXPECTED_ID, /* unexpected chunk ID */
+    IPATCH_RIFF_ERROR_UNEXPECTED_CHUNK_END,  /* unexpected LIST chunk end */
+    IPATCH_RIFF_ERROR_INVALID_ID, /* invalid chunk FOURCC ID */
+    IPATCH_RIFF_ERROR_ODD_SIZE,	/* chunk size is ODD */
+    IPATCH_RIFF_ERROR_SIZE_EXCEEDED, /* chunk size exceeded */
 
-  /* convenience errors - not used by the riff object itself */
-  IPATCH_RIFF_ERROR_SIZE_MISMATCH, /* chunk size mismatch */
-  IPATCH_RIFF_ERROR_INVALID_DATA /* generic invalid data error */
+    /* convenience errors - not used by the riff object itself */
+    IPATCH_RIFF_ERROR_SIZE_MISMATCH, /* chunk size mismatch */
+    IPATCH_RIFF_ERROR_INVALID_DATA /* generic invalid data error */
 } IpatchRiffError;
 
 /* macro to convert 4 char RIFF ids to a guint32 integer for comparisons */
@@ -159,37 +159,37 @@ typedef enum
  */
 #define IPATCH_RIFF_WAVE_FMT_FLOAT 0x3
 
-GType ipatch_riff_get_type (void);
-GQuark ipatch_riff_error_quark (void);
-IpatchRiff *ipatch_riff_new (IpatchFileHandle *handle);
-void ipatch_riff_set_file_handle (IpatchRiff *riff, IpatchFileHandle *handle);
-IpatchFileHandle *ipatch_riff_get_file_handle (IpatchRiff *riff);
-int ipatch_riff_get_chunk_level (IpatchRiff *riff);
-IpatchRiffChunk *ipatch_riff_get_chunk_array (IpatchRiff *riff, int *count);
-IpatchRiffChunk *ipatch_riff_get_chunk (IpatchRiff *riff, int level);
-guint32 ipatch_riff_get_total_size (IpatchRiff *riff);
-guint32 ipatch_riff_get_position (IpatchRiff *riff);
-void ipatch_riff_push_state (IpatchRiff *riff);
-gboolean ipatch_riff_pop_state (IpatchRiff *riff, GError **err);
-IpatchRiffChunk *ipatch_riff_start_read (IpatchRiff *riff, GError **err);
-IpatchRiffChunk *ipatch_riff_start_read_chunk (IpatchRiff *riff, GError **err);
-IpatchRiffChunk *ipatch_riff_read_chunk_verify (IpatchRiff *riff,
-						IpatchRiffChunkType type,
-						guint32 id, GError **err);
-IpatchRiffChunk *ipatch_riff_read_chunk (IpatchRiff *riff, GError **err);
+GType ipatch_riff_get_type(void);
+GQuark ipatch_riff_error_quark(void);
+IpatchRiff *ipatch_riff_new(IpatchFileHandle *handle);
+void ipatch_riff_set_file_handle(IpatchRiff *riff, IpatchFileHandle *handle);
+IpatchFileHandle *ipatch_riff_get_file_handle(IpatchRiff *riff);
+int ipatch_riff_get_chunk_level(IpatchRiff *riff);
+IpatchRiffChunk *ipatch_riff_get_chunk_array(IpatchRiff *riff, int *count);
+IpatchRiffChunk *ipatch_riff_get_chunk(IpatchRiff *riff, int level);
+guint32 ipatch_riff_get_total_size(IpatchRiff *riff);
+guint32 ipatch_riff_get_position(IpatchRiff *riff);
+void ipatch_riff_push_state(IpatchRiff *riff);
+gboolean ipatch_riff_pop_state(IpatchRiff *riff, GError **err);
+IpatchRiffChunk *ipatch_riff_start_read(IpatchRiff *riff, GError **err);
+IpatchRiffChunk *ipatch_riff_start_read_chunk(IpatchRiff *riff, GError **err);
+IpatchRiffChunk *ipatch_riff_read_chunk_verify(IpatchRiff *riff,
+        IpatchRiffChunkType type,
+        guint32 id, GError **err);
+IpatchRiffChunk *ipatch_riff_read_chunk(IpatchRiff *riff, GError **err);
 #define ipatch_riff_write_list_chunk(parser, id, err) \
   ipatch_riff_write_chunk (parser, IPATCH_RIFF_CHUNK_LIST, id, err)
 #define ipatch_riff_write_sub_chunk(parser, id, err) \
   ipatch_riff_write_chunk (parser, IPATCH_RIFF_CHUNK_SUB, id, err)
-gboolean ipatch_riff_write_chunk (IpatchRiff *riff, IpatchRiffChunkType type,
-                                  guint32 id, GError **err);
+gboolean ipatch_riff_write_chunk(IpatchRiff *riff, IpatchRiffChunkType type,
+                                 guint32 id, GError **err);
 #define ipatch_riff_end_chunk(parser, err) \
   ipatch_riff_close_chunk (parser, -1, err)
-gboolean ipatch_riff_close_chunk (IpatchRiff *riff, int level, GError **err);
+gboolean ipatch_riff_close_chunk(IpatchRiff *riff, int level, GError **err);
 #define ipatch_riff_skip_chunk(parser, err) \
   ipatch_riff_skip_chunks (parser, 1, err)
-gboolean ipatch_riff_skip_chunks (IpatchRiff *riff, guint count, GError **err);
-gboolean ipatch_riff_get_error (IpatchRiff *riff, GError **err);
-char *ipatch_riff_message_detail (IpatchRiff *riff, int level,
-                                  const char *format, ...);
+gboolean ipatch_riff_skip_chunks(IpatchRiff *riff, guint count, GError **err);
+gboolean ipatch_riff_get_error(IpatchRiff *riff, GError **err);
+char *ipatch_riff_message_detail(IpatchRiff *riff, int level,
+                                 const char *format, ...);
 #endif

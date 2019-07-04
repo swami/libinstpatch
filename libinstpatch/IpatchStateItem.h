@@ -48,24 +48,24 @@ typedef struct _IpatchStateItemClass IpatchStateItemClass;
 /* state item */
 struct _IpatchStateItem
 {
-  GObject parent_instance;	/* derived from GObject */
+    GObject parent_instance;	/* derived from GObject */
 
-  guint flags;			/* flags for state items */
-  GNode *node;			/* node in item tree or NULL */
-  IpatchStateGroup *group;	/* group this item belongs to */
+    guint flags;			/* flags for state items */
+    GNode *node;			/* node in item tree or NULL */
+    IpatchStateGroup *group;	/* group this item belongs to */
 };
 
 typedef enum
 {
-  IPATCH_STATE_ITEM_UNDO = 0,	/* state item holds undo data */
-  IPATCH_STATE_ITEM_REDO = 1	/* state item holds redo data */
+    IPATCH_STATE_ITEM_UNDO = 0,	/* state item holds undo data */
+    IPATCH_STATE_ITEM_REDO = 1	/* state item holds redo data */
 } IpatchStateItemType;
 
 typedef enum
 {
-  IPATCH_STATE_ITEM_TYPE_MASK = 1 << 0, /* mask for IpatchStateItemType */
-  IPATCH_STATE_ITEM_ACTIVE    = 1 << 1, /* a flag for item's in item tree */
-  IPATCH_STATE_ITEM_DEPENDENT = 1 << 2 /* internal - to mark dependent items */
+    IPATCH_STATE_ITEM_TYPE_MASK = 1 << 0, /* mask for IpatchStateItemType */
+    IPATCH_STATE_ITEM_ACTIVE    = 1 << 1, /* a flag for item's in item tree */
+    IPATCH_STATE_ITEM_DEPENDENT = 1 << 2 /* internal - to mark dependent items */
 } IpatchStateItemFlags;
 
 /* reserve 5 bits for future use */
@@ -74,26 +74,26 @@ typedef enum
 /* state item class */
 struct _IpatchStateItemClass
 {
-  GObjectClass parent_class;	/* derived from GObject */
-  char *descr;			/* text description of this state class */
+    GObjectClass parent_class;	/* derived from GObject */
+    char *descr;			/* text description of this state class */
 
-  /* methods */
+    /* methods */
 
-  void (*restore)(const IpatchStateItem *item); /* restore state */
-  gboolean (*depend)(const IpatchStateItem *item1, /* check dependency */
-		     const IpatchStateItem *item2);
-  gboolean (*conflict)(const IpatchStateItem *item1, /* check for conflicts */
-		       const IpatchStateItem *item2);
-  char * (*describe)(const IpatchStateItem *item); /* detailed description */
+    void (*restore)(const IpatchStateItem *item); /* restore state */
+    gboolean(*depend)(const IpatchStateItem *item1,  /* check dependency */
+                      const IpatchStateItem *item2);
+    gboolean(*conflict)(const IpatchStateItem *item1,  /* check for conflicts */
+                        const IpatchStateItem *item2);
+    char *(*describe)(const IpatchStateItem *item);  /* detailed description */
 };
 
-GType ipatch_state_item_get_type (void);
+GType ipatch_state_item_get_type(void);
 
-void ipatch_state_item_restore (const IpatchStateItem *item);
-gboolean ipatch_state_item_depend (const IpatchStateItem *item1,
-				  const IpatchStateItem *item2);
-gboolean ipatch_state_item_conflict (const IpatchStateItem *item1,
-				    const IpatchStateItem *item2);
-char *ipatch_state_item_describe (const IpatchStateItem *item);
+void ipatch_state_item_restore(const IpatchStateItem *item);
+gboolean ipatch_state_item_depend(const IpatchStateItem *item1,
+                                  const IpatchStateItem *item2);
+gboolean ipatch_state_item_conflict(const IpatchStateItem *item1,
+                                    const IpatchStateItem *item2);
+char *ipatch_state_item_describe(const IpatchStateItem *item);
 
 #endif

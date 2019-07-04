@@ -42,17 +42,17 @@ typedef struct _IpatchSampleStoreRomClass IpatchSampleStoreRomClass;
 /* ROM sample store instance */
 struct _IpatchSampleStoreRom
 {
-  IpatchSampleStore parent_instance;
-  guint location;
+    IpatchSampleStore parent_instance;
+    guint location;
 };
 
 /* ROM sample store class */
 struct _IpatchSampleStoreRomClass
 {
-  IpatchSampleStoreClass parent_class;
+    IpatchSampleStoreClass parent_class;
 };
 
-GType ipatch_sample_store_rom_get_type (void);
-IpatchSample *ipatch_sample_store_rom_new (guint location);
+GType ipatch_sample_store_rom_get_type(void);
+IpatchSample *ipatch_sample_store_rom_new(guint location);
 
 #endif

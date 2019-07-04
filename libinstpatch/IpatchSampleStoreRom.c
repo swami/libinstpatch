@@ -20,7 +20,7 @@
 /**
  * SECTION: IpatchSampleStoreRom
  * @short_description: Sample storage object for audio in ROM of a sound card
- * @see_also: 
+ * @see_also:
  * @stability: Stable
  */
 #include <glib.h>
@@ -30,95 +30,97 @@
 
 enum
 {
-  PROP_0,
-  PROP_LOCATION,		/* location property (used by all types) */
+    PROP_0,
+    PROP_LOCATION,		/* location property (used by all types) */
 };
 
-static void ipatch_sample_store_rom_sample_iface_init (IpatchSampleIface *iface);
+static void ipatch_sample_store_rom_sample_iface_init(IpatchSampleIface *iface);
 static void ipatch_sample_store_rom_set_property
-  (GObject *object, guint property_id, const GValue *value, GParamSpec *pspec);
+(GObject *object, guint property_id, const GValue *value, GParamSpec *pspec);
 static void ipatch_sample_store_rom_get_property
-  (GObject *object, guint property_id, GValue *value, GParamSpec *pspec);
+(GObject *object, guint property_id, GValue *value, GParamSpec *pspec);
 static gboolean ipatch_sample_store_rom_sample_iface_open
-  (IpatchSampleHandle *handle, GError **err);
+(IpatchSampleHandle *handle, GError **err);
 
 
-G_DEFINE_TYPE_WITH_CODE (IpatchSampleStoreRom, ipatch_sample_store_rom,
-                         IPATCH_TYPE_SAMPLE_STORE,
-                         G_IMPLEMENT_INTERFACE (IPATCH_TYPE_SAMPLE,
-                                                ipatch_sample_store_rom_sample_iface_init))
+G_DEFINE_TYPE_WITH_CODE(IpatchSampleStoreRom, ipatch_sample_store_rom,
+                        IPATCH_TYPE_SAMPLE_STORE,
+                        G_IMPLEMENT_INTERFACE(IPATCH_TYPE_SAMPLE,
+                                ipatch_sample_store_rom_sample_iface_init))
 
 static void
-ipatch_sample_store_rom_sample_iface_init (IpatchSampleIface *iface)
+ipatch_sample_store_rom_sample_iface_init(IpatchSampleIface *iface)
 {
-  iface->open = ipatch_sample_store_rom_sample_iface_open;
+    iface->open = ipatch_sample_store_rom_sample_iface_open;
 }
 
 static void
-ipatch_sample_store_rom_class_init (IpatchSampleStoreRomClass *klass)
+ipatch_sample_store_rom_class_init(IpatchSampleStoreRomClass *klass)
 {
-  GObjectClass *gobj_class = G_OBJECT_CLASS (klass);
-  IpatchItemClass *item_class = IPATCH_ITEM_CLASS (klass);
+    GObjectClass *gobj_class = G_OBJECT_CLASS(klass);
+    IpatchItemClass *item_class = IPATCH_ITEM_CLASS(klass);
 
-  gobj_class->get_property = ipatch_sample_store_rom_get_property;
-  item_class->item_set_property = ipatch_sample_store_rom_set_property;
+    gobj_class->get_property = ipatch_sample_store_rom_get_property;
+    item_class->item_set_property = ipatch_sample_store_rom_set_property;
 
-  g_object_class_install_property (gobj_class, PROP_LOCATION,
-			g_param_spec_uint ("location",
-					   "Location",
-					   "Sample data ROM location",
-					   0, G_MAXUINT, 0,
-					   G_PARAM_READWRITE));
+    g_object_class_install_property(gobj_class, PROP_LOCATION,
+                                    g_param_spec_uint("location",
+                                            "Location",
+                                            "Sample data ROM location",
+                                            0, G_MAXUINT, 0,
+                                            G_PARAM_READWRITE));
 }
 
 static void
-ipatch_sample_store_rom_set_property (GObject *object, guint property_id,
-			              const GValue *value, GParamSpec *pspec)
+ipatch_sample_store_rom_set_property(GObject *object, guint property_id,
+                                     const GValue *value, GParamSpec *pspec)
 {
-  IpatchSampleStoreRom *store = IPATCH_SAMPLE_STORE_ROM (object);
+    IpatchSampleStoreRom *store = IPATCH_SAMPLE_STORE_ROM(object);
 
-  switch (property_id)
+    switch(property_id)
     {
     case PROP_LOCATION:
-      g_return_if_fail (store->location == 0);
+        g_return_if_fail(store->location == 0);
 
-      /* Only set once, no lock required */
-      store->location = g_value_get_uint (value);
-      break;
+        /* Only set once, no lock required */
+        store->location = g_value_get_uint(value);
+        break;
+
     default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+        G_OBJECT_WARN_INVALID_PROPERTY_ID(object, property_id, pspec);
     }
 }
 
 static void
-ipatch_sample_store_rom_get_property (GObject *object, guint property_id,
-                                      GValue *value, GParamSpec *pspec)
+ipatch_sample_store_rom_get_property(GObject *object, guint property_id,
+                                     GValue *value, GParamSpec *pspec)
 {
-  IpatchSampleStoreRom *store = IPATCH_SAMPLE_STORE_ROM (object);
+    IpatchSampleStoreRom *store = IPATCH_SAMPLE_STORE_ROM(object);
 
-  switch (property_id)
+    switch(property_id)
     {
     case PROP_LOCATION:
-      /* No need to lock, only set once before use */
-      g_value_set_uint (value, store->location);
-      break;
+        /* No need to lock, only set once before use */
+        g_value_set_uint(value, store->location);
+        break;
+
     default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+        G_OBJECT_WARN_INVALID_PROPERTY_ID(object, property_id, pspec);
     }
 }
 
 static void
-ipatch_sample_store_rom_init (IpatchSampleStoreRom *store)
+ipatch_sample_store_rom_init(IpatchSampleStoreRom *store)
 {
 }
 
 static gboolean
-ipatch_sample_store_rom_sample_iface_open (IpatchSampleHandle *handle,
-                                           GError **err)
+ipatch_sample_store_rom_sample_iface_open(IpatchSampleHandle *handle,
+        GError **err)
 {
-  g_set_error (err, IPATCH_ERROR, IPATCH_ERROR_PROGRAM,
-                     "ROM sample stores cannot be opened");
-  return (FALSE);
+    g_set_error(err, IPATCH_ERROR, IPATCH_ERROR_PROGRAM,
+                "ROM sample stores cannot be opened");
+    return (FALSE);
 }
 
 /**
@@ -133,8 +135,8 @@ ipatch_sample_store_rom_sample_iface_open (IpatchSampleHandle *handle,
  *   as an #IpatchSample for convenience.
  */
 IpatchSample *
-ipatch_sample_store_rom_new (guint location)
+ipatch_sample_store_rom_new(guint location)
 {
-  return (IPATCH_SAMPLE (g_object_new (IPATCH_TYPE_SAMPLE_STORE_ROM,
+    return (IPATCH_SAMPLE(g_object_new(IPATCH_TYPE_SAMPLE_STORE_ROM,
                                        "location", location, NULL)));
 }

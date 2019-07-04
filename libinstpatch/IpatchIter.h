@@ -32,31 +32,31 @@ typedef struct _IpatchIterMethods IpatchIterMethods;
 /* list iterator structure */
 struct _IpatchIter
 {
-  /*< private >*/
-  IpatchIterMethods *methods;	/* iterator methods */
-  gpointer data;		/* method defined data */
-  gpointer data2;		/* method defined data */
-  gpointer data3;		/* method defined data */
-  gpointer data4;		/* method defined data */
+    /*< private >*/
+    IpatchIterMethods *methods;	/* iterator methods */
+    gpointer data;		/* method defined data */
+    gpointer data2;		/* method defined data */
+    gpointer data3;		/* method defined data */
+    gpointer data4;		/* method defined data */
 };
 
 /* iterator methods */
 struct _IpatchIterMethods
 {
-  gpointer (*get)(IpatchIter *iter); /* get item method */
-  gpointer (*next)(IpatchIter *iter); /* next item method */
-  gpointer (*first)(IpatchIter *iter);	/* first item method */
-  gpointer (*last)(IpatchIter *iter); /* last item method */
-  gpointer (*index)(IpatchIter *iter, int index); /* index item method */
-  void (*insert)(IpatchIter *iter, gpointer item); /* insert item method */
-  void (*remove)(IpatchIter *iter); /* remove current item method */
-  int (*count)(IpatchIter *iter); /* count items method */
+    gpointer(*get)(IpatchIter *iter);  /* get item method */
+    gpointer(*next)(IpatchIter *iter);  /* next item method */
+    gpointer(*first)(IpatchIter *iter);	/* first item method */
+    gpointer(*last)(IpatchIter *iter);  /* last item method */
+    gpointer(*index)(IpatchIter *iter, int index);  /* index item method */
+    void (*insert)(IpatchIter *iter, gpointer item); /* insert item method */
+    void (*remove)(IpatchIter *iter); /* remove current item method */
+    int (*count)(IpatchIter *iter); /* count items method */
 };
 
-GType ipatch_iter_get_type (void);
-IpatchIter *ipatch_iter_alloc (void);
-void ipatch_iter_free (IpatchIter *iter);
-IpatchIter *ipatch_iter_duplicate (IpatchIter *iter);
+GType ipatch_iter_get_type(void);
+IpatchIter *ipatch_iter_alloc(void);
+void ipatch_iter_free(IpatchIter *iter);
+IpatchIter *ipatch_iter_duplicate(IpatchIter *iter);
 
 #define ipatch_iter_get(iter) (((iter)->methods->get)(iter))
 #define ipatch_iter_next(iter) (((iter)->methods->next)(iter))
@@ -73,15 +73,15 @@ IpatchIter *ipatch_iter_duplicate (IpatchIter *iter);
 #define IPATCH_ITER_GSLIST_SET_LIST(iter, list) (iter->data = list)
 #define IPATCH_ITER_GSLIST_SET_POS(iter, pos) (iter->data2 = pos)
 
-void ipatch_iter_GSList_init (IpatchIter *iter, GSList **list);
-gpointer ipatch_iter_GSList_get (IpatchIter *iter);
-gpointer ipatch_iter_GSList_next (IpatchIter *iter);
-gpointer ipatch_iter_GSList_first (IpatchIter *iter);
-gpointer ipatch_iter_GSList_last (IpatchIter *iter);
-gpointer ipatch_iter_GSList_index (IpatchIter *iter, int index);
-void ipatch_iter_GSList_insert (IpatchIter *iter, gpointer item);
-void ipatch_iter_GSList_remove (IpatchIter *iter);
-int ipatch_iter_GSList_count (IpatchIter *iter);
+void ipatch_iter_GSList_init(IpatchIter *iter, GSList **list);
+gpointer ipatch_iter_GSList_get(IpatchIter *iter);
+gpointer ipatch_iter_GSList_next(IpatchIter *iter);
+gpointer ipatch_iter_GSList_first(IpatchIter *iter);
+gpointer ipatch_iter_GSList_last(IpatchIter *iter);
+gpointer ipatch_iter_GSList_index(IpatchIter *iter, int index);
+void ipatch_iter_GSList_insert(IpatchIter *iter, gpointer item);
+void ipatch_iter_GSList_remove(IpatchIter *iter);
+int ipatch_iter_GSList_count(IpatchIter *iter);
 
 #define IPATCH_ITER_GLIST_GET_LIST(iter) ((GList **)(iter->data))
 #define IPATCH_ITER_GLIST_GET_POS(iter) ((GList *)(iter->data2))
@@ -89,15 +89,15 @@ int ipatch_iter_GSList_count (IpatchIter *iter);
 #define IPATCH_ITER_GLIST_SET_LIST(iter, list) (iter->data = list)
 #define IPATCH_ITER_GLIST_SET_POS(iter, pos) (iter->data2 = pos)
 
-void ipatch_iter_GList_init (IpatchIter *iter, GList **list);
-gpointer ipatch_iter_GList_get (IpatchIter *iter);
-gpointer ipatch_iter_GList_next (IpatchIter *iter);
-gpointer ipatch_iter_GList_first (IpatchIter *iter);
-gpointer ipatch_iter_GList_last (IpatchIter *iter);
-gpointer ipatch_iter_GList_index (IpatchIter *iter, int index);
-void ipatch_iter_GList_insert (IpatchIter *iter, gpointer item);
-void ipatch_iter_GList_remove (IpatchIter *iter);
-int ipatch_iter_GList_count (IpatchIter *iter);
+void ipatch_iter_GList_init(IpatchIter *iter, GList **list);
+gpointer ipatch_iter_GList_get(IpatchIter *iter);
+gpointer ipatch_iter_GList_next(IpatchIter *iter);
+gpointer ipatch_iter_GList_first(IpatchIter *iter);
+gpointer ipatch_iter_GList_last(IpatchIter *iter);
+gpointer ipatch_iter_GList_index(IpatchIter *iter, int index);
+void ipatch_iter_GList_insert(IpatchIter *iter, gpointer item);
+void ipatch_iter_GList_remove(IpatchIter *iter);
+int ipatch_iter_GList_count(IpatchIter *iter);
 
 #define IPATCH_ITER_ARRAY_GET_ARRAY(iter) ((gpointer *)(iter->data))
 #define IPATCH_ITER_ARRAY_GET_SIZE(iter) (GPOINTER_TO_UINT (iter->data2))
@@ -109,14 +109,14 @@ int ipatch_iter_GList_count (IpatchIter *iter);
 #define IPATCH_ITER_ARRAY_SET_POS(iter, pos) \
   (iter->data3 = GINT_TO_POINTER (pos))
 
-void ipatch_iter_array_init (IpatchIter *iter, gpointer *array, guint size);
-gpointer ipatch_iter_array_get (IpatchIter *iter);
-gpointer ipatch_iter_array_next (IpatchIter *iter);
-gpointer ipatch_iter_array_first (IpatchIter *iter);
-gpointer ipatch_iter_array_last (IpatchIter *iter);
-gpointer ipatch_iter_array_index (IpatchIter *iter, int index);
-void ipatch_iter_array_insert (IpatchIter *iter, gpointer item);
-void ipatch_iter_array_remove (IpatchIter *iter);
-int ipatch_iter_array_count (IpatchIter *iter);
+void ipatch_iter_array_init(IpatchIter *iter, gpointer *array, guint size);
+gpointer ipatch_iter_array_get(IpatchIter *iter);
+gpointer ipatch_iter_array_next(IpatchIter *iter);
+gpointer ipatch_iter_array_first(IpatchIter *iter);
+gpointer ipatch_iter_array_last(IpatchIter *iter);
+gpointer ipatch_iter_array_index(IpatchIter *iter, int index);
+void ipatch_iter_array_insert(IpatchIter *iter, gpointer item);
+void ipatch_iter_array_remove(IpatchIter *iter);
+int ipatch_iter_array_count(IpatchIter *iter);
 
 #endif

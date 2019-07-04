@@ -50,32 +50,32 @@ typedef struct _IpatchDLSReaderClass IpatchDLSReaderClass;
 
 typedef enum
 {
-  /* this error is returned if a file originally thought to be a plain DLS
-     file turns out to be a GigaSampler file, in which case loading should
-     be restarted in GigaSampler mode */
-  IPATCH_DLS_READER_ERROR_GIG
+    /* this error is returned if a file originally thought to be a plain DLS
+       file turns out to be a GigaSampler file, in which case loading should
+       be restarted in GigaSampler mode */
+    IPATCH_DLS_READER_ERROR_GIG
 } IpatchDLSReaderError;
 
 /* DLS reader object */
 struct _IpatchDLSReader
 {
-  IpatchRiff parent_instance; /* derived from IpatchRiff */
-  IpatchDLS2 *dls;   /* DLS or GigaSampler object to load file into */
-  gboolean is_gig;	      /* set if dls is a GigaSampler object */
-  gboolean needs_fixup;		/* set if regions in dls need fixup */
-  GHashTable *wave_hash;	/* wave chunk file offset -> sample hash */
-  guint32 *pool_table; /* wave pool table (index -> wave chunk file offset) */
-  guint pool_table_size;     /* size of pool table (in cue entries) */
+    IpatchRiff parent_instance; /* derived from IpatchRiff */
+    IpatchDLS2 *dls;   /* DLS or GigaSampler object to load file into */
+    gboolean is_gig;	      /* set if dls is a GigaSampler object */
+    gboolean needs_fixup;		/* set if regions in dls need fixup */
+    GHashTable *wave_hash;	/* wave chunk file offset -> sample hash */
+    guint32 *pool_table; /* wave pool table (index -> wave chunk file offset) */
+    guint pool_table_size;     /* size of pool table (in cue entries) */
 };
 
 /* DLS reader class */
 struct _IpatchDLSReaderClass
 {
-  IpatchRiffClass parent_class;
+    IpatchRiffClass parent_class;
 };
 
-GType ipatch_dls_reader_get_type (void);
-IpatchDLSReader *ipatch_dls_reader_new (IpatchFileHandle *handle);
-IpatchDLS2 *ipatch_dls_reader_load (IpatchDLSReader *reader, GError **err);
+GType ipatch_dls_reader_get_type(void);
+IpatchDLSReader *ipatch_dls_reader_new(IpatchFileHandle *handle);
+IpatchDLS2 *ipatch_dls_reader_load(IpatchDLSReader *reader, GError **err);
 
 #endif

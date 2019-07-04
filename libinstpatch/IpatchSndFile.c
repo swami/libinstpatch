@@ -20,7 +20,7 @@
 /**
  * SECTION: IpatchSndFile
  * @short_description: libsndfile file object
- * @see_also: 
+ * @see_also:
  * @stability: Stable
  *
  * Object type for libsndfile audio file identification.
@@ -37,131 +37,146 @@
 #include "i18n.h"
 #include "misc.h"
 
-static gboolean ipatch_snd_file_identify (IpatchFile *file, IpatchFileHandle *handle,
-                                          GError **err);
+static gboolean ipatch_snd_file_identify(IpatchFile *file, IpatchFileHandle *handle,
+        GError **err);
 
-G_DEFINE_TYPE (IpatchSndFile, ipatch_snd_file, IPATCH_TYPE_FILE);
+G_DEFINE_TYPE(IpatchSndFile, ipatch_snd_file, IPATCH_TYPE_FILE);
 
 
 /* Get type of dynamic libsndfile file format enum (register it as needed) */
 GType
-ipatch_snd_file_format_get_type (void)
+ipatch_snd_file_format_get_type(void)
 {
-  static GType type = 0;
+    static GType type = 0;
 
-  if (!type)
-  {
-    GEnumValue *values;
-    SF_FORMAT_INFO finfo;
-    int major_count;
-    int value_index = 0;
-    int i;
-
-    sf_command (NULL, SFC_GET_FORMAT_MAJOR_COUNT, &major_count, sizeof (int));
-
-    values = g_new (GEnumValue, major_count + 1);
-
-    for (i = 0; i < major_count; i++)
+    if(!type)
     {
-      finfo.format = i;
-      sf_command (NULL, SFC_GET_FORMAT_MAJOR, &finfo, sizeof (finfo));
+        GEnumValue *values;
+        SF_FORMAT_INFO finfo;
+        int major_count;
+        int value_index = 0;
+        int i;
 
-      /* Skip RAW format since we use IpatchSampleStoreFile instead, for more flexibility */
-      if (finfo.format == SF_FORMAT_RAW) continue;
+        sf_command(NULL, SFC_GET_FORMAT_MAJOR_COUNT, &major_count, sizeof(int));
 
-      values[value_index].value = finfo.format;
-      values[value_index].value_name = finfo.extension;
-      values[value_index].value_nick = finfo.extension;
-      value_index++;
+        values = g_new(GEnumValue, major_count + 1);
+
+        for(i = 0; i < major_count; i++)
+        {
+            finfo.format = i;
+            sf_command(NULL, SFC_GET_FORMAT_MAJOR, &finfo, sizeof(finfo));
+
+            /* Skip RAW format since we use IpatchSampleStoreFile instead, for more flexibility */
+            if(finfo.format == SF_FORMAT_RAW)
+            {
+                continue;
+            }
+
+            values[value_index].value = finfo.format;
+            values[value_index].value_name = finfo.extension;
+            values[value_index].value_nick = finfo.extension;
+            value_index++;
+        }
+
+        values[value_index].value = 0;
+        values[value_index].value_name = NULL;
+        values[value_index].value_nick = NULL;
+
+        type = g_enum_register_static("IpatchSndFileFormat", values);
     }
 
-    values[value_index].value = 0;
-    values[value_index].value_name = NULL;
-    values[value_index].value_nick = NULL;
-
-    type = g_enum_register_static ("IpatchSndFileFormat", values);
-  }
-
-  return (type);
+    return (type);
 }
 
 /* Get type of dynamic libsndfile file sub format enum (register it as needed) */
 GType
-ipatch_snd_file_sub_format_get_type (void)
+ipatch_snd_file_sub_format_get_type(void)
 {
-  static GType type = 0;
-  char *name, *s;
+    static GType type = 0;
+    char *name, *s;
 
-  if (!type)
-  {
-    GEnumValue *values;
-    SF_FORMAT_INFO sinfo;
-    int subtype_count;
-    int value_index = 0;
-    int i;
-
-    sf_command (NULL, SFC_GET_FORMAT_SUBTYPE_COUNT, &subtype_count, sizeof (int));
-
-    values = g_new (GEnumValue, subtype_count + 1);
-
-    for (i = 0; i < subtype_count; i++)
+    if(!type)
     {
-      sinfo.format = i;
-      sf_command (NULL, SFC_GET_FORMAT_SUBTYPE, &sinfo, sizeof (sinfo));
+        GEnumValue *values;
+        SF_FORMAT_INFO sinfo;
+        int subtype_count;
+        int value_index = 0;
+        int i;
 
-      name = g_ascii_strdown (sinfo.name, -1);        /* ++ alloc forever */
+        sf_command(NULL, SFC_GET_FORMAT_SUBTYPE_COUNT, &subtype_count, sizeof(int));
 
-      /* Replace spaces and '.' with dashes */
-      for (s = name; *s; s++)
-        if (*s == ' ' || *s == '.') *s = '-';
+        values = g_new(GEnumValue, subtype_count + 1);
 
-      values[value_index].value = sinfo.format;
-      values[value_index].value_name = name;
-      values[value_index].value_nick = name;
-      value_index++;
+        for(i = 0; i < subtype_count; i++)
+        {
+            sinfo.format = i;
+            sf_command(NULL, SFC_GET_FORMAT_SUBTYPE, &sinfo, sizeof(sinfo));
+
+            name = g_ascii_strdown(sinfo.name, -1);         /* ++ alloc forever */
+
+            /* Replace spaces and '.' with dashes */
+            for(s = name; *s; s++)
+                if(*s == ' ' || *s == '.')
+                {
+                    *s = '-';
+                }
+
+            values[value_index].value = sinfo.format;
+            values[value_index].value_name = name;
+            values[value_index].value_nick = name;
+            value_index++;
+        }
+
+        values[value_index].value = 0;
+        values[value_index].value_name = NULL;
+        values[value_index].value_nick = NULL;
+
+        type = g_enum_register_static("IpatchSndFileSubFormat", values);
     }
 
-    values[value_index].value = 0;
-    values[value_index].value_name = NULL;
-    values[value_index].value_nick = NULL;
-
-    type = g_enum_register_static ("IpatchSndFileSubFormat", values);
-  }
-
-  return (type);
+    return (type);
 }
 
 static void
-ipatch_snd_file_class_init (IpatchSndFileClass *klass)
+ipatch_snd_file_class_init(IpatchSndFileClass *klass)
 {
-  IpatchFileClass *file_class = IPATCH_FILE_CLASS (klass);
-  file_class->identify = ipatch_snd_file_identify;
+    IpatchFileClass *file_class = IPATCH_FILE_CLASS(klass);
+    file_class->identify = ipatch_snd_file_identify;
 
-  /* Set to last execution (subtract another 100, since we really want to be last) */
-  file_class->identify_order = IPATCH_FILE_IDENTIFY_ORDER_LAST - 100;
+    /* Set to last execution (subtract another 100, since we really want to be last) */
+    file_class->identify_order = IPATCH_FILE_IDENTIFY_ORDER_LAST - 100;
 }
 
 static void
-ipatch_snd_file_init (IpatchSndFile *file)
+ipatch_snd_file_init(IpatchSndFile *file)
 {
 }
 
 /* Identify if this file format is known by libsndfile */
 static gboolean
-ipatch_snd_file_identify (IpatchFile *file, IpatchFileHandle *handle, GError **err)
+ipatch_snd_file_identify(IpatchFile *file, IpatchFileHandle *handle, GError **err)
 {
-  SNDFILE *sfhandle;
-  SF_INFO info = { 0 };
-  char *filename;
+    SNDFILE *sfhandle;
+    SF_INFO info = { 0 };
+    char *filename;
 
-  filename = ipatch_file_get_name (file);       /* ++ alloc file name */
-  if (!filename) return (FALSE);
+    filename = ipatch_file_get_name(file);        /* ++ alloc file name */
 
-  sfhandle = sf_open (filename, SFM_READ, &info);
-  if (sfhandle) sf_close (sfhandle);
-  g_free (filename);    /* -- free file name */
+    if(!filename)
+    {
+        return (FALSE);
+    }
 
-  return (sfhandle != NULL);
+    sfhandle = sf_open(filename, SFM_READ, &info);
+
+    if(sfhandle)
+    {
+        sf_close(sfhandle);
+    }
+
+    g_free(filename);     /* -- free file name */
+
+    return (sfhandle != NULL);
 }
 
 /**
@@ -174,9 +189,9 @@ ipatch_snd_file_identify (IpatchFile *file, IpatchFileHandle *handle, GError **e
  * destroy the item.
  */
 IpatchSndFile *
-ipatch_snd_file_new (void)
+ipatch_snd_file_new(void)
 {
-  return (IPATCH_SND_FILE (g_object_new (IPATCH_TYPE_SND_FILE, NULL)));
+    return (IPATCH_SND_FILE(g_object_new(IPATCH_TYPE_SND_FILE, NULL)));
 }
 
 /**
@@ -190,38 +205,43 @@ ipatch_snd_file_new (void)
  *   enum values or %NULL if @format is invalid
  */
 int *
-ipatch_snd_file_format_get_sub_formats (int format, guint *size)
+ipatch_snd_file_format_get_sub_formats(int format, guint *size)
 {
-  SF_FORMAT_INFO info;
-  SF_INFO sfinfo;
-  GArray *array;
-  int subtype_count, s;
+    SF_FORMAT_INFO info;
+    SF_INFO sfinfo;
+    GArray *array;
+    int subtype_count, s;
 
-  if (size) *size = 0;          /* In case of error */
+    if(size)
+    {
+        *size = 0;    /* In case of error */
+    }
 
-  g_return_val_if_fail (size != NULL, NULL);
+    g_return_val_if_fail(size != NULL, NULL);
 
-  format &= SF_FORMAT_TYPEMASK;         /* Mask out everything but file type */
-  array = g_array_new (FALSE, FALSE, sizeof (int));     /* ++ alloc array */
+    format &= SF_FORMAT_TYPEMASK;         /* Mask out everything but file type */
+    array = g_array_new(FALSE, FALSE, sizeof(int));       /* ++ alloc array */
 
-  memset (&sfinfo, 0, sizeof (sfinfo));
-  sf_command (NULL, SFC_GET_FORMAT_SUBTYPE_COUNT, &subtype_count, sizeof (int));
-  sfinfo.channels = 1;
+    memset(&sfinfo, 0, sizeof(sfinfo));
+    sf_command(NULL, SFC_GET_FORMAT_SUBTYPE_COUNT, &subtype_count, sizeof(int));
+    sfinfo.channels = 1;
 
-  for (s = 0; s < subtype_count; s++)
-  {
-    info.format = s;
-    sf_command (NULL, SFC_GET_FORMAT_SUBTYPE, &info, sizeof (info));
+    for(s = 0; s < subtype_count; s++)
+    {
+        info.format = s;
+        sf_command(NULL, SFC_GET_FORMAT_SUBTYPE, &info, sizeof(info));
 
-    sfinfo.format = format | info.format;
+        sfinfo.format = format | info.format;
 
-    if (sf_format_check (&sfinfo))
-      g_array_append_val (array, info.format);
-  }
+        if(sf_format_check(&sfinfo))
+        {
+            g_array_append_val(array, info.format);
+        }
+    }
 
-  *size = array->len;
+    *size = array->len;
 
-  return ((int *)g_array_free (array, FALSE)); /* !! caller takes over alloc */
+    return ((int *)g_array_free(array, FALSE));  /* !! caller takes over alloc */
 }
 
 /* FIXME-GIR: @file_format accepts -1 as well! */
@@ -242,55 +262,69 @@ ipatch_snd_file_format_get_sub_formats (int format, guint *size)
  *   @sample_format).
  */
 int
-ipatch_snd_file_sample_format_to_sub_format (int sample_format, int file_format)
+ipatch_snd_file_sample_format_to_sub_format(int sample_format, int file_format)
 {
-  int sub_format;
-  int *formats;
-  guint i,size;
-  
-  g_return_val_if_fail (ipatch_sample_format_verify (sample_format), -1);
+    int sub_format;
+    int *formats;
+    guint i, size;
 
-  switch (IPATCH_SAMPLE_FORMAT_GET_WIDTH (sample_format))
-  {
+    g_return_val_if_fail(ipatch_sample_format_verify(sample_format), -1);
+
+    switch(IPATCH_SAMPLE_FORMAT_GET_WIDTH(sample_format))
+    {
     case IPATCH_SAMPLE_8BIT:
-      sub_format = SF_FORMAT_PCM_S8;
-      break;
-    case IPATCH_SAMPLE_16BIT:
-      sub_format = SF_FORMAT_PCM_16;
-      break;
-    case IPATCH_SAMPLE_24BIT:
-    case IPATCH_SAMPLE_REAL24BIT:
-      sub_format = SF_FORMAT_PCM_24;
-      break;
-    case IPATCH_SAMPLE_32BIT:
-      sub_format = SF_FORMAT_PCM_32;
-      break;
-    case IPATCH_SAMPLE_FLOAT:
-      sub_format = SF_FORMAT_FLOAT;
-      break;
-    case IPATCH_SAMPLE_DOUBLE:
-      sub_format = SF_FORMAT_DOUBLE;
-      break;
-    default:
-      sub_format = SF_FORMAT_PCM_16;
-      break;
-  }
-
-  if (file_format)
-  { /* ++ alloc array of valid sub formats for this file format */
-    formats = ipatch_snd_file_format_get_sub_formats (file_format, &size);
-
-    if (!formats) return (-1);  /* Invalid file_format value */
-
-    for (i = 0; i < size; i++)
-      if (formats[i] == sub_format)
+        sub_format = SF_FORMAT_PCM_S8;
         break;
 
-    if (i == size)
-      sub_format = formats[0];  /* sub format not found?  Just use first one.  FIXME? */
+    case IPATCH_SAMPLE_16BIT:
+        sub_format = SF_FORMAT_PCM_16;
+        break;
 
-    g_free (formats);   /* -- free formats array */
-  }
+    case IPATCH_SAMPLE_24BIT:
+    case IPATCH_SAMPLE_REAL24BIT:
+        sub_format = SF_FORMAT_PCM_24;
+        break;
 
-  return (sub_format);
+    case IPATCH_SAMPLE_32BIT:
+        sub_format = SF_FORMAT_PCM_32;
+        break;
+
+    case IPATCH_SAMPLE_FLOAT:
+        sub_format = SF_FORMAT_FLOAT;
+        break;
+
+    case IPATCH_SAMPLE_DOUBLE:
+        sub_format = SF_FORMAT_DOUBLE;
+        break;
+
+    default:
+        sub_format = SF_FORMAT_PCM_16;
+        break;
+    }
+
+    if(file_format)
+    {
+        /* ++ alloc array of valid sub formats for this file format */
+        formats = ipatch_snd_file_format_get_sub_formats(file_format, &size);
+
+        if(!formats)
+        {
+            return (-1);    /* Invalid file_format value */
+        }
+
+        for(i = 0; i < size; i++)
+            if(formats[i] == sub_format)
+            {
+                break;
+            }
+
+        if(i == size)
+        {
+            sub_format = formats[0];    /* sub format not found?  Just use first one.  FIXME? */
+        }
+
+        g_free(formats);    /* -- free formats array */
+    }
+
+    return (sub_format);
 }

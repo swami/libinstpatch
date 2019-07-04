@@ -33,8 +33,8 @@ typedef struct _IpatchParamSpecRange IpatchParamSpecRange;
 /* integer range structure */
 struct _IpatchRange
 {
-  int low;		/* low endpoint of range or -1 if undefined */
-  int high;	       /* high endpoint of range or -1 if undefined */
+    int low;		/* low endpoint of range or -1 if undefined */
+    int high;	       /* high endpoint of range or -1 if undefined */
 };
 
 /* set range value making sure that are in the correct order */
@@ -57,14 +57,14 @@ struct _IpatchRange
 } G_STMT_END
 
 
-GType ipatch_range_get_type (void);
-IpatchRange *ipatch_range_new (int low, int high);
-IpatchRange *ipatch_range_copy (IpatchRange *range);
-void ipatch_range_free (IpatchRange *range);
+GType ipatch_range_get_type(void);
+IpatchRange *ipatch_range_new(int low, int high);
+IpatchRange *ipatch_range_copy(IpatchRange *range);
+void ipatch_range_free(IpatchRange *range);
 
-void ipatch_value_set_range (GValue *value, const IpatchRange *range);
-void ipatch_value_set_static_range (GValue *value, IpatchRange *range);
-IpatchRange *ipatch_value_get_range (const GValue *value);
+void ipatch_value_set_range(GValue *value, const IpatchRange *range);
+void ipatch_value_set_static_range(GValue *value, IpatchRange *range);
+IpatchRange *ipatch_value_get_range(const GValue *value);
 
 /* range parameter specification */
 
@@ -78,16 +78,16 @@ IpatchRange *ipatch_value_get_range (const GValue *value);
 /* a parameter specification for the integer range type */
 struct _IpatchParamSpecRange
 {
-  GParamSpec parent_instance;	/* derived from GParamSpec */
-  int min, max;		  /* min and max values for range endpoints */
-  int default_low, default_high; /* default vals for low and high endpoints */
+    GParamSpec parent_instance;	/* derived from GParamSpec */
+    int min, max;		  /* min and max values for range endpoints */
+    int default_low, default_high; /* default vals for low and high endpoints */
 };
 
-GType ipatch_param_spec_range_get_type (void);
-GParamSpec *ipatch_param_spec_range (const char *name, const char *nick,
-				     const char *blurb,
-				     int min, int max,
-				     int default_low, int default_high,
-				     GParamFlags flags);
+GType ipatch_param_spec_range_get_type(void);
+GParamSpec *ipatch_param_spec_range(const char *name, const char *nick,
+                                    const char *blurb,
+                                    int min, int max,
+                                    int default_low, int default_high,
+                                    GParamFlags flags);
 
 #endif

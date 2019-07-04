@@ -20,7 +20,7 @@
 /**
  * SECTION: IpatchItem
  * @short_description: Abstract base item object
- * @see_also: 
+ * @see_also:
  * @stability: Stable
  *
  * The abstract base item type from which all instrument objects are derived
@@ -42,56 +42,56 @@
 
 enum
 {
-  PROP_0,
-  PROP_FLAGS,
-  PROP_PARENT,
-  PROP_BASE,
-  PROP_TITLE
+    PROP_0,
+    PROP_FLAGS,
+    PROP_PARENT,
+    PROP_BASE,
+    PROP_TITLE
 };
 
 /* for unique property caching */
 typedef struct
 {
-  GParamSpec **pspecs;	/* unique prop paramspecs (groups are consecutive) */
-  guint32 groups;	/* 1 bit per pspec, pspecs of same group are the same */
+    GParamSpec **pspecs;	/* unique prop paramspecs (groups are consecutive) */
+    guint32 groups;	/* 1 bit per pspec, pspecs of same group are the same */
 } UniqueBag;
 
 /* a private bag structure for ipatch_item_set_parent */
 typedef struct
 {
-  IpatchItem *base;
-  int hooks_active;
+    IpatchItem *base;
+    int hooks_active;
 } SetParentBag;
 
 /* defined in IpatchItemProp.c */
-extern void _ipatch_item_prop_init (void);
+extern void _ipatch_item_prop_init(void);
 
 /* defined in IpatchBase.c */
 extern GParamSpec *ipatch_base_pspec_changed;
 
 
-static void ipatch_item_base_init (IpatchItemClass *klass);
-static void ipatch_item_class_init (IpatchItemClass *klass);
-static void ipatch_item_set_property (GObject *object, guint property_id,
-				      const GValue *value, GParamSpec *pspec);
-static void ipatch_item_get_property (GObject *object, guint property_id,
-				      GValue *value, GParamSpec *pspec);
-static void ipatch_item_set_property_override (GObject *object,
-					       guint property_id,
-					       const GValue *value,
-					       GParamSpec *pspec);
-static void ipatch_item_init (IpatchItem *item);
-static void ipatch_item_finalize (GObject *object);
-static void ipatch_item_item_remove_full (IpatchItem *item, gboolean full);
-static void ipatch_item_recursive_base_set (IpatchContainer *container,
-					    SetParentBag *bag);
-static void ipatch_item_recursive_base_unset (IpatchContainer *container);
-static void ipatch_item_real_remove_full (IpatchItem *item, gboolean full);
-static void ipatch_item_real_remove_recursive (IpatchItem *item, gboolean full);
-static void copy_hash_to_list_GHFunc (gpointer key, gpointer value,
-				      gpointer user_data);
-static UniqueBag *item_lookup_unique_bag (GType type);
-static gint unique_group_list_sort_func (gconstpointer a, gconstpointer b);
+static void ipatch_item_base_init(IpatchItemClass *klass);
+static void ipatch_item_class_init(IpatchItemClass *klass);
+static void ipatch_item_set_property(GObject *object, guint property_id,
+                                     const GValue *value, GParamSpec *pspec);
+static void ipatch_item_get_property(GObject *object, guint property_id,
+                                     GValue *value, GParamSpec *pspec);
+static void ipatch_item_set_property_override(GObject *object,
+        guint property_id,
+        const GValue *value,
+        GParamSpec *pspec);
+static void ipatch_item_init(IpatchItem *item);
+static void ipatch_item_finalize(GObject *object);
+static void ipatch_item_item_remove_full(IpatchItem *item, gboolean full);
+static void ipatch_item_recursive_base_set(IpatchContainer *container,
+        SetParentBag *bag);
+static void ipatch_item_recursive_base_unset(IpatchContainer *container);
+static void ipatch_item_real_remove_full(IpatchItem *item, gboolean full);
+static void ipatch_item_real_remove_recursive(IpatchItem *item, gboolean full);
+static void copy_hash_to_list_GHFunc(gpointer key, gpointer value,
+                                     gpointer user_data);
+static UniqueBag *item_lookup_unique_bag(GType type);
+static gint unique_group_list_sort_func(gconstpointer a, gconstpointer b);
 
 
 static GObjectClass *parent_class = NULL;
@@ -100,7 +100,7 @@ static GObjectClass *parent_class = NULL;
 static IpatchItemClass *real_item_class = NULL;
 
 /* define the lock for the unique property cache hash */
-G_LOCK_DEFINE_STATIC (unique_prop_cache);
+G_LOCK_DEFINE_STATIC(unique_prop_cache);
 
 /* cache of IpatchItem unique properties (hash: GType => UniqueBag) */
 static GHashTable *unique_prop_cache = NULL;
@@ -123,236 +123,260 @@ ipatch_item_get_pspec_title(void)
 }
 
 GType
-ipatch_item_get_type (void)
+ipatch_item_get_type(void)
 {
-  static GType item_type = 0;
+    static GType item_type = 0;
 
-  if (!item_type) {
-    static const GTypeInfo item_info = {
-      sizeof (IpatchItemClass),
-      (GBaseInitFunc) ipatch_item_base_init, NULL,
-      (GClassInitFunc) ipatch_item_class_init, NULL, NULL,
-      sizeof (IpatchItem), 0,
-      (GInstanceInitFunc)ipatch_item_init,
-    };
+    if(!item_type)
+    {
+        static const GTypeInfo item_info =
+        {
+            sizeof(IpatchItemClass),
+            (GBaseInitFunc) ipatch_item_base_init, NULL,
+            (GClassInitFunc) ipatch_item_class_init, NULL, NULL,
+            sizeof(IpatchItem), 0,
+            (GInstanceInitFunc)ipatch_item_init,
+        };
 
-    item_type = g_type_register_static (G_TYPE_OBJECT, "IpatchItem",
-					&item_info, G_TYPE_FLAG_ABSTRACT);
+        item_type = g_type_register_static(G_TYPE_OBJECT, "IpatchItem",
+                                           &item_info, G_TYPE_FLAG_ABSTRACT);
 
-    /* create unique property cache (elements are never removed) */
-    unique_prop_cache = g_hash_table_new (NULL, NULL);
+        /* create unique property cache (elements are never removed) */
+        unique_prop_cache = g_hash_table_new(NULL, NULL);
 
-    _ipatch_item_prop_init ();	/* Initialize property change callback system */
-  }
+        _ipatch_item_prop_init();	/* Initialize property change callback system */
+    }
 
-  return (item_type);
+    return (item_type);
 }
 
 static void
-ipatch_item_base_init (IpatchItemClass *klass)
+ipatch_item_base_init(IpatchItemClass *klass)
 {
-  GObjectClass *obj_class = G_OBJECT_CLASS (klass);
+    GObjectClass *obj_class = G_OBJECT_CLASS(klass);
 
-  /* override the set property method for all derived IpatchItem types */
-  obj_class->set_property = ipatch_item_set_property_override;
+    /* override the set property method for all derived IpatchItem types */
+    obj_class->set_property = ipatch_item_set_property_override;
 }
 
 /* set_property override method that calls item_set_property method, derived
  * classes should use the item_set_property method instead of set_property. */
 static void
-ipatch_item_set_property_override (GObject *object, guint property_id,
-				   const GValue *value, GParamSpec *pspec)
+ipatch_item_set_property_override(GObject *object, guint property_id,
+                                  const GValue *value, GParamSpec *pspec)
 {
-  IpatchItemClass *klass;
-  GObjectClass *obj_class;
-  gboolean hooks_active;
-  GValue oldval = { 0 };
-  GType type, prev_type;
+    IpatchItemClass *klass;
+    GObjectClass *obj_class;
+    gboolean hooks_active;
+    GValue oldval = { 0 };
+    GType type, prev_type;
 
-  /* Get the class for the owning type of this parameter.
-   * NOTE: This wont work for interfaces (handled below) or overridden
-   * properties.  FIXME - Not sure how to handle overridden properties. */
-  klass = g_type_class_peek (pspec->owner_type);
+    /* Get the class for the owning type of this parameter.
+     * NOTE: This wont work for interfaces (handled below) or overridden
+     * properties.  FIXME - Not sure how to handle overridden properties. */
+    klass = g_type_class_peek(pspec->owner_type);
 
-  /* property belongs to an interface? */
-  if (!klass && G_TYPE_IS_INTERFACE (pspec->owner_type))
-  {
-    /* Unfortunately GObject doesn't give us an easy way to determine which
-     * class implements an interface in an object's derived ancestry, so we're
-     * left with this hack.. */
-
-    prev_type = G_OBJECT_TYPE (object);
-    type = prev_type;
-
-    /* find type in object's ancestry that implements the interface by searching
-     * for the type just before the first parent which doesn't conform to the
-     * interface. */
-    while ((type = g_type_parent (type)))
+    /* property belongs to an interface? */
+    if(!klass && G_TYPE_IS_INTERFACE(pspec->owner_type))
     {
-      if (!g_type_is_a (type, pspec->owner_type)) break;
-      prev_type = type;
+        /* Unfortunately GObject doesn't give us an easy way to determine which
+         * class implements an interface in an object's derived ancestry, so we're
+         * left with this hack.. */
+
+        prev_type = G_OBJECT_TYPE(object);
+        type = prev_type;
+
+        /* find type in object's ancestry that implements the interface by searching
+         * for the type just before the first parent which doesn't conform to the
+         * interface. */
+        while((type = g_type_parent(type)))
+        {
+            if(!g_type_is_a(type, pspec->owner_type))
+            {
+                break;
+            }
+
+            prev_type = type;
+        }
+
+        if(prev_type)
+        {
+            klass = g_type_class_peek(prev_type);
+        }
     }
 
-    if (prev_type) klass = g_type_class_peek (prev_type);
-  }
+    g_return_if_fail(klass != NULL);
+    g_return_if_fail(klass->item_set_property != NULL);
 
-  g_return_if_fail (klass != NULL);
-  g_return_if_fail (klass->item_set_property != NULL);
+    /* hook functions can be inactive for greater performance */
+    hooks_active = (ipatch_item_get_flags(object) & IPATCH_ITEM_HOOKS_ACTIVE) != 0;
 
-  /* hook functions can be inactive for greater performance */
-  hooks_active = (ipatch_item_get_flags (object) & IPATCH_ITEM_HOOKS_ACTIVE) != 0;
-
-  /* fetch parameter's current value to use as oldval in property notify */
-  if (hooks_active)
+    /* fetch parameter's current value to use as oldval in property notify */
+    if(hooks_active)
     {
-      obj_class = (GObjectClass *)klass;
-      g_return_if_fail (obj_class->get_property != NULL);
+        obj_class = (GObjectClass *)klass;
+        g_return_if_fail(obj_class->get_property != NULL);
 
-      g_value_init (&oldval, G_PARAM_SPEC_VALUE_TYPE (pspec));
-      obj_class->get_property (object, property_id, &oldval, pspec);
+        g_value_init(&oldval, G_PARAM_SPEC_VALUE_TYPE(pspec));
+        obj_class->get_property(object, property_id, &oldval, pspec);
     }
 
-  klass->item_set_property (object, property_id, value, pspec);
+    klass->item_set_property(object, property_id, value, pspec);
 
-  /* call property change  */
-  if (hooks_active)
+    /* call property change  */
+    if(hooks_active)
     {
-      ipatch_item_prop_notify ((IpatchItem *)object, pspec, value, &oldval);
-      g_value_unset (&oldval);
+        ipatch_item_prop_notify((IpatchItem *)object, pspec, value, &oldval);
+        g_value_unset(&oldval);
     }
 }
 
 static void
-ipatch_item_class_init (IpatchItemClass *klass)
+ipatch_item_class_init(IpatchItemClass *klass)
 {
-  GObjectClass *obj_class = G_OBJECT_CLASS (klass);
+    GObjectClass *obj_class = G_OBJECT_CLASS(klass);
 
-  real_item_class = klass;
-  parent_class = g_type_class_peek_parent (klass);
+    real_item_class = klass;
+    parent_class = g_type_class_peek_parent(klass);
 
-  klass->item_set_property = ipatch_item_set_property;
+    klass->item_set_property = ipatch_item_set_property;
 
-  obj_class->get_property = ipatch_item_get_property;
-  obj_class->finalize = ipatch_item_finalize;
+    obj_class->get_property = ipatch_item_get_property;
+    obj_class->finalize = ipatch_item_finalize;
 
-  klass->remove_full = ipatch_item_item_remove_full;
+    klass->remove_full = ipatch_item_item_remove_full;
 
-  g_object_class_install_property (obj_class, PROP_FLAGS,
-		    g_param_spec_uint ("flags", _("Flags"), _("Flags"),
-				       0, G_MAXUINT, 0,
-				       G_PARAM_READABLE | IPATCH_PARAM_HIDE
-				       | IPATCH_PARAM_NO_SAVE_CHANGE
-				       | IPATCH_PARAM_NO_SAVE));
-  g_object_class_install_property (obj_class, PROP_PARENT,
-			  g_param_spec_object ("parent", _("Parent"),
-					       _("Parent"),
-					       IPATCH_TYPE_ITEM,
-					       G_PARAM_READWRITE
-					       | IPATCH_PARAM_NO_SAVE));
-  g_object_class_install_property (obj_class, PROP_BASE,
-			  g_param_spec_object ("base", _("Base"), _("Base"),
-					       IPATCH_TYPE_BASE,
-					       G_PARAM_READABLE
-					       | IPATCH_PARAM_NO_SAVE));
-  ipatch_item_pspec_title
-    = g_param_spec_string ("title", _("Title"), _("Title"),
-			   NULL, G_PARAM_READABLE | IPATCH_PARAM_NO_SAVE_CHANGE
-			   | IPATCH_PARAM_NO_SAVE);
-  g_object_class_install_property (obj_class, PROP_TITLE,
-				   ipatch_item_pspec_title);
+    g_object_class_install_property(obj_class, PROP_FLAGS,
+                                    g_param_spec_uint("flags", _("Flags"), _("Flags"),
+                                            0, G_MAXUINT, 0,
+                                            G_PARAM_READABLE | IPATCH_PARAM_HIDE
+                                            | IPATCH_PARAM_NO_SAVE_CHANGE
+                                            | IPATCH_PARAM_NO_SAVE));
+    g_object_class_install_property(obj_class, PROP_PARENT,
+                                    g_param_spec_object("parent", _("Parent"),
+                                            _("Parent"),
+                                            IPATCH_TYPE_ITEM,
+                                            G_PARAM_READWRITE
+                                            | IPATCH_PARAM_NO_SAVE));
+    g_object_class_install_property(obj_class, PROP_BASE,
+                                    g_param_spec_object("base", _("Base"), _("Base"),
+                                            IPATCH_TYPE_BASE,
+                                            G_PARAM_READABLE
+                                            | IPATCH_PARAM_NO_SAVE));
+    ipatch_item_pspec_title
+        = g_param_spec_string("title", _("Title"), _("Title"),
+                              NULL, G_PARAM_READABLE | IPATCH_PARAM_NO_SAVE_CHANGE
+                              | IPATCH_PARAM_NO_SAVE);
+    g_object_class_install_property(obj_class, PROP_TITLE,
+                                    ipatch_item_pspec_title);
 }
 
 static void
-ipatch_item_set_property (GObject *object, guint property_id,
-			  const GValue *value, GParamSpec *pspec)
+ipatch_item_set_property(GObject *object, guint property_id,
+                         const GValue *value, GParamSpec *pspec)
 {
-  IpatchItem *item = IPATCH_ITEM (object);
+    IpatchItem *item = IPATCH_ITEM(object);
 
-  switch (property_id)
+    switch(property_id)
     {
     case PROP_FLAGS:
-      ipatch_item_set_flags (item, g_value_get_uint (value));
-      break;
+        ipatch_item_set_flags(item, g_value_get_uint(value));
+        break;
+
     case PROP_PARENT:
-      ipatch_item_set_parent (item, IPATCH_ITEM (g_value_get_object (value)));
-      break;
+        ipatch_item_set_parent(item, IPATCH_ITEM(g_value_get_object(value)));
+        break;
+
     default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
-      return;
+        G_OBJECT_WARN_INVALID_PROPERTY_ID(object, property_id, pspec);
+        return;
     }
 }
 
 static void
-ipatch_item_get_property (GObject *object, guint property_id,
-			  GValue *value, GParamSpec *pspec)
+ipatch_item_get_property(GObject *object, guint property_id,
+                         GValue *value, GParamSpec *pspec)
 {
-  IpatchItem *item = IPATCH_ITEM (object);
-  char *name;
+    IpatchItem *item = IPATCH_ITEM(object);
+    char *name;
 
-  switch (property_id)
+    switch(property_id)
     {
     case PROP_FLAGS:
-      g_value_set_uint (value, ipatch_item_get_flags (item));
-      break;
+        g_value_set_uint(value, ipatch_item_get_flags(item));
+        break;
+
     case PROP_PARENT:
-      g_value_take_object (value, ipatch_item_get_parent (item));
-      break;
+        g_value_take_object(value, ipatch_item_get_parent(item));
+        break;
+
     case PROP_BASE:
-      g_value_take_object (value, ipatch_item_get_base (item));
-      break;
+        g_value_take_object(value, ipatch_item_get_base(item));
+        break;
+
     case PROP_TITLE:
-      /* see if the "name" type property is set */
-      ipatch_type_object_get ((GObject *)item, "name", &name, NULL);
+        /* see if the "name" type property is set */
+        ipatch_type_object_get((GObject *)item, "name", &name, NULL);
 
-      if (name) g_value_take_string (value, name);
-      else g_value_set_string (value, IPATCH_UNTITLED);	/* "untitled" */
-      break;
+        if(name)
+        {
+            g_value_take_string(value, name);
+        }
+        else
+        {
+            g_value_set_string(value, IPATCH_UNTITLED);    /* "untitled" */
+        }
+
+        break;
+
     default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
-      return;
+        G_OBJECT_WARN_INVALID_PROPERTY_ID(object, property_id, pspec);
+        return;
     }
 }
 
 static void
-ipatch_item_init (IpatchItem *item)
+ipatch_item_init(IpatchItem *item)
 {
-  /* always assign a mutex, will be freed and set to parent's mutex if the
-     class has mutex_slave set (during ipatch_item_set_parent) */
-  item->mutex = g_malloc (sizeof (GStaticRecMutex));
-  g_static_rec_mutex_init (item->mutex);
+    /* always assign a mutex, will be freed and set to parent's mutex if the
+       class has mutex_slave set (during ipatch_item_set_parent) */
+    item->mutex = g_malloc(sizeof(GStaticRecMutex));
+    g_static_rec_mutex_init(item->mutex);
 
-  ipatch_item_set_flags (item, IPATCH_ITEM_FREE_MUTEX);
+    ipatch_item_set_flags(item, IPATCH_ITEM_FREE_MUTEX);
 }
 
 static void
-ipatch_item_finalize (GObject *object)
+ipatch_item_finalize(GObject *object)
 {
-  IpatchItem *item = IPATCH_ITEM (object);
+    IpatchItem *item = IPATCH_ITEM(object);
 
-  if (ipatch_item_get_flags (item) & IPATCH_ITEM_FREE_MUTEX)
+    if(ipatch_item_get_flags(item) & IPATCH_ITEM_FREE_MUTEX)
     {
-      g_static_rec_mutex_free (item->mutex);
-      g_free (item->mutex);
+        g_static_rec_mutex_free(item->mutex);
+        g_free(item->mutex);
     }
 
-  item->mutex = NULL;
+    item->mutex = NULL;
 
-  if (parent_class->finalize)
-    parent_class->finalize (object);
+    if(parent_class->finalize)
+    {
+        parent_class->finalize(object);
+    }
 }
 
 static void
-ipatch_item_item_remove_full (IpatchItem *item, gboolean full)
+ipatch_item_item_remove_full(IpatchItem *item, gboolean full)
 {
-  IpatchItem *parent;
+    IpatchItem *parent;
 
-  parent = ipatch_item_get_parent (item);       // ++ ref parent
+    parent = ipatch_item_get_parent(item);        // ++ ref parent
 
-  if (parent)
-  {
-    ipatch_container_remove (IPATCH_CONTAINER (parent), item);
-    g_object_unref (parent);                    // -- unref parent
-  }
+    if(parent)
+    {
+        ipatch_container_remove(IPATCH_CONTAINER(parent), item);
+        g_object_unref(parent);                     // -- unref parent
+    }
 }
 
 /**
@@ -364,11 +388,11 @@ ipatch_item_item_remove_full (IpatchItem *item, gboolean full)
  * Returns: Value of flags field (some of which is user definable).
  */
 int
-ipatch_item_get_flags (gpointer item)
+ipatch_item_get_flags(gpointer item)
 {
-  g_return_val_if_fail (IPATCH_IS_ITEM (item), 0);
+    g_return_val_if_fail(IPATCH_IS_ITEM(item), 0);
 
-  return (item ? g_atomic_int_get (&((IpatchItem *)item)->flags) : 0);
+    return (item ? g_atomic_int_get(&((IpatchItem *)item)->flags) : 0);
 }
 
 /**
@@ -380,18 +404,19 @@ ipatch_item_get_flags (gpointer item)
  * the @item flags field.
  */
 void
-ipatch_item_set_flags (gpointer item, int flags)
+ipatch_item_set_flags(gpointer item, int flags)
 {
-  int oldval, newval;
+    int oldval, newval;
 
-  g_return_if_fail (IPATCH_IS_ITEM (item));
+    g_return_if_fail(IPATCH_IS_ITEM(item));
 
-  do
-  {
-    oldval = g_atomic_int_get (&((IpatchItem *)item)->flags);
-    newval = oldval | flags;
-  } while (!g_atomic_int_compare_and_exchange (&((IpatchItem *)item)->flags,
-                                               oldval, newval));
+    do
+    {
+        oldval = g_atomic_int_get(&((IpatchItem *)item)->flags);
+        newval = oldval | flags;
+    }
+    while(!g_atomic_int_compare_and_exchange(&((IpatchItem *)item)->flags,
+            oldval, newval));
 }
 
 /**
@@ -403,18 +428,19 @@ ipatch_item_set_flags (gpointer item, int flags)
  * cleared in the @item flags field.
  */
 void
-ipatch_item_clear_flags (gpointer item, int flags)
+ipatch_item_clear_flags(gpointer item, int flags)
 {
-  int oldval, newval;
+    int oldval, newval;
 
-  g_return_if_fail (IPATCH_IS_ITEM (item));
+    g_return_if_fail(IPATCH_IS_ITEM(item));
 
-  do
-  {
-    oldval = g_atomic_int_get (&((IpatchItem *)item)->flags);
-    newval = oldval & ~flags;
-  } while (!g_atomic_int_compare_and_exchange (&((IpatchItem *)item)->flags,
-                                               oldval, newval));
+    do
+    {
+        oldval = g_atomic_int_get(&((IpatchItem *)item)->flags);
+        newval = oldval & ~flags;
+    }
+    while(!g_atomic_int_compare_and_exchange(&((IpatchItem *)item)->flags,
+            oldval, newval));
 }
 
 /**
@@ -436,101 +462,128 @@ ipatch_item_clear_flags (gpointer item, int flags)
  * item's are often only accessed by 1 thread until being parented.
  */
 void
-ipatch_item_set_parent (IpatchItem *item, IpatchItem *parent)
+ipatch_item_set_parent(IpatchItem *item, IpatchItem *parent)
 {
-  IpatchItemClass *klass;
-  gboolean is_container;
-  SetParentBag bag;
-  guint depth;
-  guint i;
+    IpatchItemClass *klass;
+    gboolean is_container;
+    SetParentBag bag;
+    guint depth;
+    guint i;
 
-  g_return_if_fail (IPATCH_IS_ITEM (item));
-  g_return_if_fail (IPATCH_IS_ITEM (parent));
-  g_return_if_fail (item != parent);
+    g_return_if_fail(IPATCH_IS_ITEM(item));
+    g_return_if_fail(IPATCH_IS_ITEM(parent));
+    g_return_if_fail(item != parent);
 
-  bag.base = ipatch_item_get_base (parent); /* ++ ref base patch item */
-  is_container = IPATCH_IS_CONTAINER (item);
+    bag.base = ipatch_item_get_base(parent);  /* ++ ref base patch item */
+    is_container = IPATCH_IS_CONTAINER(item);
 
-  /* get value of parent's hook flag */
-  bag.hooks_active = ipatch_item_get_flags (parent) & IPATCH_ITEM_HOOKS_ACTIVE;
+    /* get value of parent's hook flag */
+    bag.hooks_active = ipatch_item_get_flags(parent) & IPATCH_ITEM_HOOKS_ACTIVE;
 
-  IPATCH_ITEM_WLOCK (item);
-  if (log_if_fail (item->parent == NULL))
+    IPATCH_ITEM_WLOCK(item);
+
+    if(log_if_fail(item->parent == NULL))
     {
-      IPATCH_ITEM_WUNLOCK (item);
-      if (bag.base) g_object_unref (bag.base);
-      return;
+        IPATCH_ITEM_WUNLOCK(item);
+
+        if(bag.base)
+        {
+            g_object_unref(bag.base);
+        }
+
+        return;
     }
 
-  klass = IPATCH_ITEM_GET_CLASS (item);
-  if (klass->mutex_slave)
+    klass = IPATCH_ITEM_GET_CLASS(item);
+
+    if(klass->mutex_slave)
     {
-      depth = g_static_rec_mutex_unlock_full (item->mutex);
-      if (ipatch_item_get_flags (item) & IPATCH_ITEM_FREE_MUTEX)
-	{
-	  g_static_rec_mutex_free (item->mutex);
-	  g_free (item->mutex);
-	}
+        depth = g_static_rec_mutex_unlock_full(item->mutex);
 
-      item->mutex = parent->mutex;
-      ipatch_item_clear_flags (item, IPATCH_ITEM_FREE_MUTEX);
+        if(ipatch_item_get_flags(item) & IPATCH_ITEM_FREE_MUTEX)
+        {
+            g_static_rec_mutex_free(item->mutex);
+            g_free(item->mutex);
+        }
 
-      /* lock it the number of times old mutex was locked, we don't use
-	 g_static_rec_mutex_lock_full because it could set depth rather than
-	 add to it */
-      for (i = 0; i < depth; i++)
-	g_static_rec_mutex_lock (item->mutex);
+        item->mutex = parent->mutex;
+        ipatch_item_clear_flags(item, IPATCH_ITEM_FREE_MUTEX);
+
+        /* lock it the number of times old mutex was locked, we don't use
+        g_static_rec_mutex_lock_full because it could set depth rather than
+         add to it */
+        for(i = 0; i < depth; i++)
+        {
+            g_static_rec_mutex_lock(item->mutex);
+        }
     }
 
-  item->parent = parent;
-  if (bag.base) item->base = bag.base; /* inherit base parent item if set */
+    item->parent = parent;
 
-  /* inherit active hooks flag, has no effect if not set */
-  ipatch_item_set_flags (item, bag.hooks_active);
+    if(bag.base)
+    {
+        item->base = bag.base;    /* inherit base parent item if set */
+    }
 
-  /* if item is a container and base or hooks active flag is set, recursively
-     set children hooks active flags */
-  if (is_container && (bag.base || bag.hooks_active))
-    ipatch_item_recursive_base_set ((IpatchContainer *)item, &bag);
+    /* inherit active hooks flag, has no effect if not set */
+    ipatch_item_set_flags(item, bag.hooks_active);
 
-  IPATCH_ITEM_WUNLOCK (item);
+    /* if item is a container and base or hooks active flag is set, recursively
+       set children hooks active flags */
+    if(is_container && (bag.base || bag.hooks_active))
+    {
+        ipatch_item_recursive_base_set((IpatchContainer *)item, &bag);
+    }
 
-  if (bag.base) g_object_unref (bag.base); /* -- unref base patch item */
+    IPATCH_ITEM_WUNLOCK(item);
+
+    if(bag.base)
+    {
+        g_object_unref(bag.base);    /* -- unref base patch item */
+    }
 }
 
 /* recursively sets base field of a tree of items, expects container to
    be write locked */
 static void
-ipatch_item_recursive_base_set (IpatchContainer *container, SetParentBag *bag)
+ipatch_item_recursive_base_set(IpatchContainer *container, SetParentBag *bag)
 {
-  IpatchIter iter;
-  GObject *child;
-  const GType *types;
+    IpatchIter iter;
+    GObject *child;
+    const GType *types;
 
-  /* get container child list types */
-  types = ipatch_container_get_child_types (container);
-  while (*types)		/* loop over list types */
-    { /* initialize iterator to child list */
-      ipatch_container_init_iter (container, &iter, *types);
-      child = ipatch_iter_first (&iter);
-      while (child)		/* loop over child list */
-	{
-	  IPATCH_ITEM_WLOCK (child);
+    /* get container child list types */
+    types = ipatch_container_get_child_types(container);
 
-	  if (bag->base)	/* inherit base pointer if set */
-	    ((IpatchItem *)child)->base = bag->base;
+    while(*types)		/* loop over list types */
+    {
+        /* initialize iterator to child list */
+        ipatch_container_init_iter(container, &iter, *types);
+        child = ipatch_iter_first(&iter);
 
-	  /* inherit active hooks flag, has no effect if not set */
-	  ipatch_item_set_flags (child, bag->hooks_active);
+        while(child)		/* loop over child list */
+        {
+            IPATCH_ITEM_WLOCK(child);
 
-	  if (IPATCH_IS_CONTAINER (child)) /* recurse if a container */
-	    ipatch_item_recursive_base_set ((IpatchContainer *)child, bag);
+            if(bag->base)	/* inherit base pointer if set */
+            {
+                ((IpatchItem *)child)->base = bag->base;
+            }
 
-	  IPATCH_ITEM_WUNLOCK (child);
+            /* inherit active hooks flag, has no effect if not set */
+            ipatch_item_set_flags(child, bag->hooks_active);
 
-	  child = ipatch_iter_next (&iter);
-	} /* child loop */
-      types++;
+            if(IPATCH_IS_CONTAINER(child))   /* recurse if a container */
+            {
+                ipatch_item_recursive_base_set((IpatchContainer *)child, bag);
+            }
+
+            IPATCH_ITEM_WUNLOCK(child);
+
+            child = ipatch_iter_next(&iter);
+        } /* child loop */
+
+        types++;
     } /* child type loop */
 }
 
@@ -545,63 +598,72 @@ ipatch_item_recursive_base_set (IpatchContainer *container, SetParentBag *bag)
  * not do so.
  */
 void
-ipatch_item_unparent (IpatchItem *item)
+ipatch_item_unparent(IpatchItem *item)
 {
-  gboolean is_container;
+    gboolean is_container;
 
-  g_return_if_fail (IPATCH_IS_ITEM (item));
+    g_return_if_fail(IPATCH_IS_ITEM(item));
 
-  is_container = IPATCH_IS_CONTAINER (item);
+    is_container = IPATCH_IS_CONTAINER(item);
 
-  IPATCH_ITEM_WLOCK (item);
-  if (!item->parent)
+    IPATCH_ITEM_WLOCK(item);
+
+    if(!item->parent)
     {
-      IPATCH_ITEM_WUNLOCK (item);
-      return;
+        IPATCH_ITEM_WUNLOCK(item);
+        return;
     }
 
-  /* clear parent, base and active hooks flag of item */
-  item->parent = NULL;
-  item->base = NULL;
-  ipatch_item_clear_flags (item, IPATCH_ITEM_HOOKS_ACTIVE);
+    /* clear parent, base and active hooks flag of item */
+    item->parent = NULL;
+    item->base = NULL;
+    ipatch_item_clear_flags(item, IPATCH_ITEM_HOOKS_ACTIVE);
 
-  /* recursively unset base field and active hooks flag of all children */
-  if (is_container)
-    ipatch_item_recursive_base_unset ((IpatchContainer *)item);
+    /* recursively unset base field and active hooks flag of all children */
+    if(is_container)
+    {
+        ipatch_item_recursive_base_unset((IpatchContainer *)item);
+    }
 
-  IPATCH_ITEM_WUNLOCK (item);
+    IPATCH_ITEM_WUNLOCK(item);
 }
 
 /* recursively unsets base field of a tree of items, expects container to
    be write locked */
 static void
-ipatch_item_recursive_base_unset (IpatchContainer *container)
+ipatch_item_recursive_base_unset(IpatchContainer *container)
 {
-  IpatchIter iter;
-  GObject *child;
-  const GType *types;
+    IpatchIter iter;
+    GObject *child;
+    const GType *types;
 
-  types = ipatch_container_get_child_types (container);
-  while (*types)		/* loop over list types */
-    { /* initialize iterator to child list */
-      ipatch_container_init_iter (container, &iter, *types);
-      child = ipatch_iter_first (&iter);
-      while (child)		/* loop over child list */
-	{
-	  IPATCH_ITEM_WLOCK (child);
+    types = ipatch_container_get_child_types(container);
 
-	  /* unset base pointer and clear active hooks flag */
-	  ((IpatchItem *)child)->base = NULL;
-	  ipatch_item_clear_flags (child, IPATCH_ITEM_HOOKS_ACTIVE);
+    while(*types)		/* loop over list types */
+    {
+        /* initialize iterator to child list */
+        ipatch_container_init_iter(container, &iter, *types);
+        child = ipatch_iter_first(&iter);
 
-	  if (IPATCH_IS_CONTAINER (child)) /* recurse if a container */
-	    ipatch_item_recursive_base_unset ((IpatchContainer *)child);
+        while(child)		/* loop over child list */
+        {
+            IPATCH_ITEM_WLOCK(child);
 
-	  IPATCH_ITEM_WUNLOCK (child);
+            /* unset base pointer and clear active hooks flag */
+            ((IpatchItem *)child)->base = NULL;
+            ipatch_item_clear_flags(child, IPATCH_ITEM_HOOKS_ACTIVE);
 
-	  child = ipatch_iter_next (&iter);
-	} /* child loop */
-      types++;
+            if(IPATCH_IS_CONTAINER(child))   /* recurse if a container */
+            {
+                ipatch_item_recursive_base_unset((IpatchContainer *)child);
+            }
+
+            IPATCH_ITEM_WUNLOCK(child);
+
+            child = ipatch_iter_next(&iter);
+        } /* child loop */
+
+        types++;
     } /* child type loop */
 }
 
@@ -621,18 +683,23 @@ ipatch_item_recursive_base_unset (IpatchContainer *container)
  * caller is responsible for removing it when finished with parent.
  */
 IpatchItem *
-ipatch_item_get_parent (IpatchItem *item)
+ipatch_item_get_parent(IpatchItem *item)
 {
-  IpatchItem *parent;
+    IpatchItem *parent;
 
-  g_return_val_if_fail (IPATCH_IS_ITEM (item), NULL);
+    g_return_val_if_fail(IPATCH_IS_ITEM(item), NULL);
 
-  IPATCH_ITEM_RLOCK (item);
-  parent = item->parent;
-  if (parent) g_object_ref (parent);
-  IPATCH_ITEM_RUNLOCK (item);
+    IPATCH_ITEM_RLOCK(item);
+    parent = item->parent;
 
-  return (parent);
+    if(parent)
+    {
+        g_object_ref(parent);
+    }
+
+    IPATCH_ITEM_RUNLOCK(item);
+
+    return (parent);
 }
 
 /**
@@ -648,10 +715,10 @@ ipatch_item_get_parent (IpatchItem *item)
  * Returns: The parent of @item or %NULL if not parented or a root item.
  */
 IpatchItem *
-ipatch_item_peek_parent (IpatchItem *item)
+ipatch_item_peek_parent(IpatchItem *item)
 {
-  g_return_val_if_fail (IPATCH_IS_ITEM (item), NULL);
-  return (item->parent);
+    g_return_val_if_fail(IPATCH_IS_ITEM(item), NULL);
+    return (item->parent);
 }
 
 /**
@@ -669,21 +736,29 @@ ipatch_item_peek_parent (IpatchItem *item)
  * removing it when finished with the base parent.
  */
 IpatchItem *
-ipatch_item_get_base (IpatchItem *item)
+ipatch_item_get_base(IpatchItem *item)
 {
-  IpatchItem *base;
+    IpatchItem *base;
 
-  g_return_val_if_fail (IPATCH_IS_ITEM (item), NULL);
+    g_return_val_if_fail(IPATCH_IS_ITEM(item), NULL);
 
-  /* return the item if it is itself an #IpatchBase object */
-  if (IPATCH_IS_BASE (item)) return (g_object_ref (item));
+    /* return the item if it is itself an #IpatchBase object */
+    if(IPATCH_IS_BASE(item))
+    {
+        return (g_object_ref(item));
+    }
 
-  IPATCH_ITEM_RLOCK (item);
-  base = item->base;
-  if (base) g_object_ref (base);
-  IPATCH_ITEM_RUNLOCK (item);
+    IPATCH_ITEM_RLOCK(item);
+    base = item->base;
 
-  return (base);
+    if(base)
+    {
+        g_object_ref(base);
+    }
+
+    IPATCH_ITEM_RUNLOCK(item);
+
+    return (base);
 }
 
 /**
@@ -700,14 +775,17 @@ ipatch_item_get_base (IpatchItem *item)
  * in parent ancestry.
  */
 IpatchItem *
-ipatch_item_peek_base (IpatchItem *item)
+ipatch_item_peek_base(IpatchItem *item)
 {
-  g_return_val_if_fail (IPATCH_IS_ITEM (item), NULL);
+    g_return_val_if_fail(IPATCH_IS_ITEM(item), NULL);
 
-  /* return the item if it is itself an #IpatchBase object */
-  if (IPATCH_IS_BASE (item)) return (item);
+    /* return the item if it is itself an #IpatchBase object */
+    if(IPATCH_IS_BASE(item))
+    {
+        return (item);
+    }
 
-  return (item->base);
+    return (item->base);
 }
 
 /**
@@ -728,34 +806,43 @@ ipatch_item_peek_base (IpatchItem *item)
  * matched item when done with it.
  */
 IpatchItem *
-ipatch_item_get_ancestor_by_type (IpatchItem *item, GType ancestor_type)
+ipatch_item_get_ancestor_by_type(IpatchItem *item, GType ancestor_type)
 {
 #define MAX_ITEM_DEPTH 10
-  IpatchItem *p, *ancestry[MAX_ITEM_DEPTH];
-  int i, depth = -1;
+    IpatchItem *p, *ancestry[MAX_ITEM_DEPTH];
+    int i, depth = -1;
 
-  g_return_val_if_fail (IPATCH_ITEM (item), NULL);
-  g_return_val_if_fail (g_type_is_a (ancestor_type, IPATCH_TYPE_ITEM), NULL);
+    g_return_val_if_fail(IPATCH_ITEM(item), NULL);
+    g_return_val_if_fail(g_type_is_a(ancestor_type, IPATCH_TYPE_ITEM), NULL);
 
-  p = item;
-  do
+    p = item;
+
+    do
     {
-      if (g_type_is_a (G_OBJECT_TYPE (p), ancestor_type))
-	break;
+        if(g_type_is_a(G_OBJECT_TYPE(p), ancestor_type))
+        {
+            break;
+        }
 
-      depth++;
-      g_assert (depth < MAX_ITEM_DEPTH);
-      p = ancestry[depth] = ipatch_item_get_parent (p);
+        depth++;
+        g_assert(depth < MAX_ITEM_DEPTH);
+        p = ancestry[depth] = ipatch_item_get_parent(p);
     }
-  while (p);
+    while(p);
 
-  if (depth >= 0)		/* unreference ancestry */
-    for (i = 0; i <= depth; i++)
-      if (ancestry[i] != p) g_object_unref (ancestry[i]);
+    if(depth >= 0)		/* unreference ancestry */
+        for(i = 0; i <= depth; i++)
+            if(ancestry[i] != p)
+            {
+                g_object_unref(ancestry[i]);
+            }
 
-  if (p == item) g_object_ref (p);
+    if(p == item)
+    {
+        g_object_ref(p);
+    }
 
-  return (p);
+    return (p);
 }
 
 /**
@@ -773,13 +860,18 @@ ipatch_item_get_ancestor_by_type (IpatchItem *item, GType ancestor_type)
  * item is not referenced.
  */
 IpatchItem *
-ipatch_item_peek_ancestor_by_type (IpatchItem *item, GType ancestor_type)
+ipatch_item_peek_ancestor_by_type(IpatchItem *item, GType ancestor_type)
 {
-  IpatchItem *match;
+    IpatchItem *match;
 
-  match = ipatch_item_get_ancestor_by_type (item, ancestor_type);
-  if (match) g_object_unref (match);
-  return (match);
+    match = ipatch_item_get_ancestor_by_type(item, ancestor_type);
+
+    if(match)
+    {
+        g_object_unref(match);
+    }
+
+    return (match);
 }
 
 /**
@@ -792,10 +884,10 @@ ipatch_item_peek_ancestor_by_type (IpatchItem *item, GType ancestor_type)
  * referencing the sample will also be removed).
  */
 void
-ipatch_item_remove (IpatchItem *item)
+ipatch_item_remove(IpatchItem *item)
 {
-  g_return_if_fail (IPATCH_IS_ITEM (item));
-  ipatch_item_real_remove_full (item, FALSE);
+    g_return_if_fail(IPATCH_IS_ITEM(item));
+    ipatch_item_real_remove_full(item, FALSE);
 }
 
 /**
@@ -809,44 +901,51 @@ ipatch_item_remove (IpatchItem *item)
  * Since: 1.1.0
  */
 void
-ipatch_item_remove_full (IpatchItem *item, gboolean full)
+ipatch_item_remove_full(IpatchItem *item, gboolean full)
 {
-  g_return_if_fail (IPATCH_IS_ITEM (item));
-  ipatch_item_real_remove_full (item, full);
+    g_return_if_fail(IPATCH_IS_ITEM(item));
+    ipatch_item_real_remove_full(item, full);
 }
 
 static void
-ipatch_item_real_remove_full (IpatchItem *item, gboolean full)
+ipatch_item_real_remove_full(IpatchItem *item, gboolean full)
 {
-  IpatchItemClass *klass;
-  IpatchItem *parent;
+    IpatchItemClass *klass;
+    IpatchItem *parent;
 
-  klass = IPATCH_ITEM_GET_CLASS (item);
+    klass = IPATCH_ITEM_GET_CLASS(item);
 
-  if (klass->remove_full)
-    (*klass->remove_full)(item, full);  /* call the remove_full class method */
-  else if (klass->remove)
-  {
-    (*klass->remove)(item);     /* call the remove class method */
-
-    // If full removal specified and item only has older remove method, remove all children
-    if (full && IPATCH_IS_CONTAINER (item))
-      ipatch_container_remove_all (IPATCH_CONTAINER (item));
-  }
-  else
-  { // Default remove if no class method
-    parent = ipatch_item_get_parent (item);
-
-    if (parent) // Remove item from parent
+    if(klass->remove_full)
     {
-      ipatch_container_remove (IPATCH_CONTAINER (parent), item);
-      g_object_unref (parent);
+        (*klass->remove_full)(item, full);    /* call the remove_full class method */
     }
+    else if(klass->remove)
+    {
+        (*klass->remove)(item);     /* call the remove class method */
 
-    // If full removal specified, remove all children
-    if (full && IPATCH_IS_CONTAINER (item))
-      ipatch_container_remove_all (IPATCH_CONTAINER (item));
-  }
+        // If full removal specified and item only has older remove method, remove all children
+        if(full && IPATCH_IS_CONTAINER(item))
+        {
+            ipatch_container_remove_all(IPATCH_CONTAINER(item));
+        }
+    }
+    else
+    {
+        // Default remove if no class method
+        parent = ipatch_item_get_parent(item);
+
+        if(parent)  // Remove item from parent
+        {
+            ipatch_container_remove(IPATCH_CONTAINER(parent), item);
+            g_object_unref(parent);
+        }
+
+        // If full removal specified, remove all children
+        if(full && IPATCH_IS_CONTAINER(item))
+        {
+            ipatch_container_remove_all(IPATCH_CONTAINER(item));
+        }
+    }
 }
 
 /**
@@ -859,44 +958,48 @@ ipatch_item_real_remove_full (IpatchItem *item, gboolean full)
  * Since: 1.1.0
  */
 void
-ipatch_item_remove_recursive (IpatchItem *item, gboolean full)
+ipatch_item_remove_recursive(IpatchItem *item, gboolean full)
 {
-  g_return_if_fail (IPATCH_IS_ITEM (item));
-  ipatch_item_real_remove_recursive (item, full);
+    g_return_if_fail(IPATCH_IS_ITEM(item));
+    ipatch_item_real_remove_recursive(item, full);
 }
 
 static void
-ipatch_item_real_remove_recursive (IpatchItem *item, gboolean full)
+ipatch_item_real_remove_recursive(IpatchItem *item, gboolean full)
 {
-  const GType *child_types, *ptype;
-  IpatchList *list;
-  GList *p;
+    const GType *child_types, *ptype;
+    IpatchList *list;
+    GList *p;
 
-  if (IPATCH_IS_CONTAINER (item))
-  {
-    child_types = ipatch_container_get_child_types ((IpatchContainer *)item);
-
-    /* loop over child types */
-    for (ptype = child_types; *ptype; ptype++)
+    if(IPATCH_IS_CONTAINER(item))
     {
-      list = ipatch_container_get_children ((IpatchContainer *)item, *ptype);   /* ++ ref new list */
+        child_types = ipatch_container_get_child_types((IpatchContainer *)item);
 
-      if (g_type_is_a (*ptype, IPATCH_TYPE_CONTAINER))
-      {
-        for (p = list->items; p; p = p->next)
-          ipatch_item_real_remove_recursive ((IpatchItem *)(p->data), full);
-      }
-      else      // Shortcut for non-container types (removes a level of unnecessary recursiveness)
-      {
-        for (p = list->items; p; p = p->next)
-          ipatch_item_real_remove_full ((IpatchItem *)(p->data), full);
-      }
+        /* loop over child types */
+        for(ptype = child_types; *ptype; ptype++)
+        {
+            list = ipatch_container_get_children((IpatchContainer *)item, *ptype);    /* ++ ref new list */
 
-      g_object_unref (list);      /* -- unref list */
+            if(g_type_is_a(*ptype, IPATCH_TYPE_CONTAINER))
+            {
+                for(p = list->items; p; p = p->next)
+                {
+                    ipatch_item_real_remove_recursive((IpatchItem *)(p->data), full);
+                }
+            }
+            else      // Shortcut for non-container types (removes a level of unnecessary recursiveness)
+            {
+                for(p = list->items; p; p = p->next)
+                {
+                    ipatch_item_real_remove_full((IpatchItem *)(p->data), full);
+                }
+            }
+
+            g_object_unref(list);       /* -- unref list */
+        }
     }
-  }
 
-  ipatch_item_real_remove_full (item, full);
+    ipatch_item_real_remove_full(item, full);
 }
 
 /**
@@ -912,33 +1015,42 @@ ipatch_item_real_remove_recursive (IpatchItem *item, gboolean full)
  * function should not be called additionally.
  */
 void
-ipatch_item_changed (IpatchItem *item)
+ipatch_item_changed(IpatchItem *item)
 {
-  IpatchItem *base = NULL;
+    IpatchItem *base = NULL;
 
-  g_return_if_fail (IPATCH_IS_ITEM (item));
+    g_return_if_fail(IPATCH_IS_ITEM(item));
 
-  IPATCH_ITEM_RLOCK (item);
+    IPATCH_ITEM_RLOCK(item);
 
-  if (item->base) base = item->base;
-  else if (IPATCH_IS_BASE (item)) base = item;
+    if(item->base)
+    {
+        base = item->base;
+    }
+    else if(IPATCH_IS_BASE(item))
+    {
+        base = item;
+    }
 
-  if (base && !(base->flags & IPATCH_BASE_CHANGED))
-  {
-    g_object_ref (base);	/* ++ ref base object */
-    ipatch_item_set_flags (base, IPATCH_BASE_CHANGED);
-  }
-  else base = NULL;
+    if(base && !(base->flags & IPATCH_BASE_CHANGED))
+    {
+        g_object_ref(base);	/* ++ ref base object */
+        ipatch_item_set_flags(base, IPATCH_BASE_CHANGED);
+    }
+    else
+    {
+        base = NULL;
+    }
 
-  IPATCH_ITEM_RUNLOCK (item);
+    IPATCH_ITEM_RUNLOCK(item);
 
-  if (base)	/* do property notify for base "changed" flag */
-  {
-    ipatch_item_prop_notify (base, ipatch_base_pspec_changed,
-			     ipatch_util_value_bool_true,
-			     ipatch_util_value_bool_false);
-    g_object_unref (base);	/* -- unref base parent object */
-  }
+    if(base)	/* do property notify for base "changed" flag */
+    {
+        ipatch_item_prop_notify(base, ipatch_base_pspec_changed,
+                                ipatch_util_value_bool_true,
+                                ipatch_util_value_bool_false);
+        g_object_unref(base);	/* -- unref base parent object */
+    }
 }
 
 /**
@@ -954,22 +1066,22 @@ ipatch_item_changed (IpatchItem *item)
  * or class overridden properties.
  */
 void
-ipatch_item_get_property_fast (IpatchItem *item, GParamSpec *pspec,
-			       GValue *value)
+ipatch_item_get_property_fast(IpatchItem *item, GParamSpec *pspec,
+                              GValue *value)
 {
-  GObjectClass *obj_class;
+    GObjectClass *obj_class;
 
-  g_return_if_fail (IPATCH_IS_ITEM (item));
-  g_return_if_fail (G_IS_PARAM_SPEC (pspec));
-  g_return_if_fail (value != NULL);
+    g_return_if_fail(IPATCH_IS_ITEM(item));
+    g_return_if_fail(G_IS_PARAM_SPEC(pspec));
+    g_return_if_fail(value != NULL);
 
-  obj_class = g_type_class_peek (pspec->owner_type);
-  g_return_if_fail (obj_class != NULL);
-  g_return_if_fail (obj_class->get_property != NULL);
+    obj_class = g_type_class_peek(pspec->owner_type);
+    g_return_if_fail(obj_class != NULL);
+    g_return_if_fail(obj_class->get_property != NULL);
 
-  g_value_init (value, G_PARAM_SPEC_VALUE_TYPE (pspec));
-  obj_class->get_property ((GObject *)item, IPATCH_PARAM_SPEC_ID (pspec),
-			   value, pspec);
+    g_value_init(value, G_PARAM_SPEC_VALUE_TYPE(pspec));
+    obj_class->get_property((GObject *)item, IPATCH_PARAM_SPEC_ID(pspec),
+                            value, pspec);
 }
 
 /**
@@ -983,21 +1095,21 @@ ipatch_item_get_property_fast (IpatchItem *item, GParamSpec *pspec,
  * #IpatchBase.
  */
 void
-ipatch_item_copy (IpatchItem *dest, IpatchItem *src)
+ipatch_item_copy(IpatchItem *dest, IpatchItem *src)
 {
-  IpatchItemClass *klass;
-  GType dest_type, src_type;
+    IpatchItemClass *klass;
+    GType dest_type, src_type;
 
-  g_return_if_fail (IPATCH_IS_ITEM (dest));
-  g_return_if_fail (IPATCH_IS_ITEM (src));
-  dest_type = G_OBJECT_TYPE (dest);
-  src_type = G_OBJECT_TYPE (src);
-  g_return_if_fail (g_type_is_a (dest_type, src_type));
+    g_return_if_fail(IPATCH_IS_ITEM(dest));
+    g_return_if_fail(IPATCH_IS_ITEM(src));
+    dest_type = G_OBJECT_TYPE(dest);
+    src_type = G_OBJECT_TYPE(src);
+    g_return_if_fail(g_type_is_a(dest_type, src_type));
 
-  klass = IPATCH_ITEM_GET_CLASS (src);
-  g_return_if_fail (klass->copy != NULL);
+    klass = IPATCH_ITEM_GET_CLASS(src);
+    g_return_if_fail(klass->copy != NULL);
 
-  klass->copy (dest, src, NULL, NULL);
+    klass->copy(dest, src, NULL, NULL);
 }
 
 /**
@@ -1015,25 +1127,25 @@ ipatch_item_copy (IpatchItem *dest, IpatchItem *src)
  * there is ipatch_item_duplicate_deep() specifically for that).
  */
 void
-ipatch_item_copy_link_func (IpatchItem *dest, IpatchItem *src,
-			    IpatchItemCopyLinkFunc link_func,
-			    gpointer user_data)
+ipatch_item_copy_link_func(IpatchItem *dest, IpatchItem *src,
+                           IpatchItemCopyLinkFunc link_func,
+                           gpointer user_data)
 {
-  IpatchItemClass *klass;
-  GType dest_type, src_type;
+    IpatchItemClass *klass;
+    GType dest_type, src_type;
 
-  g_return_if_fail (IPATCH_IS_ITEM (dest));
-  g_return_if_fail (IPATCH_IS_ITEM (src));
-  g_return_if_fail (link_func != NULL);
+    g_return_if_fail(IPATCH_IS_ITEM(dest));
+    g_return_if_fail(IPATCH_IS_ITEM(src));
+    g_return_if_fail(link_func != NULL);
 
-  dest_type = G_OBJECT_TYPE (dest);
-  src_type = G_OBJECT_TYPE (src);
-  g_return_if_fail (g_type_is_a (dest_type, src_type));
+    dest_type = G_OBJECT_TYPE(dest);
+    src_type = G_OBJECT_TYPE(src);
+    g_return_if_fail(g_type_is_a(dest_type, src_type));
 
-  klass = IPATCH_ITEM_GET_CLASS (src);
-  g_return_if_fail (klass->copy != NULL);
+    klass = IPATCH_ITEM_GET_CLASS(src);
+    g_return_if_fail(klass->copy != NULL);
 
-  klass->copy (dest, src, link_func, user_data);
+    klass->copy(dest, src, link_func, user_data);
 }
 
 /**
@@ -1050,22 +1162,22 @@ ipatch_item_copy_link_func (IpatchItem *dest, IpatchItem *src,
  * ipatch_item_copy_link_func() if even more flexibility is desired.
  */
 void
-ipatch_item_copy_replace (IpatchItem *dest, IpatchItem *src,
-			  GHashTable *repl_hash)
+ipatch_item_copy_replace(IpatchItem *dest, IpatchItem *src,
+                         GHashTable *repl_hash)
 {
-  IpatchItemClass *klass;
-  GType dest_type, src_type;
+    IpatchItemClass *klass;
+    GType dest_type, src_type;
 
-  g_return_if_fail (IPATCH_IS_ITEM (dest));
-  g_return_if_fail (IPATCH_IS_ITEM (src));
-  dest_type = G_OBJECT_TYPE (dest);
-  src_type = G_OBJECT_TYPE (src);
-  g_return_if_fail (g_type_is_a (dest_type, src_type));
+    g_return_if_fail(IPATCH_IS_ITEM(dest));
+    g_return_if_fail(IPATCH_IS_ITEM(src));
+    dest_type = G_OBJECT_TYPE(dest);
+    src_type = G_OBJECT_TYPE(src);
+    g_return_if_fail(g_type_is_a(dest_type, src_type));
 
-  klass = IPATCH_ITEM_GET_CLASS (src);
-  g_return_if_fail (klass->copy != NULL);
+    klass = IPATCH_ITEM_GET_CLASS(src);
+    g_return_if_fail(klass->copy != NULL);
 
-  klass->copy (dest, src, ipatch_item_copy_link_func_hash, repl_hash);
+    klass->copy(dest, src, ipatch_item_copy_link_func_hash, repl_hash);
 }
 
 /**
@@ -1080,17 +1192,17 @@ ipatch_item_copy_replace (IpatchItem *dest, IpatchItem *src,
  * Returns: (transfer full): New duplicate item. Caller owns the reference to the new item.
  */
 IpatchItem *
-ipatch_item_duplicate (IpatchItem *item)
+ipatch_item_duplicate(IpatchItem *item)
 {
-  IpatchItem *newitem;
+    IpatchItem *newitem;
 
-  g_return_val_if_fail (IPATCH_IS_ITEM (item), NULL);
+    g_return_val_if_fail(IPATCH_IS_ITEM(item), NULL);
 
-  newitem = g_object_new (G_OBJECT_TYPE (item), NULL); /* ++ ref new item */
-  g_return_val_if_fail (newitem != NULL, NULL);
+    newitem = g_object_new(G_OBJECT_TYPE(item), NULL);   /* ++ ref new item */
+    g_return_val_if_fail(newitem != NULL, NULL);
 
-  ipatch_item_copy (newitem, item);
-  return (newitem);		/* !! caller owns reference */
+    ipatch_item_copy(newitem, item);
+    return (newitem);		/* !! caller owns reference */
 }
 
 /**
@@ -1106,19 +1218,19 @@ ipatch_item_duplicate (IpatchItem *item)
  * Returns: (transfer full): New duplicate item. Caller owns the reference to the new item.
  */
 IpatchItem *
-ipatch_item_duplicate_link_func (IpatchItem *item,
-				 IpatchItemCopyLinkFunc link_func,
-				 gpointer user_data)
+ipatch_item_duplicate_link_func(IpatchItem *item,
+                                IpatchItemCopyLinkFunc link_func,
+                                gpointer user_data)
 {
-  IpatchItem *newitem;
+    IpatchItem *newitem;
 
-  g_return_val_if_fail (IPATCH_IS_ITEM (item), NULL);
+    g_return_val_if_fail(IPATCH_IS_ITEM(item), NULL);
 
-  newitem = g_object_new (G_OBJECT_TYPE (item), NULL); /* ++ ref new item */
-  g_return_val_if_fail (newitem != NULL, NULL);
+    newitem = g_object_new(G_OBJECT_TYPE(item), NULL);   /* ++ ref new item */
+    g_return_val_if_fail(newitem != NULL, NULL);
 
-  ipatch_item_copy_link_func (newitem, item, link_func, user_data);
-  return (newitem);		/* !! caller owns reference */
+    ipatch_item_copy_link_func(newitem, item, link_func, user_data);
+    return (newitem);		/* !! caller owns reference */
 }
 
 /**
@@ -1134,17 +1246,17 @@ ipatch_item_duplicate_link_func (IpatchItem *item,
  * Returns: (transfer full): New duplicate item. Caller owns the reference to the new item.
  */
 IpatchItem *
-ipatch_item_duplicate_replace (IpatchItem *item, GHashTable *repl_hash)
+ipatch_item_duplicate_replace(IpatchItem *item, GHashTable *repl_hash)
 {
-  IpatchItem *newitem;
+    IpatchItem *newitem;
 
-  g_return_val_if_fail (IPATCH_IS_ITEM (item), NULL);
+    g_return_val_if_fail(IPATCH_IS_ITEM(item), NULL);
 
-  newitem = g_object_new (G_OBJECT_TYPE (item), NULL); /* ++ ref new item */
-  g_return_val_if_fail (newitem != NULL, NULL);
+    newitem = g_object_new(G_OBJECT_TYPE(item), NULL);   /* ++ ref new item */
+    g_return_val_if_fail(newitem != NULL, NULL);
 
-  ipatch_item_copy_replace (newitem, item, repl_hash);
-  return (newitem);		/* !! caller owns reference */
+    ipatch_item_copy_replace(newitem, item, repl_hash);
+    return (newitem);		/* !! caller owns reference */
 }
 
 /**
@@ -1158,51 +1270,51 @@ ipatch_item_duplicate_replace (IpatchItem *item, GHashTable *repl_hash)
  * the caller and should be unreferenced when finished using it.
  */
 IpatchList *
-ipatch_item_duplicate_deep (IpatchItem *item)
+ipatch_item_duplicate_deep(IpatchItem *item)
 {
-  IpatchItemClass *klass;
-  IpatchItem *newitem;
-  IpatchList *list;
-  GHashTable *linkhash;	/* link substitutions */
+    IpatchItemClass *klass;
+    IpatchItem *newitem;
+    IpatchList *list;
+    GHashTable *linkhash;	/* link substitutions */
 
-  g_return_val_if_fail (IPATCH_IS_ITEM (item), NULL);
+    g_return_val_if_fail(IPATCH_IS_ITEM(item), NULL);
 
-  klass = IPATCH_ITEM_GET_CLASS (item);
-  g_return_val_if_fail (klass->copy != NULL, NULL);
+    klass = IPATCH_ITEM_GET_CLASS(item);
+    g_return_val_if_fail(klass->copy != NULL, NULL);
 
-  newitem = g_object_new (G_OBJECT_TYPE (item), NULL); /* ++ ref new item */
-  g_return_val_if_fail (newitem != NULL, NULL);
+    newitem = g_object_new(G_OBJECT_TYPE(item), NULL);   /* ++ ref new item */
+    g_return_val_if_fail(newitem != NULL, NULL);
 
-  /* create hash to track new duplicated items */
-  linkhash = g_hash_table_new (NULL, NULL);
-  g_hash_table_insert (linkhash, item, newitem);
+    /* create hash to track new duplicated items */
+    linkhash = g_hash_table_new(NULL, NULL);
+    g_hash_table_insert(linkhash, item, newitem);
 
-  /* do the copy using the deep copy link function callback */
-  klass->copy (newitem, item, ipatch_item_copy_link_func_deep, linkhash);
+    /* do the copy using the deep copy link function callback */
+    klass->copy(newitem, item, ipatch_item_copy_link_func_deep, linkhash);
 
-  list = ipatch_list_new ();	/* ++ref new list */
+    list = ipatch_list_new();	/* ++ref new list */
 
-  /* remove newitem, before convert to list */
-  g_hash_table_remove (linkhash, newitem);
+    /* remove newitem, before convert to list */
+    g_hash_table_remove(linkhash, newitem);
 
-  /* convert hash to IpatchList (!! list takes over references) */
-  g_hash_table_foreach (linkhash, copy_hash_to_list_GHFunc, list);
+    /* convert hash to IpatchList (!! list takes over references) */
+    g_hash_table_foreach(linkhash, copy_hash_to_list_GHFunc, list);
 
-  /* prepend newitem (!! List takes over creator's reference) */
-  list->items = g_list_prepend (list->items, newitem);
+    /* prepend newitem (!! List takes over creator's reference) */
+    list->items = g_list_prepend(list->items, newitem);
 
-  g_hash_table_destroy (linkhash);
+    g_hash_table_destroy(linkhash);
 
-  return (list);
+    return (list);
 }
 
 /* GHFunc to convert hash table to IpatchList */
-static void copy_hash_to_list_GHFunc (gpointer key, gpointer value,
-				      gpointer user_data)
+static void copy_hash_to_list_GHFunc(gpointer key, gpointer value,
+                                     gpointer user_data)
 {
-  IpatchList *list = (IpatchList *)user_data;
+    IpatchList *list = (IpatchList *)user_data;
 
-  list->items = g_list_prepend (list->items, value);
+    list->items = g_list_prepend(list->items, value);
 }
 
 /**
@@ -1216,29 +1328,35 @@ static void copy_hash_to_list_GHFunc (gpointer key, gpointer value,
  * Returns: Pointer to item to use for link property (duplicated).
  */
 IpatchItem *
-ipatch_item_copy_link_func_deep (IpatchItem *item, IpatchItem *link,
-				 gpointer user_data)
+ipatch_item_copy_link_func_deep(IpatchItem *item, IpatchItem *link,
+                                gpointer user_data)
 {
-  GHashTable *linkhash = (GHashTable *)user_data;
-  IpatchItem *dup = NULL;
+    GHashTable *linkhash = (GHashTable *)user_data;
+    IpatchItem *dup = NULL;
 
-  if (!link) return (NULL);
-
-  /* look up link item in duplicate hash. */
-  if (linkhash) dup = g_hash_table_lookup (linkhash, link);
-
-  if (!dup)	/* link not in hash? - Duplicate link and add it to hash. */
+    if(!link)
     {
-      dup = g_object_new (G_OBJECT_TYPE (link), NULL); /* ++ ref new item */
-      g_return_val_if_fail (dup != NULL, NULL);
-
-      /* !! hash table takes over reference */
-      g_hash_table_insert (linkhash, link, dup);
-      ipatch_item_copy_link_func (dup, link, ipatch_item_copy_link_func_deep,
-				  user_data);
+        return (NULL);
     }
 
-  return (dup);
+    /* look up link item in duplicate hash. */
+    if(linkhash)
+    {
+        dup = g_hash_table_lookup(linkhash, link);
+    }
+
+    if(!dup)	/* link not in hash? - Duplicate link and add it to hash. */
+    {
+        dup = g_object_new(G_OBJECT_TYPE(link), NULL);   /* ++ ref new item */
+        g_return_val_if_fail(dup != NULL, NULL);
+
+        /* !! hash table takes over reference */
+        g_hash_table_insert(linkhash, link, dup);
+        ipatch_item_copy_link_func(dup, link, ipatch_item_copy_link_func_deep,
+                                   user_data);
+    }
+
+    return (dup);
 }
 
 /**
@@ -1256,16 +1374,23 @@ ipatch_item_copy_link_func_deep (IpatchItem *item, IpatchItem *link,
  * itself if not.
  */
 IpatchItem *
-ipatch_item_copy_link_func_hash (IpatchItem *item, IpatchItem *link,
-				 gpointer user_data)
+ipatch_item_copy_link_func_hash(IpatchItem *item, IpatchItem *link,
+                                gpointer user_data)
 {
-  GHashTable *hash = (GHashTable *)user_data;
-  IpatchItem *repl = NULL;
+    GHashTable *hash = (GHashTable *)user_data;
+    IpatchItem *repl = NULL;
 
-  if (!link) return (NULL);
+    if(!link)
+    {
+        return (NULL);
+    }
 
-  if (hash) repl = g_hash_table_lookup (hash, link);
-  return (repl ? repl : link);
+    if(hash)
+    {
+        repl = g_hash_table_lookup(hash, link);
+    }
+
+    return (repl ? repl : link);
 }
 
 /**
@@ -1279,12 +1404,12 @@ ipatch_item_copy_link_func_hash (IpatchItem *item, IpatchItem *link,
  * unique among its siblings), %FALSE otherwise.
  */
 gboolean
-ipatch_item_type_can_conflict (GType item_type)
+ipatch_item_type_can_conflict(GType item_type)
 {
-  UniqueBag *unique;
+    UniqueBag *unique;
 
-  unique = item_lookup_unique_bag (item_type);
-  return (unique != NULL);
+    unique = item_lookup_unique_bag(item_type);
+    return (unique != NULL);
 }
 
 /**
@@ -1304,21 +1429,29 @@ ipatch_item_type_can_conflict (GType item_type)
  * array is internal and should not be modified or freed.
  */
 GParamSpec **
-ipatch_item_type_get_unique_specs (GType item_type, guint32 *groups)
+ipatch_item_type_get_unique_specs(GType item_type, guint32 *groups)
 {
-  UniqueBag *unique;
+    UniqueBag *unique;
 
-  unique = item_lookup_unique_bag (item_type);
+    unique = item_lookup_unique_bag(item_type);
 
-  if (unique)
+    if(unique)
     {
-      if (groups) *groups = unique->groups;
-      return (unique->pspecs);
+        if(groups)
+        {
+            *groups = unique->groups;
+        }
+
+        return (unique->pspecs);
     }
-  else
+    else
     {
-      if (groups) *groups = 0;
-      return (NULL);
+        if(groups)
+        {
+            *groups = 0;
+        }
+
+        return (NULL);
     }
 }
 
@@ -1336,33 +1469,38 @@ ipatch_item_type_get_unique_specs (GType item_type, guint32 *groups)
  * Use g_value_array_free() to free the array when finished using it.
  */
 GValueArray *
-ipatch_item_get_unique_props (IpatchItem *item)
+ipatch_item_get_unique_props(IpatchItem *item)
 {
-  GParamSpec **ps;
-  UniqueBag *unique;
-  GValueArray *vals;
-  GValue *value;
-  int count, i;
+    GParamSpec **ps;
+    UniqueBag *unique;
+    GValueArray *vals;
+    GValue *value;
+    int count, i;
 
-  g_return_val_if_fail (IPATCH_IS_ITEM (item), NULL);
+    g_return_val_if_fail(IPATCH_IS_ITEM(item), NULL);
 
-  /* item has any unique properties? */
-  unique = item_lookup_unique_bag (G_OBJECT_TYPE (item));
-  if (!unique) return (NULL);
+    /* item has any unique properties? */
+    unique = item_lookup_unique_bag(G_OBJECT_TYPE(item));
 
-  /* count param specs */
-  for (count = 0, ps = unique->pspecs; *ps; count++, ps++);
-
-  vals = g_value_array_new (count);
-
-  for (i = 0, ps = unique->pspecs; i < count; i++, ps++)
-    { /* NULL will append an unset value, saves a value copy operation */
-      g_value_array_append (vals, NULL);
-      value = g_value_array_get_nth (vals, i);
-      ipatch_item_get_property_fast (item, *ps, value);
+    if(!unique)
+    {
+        return (NULL);
     }
 
-  return (vals);
+    /* count param specs */
+    for(count = 0, ps = unique->pspecs; *ps; count++, ps++);
+
+    vals = g_value_array_new(count);
+
+    for(i = 0, ps = unique->pspecs; i < count; i++, ps++)
+    {
+        /* NULL will append an unset value, saves a value copy operation */
+        g_value_array_append(vals, NULL);
+        value = g_value_array_get_nth(vals, i);
+        ipatch_item_get_property_fast(item, *ps, value);
+    }
+
+    return (vals);
 }
 
 /**
@@ -1379,159 +1517,195 @@ ipatch_item_get_unique_props (IpatchItem *item)
  * conflict.
  */
 guint
-ipatch_item_test_conflict (IpatchItem *item1, IpatchItem *item2)
+ipatch_item_test_conflict(IpatchItem *item1, IpatchItem *item2)
 {
-  GValue val1 = { 0 }, val2 = { 0 };
-  UniqueBag *unique;
-  GParamSpec *pspec;
-  GType type;
-  guint conflicts;
-  guint mask;
-  int i, count, toggle, groupcount;
+    GValue val1 = { 0 }, val2 = { 0 };
+    UniqueBag *unique;
+    GParamSpec *pspec;
+    GType type;
+    guint conflicts;
+    guint mask;
+    int i, count, toggle, groupcount;
 
-  g_return_val_if_fail (IPATCH_IS_ITEM (item1), 0);
-  g_return_val_if_fail (IPATCH_IS_ITEM (item2), 0);
+    g_return_val_if_fail(IPATCH_IS_ITEM(item1), 0);
+    g_return_val_if_fail(IPATCH_IS_ITEM(item2), 0);
 
-  type = G_OBJECT_TYPE (item1);
+    type = G_OBJECT_TYPE(item1);
 
-  /* can't conflict if items not the same type */
-  if (type != G_OBJECT_TYPE (item2)) return (0);
-
-  unique = item_lookup_unique_bag (type);
-  if (!unique) return (0);	/* no unique properties? */
-
-  conflicts = 0;
-  for (i = 0; TRUE; i++)
+    /* can't conflict if items not the same type */
+    if(type != G_OBJECT_TYPE(item2))
     {
-      pspec = unique->pspecs[i];
-      if (!pspec) break;
-
-      ipatch_item_get_property_fast (item1, pspec, &val1);
-      ipatch_item_get_property_fast (item2, pspec, &val2);
-
-      if (g_param_values_cmp (pspec, &val1, &val2) == 0)
-	conflicts |= (1 << i);
-
-      g_value_unset (&val1);
-      g_value_unset (&val2);
+        return (0);
     }
 
-  /* mask out any unique groups which don't have all its props conflicting */
+    unique = item_lookup_unique_bag(type);
 
-  count = i;
-  mask = 1;
-  groupcount = 1;
-  toggle = (unique->groups & 1);	/* to track group changes */
-
-  for (i = 1; i < count; i++)
-    {	/* same group as prev. property? */
-      if (toggle == ((unique->groups & (1 << i)) != 0))
-	{
-	  mask |= (1 << i);	/* add another mask bit */
-	  groupcount++;		/* increment group property count */
-	}
-      else	/* group changed */
-	{ /* prev group is larger than 1 prop. and not all props conflicting? */
-	  if (groupcount > 1 && (conflicts & mask) != mask)
-	    conflicts &= ~mask;	/* clear all conflicts for prev group */
-
-	  toggle ^= 1;
-	  mask = (1 << i);
-	  groupcount = 1;
-	}
+    if(!unique)
+    {
+        return (0);    /* no unique properties? */
     }
 
-  /* check if last gorup is larger than 1 prop. and not all props conflicting */
-  if (groupcount > 1 && (conflicts & mask) != mask)
-    conflicts &= ~mask;	/* clear all conflicts for last group */
+    conflicts = 0;
 
-  return (conflicts);
+    for(i = 0; TRUE; i++)
+    {
+        pspec = unique->pspecs[i];
+
+        if(!pspec)
+        {
+            break;
+        }
+
+        ipatch_item_get_property_fast(item1, pspec, &val1);
+        ipatch_item_get_property_fast(item2, pspec, &val2);
+
+        if(g_param_values_cmp(pspec, &val1, &val2) == 0)
+        {
+            conflicts |= (1 << i);
+        }
+
+        g_value_unset(&val1);
+        g_value_unset(&val2);
+    }
+
+    /* mask out any unique groups which don't have all its props conflicting */
+
+    count = i;
+    mask = 1;
+    groupcount = 1;
+    toggle = (unique->groups & 1);	/* to track group changes */
+
+    for(i = 1; i < count; i++)
+    {
+        /* same group as prev. property? */
+        if(toggle == ((unique->groups & (1 << i)) != 0))
+        {
+            mask |= (1 << i);	/* add another mask bit */
+            groupcount++;		/* increment group property count */
+        }
+        else	/* group changed */
+        {
+            /* prev group is larger than 1 prop. and not all props conflicting? */
+            if(groupcount > 1 && (conflicts & mask) != mask)
+            {
+                conflicts &= ~mask;    /* clear all conflicts for prev group */
+            }
+
+            toggle ^= 1;
+            mask = (1 << i);
+            groupcount = 1;
+        }
+    }
+
+    /* check if last gorup is larger than 1 prop. and not all props conflicting */
+    if(groupcount > 1 && (conflicts & mask) != mask)
+    {
+        conflicts &= ~mask;    /* clear all conflicts for last group */
+    }
+
+    return (conflicts);
 }
 
 /* lookup cached unique property info for a given type */
 static UniqueBag *
-item_lookup_unique_bag (GType type)
+item_lookup_unique_bag(GType type)
 {
-  GParamSpec **pspecs, *ps;
-  GList *speclist = NULL;	/* sorted spec list (sorted by unique group) */
-  UniqueBag *unique;
-  gpointer klass;
-  guint n_props, count;
-  guint i;
+    GParamSpec **pspecs, *ps;
+    GList *speclist = NULL;	/* sorted spec list (sorted by unique group) */
+    UniqueBag *unique;
+    gpointer klass;
+    guint n_props, count;
+    guint i;
 
-  G_LOCK (unique_prop_cache);
+    G_LOCK(unique_prop_cache);
 
-  unique = g_hash_table_lookup (unique_prop_cache, GUINT_TO_POINTER (type));
+    unique = g_hash_table_lookup(unique_prop_cache, GUINT_TO_POINTER(type));
 
-  if (!unique)			/* has not been cached yet? */
+    if(!unique)			/* has not been cached yet? */
     {
-      klass = g_type_class_ref (type);
-      g_return_val_if_fail (klass != NULL, NULL);
+        klass = g_type_class_ref(type);
+        g_return_val_if_fail(klass != NULL, NULL);
 
-      /* get property list and add unique properties to speclist */
-      pspecs = g_object_class_list_properties (klass, &n_props);
-      for (i = 0, count = 0; i < n_props; i++)
-	{
-	  ps = pspecs[i];
-	  if (ps->flags & IPATCH_PARAM_UNIQUE)	/* unique property? */
-	    {	/* add to speclist sorted by unique group (0 = nogroup) */
-	      speclist = g_list_insert_sorted (speclist, ps,
-					       unique_group_list_sort_func);
-	      count++;
-	    }
-	}
+        /* get property list and add unique properties to speclist */
+        pspecs = g_object_class_list_properties(klass, &n_props);
 
-      g_free (pspecs);
+        for(i = 0, count = 0; i < n_props; i++)
+        {
+            ps = pspecs[i];
 
-      if (speclist)	/* any unique properties? */
-	{
-	  guint group, lastgroup = 0;
-	  int toggle = 0;
-	  GList *p;
+            if(ps->flags & IPATCH_PARAM_UNIQUE)	/* unique property? */
+            {
+                /* add to speclist sorted by unique group (0 = nogroup) */
+                speclist = g_list_insert_sorted(speclist, ps,
+                                                unique_group_list_sort_func);
+                count++;
+            }
+        }
 
-	  /* create unique bag */
-	  unique = g_new (UniqueBag, 1);
-	  unique->pspecs = g_new (GParamSpec *, count + 1);
-	  unique->groups = 0;
+        g_free(pspecs);
 
-	  /* add pointers to unique spec array and set group bit toggle field */
-	  for (i = 0, p = speclist; i < count; i++, p = p->next)
-	    {
-	      unique->pspecs[i] = (GParamSpec *)(p->data);
-	      ipatch_param_get ((GParamSpec *)(p->data),
-				"unique-group-id", &group, NULL);
-	      if (group != lastgroup) toggle ^= 1;
-	      if (toggle) unique->groups |= (1 << i);
+        if(speclist)	/* any unique properties? */
+        {
+            guint group, lastgroup = 0;
+            int toggle = 0;
+            GList *p;
 
-	      lastgroup = group;
-	    }
+            /* create unique bag */
+            unique = g_new(UniqueBag, 1);
+            unique->pspecs = g_new(GParamSpec *, count + 1);
+            unique->groups = 0;
 
-	  unique->pspecs[count] = NULL;	/* NULL terminated */
-	}
-      else unique = &no_unique_props;	/* indicate no unique properties */
-      
-      g_hash_table_insert (unique_prop_cache, GUINT_TO_POINTER (type), unique);
+            /* add pointers to unique spec array and set group bit toggle field */
+            for(i = 0, p = speclist; i < count; i++, p = p->next)
+            {
+                unique->pspecs[i] = (GParamSpec *)(p->data);
+                ipatch_param_get((GParamSpec *)(p->data),
+                                 "unique-group-id", &group, NULL);
+
+                if(group != lastgroup)
+                {
+                    toggle ^= 1;
+                }
+
+                if(toggle)
+                {
+                    unique->groups |= (1 << i);
+                }
+
+                lastgroup = group;
+            }
+
+            unique->pspecs[count] = NULL;	/* NULL terminated */
+        }
+        else
+        {
+            unique = &no_unique_props;    /* indicate no unique properties */
+        }
+
+        g_hash_table_insert(unique_prop_cache, GUINT_TO_POINTER(type), unique);
     }
 
-  G_UNLOCK (unique_prop_cache);
+    G_UNLOCK(unique_prop_cache);
 
-  if (unique == &no_unique_props)	/* no unique properties? */
-    unique = NULL;
+    if(unique == &no_unique_props)	/* no unique properties? */
+    {
+        unique = NULL;
+    }
 
-  return (unique);
+    return (unique);
 }
 
 /* sort GParamSpec pointers by their unique group id (0 = no group) */
 static gint
-unique_group_list_sort_func (gconstpointer a, gconstpointer b)
+unique_group_list_sort_func(gconstpointer a, gconstpointer b)
 {
-  GParamSpec *aspec = (GParamSpec *)a, *bspec = (GParamSpec *)b;
-  int agroup, bgroup;
+    GParamSpec *aspec = (GParamSpec *)a, *bspec = (GParamSpec *)b;
+    int agroup, bgroup;
 
-  ipatch_param_get (aspec, "unique-group-id", &agroup, NULL);
-  ipatch_param_get (bspec, "unique-group-id", &bgroup, NULL);
+    ipatch_param_get(aspec, "unique-group-id", &agroup, NULL);
+    ipatch_param_get(bspec, "unique-group-id", &bgroup, NULL);
 
-  return (agroup - bgroup);
+    return (agroup - bgroup);
 }
 
 /**
@@ -1549,19 +1723,19 @@ unique_group_list_sort_func (gconstpointer a, gconstpointer b)
  * setting properties.
  */
 void
-ipatch_item_set_atomic (gpointer item, const char *first_property_name, ...)
+ipatch_item_set_atomic(gpointer item, const char *first_property_name, ...)
 {
-  va_list args;
+    va_list args;
 
-  g_return_if_fail (IPATCH_IS_ITEM (item));
+    g_return_if_fail(IPATCH_IS_ITEM(item));
 
-  va_start (args, first_property_name);
+    va_start(args, first_property_name);
 
-  IPATCH_ITEM_WLOCK (item);
-  g_object_set_valist (G_OBJECT (item), first_property_name, args);
-  IPATCH_ITEM_WUNLOCK (item);
+    IPATCH_ITEM_WLOCK(item);
+    g_object_set_valist(G_OBJECT(item), first_property_name, args);
+    IPATCH_ITEM_WUNLOCK(item);
 
-  va_end (args);
+    va_end(args);
 }
 
 /**
@@ -1580,19 +1754,19 @@ ipatch_item_set_atomic (gpointer item, const char *first_property_name, ...)
  * getting properties.
  */
 void
-ipatch_item_get_atomic (gpointer item, const char *first_property_name, ...)
+ipatch_item_get_atomic(gpointer item, const char *first_property_name, ...)
 {
-  va_list args;
+    va_list args;
 
-  g_return_if_fail (IPATCH_IS_ITEM (item));
+    g_return_if_fail(IPATCH_IS_ITEM(item));
 
-  va_start (args, first_property_name);
+    va_start(args, first_property_name);
 
-  IPATCH_ITEM_WLOCK (item);
-  g_object_get_valist (G_OBJECT (item), first_property_name, args);
-  IPATCH_ITEM_WUNLOCK (item);
+    IPATCH_ITEM_WLOCK(item);
+    g_object_get_valist(G_OBJECT(item), first_property_name, args);
+    IPATCH_ITEM_WUNLOCK(item);
 
-  va_end (args);
+    va_end(args);
 }
 
 /**
@@ -1605,14 +1779,21 @@ ipatch_item_get_atomic (gpointer item, const char *first_property_name, ...)
  * Returns: The first item in @iter or %NULL if empty.
  */
 IpatchItem *
-ipatch_item_first (IpatchIter *iter)
+ipatch_item_first(IpatchIter *iter)
 {
-  GObject *obj;
-  g_return_val_if_fail (iter != NULL, NULL);
+    GObject *obj;
+    g_return_val_if_fail(iter != NULL, NULL);
 
-  obj = ipatch_iter_first (iter);
-  if (obj) return (IPATCH_ITEM (obj));
-  else return (NULL);
+    obj = ipatch_iter_first(iter);
+
+    if(obj)
+    {
+        return (IPATCH_ITEM(obj));
+    }
+    else
+    {
+        return (NULL);
+    }
 }
 
 /**
@@ -1625,12 +1806,19 @@ ipatch_item_first (IpatchIter *iter)
  * Returns: The next item in @iter or %NULL if no more items.
  */
 IpatchItem *
-ipatch_item_next (IpatchIter *iter)
+ipatch_item_next(IpatchIter *iter)
 {
-  GObject *obj;
-  g_return_val_if_fail (iter != NULL, NULL);
+    GObject *obj;
+    g_return_val_if_fail(iter != NULL, NULL);
 
-  obj = ipatch_iter_next (iter);
-  if (obj) return (IPATCH_ITEM (obj));
-  else return (NULL);
+    obj = ipatch_iter_next(iter);
+
+    if(obj)
+    {
+        return (IPATCH_ITEM(obj));
+    }
+    else
+    {
+        return (NULL);
+    }
 }

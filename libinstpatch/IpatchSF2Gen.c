@@ -20,7 +20,7 @@
 /**
  * SECTION: IpatchSF2Gen
  * @short_description: SoundFont generator functions and definitions
- * @see_also: 
+ * @see_also:
  * @stability: Stable
  *
  * SoundFont generators are synthesis parameters used by #IpatchSF2Preset,
@@ -61,95 +61,104 @@ static const char **gen_property_names = NULL; /* names [IPATCH_SF2_GEN_COUNT] *
  * Library internal init function for SoundFont generator subsystem.
  */
 void
-_ipatch_sf2_gen_init (void)
+_ipatch_sf2_gen_init(void)
 {
-  GEnumClass *enum_class;
-  GEnumValue *enum_val;
-  guint64 v;
-  int i;
+    GEnumClass *enum_class;
+    GEnumValue *enum_val;
+    guint64 v;
+    int i;
 
-  /* initialize valid generator masks */
-  for (i = 0, v = 0x1; i < IPATCH_SF2_GEN_COUNT; i++, v <<= 1)
+    /* initialize valid generator masks */
+    for(i = 0, v = 0x1; i < IPATCH_SF2_GEN_COUNT; i++, v <<= 1)
     {
-      switch (i)
-	{
-	case IPATCH_SF2_GEN_SAMPLE_START:
-	case IPATCH_SF2_GEN_SAMPLE_END:
-	case IPATCH_SF2_GEN_SAMPLE_LOOP_START:
-	case IPATCH_SF2_GEN_SAMPLE_LOOP_END:
-	case IPATCH_SF2_GEN_SAMPLE_COARSE_START:
-	case IPATCH_SF2_GEN_SAMPLE_COARSE_END:
-	case IPATCH_SF2_GEN_SAMPLE_COARSE_LOOP_START:
-	case IPATCH_SF2_GEN_FIXED_NOTE:
-	case IPATCH_SF2_GEN_FIXED_VELOCITY:
-	case IPATCH_SF2_GEN_SAMPLE_COARSE_LOOP_END:
-	case IPATCH_SF2_GEN_SAMPLE_MODES:
-	case IPATCH_SF2_GEN_EXCLUSIVE_CLASS:
-	case IPATCH_SF2_GEN_ROOT_NOTE_OVERRIDE:
-	  ipatch_sf2_gen_abs_valid_mask |= v; /* OK for absolute generators */
-	  break;
-	case IPATCH_SF2_GEN_UNUSED1:
-	case IPATCH_SF2_GEN_UNUSED2:
-	case IPATCH_SF2_GEN_UNUSED3:
-	case IPATCH_SF2_GEN_UNUSED4:
-	case IPATCH_SF2_GEN_RESERVED1:
-	case IPATCH_SF2_GEN_RESERVED2:
-	case IPATCH_SF2_GEN_RESERVED3:
-	case IPATCH_SF2_GEN_INSTRUMENT_ID: /* we don't use these in the API */
-	case IPATCH_SF2_GEN_SAMPLE_ID: /* they get saved to files though */
-	  break;		/* not valid for any generator type */
-	default:		/* valid for either generator type */
-	  ipatch_sf2_gen_ofs_valid_mask |= v;
-	  ipatch_sf2_gen_abs_valid_mask |= v;
-	  break;
-	}
+        switch(i)
+        {
+        case IPATCH_SF2_GEN_SAMPLE_START:
+        case IPATCH_SF2_GEN_SAMPLE_END:
+        case IPATCH_SF2_GEN_SAMPLE_LOOP_START:
+        case IPATCH_SF2_GEN_SAMPLE_LOOP_END:
+        case IPATCH_SF2_GEN_SAMPLE_COARSE_START:
+        case IPATCH_SF2_GEN_SAMPLE_COARSE_END:
+        case IPATCH_SF2_GEN_SAMPLE_COARSE_LOOP_START:
+        case IPATCH_SF2_GEN_FIXED_NOTE:
+        case IPATCH_SF2_GEN_FIXED_VELOCITY:
+        case IPATCH_SF2_GEN_SAMPLE_COARSE_LOOP_END:
+        case IPATCH_SF2_GEN_SAMPLE_MODES:
+        case IPATCH_SF2_GEN_EXCLUSIVE_CLASS:
+        case IPATCH_SF2_GEN_ROOT_NOTE_OVERRIDE:
+            ipatch_sf2_gen_abs_valid_mask |= v; /* OK for absolute generators */
+            break;
+
+        case IPATCH_SF2_GEN_UNUSED1:
+        case IPATCH_SF2_GEN_UNUSED2:
+        case IPATCH_SF2_GEN_UNUSED3:
+        case IPATCH_SF2_GEN_UNUSED4:
+        case IPATCH_SF2_GEN_RESERVED1:
+        case IPATCH_SF2_GEN_RESERVED2:
+        case IPATCH_SF2_GEN_RESERVED3:
+        case IPATCH_SF2_GEN_INSTRUMENT_ID: /* we don't use these in the API */
+        case IPATCH_SF2_GEN_SAMPLE_ID: /* they get saved to files though */
+            break;		/* not valid for any generator type */
+
+        default:		/* valid for either generator type */
+            ipatch_sf2_gen_ofs_valid_mask |= v;
+            ipatch_sf2_gen_abs_valid_mask |= v;
+            break;
+        }
     }
 
-  /* create generator add mask (gens that can be directly summed) */
-  ipatch_sf2_gen_add_mask = ipatch_sf2_gen_ofs_valid_mask;
+    /* create generator add mask (gens that can be directly summed) */
+    ipatch_sf2_gen_add_mask = ipatch_sf2_gen_ofs_valid_mask;
 
-  /* I don't trust constants to be 64 bit (LL perhaps?), so .. */
-  v = 1;
-  v <<= IPATCH_SF2_GEN_NOTE_RANGE;
-  ipatch_sf2_gen_add_mask &= ~v;
-  
-  v = 1;
-  v <<= IPATCH_SF2_GEN_VELOCITY_RANGE;
-  ipatch_sf2_gen_add_mask &= ~v;
+    /* I don't trust constants to be 64 bit (LL perhaps?), so .. */
+    v = 1;
+    v <<= IPATCH_SF2_GEN_NOTE_RANGE;
+    ipatch_sf2_gen_add_mask &= ~v;
 
-  /* initialize default offset array values */
-  ipatch_sf2_gen_ofs_array = ipatch_sf2_gen_array_new (TRUE);
-  ipatch_sf2_gen_ofs_array->values[IPATCH_SF2_GEN_NOTE_RANGE].range.low = 0;
-  ipatch_sf2_gen_ofs_array->values[IPATCH_SF2_GEN_NOTE_RANGE].range.high = 127;
-  ipatch_sf2_gen_ofs_array->values[IPATCH_SF2_GEN_VELOCITY_RANGE].range.low =0;
-  ipatch_sf2_gen_ofs_array->values[IPATCH_SF2_GEN_VELOCITY_RANGE].range.high = 127;
+    v = 1;
+    v <<= IPATCH_SF2_GEN_VELOCITY_RANGE;
+    ipatch_sf2_gen_add_mask &= ~v;
 
-  /* initialize absolute generator default values */
-  ipatch_sf2_gen_abs_array = ipatch_sf2_gen_array_new (TRUE);
-  for (i = 0; i < IPATCH_SF2_GEN_COUNT; i++)
-    ipatch_sf2_gen_abs_array->values[i] = ipatch_sf2_gen_info[i].def;
+    /* initialize default offset array values */
+    ipatch_sf2_gen_ofs_array = ipatch_sf2_gen_array_new(TRUE);
+    ipatch_sf2_gen_ofs_array->values[IPATCH_SF2_GEN_NOTE_RANGE].range.low = 0;
+    ipatch_sf2_gen_ofs_array->values[IPATCH_SF2_GEN_NOTE_RANGE].range.high = 127;
+    ipatch_sf2_gen_ofs_array->values[IPATCH_SF2_GEN_VELOCITY_RANGE].range.low = 0;
+    ipatch_sf2_gen_ofs_array->values[IPATCH_SF2_GEN_VELOCITY_RANGE].range.high = 127;
 
-  /* init flags to all valid generators for the given type */
-  ipatch_sf2_gen_ofs_array->flags = ipatch_sf2_gen_ofs_valid_mask;
-  ipatch_sf2_gen_abs_array->flags = ipatch_sf2_gen_abs_valid_mask;
+    /* initialize absolute generator default values */
+    ipatch_sf2_gen_abs_array = ipatch_sf2_gen_array_new(TRUE);
 
-
-  /* initialize array mapping generator IDs to property names */
-
-  gen_property_names = g_malloc (sizeof (char *) * IPATCH_SF2_GEN_COUNT);
-
-  enum_class = g_type_class_ref (IPATCH_TYPE_SF2_GEN_TYPE);
-  if (log_if_fail (enum_class != NULL))	/* shouldn't happen.. just in case */
+    for(i = 0; i < IPATCH_SF2_GEN_COUNT; i++)
     {
-      for (i = 0; i < IPATCH_SF2_GEN_COUNT; i++)
-	gen_property_names[i] = NULL;
-      return;
+        ipatch_sf2_gen_abs_array->values[i] = ipatch_sf2_gen_info[i].def;
     }
 
-  for (i = 0; i < IPATCH_SF2_GEN_COUNT; i++)
+    /* init flags to all valid generators for the given type */
+    ipatch_sf2_gen_ofs_array->flags = ipatch_sf2_gen_ofs_valid_mask;
+    ipatch_sf2_gen_abs_array->flags = ipatch_sf2_gen_abs_valid_mask;
+
+
+    /* initialize array mapping generator IDs to property names */
+
+    gen_property_names = g_malloc(sizeof(char *) * IPATCH_SF2_GEN_COUNT);
+
+    enum_class = g_type_class_ref(IPATCH_TYPE_SF2_GEN_TYPE);
+
+    if(log_if_fail(enum_class != NULL))	/* shouldn't happen.. just in case */
     {
-      enum_val = g_enum_get_value (enum_class, i);
-      gen_property_names[i] = enum_val ? enum_val->value_nick : NULL;
+        for(i = 0; i < IPATCH_SF2_GEN_COUNT; i++)
+        {
+            gen_property_names[i] = NULL;
+        }
+
+        return;
+    }
+
+    for(i = 0; i < IPATCH_SF2_GEN_COUNT; i++)
+    {
+        enum_val = g_enum_get_value(enum_class, i);
+        gen_property_names[i] = enum_val ? enum_val->value_nick : NULL;
     }
 }
 
@@ -163,27 +172,35 @@ _ipatch_sf2_gen_init (void)
  * Returns: %TRUE if valid, %FALSE otherwise
  */
 gboolean
-ipatch_sf2_gen_is_valid (guint genid, IpatchSF2GenPropsType propstype)
+ipatch_sf2_gen_is_valid(guint genid, IpatchSF2GenPropsType propstype)
 {
-  if (genid == IPATCH_SF2_GEN_SAMPLE_MODES
-      && propstype == IPATCH_SF2_GEN_PROPS_INST_GLOBAL)
-    return (FALSE);
-  else if ((propstype & 0x1) == IPATCH_SF2_GEN_PROPS_INST)
-    return ((ipatch_sf2_gen_abs_valid_mask & ((guint64)0x1 << genid)) != 0);
-  else return ((ipatch_sf2_gen_ofs_valid_mask & ((guint64)0x1 << genid)) != 0);
+    if(genid == IPATCH_SF2_GEN_SAMPLE_MODES
+            && propstype == IPATCH_SF2_GEN_PROPS_INST_GLOBAL)
+    {
+        return (FALSE);
+    }
+    else if((propstype & 0x1) == IPATCH_SF2_GEN_PROPS_INST)
+    {
+        return ((ipatch_sf2_gen_abs_valid_mask & ((guint64)0x1 << genid)) != 0);
+    }
+    else
+    {
+        return ((ipatch_sf2_gen_ofs_valid_mask & ((guint64)0x1 << genid)) != 0);
+    }
 }
 
 /* IpatchSF2GenArray boxed type */
 GType
-ipatch_sf2_gen_array_get_type (void)
+ipatch_sf2_gen_array_get_type(void)
 {
-  static GType type = 0;
+    static GType type = 0;
 
-  if (!type)
-    type = g_boxed_type_register_static ("IpatchSF2GenArray",
-				(GBoxedCopyFunc)ipatch_sf2_gen_array_duplicate,
-				(GBoxedFreeFunc)ipatch_sf2_gen_array_free);
-  return (type);
+    if(!type)
+        type = g_boxed_type_register_static("IpatchSF2GenArray",
+                                            (GBoxedCopyFunc)ipatch_sf2_gen_array_duplicate,
+                                            (GBoxedFreeFunc)ipatch_sf2_gen_array_free);
+
+    return (type);
 }
 
 /**
@@ -197,10 +214,16 @@ ipatch_sf2_gen_array_get_type (void)
  * Returns: New generator array
  */
 IpatchSF2GenArray *
-ipatch_sf2_gen_array_new (gboolean clear)
+ipatch_sf2_gen_array_new(gboolean clear)
 {
-  if (!clear) return (g_new (IpatchSF2GenArray, 1));
-  else return (g_new0 (IpatchSF2GenArray, 1));
+    if(!clear)
+    {
+        return (g_new(IpatchSF2GenArray, 1));
+    }
+    else
+    {
+        return (g_new0(IpatchSF2GenArray, 1));
+    }
 }
 
 /**
@@ -210,10 +233,10 @@ ipatch_sf2_gen_array_new (gboolean clear)
  * Frees a generator array structure.
  */
 void
-ipatch_sf2_gen_array_free (IpatchSF2GenArray *array)
+ipatch_sf2_gen_array_free(IpatchSF2GenArray *array)
 {
-  g_return_if_fail (array != NULL);
-  g_free (array);
+    g_return_if_fail(array != NULL);
+    g_free(array);
 }
 
 /**
@@ -226,15 +249,15 @@ ipatch_sf2_gen_array_free (IpatchSF2GenArray *array)
  *   of @array.
  */
 IpatchSF2GenArray *
-ipatch_sf2_gen_array_duplicate (const IpatchSF2GenArray *array)
+ipatch_sf2_gen_array_duplicate(const IpatchSF2GenArray *array)
 {
-  IpatchSF2GenArray *new;
+    IpatchSF2GenArray *new;
 
-  g_return_val_if_fail (array != NULL, NULL);
+    g_return_val_if_fail(array != NULL, NULL);
 
-  new = g_new (IpatchSF2GenArray, 1);
-  memcpy (new, array, sizeof (IpatchSF2GenArray));
-  return (new);
+    new = g_new(IpatchSF2GenArray, 1);
+    memcpy(new, array, sizeof(IpatchSF2GenArray));
+    return (new);
 }
 
 /**
@@ -248,17 +271,24 @@ ipatch_sf2_gen_array_duplicate (const IpatchSF2GenArray *array)
  * Initialize a generator array to default values.
  */
 void
-ipatch_sf2_gen_array_init (IpatchSF2GenArray *array, gboolean offset,
-			   gboolean set)
+ipatch_sf2_gen_array_init(IpatchSF2GenArray *array, gboolean offset,
+                          gboolean set)
 {
-  IpatchSF2GenArray *duparray;
+    IpatchSF2GenArray *duparray;
 
-  g_return_if_fail (array != NULL);
+    g_return_if_fail(array != NULL);
 
-  duparray = offset ? ipatch_sf2_gen_ofs_array : ipatch_sf2_gen_abs_array;
-  memcpy (array->values, duparray->values, sizeof (array->values));
-  if (set) array->flags = duparray->flags;
-  else array->flags = 0;
+    duparray = offset ? ipatch_sf2_gen_ofs_array : ipatch_sf2_gen_abs_array;
+    memcpy(array->values, duparray->values, sizeof(array->values));
+
+    if(set)
+    {
+        array->flags = duparray->flags;
+    }
+    else
+    {
+        array->flags = 0;
+    }
 }
 
 /**
@@ -275,38 +305,45 @@ ipatch_sf2_gen_array_init (IpatchSF2GenArray *array, gboolean offset,
  *   the non-intersecting ranges are left unassigned), %TRUE otherwise
  */
 gboolean
-ipatch_sf2_gen_array_offset (IpatchSF2GenArray *abs_array,
-			     const IpatchSF2GenArray *ofs_array)
+ipatch_sf2_gen_array_offset(IpatchSF2GenArray *abs_array,
+                            const IpatchSF2GenArray *ofs_array)
 {
-  IpatchSF2GenAmount *abs_vals;
-  const IpatchSF2GenAmount *ofs_vals;
-  gboolean retval;
-  guint64 v;
-  gint32 temp;
-  int i;
+    IpatchSF2GenAmount *abs_vals;
+    const IpatchSF2GenAmount *ofs_vals;
+    gboolean retval;
+    guint64 v;
+    gint32 temp;
+    int i;
 
-  abs_vals = abs_array->values;
-  ofs_vals = ofs_array->values;
+    abs_vals = abs_array->values;
+    ofs_vals = ofs_array->values;
 
-  for (i = 0, v = 0x1; i < IPATCH_SF2_GEN_COUNT; i++, v <<= 1)
-    { /* generator in add_mask and offset value set? */
-      if ((ipatch_sf2_gen_add_mask & v) && (ofs_array->flags & v))
-	{
-	  temp = (gint32)(abs_vals[i].sword) + (gint32)(ofs_vals[i].sword);
-	  if (temp < (gint32)ipatch_sf2_gen_info[i].min.sword)
-	    temp = ipatch_sf2_gen_info[i].min.sword;
-	  else if (temp > (gint32)ipatch_sf2_gen_info[i].max.sword)
-	    temp = ipatch_sf2_gen_info[i].max.sword;
-	  abs_vals[i].sword = (gint16)temp;
-	  abs_array->flags |= v; /* generator now set */
-	}
+    for(i = 0, v = 0x1; i < IPATCH_SF2_GEN_COUNT; i++, v <<= 1)
+    {
+        /* generator in add_mask and offset value set? */
+        if((ipatch_sf2_gen_add_mask & v) && (ofs_array->flags & v))
+        {
+            temp = (gint32)(abs_vals[i].sword) + (gint32)(ofs_vals[i].sword);
+
+            if(temp < (gint32)ipatch_sf2_gen_info[i].min.sword)
+            {
+                temp = ipatch_sf2_gen_info[i].min.sword;
+            }
+            else if(temp > (gint32)ipatch_sf2_gen_info[i].max.sword)
+            {
+                temp = ipatch_sf2_gen_info[i].max.sword;
+            }
+
+            abs_vals[i].sword = (gint16)temp;
+            abs_array->flags |= v; /* generator now set */
+        }
     }
 
-  retval = ipatch_sf2_gen_range_intersect (&abs_vals[IPATCH_SF2_GEN_NOTE_RANGE],
-                                           &ofs_vals[IPATCH_SF2_GEN_NOTE_RANGE]);
-  return retval
-    && ipatch_sf2_gen_range_intersect (&abs_vals[IPATCH_SF2_GEN_VELOCITY_RANGE],
-                                       &ofs_vals[IPATCH_SF2_GEN_VELOCITY_RANGE]);
+    retval = ipatch_sf2_gen_range_intersect(&abs_vals[IPATCH_SF2_GEN_NOTE_RANGE],
+                                            &ofs_vals[IPATCH_SF2_GEN_NOTE_RANGE]);
+    return retval
+           && ipatch_sf2_gen_range_intersect(&abs_vals[IPATCH_SF2_GEN_VELOCITY_RANGE],
+                   &ofs_vals[IPATCH_SF2_GEN_VELOCITY_RANGE]);
 }
 
 /**
@@ -319,15 +356,17 @@ ipatch_sf2_gen_array_offset (IpatchSF2GenArray *abs_array,
  * Returns: %TRUE if both ranges intersect, %FALSE if one or both do not.
  */
 gboolean
-ipatch_sf2_gen_array_intersect_test (const IpatchSF2GenArray *array1,
-                                     const IpatchSF2GenArray *array2)
+ipatch_sf2_gen_array_intersect_test(const IpatchSF2GenArray *array1,
+                                    const IpatchSF2GenArray *array2)
 {
-  if (!ipatch_sf2_gen_range_intersect_test (&array1->values[IPATCH_SF2_GEN_NOTE_RANGE],
+    if(!ipatch_sf2_gen_range_intersect_test(&array1->values[IPATCH_SF2_GEN_NOTE_RANGE],
                                             &array2->values[IPATCH_SF2_GEN_NOTE_RANGE]))
-    return (FALSE);
+    {
+        return (FALSE);
+    }
 
-  return (ipatch_sf2_gen_range_intersect_test (&array1->values[IPATCH_SF2_GEN_VELOCITY_RANGE],
-                                               &array2->values[IPATCH_SF2_GEN_VELOCITY_RANGE]));
+    return (ipatch_sf2_gen_range_intersect_test(&array1->values[IPATCH_SF2_GEN_VELOCITY_RANGE],
+            &array2->values[IPATCH_SF2_GEN_VELOCITY_RANGE]));
 }
 
 /**
@@ -339,17 +378,20 @@ ipatch_sf2_gen_array_intersect_test (const IpatchSF2GenArray *array1,
  * Returns: Count of "set" generators.
  */
 guint
-ipatch_sf2_gen_array_count_set (IpatchSF2GenArray *array)
+ipatch_sf2_gen_array_count_set(IpatchSF2GenArray *array)
 {
-  guint count = 0;
-  guint64 v;
+    guint count = 0;
+    guint64 v;
 
-  g_return_val_if_fail (array != NULL, 0);
+    g_return_val_if_fail(array != NULL, 0);
 
-  for (v = array->flags; v; v >>= 1) 
-    if (v & 0x1) count++;
+    for(v = array->flags; v; v >>= 1)
+        if(v & 0x1)
+        {
+            count++;
+        }
 
-  return (count);
+    return (count);
 }
 
 /**
@@ -363,26 +405,26 @@ ipatch_sf2_gen_array_count_set (IpatchSF2GenArray *array)
  * IPATCH_TYPE_RANGE for velocity or note split ranges.
  */
 void
-ipatch_sf2_gen_amount_to_value (guint genid, const IpatchSF2GenAmount *amt,
-				GValue *value)
+ipatch_sf2_gen_amount_to_value(guint genid, const IpatchSF2GenAmount *amt,
+                               GValue *value)
 {
-  g_return_if_fail (genid < IPATCH_SF2_GEN_COUNT);
-  g_return_if_fail (amt != NULL);
-  g_return_if_fail (value != NULL);
+    g_return_if_fail(genid < IPATCH_SF2_GEN_COUNT);
+    g_return_if_fail(amt != NULL);
+    g_return_if_fail(value != NULL);
 
-  if (ipatch_sf2_gen_info [genid].unit != IPATCH_UNIT_TYPE_RANGE)
+    if(ipatch_sf2_gen_info [genid].unit != IPATCH_UNIT_TYPE_RANGE)
     {
-      g_value_init (value, G_TYPE_INT);
-      g_value_set_int (value, amt->sword);
+        g_value_init(value, G_TYPE_INT);
+        g_value_set_int(value, amt->sword);
     }
-  else
+    else
     {
-      IpatchRange range;
+        IpatchRange range;
 
-      range.low = amt->range.low;
-      range.high = amt->range.high;
-      g_value_init (value, IPATCH_TYPE_RANGE);
-      ipatch_value_set_range (value, &range);
+        range.low = amt->range.low;
+        range.high = amt->range.high;
+        g_value_init(value, IPATCH_TYPE_RANGE);
+        ipatch_value_set_range(value, &range);
     }
 }
 
@@ -396,25 +438,29 @@ ipatch_sf2_gen_amount_to_value (guint genid, const IpatchSF2GenAmount *amt,
  * type.
  */
 void
-ipatch_sf2_gen_default_value (guint genid, gboolean ispreset,
-			      IpatchSF2GenAmount *out_amt)
+ipatch_sf2_gen_default_value(guint genid, gboolean ispreset,
+                             IpatchSF2GenAmount *out_amt)
 {
-  g_return_if_fail (out_amt != NULL);
+    g_return_if_fail(out_amt != NULL);
 
-  out_amt->sword = 0;		/* in case we fail, user gets 0 amount */
+    out_amt->sword = 0;		/* in case we fail, user gets 0 amount */
 
-  g_return_if_fail (ipatch_sf2_gen_is_valid (genid, ispreset));
+    g_return_if_fail(ipatch_sf2_gen_is_valid(genid, ispreset));
 
-  if (ispreset)
+    if(ispreset)
     {
-      if (ipatch_sf2_gen_info[genid].unit == IPATCH_UNIT_TYPE_RANGE)
-	{
-	  out_amt->range.low = 0;
-	  out_amt->range.high = 127;
-	}
-      /* else: Amount already set to 0, which is default for preset gens */
+        if(ipatch_sf2_gen_info[genid].unit == IPATCH_UNIT_TYPE_RANGE)
+        {
+            out_amt->range.low = 0;
+            out_amt->range.high = 127;
+        }
+
+        /* else: Amount already set to 0, which is default for preset gens */
     }
-  else *out_amt = ipatch_sf2_gen_info[genid].def;
+    else
+    {
+        *out_amt = ipatch_sf2_gen_info[genid].def;
+    }
 }
 
 /**
@@ -432,34 +478,39 @@ ipatch_sf2_gen_default_value (guint genid, gboolean ispreset,
  * Returns: %TRUE if value was clamped, %FALSE otherwise.
  */
 gboolean
-ipatch_sf2_gen_offset (guint genid, IpatchSF2GenAmount *dst,
-		       const IpatchSF2GenAmount *ofs)
+ipatch_sf2_gen_offset(guint genid, IpatchSF2GenAmount *dst,
+                      const IpatchSF2GenAmount *ofs)
 {
-  gint32 temp;
-  gboolean clamped = FALSE;
+    gint32 temp;
+    gboolean clamped = FALSE;
 
-  g_return_val_if_fail (dst != NULL, FALSE);
-  g_return_val_if_fail (ofs != NULL, FALSE);
-  g_return_val_if_fail (ipatch_sf2_gen_is_valid (genid, TRUE), FALSE);
+    g_return_val_if_fail(dst != NULL, FALSE);
+    g_return_val_if_fail(ofs != NULL, FALSE);
+    g_return_val_if_fail(ipatch_sf2_gen_is_valid(genid, TRUE), FALSE);
 
-  if (genid != IPATCH_SF2_GEN_NOTE_RANGE && genid != IPATCH_SF2_GEN_VELOCITY_RANGE)
+    if(genid != IPATCH_SF2_GEN_NOTE_RANGE && genid != IPATCH_SF2_GEN_VELOCITY_RANGE)
     {
-      temp = (gint32)(dst->sword) + (gint32)(ofs->sword);
-      if (temp < (gint32)ipatch_sf2_gen_info[genid].min.sword)
-	{
-	  temp = ipatch_sf2_gen_info[genid].min.sword;
-	  clamped = TRUE;
-	}
-      else if (temp > (gint32)ipatch_sf2_gen_info[genid].max.sword)
-	{
-	  temp = ipatch_sf2_gen_info[genid].max.sword;
-	  clamped = TRUE;
-	}
-      dst->sword = (gint16)temp;
-    }
-  else clamped = !ipatch_sf2_gen_range_intersect (dst, ofs);
+        temp = (gint32)(dst->sword) + (gint32)(ofs->sword);
 
-  return (clamped);
+        if(temp < (gint32)ipatch_sf2_gen_info[genid].min.sword)
+        {
+            temp = ipatch_sf2_gen_info[genid].min.sword;
+            clamped = TRUE;
+        }
+        else if(temp > (gint32)ipatch_sf2_gen_info[genid].max.sword)
+        {
+            temp = ipatch_sf2_gen_info[genid].max.sword;
+            clamped = TRUE;
+        }
+
+        dst->sword = (gint16)temp;
+    }
+    else
+    {
+        clamped = !ipatch_sf2_gen_range_intersect(dst, ofs);
+    }
+
+    return (clamped);
 }
 
 /**
@@ -471,25 +522,36 @@ ipatch_sf2_gen_offset (guint genid, IpatchSF2GenAmount *dst,
  * Clamp a generators value to its valid range.
  */
 void
-ipatch_sf2_gen_clamp (guint genid, int *sfval, gboolean ispreset)
+ipatch_sf2_gen_clamp(guint genid, int *sfval, gboolean ispreset)
 {
-  int ofsrange;			/* used only for offset gens, range of value */
+    int ofsrange;			/* used only for offset gens, range of value */
 
-  g_return_if_fail (ipatch_sf2_gen_is_valid (genid, ispreset));
+    g_return_if_fail(ipatch_sf2_gen_is_valid(genid, ispreset));
 
-  if (ispreset)
+    if(ispreset)
     {
-      ofsrange = ipatch_sf2_gen_info[genid].max.sword
-	- ipatch_sf2_gen_info[genid].min.sword;
-      if (*sfval < -ofsrange) *sfval = -ofsrange;
-      else if (*sfval > ofsrange) *sfval = ofsrange;
+        ofsrange = ipatch_sf2_gen_info[genid].max.sword
+                   - ipatch_sf2_gen_info[genid].min.sword;
+
+        if(*sfval < -ofsrange)
+        {
+            *sfval = -ofsrange;
+        }
+        else if(*sfval > ofsrange)
+        {
+            *sfval = ofsrange;
+        }
     }
-  else
+    else
     {
-      if (*sfval < ipatch_sf2_gen_info[genid].min.sword)
-	*sfval = ipatch_sf2_gen_info[genid].min.sword;
-      else if (*sfval > ipatch_sf2_gen_info[genid].max.sword)
-	*sfval = ipatch_sf2_gen_info[genid].max.sword;
+        if(*sfval < ipatch_sf2_gen_info[genid].min.sword)
+        {
+            *sfval = ipatch_sf2_gen_info[genid].min.sword;
+        }
+        else if(*sfval > ipatch_sf2_gen_info[genid].max.sword)
+        {
+            *sfval = ipatch_sf2_gen_info[genid].max.sword;
+        }
     }
 }
 
@@ -504,23 +566,26 @@ ipatch_sf2_gen_clamp (guint genid, int *sfval, gboolean ispreset)
  * Returns: %FALSE if ranges don't share any range in common.
  */
 gboolean
-ipatch_sf2_gen_range_intersect (IpatchSF2GenAmount *dst,
-				const IpatchSF2GenAmount *src)
+ipatch_sf2_gen_range_intersect(IpatchSF2GenAmount *dst,
+                               const IpatchSF2GenAmount *src)
 {
-  guint8 dl, dh, sl, sh;
+    guint8 dl, dh, sl, sh;
 
-  dl = dst->range.low;
-  dh = dst->range.high;
-  sl = src->range.low;
-  sh = src->range.high;
+    dl = dst->range.low;
+    dh = dst->range.high;
+    sl = src->range.low;
+    sh = src->range.high;
 
-  /* Nothing in common? */
-  if (dh < sl || sh < dl) return (FALSE);
+    /* Nothing in common? */
+    if(dh < sl || sh < dl)
+    {
+        return (FALSE);
+    }
 
-  dst->range.low = MAX (dl, sl);
-  dst->range.high = MIN (dh, sh);
+    dst->range.low = MAX(dl, sl);
+    dst->range.high = MIN(dh, sh);
 
-  return (TRUE);
+    return (TRUE);
 }
 
 /**
@@ -533,10 +598,10 @@ ipatch_sf2_gen_range_intersect (IpatchSF2GenAmount *dst,
  * Returns: %FALSE if ranges don't share any range in common, %TRUE otherwise
  */
 gboolean
-ipatch_sf2_gen_range_intersect_test (const IpatchSF2GenAmount *amt1,
-                                     const IpatchSF2GenAmount *amt2)
+ipatch_sf2_gen_range_intersect_test(const IpatchSF2GenAmount *amt1,
+                                    const IpatchSF2GenAmount *amt2)
 {
-  return (!(amt1->range.high < amt2->range.low || amt2->range.high < amt1->range.low));
+    return (!(amt1->range.high < amt2->range.low || amt2->range.high < amt1->range.low));
 }
 
 /**
@@ -549,8 +614,8 @@ ipatch_sf2_gen_range_intersect_test (const IpatchSF2GenAmount *amt1,
  * The returned string is internal and should not be modified or freed.
  */
 G_CONST_RETURN char *
-ipatch_sf2_gen_get_prop_name (guint genid)
+ipatch_sf2_gen_get_prop_name(guint genid)
 {
-  g_return_val_if_fail (genid < IPATCH_SF2_GEN_COUNT, NULL);
-  return (gen_property_names[genid]);
+    g_return_val_if_fail(genid < IPATCH_SF2_GEN_COUNT, NULL);
+    return (gen_property_names[genid]);
 }

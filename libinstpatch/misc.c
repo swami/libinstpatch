@@ -20,7 +20,7 @@
 /**
  * SECTION: misc
  * @short_description: Miscellaneous stuff
- * @see_also: 
+ * @see_also:
  * @stability: Stable
  */
 #if defined(HAVE_CONFIG_H)
@@ -43,79 +43,79 @@
 #include "i18n.h"
 
 /* private initializers in other source files */
-void _ipatch_sf2_gen_init (void); /* IpatchSF2Gen.c */
-void _ipatch_param_init (void);	/* IpatchParam.c */
-void _ipatch_type_prop_init (void); /* IpatchTypeProp.c */
-void _ipatch_util_init (void);	/* util.c */
-void _ipatch_unit_init (void);	/* unit.c */
-void _ipatch_xml_object_init (void);	/* IpatchXmlObject.c */
-void _ipatch_range_init (void);	/* IpatchRange.c */
+void _ipatch_sf2_gen_init(void);  /* IpatchSF2Gen.c */
+void _ipatch_param_init(void);	/* IpatchParam.c */
+void _ipatch_type_prop_init(void);  /* IpatchTypeProp.c */
+void _ipatch_util_init(void);	/* util.c */
+void _ipatch_unit_init(void);	/* unit.c */
+void _ipatch_xml_object_init(void);	/* IpatchXmlObject.c */
+void _ipatch_range_init(void);	/* IpatchRange.c */
 
-void _ipatch_convert_SF2_init (void);
-void _ipatch_convert_gig_init (void);
-void _ipatch_convert_DLS2_init (void);
-void _ipatch_convert_SLI_init (void);
-void _ipatch_sf2_voice_cache_init_DLS (void);
-void _ipatch_sf2_voice_cache_init_SF2 (void);
-void _ipatch_sf2_voice_cache_init_SLI (void);
-void _ipatch_sf2_voice_cache_init_gig (void);
-void _ipatch_sf2_voice_cache_init_VBank (void);
+void _ipatch_convert_SF2_init(void);
+void _ipatch_convert_gig_init(void);
+void _ipatch_convert_DLS2_init(void);
+void _ipatch_convert_SLI_init(void);
+void _ipatch_sf2_voice_cache_init_DLS(void);
+void _ipatch_sf2_voice_cache_init_SF2(void);
+void _ipatch_sf2_voice_cache_init_SLI(void);
+void _ipatch_sf2_voice_cache_init_gig(void);
+void _ipatch_sf2_voice_cache_init_VBank(void);
 
-static gboolean ipatch_strv_xml_encode (GNode *node, GObject *object,
-                                        GParamSpec *pspec, GValue *value,
-                                        GError **err);
-static gboolean ipatch_strv_xml_decode (GNode *node, GObject *object,
-                                        GParamSpec *pspec, GValue *value,
-                                        GError **err);
-static void virtual_parent_dls2_inst (GType type, GParamSpec *spec,
-				      GValue *value, GObject *object);
-static void virtual_parent_gig_inst (GType type, GParamSpec *spec,
-				     GValue *value, GObject *object);
-static void virtual_parent_sf2_preset (GType type, GParamSpec *spec,
-				       GValue *value, GObject *object);
-static void virtual_parent_sf2_sample (GType type, GParamSpec *spec,
-				       GValue *value, GObject *object);
-static void conform_percussion (GObject *object);
-static void conform_melodic (GObject *object);
+static gboolean ipatch_strv_xml_encode(GNode *node, GObject *object,
+                                       GParamSpec *pspec, GValue *value,
+                                       GError **err);
+static gboolean ipatch_strv_xml_decode(GNode *node, GObject *object,
+                                       GParamSpec *pspec, GValue *value,
+                                       GError **err);
+static void virtual_parent_dls2_inst(GType type, GParamSpec *spec,
+                                     GValue *value, GObject *object);
+static void virtual_parent_gig_inst(GType type, GParamSpec *spec,
+                                    GValue *value, GObject *object);
+static void virtual_parent_sf2_preset(GType type, GParamSpec *spec,
+                                      GValue *value, GObject *object);
+static void virtual_parent_sf2_sample(GType type, GParamSpec *spec,
+                                      GValue *value, GObject *object);
+static void conform_percussion(GObject *object);
+static void conform_melodic(GObject *object);
 
-static void dump_recursive (GObject *object, char *indent, FILE *file);
-static void dump_object_info (GObject *object, char *indent, FILE *file);
+static void dump_recursive(GObject *object, char *indent, FILE *file);
+static void dump_object_info(GObject *object, char *indent, FILE *file);
 
 typedef struct
 {
-  char *type_name;
-  char *name;
-  char *blurb;
-  int category;
+    char *type_name;
+    char *name;
+    char *blurb;
+    int category;
 } TypePropInit;
 
 /* info to initialize type properties */
 static TypePropInit type_props[] =
 {
-  { "IpatchSampleStoreSndFile", N_("Sample file"), NULL, IPATCH_CATEGORY_SAMPLE },
-  { "IpatchDLS2", N_("DLS"), N_("Down Loadable Sounds"), IPATCH_CATEGORY_BASE },
-  { "IpatchDLS2Inst", N_("Instrument"), N_("DLS Instrument"), IPATCH_CATEGORY_PROGRAM },
-  { "IpatchDLS2Region", N_("Region"), N_("DLS Region"), IPATCH_CATEGORY_SAMPLE_REF },
-  { "IpatchDLS2Sample", N_("Sample"), N_("DLS Sample"), IPATCH_CATEGORY_SAMPLE },
-  { "IpatchGig", N_("GigaSampler"), NULL, IPATCH_CATEGORY_BASE },
-  { "IpatchGigDimension", N_("Dimension"), N_("GigaSampler Dimension"), IPATCH_CATEGORY_NONE },
-  { "IpatchGigInst", N_("Instrument"), N_("GigaSampler Instrument"), IPATCH_CATEGORY_PROGRAM },
-  { "IpatchGigRegion", N_("Region"), N_("GigaSampler Region"), IPATCH_CATEGORY_NONE },
-  { "IpatchGigSample", N_("Sample"), N_("GigaSampler Sample"), IPATCH_CATEGORY_SAMPLE },
-  { "IpatchGigSubRegion", N_("Sub Region"), N_("GigaSampler Sub Region"), IPATCH_CATEGORY_SAMPLE_REF },
-  { "IpatchSF2", N_("SoundFont"), NULL, IPATCH_CATEGORY_BASE },
-  { "IpatchSF2Inst", N_("Instrument"), N_("SoundFont Instrument"), IPATCH_CATEGORY_INSTRUMENT },
-  { "IpatchSF2IZone", N_("Zone"), N_("SoundFont Instrument Zone"), IPATCH_CATEGORY_SAMPLE_REF },
-  { "IpatchSF2Preset", N_("Preset"), N_("SoundFont Preset"), IPATCH_CATEGORY_PROGRAM },
-  { "IpatchSF2PZone", N_("Zone"), N_("SoundFont Preset Zone"), IPATCH_CATEGORY_INSTRUMENT_REF },
-  { "IpatchSF2Sample", N_("Sample"), N_("SoundFont Sample"), IPATCH_CATEGORY_SAMPLE },
-  { "IpatchSLI", N_("Spectralis"), NULL, IPATCH_CATEGORY_BASE },
-  { "IpatchSLIInst", N_("Instrument"), N_("Spectralis Instrument"), IPATCH_CATEGORY_INSTRUMENT },
-  { "IpatchSLIZone", N_("Zone"), N_("Spectralis Instrument Zone"), IPATCH_CATEGORY_SAMPLE_REF },
-  { "IpatchSLISample", N_("Sample"), N_("Spectralis Sample"), IPATCH_CATEGORY_SAMPLE },
-  { "IpatchVBank", N_("VBank"), N_("Virtual Bank"), IPATCH_CATEGORY_BASE },
-  { "IpatchVBankInst", N_("Instrument"), N_("VBank Instrument"), IPATCH_CATEGORY_PROGRAM },
-  { "IpatchVBankRegion", N_("Region"), N_("VBank Region"), IPATCH_CATEGORY_INSTRUMENT_REF }
+    { "IpatchSampleStoreSndFile", N_("Sample file"), NULL, IPATCH_CATEGORY_SAMPLE },
+    { "IpatchDLS2", N_("DLS"), N_("Down Loadable Sounds"), IPATCH_CATEGORY_BASE },
+    { "IpatchDLS2Inst", N_("Instrument"), N_("DLS Instrument"), IPATCH_CATEGORY_PROGRAM },
+    { "IpatchDLS2Region", N_("Region"), N_("DLS Region"), IPATCH_CATEGORY_SAMPLE_REF },
+    { "IpatchDLS2Sample", N_("Sample"), N_("DLS Sample"), IPATCH_CATEGORY_SAMPLE },
+    { "IpatchGig", N_("GigaSampler"), NULL, IPATCH_CATEGORY_BASE },
+    { "IpatchGigDimension", N_("Dimension"), N_("GigaSampler Dimension"), IPATCH_CATEGORY_NONE },
+    { "IpatchGigInst", N_("Instrument"), N_("GigaSampler Instrument"), IPATCH_CATEGORY_PROGRAM },
+    { "IpatchGigRegion", N_("Region"), N_("GigaSampler Region"), IPATCH_CATEGORY_NONE },
+    { "IpatchGigSample", N_("Sample"), N_("GigaSampler Sample"), IPATCH_CATEGORY_SAMPLE },
+    { "IpatchGigSubRegion", N_("Sub Region"), N_("GigaSampler Sub Region"), IPATCH_CATEGORY_SAMPLE_REF },
+    { "IpatchSF2", N_("SoundFont"), NULL, IPATCH_CATEGORY_BASE },
+    { "IpatchSF2Inst", N_("Instrument"), N_("SoundFont Instrument"), IPATCH_CATEGORY_INSTRUMENT },
+    { "IpatchSF2IZone", N_("Zone"), N_("SoundFont Instrument Zone"), IPATCH_CATEGORY_SAMPLE_REF },
+    { "IpatchSF2Preset", N_("Preset"), N_("SoundFont Preset"), IPATCH_CATEGORY_PROGRAM },
+    { "IpatchSF2PZone", N_("Zone"), N_("SoundFont Preset Zone"), IPATCH_CATEGORY_INSTRUMENT_REF },
+    { "IpatchSF2Sample", N_("Sample"), N_("SoundFont Sample"), IPATCH_CATEGORY_SAMPLE },
+    { "IpatchSLI", N_("Spectralis"), NULL, IPATCH_CATEGORY_BASE },
+    { "IpatchSLIInst", N_("Instrument"), N_("Spectralis Instrument"), IPATCH_CATEGORY_INSTRUMENT },
+    { "IpatchSLIZone", N_("Zone"), N_("Spectralis Instrument Zone"), IPATCH_CATEGORY_SAMPLE_REF },
+    { "IpatchSLISample", N_("Sample"), N_("Spectralis Sample"), IPATCH_CATEGORY_SAMPLE },
+    { "IpatchVBank", N_("VBank"), N_("Virtual Bank"), IPATCH_CATEGORY_BASE },
+    { "IpatchVBankInst", N_("Instrument"), N_("VBank Instrument"), IPATCH_CATEGORY_PROGRAM },
+    { "IpatchVBankRegion", N_("Region"), N_("VBank Region"), IPATCH_CATEGORY_INSTRUMENT_REF }
 };
 
 /* name of application using libInstPatch (for saving to files) */
@@ -128,270 +128,286 @@ char *ipatch_application_name = NULL;
  * libInstPatch related functions.
  */
 void
-ipatch_init (void)
+ipatch_init(void)
 {
-  static gboolean initialized = FALSE;
-  TypePropInit *prop_info;
-  GType type;
-  int i;
+    static gboolean initialized = FALSE;
+    TypePropInit *prop_info;
+    GType type;
+    int i;
 
-  if (initialized) return;
-  initialized = TRUE;
-
-  g_type_init ();
-
-  if (!g_thread_supported ())
-    g_thread_init (NULL);
-
-  /* set up current locale.
-     
-     Warning: This ensures that when loading preferences, decimal floating values are
-     properly decoded accordling to the LC_NUMERIC separator.
-
-     When using ipatch_xml_xxxx_decode_xxxx_func(),this will ensure that when decoding
-	 float numbers, decimal part values are properly decoded. Otherwise there is risk
-	 that decimal part will be ignored, leading in previous float preferences being
-	 read as integer value.
-  */
-  if(! setlocale( LC_ALL, "" ))
-  {
-	  g_critical("Error setting locale");
-  }
-
-  /* bind the gettext domain */
-#if defined(ENABLE_NLS)
-  bindtextdomain (PACKAGE, LOCALEDIR);
-#endif
-
-  /* Must be done before other types since they may be dependent */
-  _ipatch_param_init ();
-  _ipatch_type_prop_init ();
-  _ipatch_unit_init ();
-  _ipatch_xml_object_init ();
-  _ipatch_util_init ();
-  _ipatch_sf2_gen_init ();
-
-  /* initialize interfaces before objects */
-  ipatch_sample_get_type ();
-  ipatch_sf2_gen_item_get_type ();
-  ipatch_sf2_mod_item_get_type ();
-
-  /* declares property types which other types may use */
-  g_type_class_ref (IPATCH_TYPE_SF2_VOICE_CACHE);
-
-
-  g_type_class_ref (IPATCH_TYPE_BASE);
-  g_type_class_ref (IPATCH_TYPE_CONTAINER);
-  g_type_class_ref (IPATCH_TYPE_CONVERTER);
-  g_type_class_ref (IPATCH_TYPE_DLS2);
-  ipatch_dls2_conn_get_type ();
-  g_type_class_ref (IPATCH_TYPE_DLS2_INST);
-  g_type_class_ref (IPATCH_TYPE_DLS2_REGION);
-  g_type_class_ref (IPATCH_TYPE_DLS2_SAMPLE);
-  g_type_class_ref (IPATCH_TYPE_DLS_FILE);
-  g_type_class_ref (IPATCH_TYPE_DLS_READER);
-  g_type_class_ref (IPATCH_TYPE_DLS_WRITER);
-  g_type_class_ref (IPATCH_TYPE_FILE);
-  ipatch_file_handle_get_type ();
-  g_type_class_ref (IPATCH_TYPE_GIG_FILE);
-  g_type_class_ref (IPATCH_TYPE_GIG);
-  g_type_class_ref (IPATCH_TYPE_GIG_DIMENSION);
-  g_type_class_ref (IPATCH_TYPE_GIG_INST);
-  g_type_class_ref (IPATCH_TYPE_GIG_REGION);
-  g_type_class_ref (IPATCH_TYPE_GIG_SAMPLE);
-  g_type_class_ref (IPATCH_TYPE_GIG_SUB_REGION);
-  g_type_class_ref (IPATCH_TYPE_ITEM);
-  ipatch_iter_get_type ();
-  g_type_class_ref (IPATCH_TYPE_LIST);
-  ipatch_param_spec_range_get_type ();
-  g_type_class_ref (IPATCH_TYPE_PASTE);
-  ipatch_range_get_type ();
-  g_type_class_ref (IPATCH_TYPE_RIFF);
-  g_type_class_ref (IPATCH_TYPE_SAMPLE_DATA);
-  g_type_class_ref (IPATCH_TYPE_SAMPLE_STORE);
-  g_type_class_ref (IPATCH_TYPE_SAMPLE_STORE_FILE);
-  g_type_class_ref (IPATCH_TYPE_SAMPLE_STORE_RAM);
-  g_type_class_ref (IPATCH_TYPE_SAMPLE_STORE_ROM);
-  g_type_class_ref (IPATCH_TYPE_SAMPLE_STORE_SND_FILE);
-  g_type_class_ref (IPATCH_TYPE_SAMPLE_STORE_SPLIT24);
-  g_type_class_ref (IPATCH_TYPE_SAMPLE_STORE_SWAP);
-  g_type_class_ref (IPATCH_TYPE_SAMPLE_STORE_VIRTUAL);
-  g_type_class_ref (IPATCH_TYPE_SF2_FILE);
-  ipatch_sf2_gen_array_get_type ();
-  g_type_class_ref (IPATCH_TYPE_SF2);
-  g_type_class_ref (IPATCH_TYPE_SF2_INST);
-  g_type_class_ref (IPATCH_TYPE_SF2_IZONE);
-  g_type_class_ref (IPATCH_TYPE_SF2_READER);
-  ipatch_sf2_mod_get_type ();
-  ipatch_sf2_mod_list_get_type ();
-  ipatch_sample_transform_get_type ();
-  ipatch_sample_list_get_type ();
-  ipatch_sample_list_item_get_type ();
-  g_type_class_ref (IPATCH_TYPE_SF2_PRESET);
-  g_type_class_ref (IPATCH_TYPE_SF2_PZONE);
-  g_type_class_ref (IPATCH_TYPE_SF2_SAMPLE);
-  g_type_class_ref (IPATCH_TYPE_SLI_FILE);
-  g_type_class_ref (IPATCH_TYPE_SLI);
-  g_type_class_ref (IPATCH_TYPE_SLI_INST);
-  g_type_class_ref (IPATCH_TYPE_SLI_ZONE);
-  g_type_class_ref (IPATCH_TYPE_SLI_SAMPLE);
-  g_type_class_ref (IPATCH_TYPE_SLI_READER);
-  g_type_class_ref (IPATCH_TYPE_VBANK);
-  g_type_class_ref (IPATCH_TYPE_VBANK_INST);
-  g_type_class_ref (IPATCH_TYPE_VBANK_REGION);
-  g_type_class_ref (IPATCH_TYPE_SF2_WRITER);
-  g_type_class_ref (IPATCH_TYPE_SF2_ZONE);
-  g_type_class_ref (IPATCH_TYPE_SND_FILE);
-
-  _ipatch_convert_SF2_init ();
-  _ipatch_convert_gig_init ();
-  _ipatch_convert_DLS2_init ();
-  _ipatch_convert_SLI_init ();
-
-  _ipatch_sf2_voice_cache_init_DLS ();
-  _ipatch_sf2_voice_cache_init_SF2 ();
-  _ipatch_sf2_voice_cache_init_SLI ();
-  _ipatch_sf2_voice_cache_init_gig ();
-  _ipatch_sf2_voice_cache_init_VBank ();
-
-  _ipatch_range_init ();
-
-  /* Register XML encode/decode handlers */
-
-  /* GLib string array boxed type encode/decode */
-  ipatch_xml_register_handler (G_TYPE_STRV, NULL, ipatch_strv_xml_encode,
-                               ipatch_strv_xml_decode);
-
-  /* set type properties */
-
-  for (i = 0; i < G_N_ELEMENTS (type_props); i++)
+    if(initialized)
     {
-      type = g_type_from_name (type_props[i].type_name);
-      if (log_if_fail (type != 0)) continue;
-
-      prop_info = &type_props[i];
-
-      if (prop_info->name)
-	ipatch_type_set (type, "name", prop_info->name, NULL);
-
-      if (prop_info->blurb)
-	ipatch_type_set (type, "blurb", prop_info->blurb, NULL);
-
-      if (prop_info->category != IPATCH_CATEGORY_NONE)
-	ipatch_type_set (type, "category", prop_info->category, NULL);
+        return;
     }
 
-  /* link types */
+    initialized = TRUE;
 
-  ipatch_type_set (IPATCH_TYPE_DLS2_REGION, "link-type",
-		   IPATCH_TYPE_DLS2_SAMPLE, NULL);
+    g_type_init();
 
-  ipatch_type_set (IPATCH_TYPE_GIG_SUB_REGION, "link-type",
-		   IPATCH_TYPE_GIG_SAMPLE, NULL);
+    if(!g_thread_supported())
+    {
+        g_thread_init(NULL);
+    }
 
-  ipatch_type_set (IPATCH_TYPE_SF2_PZONE, "link-type",
-		   IPATCH_TYPE_SF2_INST, NULL);
+    /* set up current locale.
 
-  ipatch_type_set (IPATCH_TYPE_SF2_IZONE, "link-type",
-		   IPATCH_TYPE_SF2_SAMPLE, NULL);
+       Warning: This ensures that when loading preferences, decimal floating values are
+       properly decoded accordling to the LC_NUMERIC separator.
 
-  ipatch_type_set (IPATCH_TYPE_SLI_ZONE, "link-type",
-		   IPATCH_TYPE_SLI_SAMPLE, NULL);
+       When using ipatch_xml_xxxx_decode_xxxx_func(),this will ensure that when decoding
+     float numbers, decimal part values are properly decoded. Otherwise there is risk
+     that decimal part will be ignored, leading in previous float preferences being
+     read as integer value.
+    */
+    if(! setlocale(LC_ALL, ""))
+    {
+        g_critical("Error setting locale");
+    }
 
-  ipatch_type_set (IPATCH_TYPE_VBANK_REGION, "link-type",
-		   IPATCH_TYPE_ITEM, NULL);
+    /* bind the gettext domain */
+#if defined(ENABLE_NLS)
+    bindtextdomain(PACKAGE, LOCALEDIR);
+#endif
 
-  /* virtual container parent type properties */
+    /* Must be done before other types since they may be dependent */
+    _ipatch_param_init();
+    _ipatch_type_prop_init();
+    _ipatch_unit_init();
+    _ipatch_xml_object_init();
+    _ipatch_util_init();
+    _ipatch_sf2_gen_init();
 
-  ipatch_type_set (IPATCH_TYPE_DLS2_SAMPLE,
-		   "virtual-parent-type", IPATCH_TYPE_VIRTUAL_DLS2_SAMPLES,
-		   NULL);
-  ipatch_type_set (IPATCH_TYPE_GIG_SAMPLE,
-		   "virtual-parent-type", IPATCH_TYPE_VIRTUAL_GIG_SAMPLES,
-		   NULL);
-  ipatch_type_set (IPATCH_TYPE_SF2_INST,
-		   "virtual-parent-type", IPATCH_TYPE_VIRTUAL_SF2_INST,
-		   NULL);
-  ipatch_type_set (IPATCH_TYPE_SLI_INST,
-		   "virtual-parent-type", IPATCH_TYPE_VIRTUAL_SLI_INST,
-		   NULL);
-  ipatch_type_set (IPATCH_TYPE_SLI_SAMPLE,
-		   "virtual-parent-type", IPATCH_TYPE_VIRTUAL_SLI_SAMPLES,
-		   NULL);
+    /* initialize interfaces before objects */
+    ipatch_sample_get_type();
+    ipatch_sf2_gen_item_get_type();
+    ipatch_sf2_mod_item_get_type();
 
-  /* dynamic virtual container properties (determined by object instance) */
-  ipatch_type_set_dynamic_func (IPATCH_TYPE_DLS2_INST, "virtual-parent-type",
-			     virtual_parent_dls2_inst);
-  ipatch_type_set_dynamic_func (IPATCH_TYPE_GIG_INST, "virtual-parent-type",
-			     virtual_parent_gig_inst);
-  ipatch_type_set_dynamic_func (IPATCH_TYPE_SF2_PRESET, "virtual-parent-type",
-			     virtual_parent_sf2_preset);
-  ipatch_type_set_dynamic_func (IPATCH_TYPE_SF2_SAMPLE, "virtual-parent-type",
-			     virtual_parent_sf2_sample);
+    /* declares property types which other types may use */
+    g_type_class_ref(IPATCH_TYPE_SF2_VOICE_CACHE);
 
-  /* child object conform functions (for making a child object conform to a
-   * specific virtual container) */
-  ipatch_type_set (IPATCH_TYPE_VIRTUAL_DLS2_PERCUSSION,
-		   "virtual-child-conform-func", conform_percussion,
-		   NULL);
-  ipatch_type_set (IPATCH_TYPE_VIRTUAL_DLS2_MELODIC,
-		   "virtual-child-conform-func", conform_melodic,
-		   NULL);
-  ipatch_type_set (IPATCH_TYPE_VIRTUAL_GIG_PERCUSSION,
-		   "virtual-child-conform-func", conform_percussion,
-		   NULL);
-  ipatch_type_set (IPATCH_TYPE_VIRTUAL_GIG_MELODIC,
-		   "virtual-child-conform-func", conform_melodic,
-		   NULL);
-  ipatch_type_set (IPATCH_TYPE_VIRTUAL_SF2_PERCUSSION,
-		   "virtual-child-conform-func", conform_percussion,
-		   NULL);
-  ipatch_type_set (IPATCH_TYPE_VIRTUAL_SF2_MELODIC,
-		   "virtual-child-conform-func", conform_melodic,
-		   NULL);
 
-  /* container child sorting */
-  ipatch_type_set (IPATCH_TYPE_VIRTUAL_DLS2_MELODIC,
-		   "sort-children", TRUE, NULL);
-  ipatch_type_set (IPATCH_TYPE_VIRTUAL_DLS2_PERCUSSION,
-		   "sort-children", TRUE, NULL);
+    g_type_class_ref(IPATCH_TYPE_BASE);
+    g_type_class_ref(IPATCH_TYPE_CONTAINER);
+    g_type_class_ref(IPATCH_TYPE_CONVERTER);
+    g_type_class_ref(IPATCH_TYPE_DLS2);
+    ipatch_dls2_conn_get_type();
+    g_type_class_ref(IPATCH_TYPE_DLS2_INST);
+    g_type_class_ref(IPATCH_TYPE_DLS2_REGION);
+    g_type_class_ref(IPATCH_TYPE_DLS2_SAMPLE);
+    g_type_class_ref(IPATCH_TYPE_DLS_FILE);
+    g_type_class_ref(IPATCH_TYPE_DLS_READER);
+    g_type_class_ref(IPATCH_TYPE_DLS_WRITER);
+    g_type_class_ref(IPATCH_TYPE_FILE);
+    ipatch_file_handle_get_type();
+    g_type_class_ref(IPATCH_TYPE_GIG_FILE);
+    g_type_class_ref(IPATCH_TYPE_GIG);
+    g_type_class_ref(IPATCH_TYPE_GIG_DIMENSION);
+    g_type_class_ref(IPATCH_TYPE_GIG_INST);
+    g_type_class_ref(IPATCH_TYPE_GIG_REGION);
+    g_type_class_ref(IPATCH_TYPE_GIG_SAMPLE);
+    g_type_class_ref(IPATCH_TYPE_GIG_SUB_REGION);
+    g_type_class_ref(IPATCH_TYPE_ITEM);
+    ipatch_iter_get_type();
+    g_type_class_ref(IPATCH_TYPE_LIST);
+    ipatch_param_spec_range_get_type();
+    g_type_class_ref(IPATCH_TYPE_PASTE);
+    ipatch_range_get_type();
+    g_type_class_ref(IPATCH_TYPE_RIFF);
+    g_type_class_ref(IPATCH_TYPE_SAMPLE_DATA);
+    g_type_class_ref(IPATCH_TYPE_SAMPLE_STORE);
+    g_type_class_ref(IPATCH_TYPE_SAMPLE_STORE_FILE);
+    g_type_class_ref(IPATCH_TYPE_SAMPLE_STORE_RAM);
+    g_type_class_ref(IPATCH_TYPE_SAMPLE_STORE_ROM);
+    g_type_class_ref(IPATCH_TYPE_SAMPLE_STORE_SND_FILE);
+    g_type_class_ref(IPATCH_TYPE_SAMPLE_STORE_SPLIT24);
+    g_type_class_ref(IPATCH_TYPE_SAMPLE_STORE_SWAP);
+    g_type_class_ref(IPATCH_TYPE_SAMPLE_STORE_VIRTUAL);
+    g_type_class_ref(IPATCH_TYPE_SF2_FILE);
+    ipatch_sf2_gen_array_get_type();
+    g_type_class_ref(IPATCH_TYPE_SF2);
+    g_type_class_ref(IPATCH_TYPE_SF2_INST);
+    g_type_class_ref(IPATCH_TYPE_SF2_IZONE);
+    g_type_class_ref(IPATCH_TYPE_SF2_READER);
+    ipatch_sf2_mod_get_type();
+    ipatch_sf2_mod_list_get_type();
+    ipatch_sample_transform_get_type();
+    ipatch_sample_list_get_type();
+    ipatch_sample_list_item_get_type();
+    g_type_class_ref(IPATCH_TYPE_SF2_PRESET);
+    g_type_class_ref(IPATCH_TYPE_SF2_PZONE);
+    g_type_class_ref(IPATCH_TYPE_SF2_SAMPLE);
+    g_type_class_ref(IPATCH_TYPE_SLI_FILE);
+    g_type_class_ref(IPATCH_TYPE_SLI);
+    g_type_class_ref(IPATCH_TYPE_SLI_INST);
+    g_type_class_ref(IPATCH_TYPE_SLI_ZONE);
+    g_type_class_ref(IPATCH_TYPE_SLI_SAMPLE);
+    g_type_class_ref(IPATCH_TYPE_SLI_READER);
+    g_type_class_ref(IPATCH_TYPE_VBANK);
+    g_type_class_ref(IPATCH_TYPE_VBANK_INST);
+    g_type_class_ref(IPATCH_TYPE_VBANK_REGION);
+    g_type_class_ref(IPATCH_TYPE_SF2_WRITER);
+    g_type_class_ref(IPATCH_TYPE_SF2_ZONE);
+    g_type_class_ref(IPATCH_TYPE_SND_FILE);
 
-  ipatch_type_set (IPATCH_TYPE_VIRTUAL_GIG_MELODIC,
-		   "sort-children", TRUE, NULL);
-  ipatch_type_set (IPATCH_TYPE_VIRTUAL_GIG_PERCUSSION,
-		   "sort-children", TRUE, NULL);
+    _ipatch_convert_SF2_init();
+    _ipatch_convert_gig_init();
+    _ipatch_convert_DLS2_init();
+    _ipatch_convert_SLI_init();
 
-  ipatch_type_set (IPATCH_TYPE_VIRTUAL_SF2_MELODIC,
-		   "sort-children", TRUE, NULL);
-  ipatch_type_set (IPATCH_TYPE_VIRTUAL_SF2_PERCUSSION,
-		   "sort-children", TRUE, NULL);
+    _ipatch_sf2_voice_cache_init_DLS();
+    _ipatch_sf2_voice_cache_init_SF2();
+    _ipatch_sf2_voice_cache_init_SLI();
+    _ipatch_sf2_voice_cache_init_gig();
+    _ipatch_sf2_voice_cache_init_VBank();
 
-  ipatch_type_set (IPATCH_TYPE_VBANK,
-		   "sort-children", TRUE, NULL);
+    _ipatch_range_init();
 
-  /* set "splits-type" properties */
-  ipatch_type_set (IPATCH_TYPE_SF2_PRESET,
-		   "splits-type", IPATCH_SPLITS_NORMAL, NULL);
-  ipatch_type_set (IPATCH_TYPE_SF2_INST,
-		   "splits-type", IPATCH_SPLITS_NORMAL, NULL);
-  ipatch_type_set (IPATCH_TYPE_DLS2_INST,
-		   "splits-type", IPATCH_SPLITS_NORMAL, NULL);
-  ipatch_type_set (IPATCH_TYPE_GIG_INST,
-		   "splits-type", IPATCH_SPLITS_NO_OVERLAP, NULL);
-  ipatch_type_set (IPATCH_TYPE_SLI_INST,
-		   "splits-type", IPATCH_SPLITS_NORMAL, NULL);
-  ipatch_type_set (IPATCH_TYPE_VBANK_INST,
-		   "splits-type", IPATCH_SPLITS_NORMAL, NULL);
+    /* Register XML encode/decode handlers */
 
-  /* set "mime-type" properties */
-  ipatch_type_set (IPATCH_TYPE_SF2_FILE,
-                   "mime-type", "audio/x-soundfont", NULL);
-  ipatch_type_set (IPATCH_TYPE_DLS_FILE,
-                   "mime-type", "audio/dls", NULL);
-  ipatch_type_set (IPATCH_TYPE_GIG_FILE,
-                   "mime-type", "audio/x-gigasampler", NULL);
-  ipatch_type_set (IPATCH_TYPE_SLI_FILE,
-                   "mime-type", "audio/x-spectralis", NULL);
+    /* GLib string array boxed type encode/decode */
+    ipatch_xml_register_handler(G_TYPE_STRV, NULL, ipatch_strv_xml_encode,
+                                ipatch_strv_xml_decode);
+
+    /* set type properties */
+
+    for(i = 0; i < G_N_ELEMENTS(type_props); i++)
+    {
+        type = g_type_from_name(type_props[i].type_name);
+
+        if(log_if_fail(type != 0))
+        {
+            continue;
+        }
+
+        prop_info = &type_props[i];
+
+        if(prop_info->name)
+        {
+            ipatch_type_set(type, "name", prop_info->name, NULL);
+        }
+
+        if(prop_info->blurb)
+        {
+            ipatch_type_set(type, "blurb", prop_info->blurb, NULL);
+        }
+
+        if(prop_info->category != IPATCH_CATEGORY_NONE)
+        {
+            ipatch_type_set(type, "category", prop_info->category, NULL);
+        }
+    }
+
+    /* link types */
+
+    ipatch_type_set(IPATCH_TYPE_DLS2_REGION, "link-type",
+                    IPATCH_TYPE_DLS2_SAMPLE, NULL);
+
+    ipatch_type_set(IPATCH_TYPE_GIG_SUB_REGION, "link-type",
+                    IPATCH_TYPE_GIG_SAMPLE, NULL);
+
+    ipatch_type_set(IPATCH_TYPE_SF2_PZONE, "link-type",
+                    IPATCH_TYPE_SF2_INST, NULL);
+
+    ipatch_type_set(IPATCH_TYPE_SF2_IZONE, "link-type",
+                    IPATCH_TYPE_SF2_SAMPLE, NULL);
+
+    ipatch_type_set(IPATCH_TYPE_SLI_ZONE, "link-type",
+                    IPATCH_TYPE_SLI_SAMPLE, NULL);
+
+    ipatch_type_set(IPATCH_TYPE_VBANK_REGION, "link-type",
+                    IPATCH_TYPE_ITEM, NULL);
+
+    /* virtual container parent type properties */
+
+    ipatch_type_set(IPATCH_TYPE_DLS2_SAMPLE,
+                    "virtual-parent-type", IPATCH_TYPE_VIRTUAL_DLS2_SAMPLES,
+                    NULL);
+    ipatch_type_set(IPATCH_TYPE_GIG_SAMPLE,
+                    "virtual-parent-type", IPATCH_TYPE_VIRTUAL_GIG_SAMPLES,
+                    NULL);
+    ipatch_type_set(IPATCH_TYPE_SF2_INST,
+                    "virtual-parent-type", IPATCH_TYPE_VIRTUAL_SF2_INST,
+                    NULL);
+    ipatch_type_set(IPATCH_TYPE_SLI_INST,
+                    "virtual-parent-type", IPATCH_TYPE_VIRTUAL_SLI_INST,
+                    NULL);
+    ipatch_type_set(IPATCH_TYPE_SLI_SAMPLE,
+                    "virtual-parent-type", IPATCH_TYPE_VIRTUAL_SLI_SAMPLES,
+                    NULL);
+
+    /* dynamic virtual container properties (determined by object instance) */
+    ipatch_type_set_dynamic_func(IPATCH_TYPE_DLS2_INST, "virtual-parent-type",
+                                 virtual_parent_dls2_inst);
+    ipatch_type_set_dynamic_func(IPATCH_TYPE_GIG_INST, "virtual-parent-type",
+                                 virtual_parent_gig_inst);
+    ipatch_type_set_dynamic_func(IPATCH_TYPE_SF2_PRESET, "virtual-parent-type",
+                                 virtual_parent_sf2_preset);
+    ipatch_type_set_dynamic_func(IPATCH_TYPE_SF2_SAMPLE, "virtual-parent-type",
+                                 virtual_parent_sf2_sample);
+
+    /* child object conform functions (for making a child object conform to a
+     * specific virtual container) */
+    ipatch_type_set(IPATCH_TYPE_VIRTUAL_DLS2_PERCUSSION,
+                    "virtual-child-conform-func", conform_percussion,
+                    NULL);
+    ipatch_type_set(IPATCH_TYPE_VIRTUAL_DLS2_MELODIC,
+                    "virtual-child-conform-func", conform_melodic,
+                    NULL);
+    ipatch_type_set(IPATCH_TYPE_VIRTUAL_GIG_PERCUSSION,
+                    "virtual-child-conform-func", conform_percussion,
+                    NULL);
+    ipatch_type_set(IPATCH_TYPE_VIRTUAL_GIG_MELODIC,
+                    "virtual-child-conform-func", conform_melodic,
+                    NULL);
+    ipatch_type_set(IPATCH_TYPE_VIRTUAL_SF2_PERCUSSION,
+                    "virtual-child-conform-func", conform_percussion,
+                    NULL);
+    ipatch_type_set(IPATCH_TYPE_VIRTUAL_SF2_MELODIC,
+                    "virtual-child-conform-func", conform_melodic,
+                    NULL);
+
+    /* container child sorting */
+    ipatch_type_set(IPATCH_TYPE_VIRTUAL_DLS2_MELODIC,
+                    "sort-children", TRUE, NULL);
+    ipatch_type_set(IPATCH_TYPE_VIRTUAL_DLS2_PERCUSSION,
+                    "sort-children", TRUE, NULL);
+
+    ipatch_type_set(IPATCH_TYPE_VIRTUAL_GIG_MELODIC,
+                    "sort-children", TRUE, NULL);
+    ipatch_type_set(IPATCH_TYPE_VIRTUAL_GIG_PERCUSSION,
+                    "sort-children", TRUE, NULL);
+
+    ipatch_type_set(IPATCH_TYPE_VIRTUAL_SF2_MELODIC,
+                    "sort-children", TRUE, NULL);
+    ipatch_type_set(IPATCH_TYPE_VIRTUAL_SF2_PERCUSSION,
+                    "sort-children", TRUE, NULL);
+
+    ipatch_type_set(IPATCH_TYPE_VBANK,
+                    "sort-children", TRUE, NULL);
+
+    /* set "splits-type" properties */
+    ipatch_type_set(IPATCH_TYPE_SF2_PRESET,
+                    "splits-type", IPATCH_SPLITS_NORMAL, NULL);
+    ipatch_type_set(IPATCH_TYPE_SF2_INST,
+                    "splits-type", IPATCH_SPLITS_NORMAL, NULL);
+    ipatch_type_set(IPATCH_TYPE_DLS2_INST,
+                    "splits-type", IPATCH_SPLITS_NORMAL, NULL);
+    ipatch_type_set(IPATCH_TYPE_GIG_INST,
+                    "splits-type", IPATCH_SPLITS_NO_OVERLAP, NULL);
+    ipatch_type_set(IPATCH_TYPE_SLI_INST,
+                    "splits-type", IPATCH_SPLITS_NORMAL, NULL);
+    ipatch_type_set(IPATCH_TYPE_VBANK_INST,
+                    "splits-type", IPATCH_SPLITS_NORMAL, NULL);
+
+    /* set "mime-type" properties */
+    ipatch_type_set(IPATCH_TYPE_SF2_FILE,
+                    "mime-type", "audio/x-soundfont", NULL);
+    ipatch_type_set(IPATCH_TYPE_DLS_FILE,
+                    "mime-type", "audio/dls", NULL);
+    ipatch_type_set(IPATCH_TYPE_GIG_FILE,
+                    "mime-type", "audio/x-gigasampler", NULL);
+    ipatch_type_set(IPATCH_TYPE_SLI_FILE,
+                    "mime-type", "audio/x-spectralis", NULL);
 }
 
 /**
@@ -403,131 +419,172 @@ ipatch_init (void)
  * Since: 1.1.0
  */
 void
-ipatch_close (void)
+ipatch_close(void)
 {
-  ipatch_sample_store_swap_close ();
+    ipatch_sample_store_swap_close();
 }
 
 static gboolean
-ipatch_strv_xml_encode (GNode *node, GObject *object, GParamSpec *pspec,
-                        GValue *value, GError **err)
+ipatch_strv_xml_encode(GNode *node, GObject *object, GParamSpec *pspec,
+                       GValue *value, GError **err)
 {
-  GStrv strv;
+    GStrv strv;
 
-  g_return_val_if_fail (G_VALUE_HOLDS (value, G_TYPE_STRV), FALSE);
+    g_return_val_if_fail(G_VALUE_HOLDS(value, G_TYPE_STRV), FALSE);
 
-  strv = g_value_get_boxed (value);
+    strv = g_value_get_boxed(value);
 
-  if (!strv)
-  {
-    ipatch_xml_set_attribute (node, "null", "1");
+    if(!strv)
+    {
+        ipatch_xml_set_attribute(node, "null", "1");
+        return (TRUE);
+    }
+
+    for(; *strv; strv++)
+    {
+        ipatch_xml_new_node(node, "value", *strv, NULL);
+    }
+
     return (TRUE);
-  }
-
-  for (; *strv; strv++)
-    ipatch_xml_new_node (node, "value", *strv, NULL);
-
-  return (TRUE);
 }
 
 static gboolean
-ipatch_strv_xml_decode (GNode *node, GObject *object, GParamSpec *pspec,
-                        GValue *value, GError **err)
+ipatch_strv_xml_decode(GNode *node, GObject *object, GParamSpec *pspec,
+                       GValue *value, GError **err)
 {
-  GStrv strv;
-  GNode *n;
-  int i;
+    GStrv strv;
+    GNode *n;
+    int i;
 
-  g_return_val_if_fail (G_VALUE_HOLDS (value, G_TYPE_STRV), FALSE);
+    g_return_val_if_fail(G_VALUE_HOLDS(value, G_TYPE_STRV), FALSE);
 
-  if (ipatch_xml_test_attribute (node, "null", "1"))
-  {
-    g_value_set_boxed (value, NULL);
+    if(ipatch_xml_test_attribute(node, "null", "1"))
+    {
+        g_value_set_boxed(value, NULL);
+        return (TRUE);
+    }
+
+    /* Count "value" child nodes */
+    for(i = 0, n = node->children; n; n = n->next)
+        if(ipatch_xml_test_name(n, "value"))
+        {
+            i++;
+        }
+
+    strv = g_new(char *, i + 1);		/* ++ alloc new strv array */
+
+    for(i = 0, n = node->children; n; n = n->next)
+    {
+        if(!ipatch_xml_test_name(n, "value"))
+        {
+            continue;
+        }
+
+        strv[i] = ipatch_xml_dup_value(n);
+        i++;
+    }
+
+    strv[i] = NULL;
+
+    g_value_take_boxed(value, strv);
+
     return (TRUE);
-  }
-
-  /* Count "value" child nodes */
-  for (i = 0, n = node->children; n; n = n->next)
-    if (ipatch_xml_test_name (n, "value")) i++;
-
-  strv = g_new (char *, i + 1);		/* ++ alloc new strv array */
-
-  for (i = 0, n = node->children; n; n = n->next)
-  {
-    if (!ipatch_xml_test_name (n, "value")) continue;
-
-    strv[i] = ipatch_xml_dup_value (n);
-    i++;
-  }
-
-  strv[i] = NULL;
-
-  g_value_take_boxed (value, strv);
-
-  return (TRUE);
 }
 
 static void
-virtual_parent_dls2_inst (GType type, GParamSpec *spec, GValue *value,
-			  GObject *object)
+virtual_parent_dls2_inst(GType type, GParamSpec *spec, GValue *value,
+                         GObject *object)
 {
-  gboolean percuss = FALSE;
+    gboolean percuss = FALSE;
 
-  if (object)
-    g_object_get (object, "percussion", &percuss, NULL);
+    if(object)
+    {
+        g_object_get(object, "percussion", &percuss, NULL);
+    }
 
-  if (percuss) g_value_set_gtype (value, IPATCH_TYPE_VIRTUAL_DLS2_PERCUSSION);
-  else g_value_set_gtype (value, IPATCH_TYPE_VIRTUAL_DLS2_MELODIC);
+    if(percuss)
+    {
+        g_value_set_gtype(value, IPATCH_TYPE_VIRTUAL_DLS2_PERCUSSION);
+    }
+    else
+    {
+        g_value_set_gtype(value, IPATCH_TYPE_VIRTUAL_DLS2_MELODIC);
+    }
 }
 
 static void
-virtual_parent_gig_inst (GType type, GParamSpec *spec, GValue *value,
-			 GObject *object)
+virtual_parent_gig_inst(GType type, GParamSpec *spec, GValue *value,
+                        GObject *object)
 {
-  gboolean percuss = FALSE;
+    gboolean percuss = FALSE;
 
-  if (object)
-    g_object_get (object, "percussion", &percuss, NULL);
+    if(object)
+    {
+        g_object_get(object, "percussion", &percuss, NULL);
+    }
 
-  if (percuss) g_value_set_gtype (value, IPATCH_TYPE_VIRTUAL_GIG_PERCUSSION);
-  else g_value_set_gtype (value, IPATCH_TYPE_VIRTUAL_GIG_MELODIC);
+    if(percuss)
+    {
+        g_value_set_gtype(value, IPATCH_TYPE_VIRTUAL_GIG_PERCUSSION);
+    }
+    else
+    {
+        g_value_set_gtype(value, IPATCH_TYPE_VIRTUAL_GIG_MELODIC);
+    }
 }
 
 static void
-virtual_parent_sf2_preset (GType type, GParamSpec *spec, GValue *value,
-			   GObject *object)
+virtual_parent_sf2_preset(GType type, GParamSpec *spec, GValue *value,
+                          GObject *object)
 {
-  gboolean percuss = FALSE;
+    gboolean percuss = FALSE;
 
-  if (object)
-    g_object_get (object, "percussion", &percuss, NULL);
+    if(object)
+    {
+        g_object_get(object, "percussion", &percuss, NULL);
+    }
 
-  if (percuss) g_value_set_gtype (value, IPATCH_TYPE_VIRTUAL_SF2_PERCUSSION);
-  else g_value_set_gtype (value, IPATCH_TYPE_VIRTUAL_SF2_MELODIC);
+    if(percuss)
+    {
+        g_value_set_gtype(value, IPATCH_TYPE_VIRTUAL_SF2_PERCUSSION);
+    }
+    else
+    {
+        g_value_set_gtype(value, IPATCH_TYPE_VIRTUAL_SF2_MELODIC);
+    }
 }
 
 static void
-virtual_parent_sf2_sample (GType type, GParamSpec *spec, GValue *value,
-			   GObject *object)
+virtual_parent_sf2_sample(GType type, GParamSpec *spec, GValue *value,
+                          GObject *object)
 {
-  gboolean rom = FALSE;
+    gboolean rom = FALSE;
 
-  if (object) g_object_get (object, "rom", &rom, NULL);
+    if(object)
+    {
+        g_object_get(object, "rom", &rom, NULL);
+    }
 
-  if (rom) g_value_set_gtype (value, IPATCH_TYPE_VIRTUAL_SF2_ROM);
-  else g_value_set_gtype (value, IPATCH_TYPE_VIRTUAL_SF2_SAMPLES);
+    if(rom)
+    {
+        g_value_set_gtype(value, IPATCH_TYPE_VIRTUAL_SF2_ROM);
+    }
+    else
+    {
+        g_value_set_gtype(value, IPATCH_TYPE_VIRTUAL_SF2_SAMPLES);
+    }
 }
 
-static void 
-conform_percussion (GObject *object)
+static void
+conform_percussion(GObject *object)
 {
-  g_object_set (object, "percussion", TRUE, NULL);
+    g_object_set(object, "percussion", TRUE, NULL);
 }
 
-static void 
-conform_melodic (GObject *object)
+static void
+conform_melodic(GObject *object)
 {
-  g_object_set (object, "percussion", FALSE, NULL);
+    g_object_set(object, "percussion", FALSE, NULL);
 }
 
 
@@ -544,12 +601,21 @@ conform_melodic (GObject *object)
  * example would look something like "swami 1.0 (libInstPatch 1.0)".
  */
 void
-ipatch_set_application_name (const char *name)
+ipatch_set_application_name(const char *name)
 {
-  if (ipatch_application_name) g_free (ipatch_application_name);
+    if(ipatch_application_name)
+    {
+        g_free(ipatch_application_name);
+    }
 
-  if (name) ipatch_application_name = g_strdup (name);
-  else ipatch_application_name = NULL;
+    if(name)
+    {
+        ipatch_application_name = g_strdup(name);
+    }
+    else
+    {
+        ipatch_application_name = NULL;
+    }
 }
 
 /**
@@ -561,37 +627,50 @@ ipatch_set_application_name (const char *name)
  * Fetch the runtime version of the libInstPatch library.
  */
 void
-ipatch_version (guint *major, guint *minor, guint *micro)
+ipatch_version(guint *major, guint *minor, guint *micro)
 {
-  if (major) *major = IPATCH_VERSION_MAJOR;
-  if (minor) *minor = IPATCH_VERSION_MINOR;
-  if (micro) *micro = IPATCH_VERSION_MICRO;
+    if(major)
+    {
+        *major = IPATCH_VERSION_MAJOR;
+    }
+
+    if(minor)
+    {
+        *minor = IPATCH_VERSION_MINOR;
+    }
+
+    if(micro)
+    {
+        *micro = IPATCH_VERSION_MICRO;
+    }
 }
 
 GQuark
-ipatch_error_quark (void)
+ipatch_error_quark(void)
 {
-  static GQuark q = 0;
+    static GQuark q = 0;
 
-  if (q == 0)
-    q = g_quark_from_static_string ("libInstPatch-error-quark");
+    if(q == 0)
+    {
+        q = g_quark_from_static_string("libInstPatch-error-quark");
+    }
 
-  return (q);
+    return (q);
 }
 
 /**
  * _ret_g_log: (skip)
  */
 int
-_ret_g_log (const gchar *log_domain, GLogLevelFlags log_level,
-	    const gchar *format, ...)
+_ret_g_log(const gchar *log_domain, GLogLevelFlags log_level,
+           const gchar *format, ...)
 {
-  va_list args;
-  va_start (args, format);
-  g_logv (log_domain, log_level, format, args);
-  va_end (args);
+    va_list args;
+    va_start(args, format);
+    g_logv(log_domain, log_level, format, args);
+    va_end(args);
 
-  return (TRUE);
+    return (TRUE);
 }
 
 /**
@@ -605,9 +684,9 @@ _ret_g_log (const gchar *log_domain, GLogLevelFlags log_level,
  * Returns: The GError's message or a "&lt;No detailed error information&gt;" string.
  */
 G_CONST_RETURN char *
-ipatch_gerror_message (GError *err)
+ipatch_gerror_message(GError *err)
 {
-  return ((err) ? (err)->message : _("<No detailed error information>"));
+    return ((err) ? (err)->message : _("<No detailed error information>"));
 }
 
 /**
@@ -616,13 +695,13 @@ ipatch_gerror_message (GError *err)
  * Internal function used by ipatch_code_error macros
  */
 void
-_ipatch_code_error (const char *file, guint line, const char *func,
-		    GError **err, const char *format, ...)
+_ipatch_code_error(const char *file, guint line, const char *func,
+                   GError **err, const char *format, ...)
 {
-  va_list args;
-  va_start (args, format);
-  _ipatch_code_errorv (file, line, func, err, format, args);
-  va_end (args);
+    va_list args;
+    va_start(args, format);
+    _ipatch_code_errorv(file, line, func, err, format, args);
+    va_end(args);
 }
 
 /**
@@ -631,25 +710,34 @@ _ipatch_code_error (const char *file, guint line, const char *func,
  * Internal function used by ipatch_code_error macros
  */
 void
-_ipatch_code_errorv (const char *file, guint line, const char *func,
-		     GError **err, const char *format, va_list args)
+_ipatch_code_errorv(const char *file, guint line, const char *func,
+                    GError **err, const char *format, va_list args)
 {
-  char *msg, *loc, *temp;
+    char *msg, *loc, *temp;
 
-  if (file && func) loc = g_strdup_printf ("%s:%d:%s()", file, line, func);
-  else if (file) loc = g_strdup_printf ("%s:%d", file, line);
-  else loc = NULL;
+    if(file && func)
+    {
+        loc = g_strdup_printf("%s:%d:%s()", file, line, func);
+    }
+    else if(file)
+    {
+        loc = g_strdup_printf("%s:%d", file, line);
+    }
+    else
+    {
+        loc = NULL;
+    }
 
-  temp = g_strdup_vprintf (format, args);
-  msg = g_strdup_printf ("%s - %s", loc, temp);
-  g_free (loc);
-  g_free (temp);
+    temp = g_strdup_vprintf(format, args);
+    msg = g_strdup_printf("%s - %s", loc, temp);
+    g_free(loc);
+    g_free(temp);
 
-  g_critical ("%s", msg);
+    g_critical("%s", msg);
 
-  g_set_error (err, IPATCH_ERROR, IPATCH_ERROR_PROGRAM,
-	       "Programmer error! (%s)", msg);
-  g_free (msg);
+    g_set_error(err, IPATCH_ERROR, IPATCH_ERROR_PROGRAM,
+                "Programmer error! (%s)", msg);
+    g_free(msg);
 }
 
 /**
@@ -664,28 +752,32 @@ _ipatch_code_errorv (const char *file, guint line, const char *func,
  * middle of the string are removed and a ".." is inserted, if necessary.
  */
 void
-ipatch_strconcat_num (const char *src, int num, char *dest, int size)
+ipatch_strconcat_num(const char *src, int num, char *dest, int size)
 {
-  char numstr[16];
-  int numlen, srclen, newlen, len1;
-  int remove;
+    char numstr[16];
+    int numlen, srclen, newlen, len1;
+    int remove;
 
-  sprintf (numstr, "%d", num);
-  numlen = strlen (numstr);
-  srclen = strlen (src);
+    sprintf(numstr, "%d", num);
+    numlen = strlen(numstr);
+    srclen = strlen(src);
 
-  remove = (srclen + numlen) - (size - 1);
-  if (remove > 0)	      /* any characters need to be removed? */
+    remove = (srclen + numlen) - (size - 1);
+
+    if(remove > 0)	       /* any characters need to be removed? */
     {
-      remove += 2;		/* for ".." */
-      newlen = srclen - remove;	/* new length of non numeric string */
-      len1 = (newlen + 1) / 2;	/* length of first part before ".." */
+        remove += 2;		/* for ".." */
+        newlen = srclen - remove;	/* new length of non numeric string */
+        len1 = (newlen + 1) / 2;	/* length of first part before ".." */
 
-      sprintf (dest, "%.*s..%.*s%s", len1, src,
-	       newlen - len1, src + (srclen - (newlen - len1)),
-	       numstr);
+        sprintf(dest, "%.*s..%.*s%s", len1, src,
+                newlen - len1, src + (srclen - (newlen - len1)),
+                numstr);
     }
-  else g_stpcpy (g_stpcpy (dest, src), numstr);
+    else
+    {
+        g_stpcpy(g_stpcpy(dest, src), numstr);
+    }
 }
 
 /**
@@ -698,87 +790,103 @@ ipatch_strconcat_num (const char *src, int num, char *dest, int size)
  * Dumps object info to a file for debugging purposes.
  */
 void
-ipatch_dump_object (GObject *object, gboolean recursive, FILE *file)
+ipatch_dump_object(GObject *object, gboolean recursive, FILE *file)
 {
-  char indent_buf[64] = "";
+    char indent_buf[64] = "";
 
-  g_return_if_fail (G_IS_OBJECT (object));
-  if (!file) file = stdout;
+    g_return_if_fail(G_IS_OBJECT(object));
 
-  if (!recursive)
+    if(!file)
     {
-      dump_object_info (object, indent_buf, file);
-      fprintf (file, "</%s addr=%p>\n",
-	       g_type_name (G_TYPE_FROM_INSTANCE (object)), object);
+        file = stdout;
     }
-  else dump_recursive (object, indent_buf, file);
+
+    if(!recursive)
+    {
+        dump_object_info(object, indent_buf, file);
+        fprintf(file, "</%s addr=%p>\n",
+                g_type_name(G_TYPE_FROM_INSTANCE(object)), object);
+    }
+    else
+    {
+        dump_recursive(object, indent_buf, file);
+    }
 }
 
 static void
-dump_recursive (GObject *object, char *indent, FILE *file)
+dump_recursive(GObject *object, char *indent, FILE *file)
 {
-  dump_object_info (object, indent, file);
+    dump_object_info(object, indent, file);
 
-  strcat (indent, "  ");	/* increase indent */
+    strcat(indent, "  ");	/* increase indent */
 
-  if (IPATCH_IS_CONTAINER (object))
-    {		 /* iterate over children if its an IpatchContainer */
-      IpatchList *list;
-      IpatchIter iter;
-      GObject *obj;
+    if(IPATCH_IS_CONTAINER(object))
+    {
+        /* iterate over children if its an IpatchContainer */
+        IpatchList *list;
+        IpatchIter iter;
+        GObject *obj;
 
-      list = ipatch_container_get_children (IPATCH_CONTAINER (object),
-					    G_TYPE_OBJECT); /* ++ ref list */
-      ipatch_list_init_iter (list, &iter);
+        list = ipatch_container_get_children(IPATCH_CONTAINER(object),
+                                             G_TYPE_OBJECT); /* ++ ref list */
+        ipatch_list_init_iter(list, &iter);
 
-      obj = ipatch_iter_first (&iter);
-      if (obj) fprintf (file, "\n");
-      while (obj)
-	{
-	  dump_recursive (obj, indent, file);
-	  obj = ipatch_iter_next (&iter);
-	}
-      g_object_unref (list);	/* -- unref list */
+        obj = ipatch_iter_first(&iter);
+
+        if(obj)
+        {
+            fprintf(file, "\n");
+        }
+
+        while(obj)
+        {
+            dump_recursive(obj, indent, file);
+            obj = ipatch_iter_next(&iter);
+        }
+
+        g_object_unref(list);	/* -- unref list */
     }
 
-  indent[strlen (indent) - 2] = '\0'; /* decrease indent */
+    indent[strlen(indent) - 2] = '\0';  /* decrease indent */
 
-  fprintf (file, "%s</%s>\n", indent,
-	   g_type_name (G_TYPE_FROM_INSTANCE (object)));
+    fprintf(file, "%s</%s>\n", indent,
+            g_type_name(G_TYPE_FROM_INSTANCE(object)));
 }
 
 static void
-dump_object_info (GObject *object, char *indent, FILE *file)
+dump_object_info(GObject *object, char *indent, FILE *file)
 {
-  GParamSpec **pspecs, **pspec;
-  GValue value = { 0 };
-  char *contents;
+    GParamSpec **pspecs, **pspec;
+    GValue value = { 0 };
+    char *contents;
 
-  fprintf (file, "%s<%s addr=%p>\n", indent,
-	   g_type_name (G_TYPE_FROM_INSTANCE (object)), object);
+    fprintf(file, "%s<%s addr=%p>\n", indent,
+            g_type_name(G_TYPE_FROM_INSTANCE(object)), object);
 
-  fprintf (file, "%s  refcount = %u\n", indent, object->ref_count);
+    fprintf(file, "%s  refcount = %u\n", indent, object->ref_count);
 
-  pspecs = g_object_class_list_properties (G_OBJECT_GET_CLASS (object), NULL);
-  pspec = pspecs;
-  while (*pspec)		/* write out property values */
+    pspecs = g_object_class_list_properties(G_OBJECT_GET_CLASS(object), NULL);
+    pspec = pspecs;
+
+    while(*pspec)		/* write out property values */
     {
-      if ((*pspec)->flags & G_PARAM_READABLE)
-	{
-	  g_value_init (&value, G_PARAM_SPEC_VALUE_TYPE (*pspec));
-	  g_object_get_property (object, g_param_spec_get_name (*pspec),
-				 &value);
-	  contents = g_strdup_value_contents (&value);
-	  g_value_unset (&value);
+        if((*pspec)->flags & G_PARAM_READABLE)
+        {
+            g_value_init(&value, G_PARAM_SPEC_VALUE_TYPE(*pspec));
+            g_object_get_property(object, g_param_spec_get_name(*pspec),
+                                  &value);
+            contents = g_strdup_value_contents(&value);
+            g_value_unset(&value);
 
-	  fprintf (file, "%s  %s = %s\n", indent,
-		   g_param_spec_get_name (*pspec), contents);
-	  g_free (contents);
-	}
+            fprintf(file, "%s  %s = %s\n", indent,
+                    g_param_spec_get_name(*pspec), contents);
+            g_free(contents);
+        }
 
-      pspec++;
+        pspec++;
     }
-  g_free (pspecs);
+
+    g_free(pspecs);
 }
 
 /**
@@ -790,8 +898,8 @@ dump_object_info (GObject *object, char *indent, FILE *file)
  * Since: 1.1.0
  */
 void
-ipatch_glist_unref_free (GList *objlist)
+ipatch_glist_unref_free(GList *objlist)
 {
-  g_list_foreach (objlist, (GFunc) g_object_unref, NULL);
-  g_list_free (objlist);
+    g_list_foreach(objlist, (GFunc) g_object_unref, NULL);
+    g_list_free(objlist);
 }

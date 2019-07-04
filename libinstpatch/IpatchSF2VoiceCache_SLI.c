@@ -39,101 +39,112 @@
  * _ipatch_sf2_voice_cache_init_SLI: (skip)
  */
 void
-_ipatch_sf2_voice_cache_init_SLI (void)
+_ipatch_sf2_voice_cache_init_SLI(void)
 {
-  g_type_class_ref (IPATCH_TYPE_CONVERTER_SLI_INST_TO_SF2_VOICE_CACHE);
-  g_type_class_ref (IPATCH_TYPE_CONVERTER_SLI_ZONE_TO_SF2_VOICE_CACHE);
-  g_type_class_ref (IPATCH_TYPE_CONVERTER_SLI_SAMPLE_TO_SF2_VOICE_CACHE);
+    g_type_class_ref(IPATCH_TYPE_CONVERTER_SLI_INST_TO_SF2_VOICE_CACHE);
+    g_type_class_ref(IPATCH_TYPE_CONVERTER_SLI_ZONE_TO_SF2_VOICE_CACHE);
+    g_type_class_ref(IPATCH_TYPE_CONVERTER_SLI_SAMPLE_TO_SF2_VOICE_CACHE);
 
-  ipatch_register_converter_map
+    ipatch_register_converter_map
     (IPATCH_TYPE_CONVERTER_SLI_INST_TO_SF2_VOICE_CACHE, 0, 0,
      IPATCH_TYPE_SLI_INST, 0, 1, IPATCH_TYPE_SF2_VOICE_CACHE, 0, 1);
-  ipatch_register_converter_map
+    ipatch_register_converter_map
     (IPATCH_TYPE_CONVERTER_SLI_ZONE_TO_SF2_VOICE_CACHE, 0, 0,
      IPATCH_TYPE_SLI_ZONE, 0, 1, IPATCH_TYPE_SF2_VOICE_CACHE, 0, 1);
-  ipatch_register_converter_map
+    ipatch_register_converter_map
     (IPATCH_TYPE_CONVERTER_SLI_SAMPLE_TO_SF2_VOICE_CACHE, 0, 0,
      IPATCH_TYPE_SLI_SAMPLE, 0, 1, IPATCH_TYPE_SF2_VOICE_CACHE, 0, 1);
 }
 
 static gboolean
-_sli_inst_to_sf2_voice_cache_convert (IpatchConverter *converter, GError **err)
+_sli_inst_to_sf2_voice_cache_convert(IpatchConverter *converter, GError **err)
 {
-  IpatchSLIInst *inst;
-  IpatchSF2VoiceCache *cache;
-  IpatchSF2Voice *voice;
-  IpatchSLIZone *zone;
-  IpatchSLISample *sample;
-  IpatchSF2GenAmount *amt;
-  IpatchItem *solo_item;
-  GObject *obj;
-  GSList *p;
+    IpatchSLIInst *inst;
+    IpatchSF2VoiceCache *cache;
+    IpatchSF2Voice *voice;
+    IpatchSLIZone *zone;
+    IpatchSLISample *sample;
+    IpatchSF2GenAmount *amt;
+    IpatchItem *solo_item;
+    GObject *obj;
+    GSList *p;
 
-  obj = IPATCH_CONVERTER_INPUT (converter);
-  cache = IPATCH_SF2_VOICE_CACHE (IPATCH_CONVERTER_OUTPUT (converter));
-  solo_item = ((IpatchConverterSF2VoiceCache *)converter)->solo_item;
+    obj = IPATCH_CONVERTER_INPUT(converter);
+    cache = IPATCH_SF2_VOICE_CACHE(IPATCH_CONVERTER_OUTPUT(converter));
+    solo_item = ((IpatchConverterSF2VoiceCache *)converter)->solo_item;
 
-  /* check if it is an instrument or a zone */
-  if (IPATCH_IS_SLI_ZONE (obj))      /* ++ ref parent instrument */
-    inst = IPATCH_SLI_INST (ipatch_item_get_parent (IPATCH_ITEM (obj)));
-  else inst = IPATCH_SLI_INST (obj);
-
-  ipatch_sf2_voice_cache_declare_item (cache, (GObject *)inst);
-
-  IPATCH_ITEM_RLOCK (inst);	/* ++ LOCK instrument */
-
-  for (p = inst->zones; p; p = p->next) /* loop over zones */
-  {
-    zone = (IpatchSLIZone *)(p->data);
-
-    /* If a zone is currently solo, skip other zones */
-    if (solo_item && (IpatchItem *)zone != solo_item) continue;
-
-    ipatch_sf2_voice_cache_declare_item (cache, (GObject *)zone);
-
-    IPATCH_ITEM_RLOCK (zone); /* ++ LOCK zone */
-
-    sample = (IpatchSLISample *)(zone->sample);
-    if (!sample)		/* skip zones without sample ref */
+    /* check if it is an instrument or a zone */
+    if(IPATCH_IS_SLI_ZONE(obj))        /* ++ ref parent instrument */
     {
-      IPATCH_ITEM_RUNLOCK (zone);	/* -- unlock izone */
-      continue;
+        inst = IPATCH_SLI_INST(ipatch_item_get_parent(IPATCH_ITEM(obj)));
+    }
+    else
+    {
+        inst = IPATCH_SLI_INST(obj);
     }
 
-    voice = ipatch_sf2_voice_cache_add_voice (cache);
-    voice->mod_list = ipatch_sf2_mod_list_duplicate (cache->default_mods);
+    ipatch_sf2_voice_cache_declare_item(cache, (GObject *)inst);
 
-    /* copy generator values */
-    memcpy (&voice->gen_array, &zone->genarray, sizeof (IpatchSF2GenArray));
+    IPATCH_ITEM_RLOCK(inst);	/* ++ LOCK instrument */
 
-    /* set MIDI note and velocity ranges */
-    amt = &voice->gen_array.values[IPATCH_SF2_GEN_NOTE_RANGE];
-    ipatch_sf2_voice_cache_set_voice_range (cache, voice, 0,
-                                            amt->range.low, amt->range.high);
+    for(p = inst->zones; p; p = p->next)  /* loop over zones */
+    {
+        zone = (IpatchSLIZone *)(p->data);
 
-    amt = &voice->gen_array.values[IPATCH_SF2_GEN_VELOCITY_RANGE];
-    ipatch_sf2_voice_cache_set_voice_range (cache, voice, 1,
-                                            amt->range.low, amt->range.high);
+        /* If a zone is currently solo, skip other zones */
+        if(solo_item && (IpatchItem *)zone != solo_item)
+        {
+            continue;
+        }
 
-    ipatch_sf2_voice_cache_declare_item (cache, (GObject *)sample);
-    ipatch_sf2_voice_set_sample_data (voice, sample->sample_data);
+        ipatch_sf2_voice_cache_declare_item(cache, (GObject *)zone);
 
-    voice->rate = sample->rate;
-    voice->loop_start = sample->loop_start;
-    voice->loop_end = sample->loop_end;
-    voice->root_note = sample->root_note;
-    voice->fine_tune = sample->fine_tune;
+        IPATCH_ITEM_RLOCK(zone);  /* ++ LOCK zone */
 
-    IPATCH_ITEM_RUNLOCK (zone); /* -- UNLOCK zone */
-  }
+        sample = (IpatchSLISample *)(zone->sample);
 
-  IPATCH_ITEM_RUNLOCK (inst); /* -- UNLOCK instrument */
+        if(!sample)		/* skip zones without sample ref */
+        {
+            IPATCH_ITEM_RUNLOCK(zone);	/* -- unlock izone */
+            continue;
+        }
 
-  /* if convert object was a zone, unref parent instrument */
-  if ((void *)obj != (void *)inst)
-    g_object_unref (inst);	/* -- unref parent instrument */
+        voice = ipatch_sf2_voice_cache_add_voice(cache);
+        voice->mod_list = ipatch_sf2_mod_list_duplicate(cache->default_mods);
 
-  return (TRUE);
+        /* copy generator values */
+        memcpy(&voice->gen_array, &zone->genarray, sizeof(IpatchSF2GenArray));
+
+        /* set MIDI note and velocity ranges */
+        amt = &voice->gen_array.values[IPATCH_SF2_GEN_NOTE_RANGE];
+        ipatch_sf2_voice_cache_set_voice_range(cache, voice, 0,
+                                               amt->range.low, amt->range.high);
+
+        amt = &voice->gen_array.values[IPATCH_SF2_GEN_VELOCITY_RANGE];
+        ipatch_sf2_voice_cache_set_voice_range(cache, voice, 1,
+                                               amt->range.low, amt->range.high);
+
+        ipatch_sf2_voice_cache_declare_item(cache, (GObject *)sample);
+        ipatch_sf2_voice_set_sample_data(voice, sample->sample_data);
+
+        voice->rate = sample->rate;
+        voice->loop_start = sample->loop_start;
+        voice->loop_end = sample->loop_end;
+        voice->root_note = sample->root_note;
+        voice->fine_tune = sample->fine_tune;
+
+        IPATCH_ITEM_RUNLOCK(zone);  /* -- UNLOCK zone */
+    }
+
+    IPATCH_ITEM_RUNLOCK(inst);  /* -- UNLOCK instrument */
+
+    /* if convert object was a zone, unref parent instrument */
+    if((void *)obj != (void *)inst)
+    {
+        g_object_unref(inst);    /* -- unref parent instrument */
+    }
+
+    return (TRUE);
 }
 
 /* use the instrument converter for zone also */
@@ -141,44 +152,44 @@ _sli_inst_to_sf2_voice_cache_convert (IpatchConverter *converter, GError **err)
   _sli_inst_to_sf2_voice_cache_convert
 
 static gboolean
-_sli_sample_to_sf2_voice_cache_convert (IpatchConverter *converter,
-                                        GError **err)
+_sli_sample_to_sf2_voice_cache_convert(IpatchConverter *converter,
+                                       GError **err)
 {
-  IpatchSLISample *sample;
-  IpatchSF2VoiceCache *cache;
-  IpatchSF2Voice *voice;
-  IpatchSF2GenAmount *amt;
+    IpatchSLISample *sample;
+    IpatchSF2VoiceCache *cache;
+    IpatchSF2Voice *voice;
+    IpatchSF2GenAmount *amt;
 
-  sample = IPATCH_SLI_SAMPLE (IPATCH_CONVERTER_INPUT (converter));
-  cache = IPATCH_SF2_VOICE_CACHE (IPATCH_CONVERTER_OUTPUT (converter));
+    sample = IPATCH_SLI_SAMPLE(IPATCH_CONVERTER_INPUT(converter));
+    cache = IPATCH_SF2_VOICE_CACHE(IPATCH_CONVERTER_OUTPUT(converter));
 
-  ipatch_sf2_voice_cache_declare_item (cache, (GObject *)sample);
+    ipatch_sf2_voice_cache_declare_item(cache, (GObject *)sample);
 
-  voice = ipatch_sf2_voice_cache_add_voice (cache);
-  voice->mod_list = ipatch_sf2_mod_list_duplicate (cache->default_mods);
+    voice = ipatch_sf2_voice_cache_add_voice(cache);
+    voice->mod_list = ipatch_sf2_mod_list_duplicate(cache->default_mods);
 
-  /* set MIDI note and velocity ranges */
-  amt = &voice->gen_array.values[IPATCH_SF2_GEN_NOTE_RANGE];
-  ipatch_sf2_voice_cache_set_voice_range (cache, voice, 0,
-				amt->range.low, amt->range.high);
-  amt = &voice->gen_array.values[IPATCH_SF2_GEN_VELOCITY_RANGE];
-  ipatch_sf2_voice_cache_set_voice_range (cache, voice, 1,
-				amt->range.low, amt->range.high);
+    /* set MIDI note and velocity ranges */
+    amt = &voice->gen_array.values[IPATCH_SF2_GEN_NOTE_RANGE];
+    ipatch_sf2_voice_cache_set_voice_range(cache, voice, 0,
+                                           amt->range.low, amt->range.high);
+    amt = &voice->gen_array.values[IPATCH_SF2_GEN_VELOCITY_RANGE];
+    ipatch_sf2_voice_cache_set_voice_range(cache, voice, 1,
+                                           amt->range.low, amt->range.high);
 
-  /* use the default loop type for the IpatchSF2VoiceCache */
-  voice->gen_array.values[IPATCH_SF2_GEN_SAMPLE_MODES].sword
-    = cache->default_loop_type;
-  IPATCH_SF2_GEN_ARRAY_SET_FLAG (&voice->gen_array, IPATCH_SF2_GEN_SAMPLE_MODES);
+    /* use the default loop type for the IpatchSF2VoiceCache */
+    voice->gen_array.values[IPATCH_SF2_GEN_SAMPLE_MODES].sword
+        = cache->default_loop_type;
+    IPATCH_SF2_GEN_ARRAY_SET_FLAG(&voice->gen_array, IPATCH_SF2_GEN_SAMPLE_MODES);
 
-  ipatch_sf2_voice_set_sample_data (voice, sample->sample_data);
+    ipatch_sf2_voice_set_sample_data(voice, sample->sample_data);
 
-  voice->rate = sample->rate;
-  voice->loop_start = sample->loop_start;
-  voice->loop_end = sample->loop_end;
-  voice->root_note = sample->root_note;
-  voice->fine_tune = sample->fine_tune;
+    voice->rate = sample->rate;
+    voice->loop_start = sample->loop_start;
+    voice->loop_end = sample->loop_end;
+    voice->root_note = sample->root_note;
+    voice->fine_tune = sample->fine_tune;
 
-  return (TRUE);
+    return (TRUE);
 }
 
 CONVERTER_CLASS_INIT(sli_inst_to_sf2_voice_cache);

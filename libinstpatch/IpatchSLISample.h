@@ -51,37 +51,37 @@ typedef struct _IpatchSLISampleClass IpatchSLISampleClass;
 /* Spectralis sample item */
 struct _IpatchSLISample
 {
-  IpatchItem parent_instance;
+    IpatchItem parent_instance;
 
-  IpatchSampleData *sample_data; /* sample data object */
-  char *name;			/* name of sample */
-  guint32 rate;                 /* sample rate */
-  guint32 loop_start;		/* loop start offset (in samples) */
-  guint32 loop_end;		/* loop end offset (in samples) */
-  guint8 root_note;		/* root midi note number */
-  gint8 fine_tune;		/* fine tuning in cents */
+    IpatchSampleData *sample_data; /* sample data object */
+    char *name;			/* name of sample */
+    guint32 rate;                 /* sample rate */
+    guint32 loop_start;		/* loop start offset (in samples) */
+    guint32 loop_end;		/* loop end offset (in samples) */
+    guint8 root_note;		/* root midi note number */
+    gint8 fine_tune;		/* fine tuning in cents */
 };
 
 struct _IpatchSLISampleClass
 {
-  IpatchItemClass parent_class;
+    IpatchItemClass parent_class;
 };
 
-GType ipatch_sli_sample_get_type (void);
-IpatchSLISample *ipatch_sli_sample_new (void);
+GType ipatch_sli_sample_get_type(void);
+IpatchSLISample *ipatch_sli_sample_new(void);
 
-IpatchSLISample *ipatch_sli_sample_first (IpatchIter *iter);
-IpatchSLISample *ipatch_sli_sample_next (IpatchIter *iter);
+IpatchSLISample *ipatch_sli_sample_first(IpatchIter *iter);
+IpatchSLISample *ipatch_sli_sample_next(IpatchIter *iter);
 
-void ipatch_sli_sample_set_name (IpatchSLISample *sample,
-                                 const char *name);
-char *ipatch_sli_sample_get_name (IpatchSLISample *sample);
+void ipatch_sli_sample_set_name(IpatchSLISample *sample,
+                                const char *name);
+char *ipatch_sli_sample_get_name(IpatchSLISample *sample);
 
-void ipatch_sli_sample_set_data (IpatchSLISample *sample,
-				 IpatchSampleData *sampledata);
-IpatchSampleData *ipatch_sli_sample_get_data (IpatchSLISample *sample);
-IpatchSampleData *ipatch_sli_sample_peek_data (IpatchSLISample *sample);
+void ipatch_sli_sample_set_data(IpatchSLISample *sample,
+                                IpatchSampleData *sampledata);
+IpatchSampleData *ipatch_sli_sample_get_data(IpatchSLISample *sample);
+IpatchSampleData *ipatch_sli_sample_peek_data(IpatchSLISample *sample);
 
-void ipatch_sli_sample_set_blank (IpatchSLISample *sample);
+void ipatch_sli_sample_set_blank(IpatchSLISample *sample);
 
 #endif

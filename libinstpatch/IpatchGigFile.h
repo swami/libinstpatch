@@ -44,16 +44,16 @@ typedef struct _IpatchGigFileClass IpatchGigFileClass;
 /* GigaSampler file object (derived from IpatchDLSFile) */
 struct _IpatchGigFile
 {
-  IpatchDLSFile parent_instance;
+    IpatchDLSFile parent_instance;
 };
 
 /* GigaSampler file class (derived from IpatchDLSFile) */
 struct _IpatchGigFileClass
 {
-  IpatchDLSFileClass parent_class;
+    IpatchDLSFileClass parent_class;
 };
 
-GType ipatch_gig_file_get_type (void);
-IpatchGigFile *ipatch_gig_file_new (void);
+GType ipatch_gig_file_get_type(void);
+IpatchGigFile *ipatch_gig_file_new(void);
 
 #endif

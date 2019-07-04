@@ -26,10 +26,10 @@
 
 typedef struct
 {
-  IpatchConverter parent_instance;
+    IpatchConverter parent_instance;
 
-  /*< private >*/
-  gboolean create_stores;
+    /*< private >*/
+    gboolean create_stores;
 } IpatchConverterDLS2ToFile;
 
 typedef IpatchConverterClass IpatchConverterDLS2ToFileClass;
@@ -47,8 +47,8 @@ typedef IpatchConverterClass IpatchConverterFileToDLS2SampleClass;
   (ipatch_converter_file_to_dls2_sample_get_type ())
 
 
-GType ipatch_converter_dls2_to_file_get_type (void);
-GType ipatch_converter_file_to_dls2_get_type (void);
-GType ipatch_converter_file_to_dls2_sample_get_type (void);
+GType ipatch_converter_dls2_to_file_get_type(void);
+GType ipatch_converter_file_to_dls2_get_type(void);
+GType ipatch_converter_file_to_dls2_sample_get_type(void);
 
 #endif

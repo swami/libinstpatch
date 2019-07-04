@@ -21,7 +21,7 @@
  * SECTION: IpatchContainer
  * @short_description: Abstract object type used for items containing other
  *   child items.
- * @see_also: 
+ * @see_also:
  * @stability: Stable
  *
  * Objects which are derived from this abstract type can contain other items,
@@ -34,15 +34,15 @@
 #include "ipatch_priv.h"
 
 /* libInstPatch private functions defined in IpatchContainer_notify.c */
-extern void _ipatch_container_notify_init (void);
-extern void ipatch_container_add_notify (IpatchContainer *container,
-					 IpatchItem *child);
-extern void ipatch_container_remove_notify (IpatchContainer *container,
-					    IpatchItem *child);
+extern void _ipatch_container_notify_init(void);
+extern void ipatch_container_add_notify(IpatchContainer *container,
+                                        IpatchItem *child);
+extern void ipatch_container_remove_notify(IpatchContainer *container,
+        IpatchItem *child);
 
-static void ipatch_container_init_class (IpatchContainerClass *klass);
-static void ipatch_container_dispose (GObject *object);
-static void ipatch_container_item_remove_full (IpatchItem *item, gboolean full);
+static void ipatch_container_init_class(IpatchContainerClass *klass);
+static void ipatch_container_dispose(GObject *object);
+static void ipatch_container_item_remove_full(IpatchItem *item, gboolean full);
 
 static GObjectClass *parent_class = NULL;
 
@@ -52,62 +52,70 @@ static IpatchContainerClass *real_container_class = NULL;
 
 
 GType
-ipatch_container_get_type (void)
+ipatch_container_get_type(void)
 {
-  static GType item_type = 0;
+    static GType item_type = 0;
 
-  if (!item_type) {
-    static const GTypeInfo item_info = {
-      sizeof (IpatchContainerClass), NULL, NULL,
-      (GClassInitFunc) ipatch_container_init_class, NULL, NULL,
-      sizeof (IpatchContainer), 0,
-      (GInstanceInitFunc) NULL,
-    };
+    if(!item_type)
+    {
+        static const GTypeInfo item_info =
+        {
+            sizeof(IpatchContainerClass), NULL, NULL,
+            (GClassInitFunc) ipatch_container_init_class, NULL, NULL,
+            sizeof(IpatchContainer), 0,
+            (GInstanceInitFunc) NULL,
+        };
 
-    item_type = g_type_register_static (IPATCH_TYPE_ITEM, "IpatchContainer",
-					&item_info, G_TYPE_FLAG_ABSTRACT);
+        item_type = g_type_register_static(IPATCH_TYPE_ITEM, "IpatchContainer",
+                                           &item_info, G_TYPE_FLAG_ABSTRACT);
 
-    _ipatch_container_notify_init (); /* init container add/remove notify system */
-  }
+        _ipatch_container_notify_init();  /* init container add/remove notify system */
+    }
 
-  return (item_type);
+    return (item_type);
 }
 
 static void
-ipatch_container_init_class (IpatchContainerClass *klass)
+ipatch_container_init_class(IpatchContainerClass *klass)
 {
-  GObjectClass *obj_class = G_OBJECT_CLASS (klass);
-  IpatchItemClass *item_class = IPATCH_ITEM_CLASS (klass);
+    GObjectClass *obj_class = G_OBJECT_CLASS(klass);
+    IpatchItemClass *item_class = IPATCH_ITEM_CLASS(klass);
 
-  parent_class = g_type_class_peek_parent (klass);
-  real_container_class = klass;
+    parent_class = g_type_class_peek_parent(klass);
+    real_container_class = klass;
 
-  obj_class->dispose = ipatch_container_dispose;
+    obj_class->dispose = ipatch_container_dispose;
 
-  item_class->remove_full = ipatch_container_item_remove_full;
+    item_class->remove_full = ipatch_container_item_remove_full;
 }
 
 static void
-ipatch_container_dispose (GObject *object)
+ipatch_container_dispose(GObject *object)
 {
-  /* clear hooks flag, we are finalizing, shouldn't be any hook callbacks
-     or should there be?  FIXME */
-  ipatch_item_clear_flags (IPATCH_ITEM (object), IPATCH_ITEM_HOOKS_ACTIVE);
+    /* clear hooks flag, we are finalizing, shouldn't be any hook callbacks
+       or should there be?  FIXME */
+    ipatch_item_clear_flags(IPATCH_ITEM(object), IPATCH_ITEM_HOOKS_ACTIVE);
 
-  ipatch_container_remove_all (IPATCH_CONTAINER (object));
+    ipatch_container_remove_all(IPATCH_CONTAINER(object));
 
-  if (parent_class->dispose)
-    parent_class->dispose (object);
+    if(parent_class->dispose)
+    {
+        parent_class->dispose(object);
+    }
 }
 
 static void
-ipatch_container_item_remove_full (IpatchItem *item, gboolean full)
+ipatch_container_item_remove_full(IpatchItem *item, gboolean full)
 {
-  if (full)
-    ipatch_container_remove_all (IPATCH_CONTAINER (item));
+    if(full)
+    {
+        ipatch_container_remove_all(IPATCH_CONTAINER(item));
+    }
 
-  if (IPATCH_ITEM_CLASS (parent_class)->remove_full)
-    IPATCH_ITEM_CLASS (parent_class)->remove_full (item, full);
+    if(IPATCH_ITEM_CLASS(parent_class)->remove_full)
+    {
+        IPATCH_ITEM_CLASS(parent_class)->remove_full(item, full);
+    }
 }
 
 /**
@@ -126,15 +134,15 @@ ipatch_container_item_remove_full (IpatchItem *item, gboolean full)
  * object list and removing the reference will destroy it.
  */
 IpatchList *
-ipatch_container_get_children (IpatchContainer *container, GType type)
+ipatch_container_get_children(IpatchContainer *container, GType type)
 {
-  IpatchList *list;
-  GList *items;
+    IpatchList *list;
+    GList *items;
 
-  items = ipatch_container_get_children_by_type (container, type);
-  list = ipatch_list_new ();
-  list->items = items;
-  return (list);
+    items = ipatch_container_get_children_by_type(container, type);
+    list = ipatch_list_new();
+    list->items = items;
+    return (list);
 }
 
 /**
@@ -150,9 +158,9 @@ ipatch_container_get_children (IpatchContainer *container, GType type)
  * Since: 1.1.0
  */
 GList *
-ipatch_container_get_children_list (IpatchContainer *container)
+ipatch_container_get_children_list(IpatchContainer *container)
 {
-  return ipatch_container_get_children_by_type (container, IPATCH_TYPE_ITEM);
+    return ipatch_container_get_children_by_type(container, IPATCH_TYPE_ITEM);
 }
 
 /**
@@ -169,38 +177,41 @@ ipatch_container_get_children_list (IpatchContainer *container)
  * Since: 1.1.0
  */
 GList *
-ipatch_container_get_children_by_type (IpatchContainer *container, GType type)
+ipatch_container_get_children_by_type(IpatchContainer *container, GType type)
 {
-  GList *list = NULL;
-  const GType *child_types;
-  IpatchIter iter;
-  GObject *obj;
+    GList *list = NULL;
+    const GType *child_types;
+    IpatchIter iter;
+    GObject *obj;
 
-  g_return_val_if_fail (IPATCH_IS_CONTAINER (container), NULL);
-  g_return_val_if_fail (g_type_is_a (type, G_TYPE_OBJECT), NULL);
+    g_return_val_if_fail(IPATCH_IS_CONTAINER(container), NULL);
+    g_return_val_if_fail(g_type_is_a(type, G_TYPE_OBJECT), NULL);
 
-  /* get container child types */
-  child_types = ipatch_container_get_child_types (container);
-  while (*child_types)		/* loop over child types */
+    /* get container child types */
+    child_types = ipatch_container_get_child_types(container);
+
+    while(*child_types)		/* loop over child types */
     {
-      if (g_type_is_a (*child_types, type)) /* child type matches type? */
-	{
-	  IPATCH_ITEM_RLOCK (container);
-	  ipatch_container_init_iter (container, &iter, *child_types);
-	  obj = ipatch_iter_first (&iter);
-	  while (obj)		/* add object list to children list */
-	    {
-	      g_object_ref (obj); /* ++ ref object for list */
-	      list = g_list_prepend (list, obj);
-	      obj = ipatch_iter_next (&iter);
-	    }
-	  IPATCH_ITEM_RUNLOCK (container);
-	}
+        if(g_type_is_a(*child_types, type))   /* child type matches type? */
+        {
+            IPATCH_ITEM_RLOCK(container);
+            ipatch_container_init_iter(container, &iter, *child_types);
+            obj = ipatch_iter_first(&iter);
 
-      child_types++;
+            while(obj)		/* add object list to children list */
+            {
+                g_object_ref(obj);  /* ++ ref object for list */
+                list = g_list_prepend(list, obj);
+                obj = ipatch_iter_next(&iter);
+            }
+
+            IPATCH_ITEM_RUNLOCK(container);
+        }
+
+        child_types++;
     }
 
-  return g_list_reverse (list);         /* since we prepended */
+    return g_list_reverse(list);          /* since we prepended */
 }
 
 /**
@@ -214,17 +225,17 @@ ipatch_container_get_children_by_type (IpatchContainer *container, GType type)
  * terminated array of types. Array is static and should not be modified or freed.
  */
 const GType *
-ipatch_container_get_child_types (IpatchContainer *container)
+ipatch_container_get_child_types(IpatchContainer *container)
 {
-  IpatchContainerClass *klass;
-  const GType *types;
+    IpatchContainerClass *klass;
+    const GType *types;
 
-  g_return_val_if_fail (IPATCH_IS_CONTAINER (container), 0);
+    g_return_val_if_fail(IPATCH_IS_CONTAINER(container), 0);
 
-  klass = IPATCH_CONTAINER_GET_CLASS (container);
-  types = klass->child_types ();
+    klass = IPATCH_CONTAINER_GET_CLASS(container);
+    types = klass->child_types();
 
-  return (types);
+    return (types);
 }
 
 /**
@@ -243,17 +254,22 @@ ipatch_container_get_child_types (IpatchContainer *container)
  * Array is static and should not be modified or freed.
  */
 const GType *
-ipatch_container_get_virtual_types (IpatchContainer *container)
+ipatch_container_get_virtual_types(IpatchContainer *container)
 {
-  IpatchContainerClass *klass;
+    IpatchContainerClass *klass;
 
-  g_return_val_if_fail (IPATCH_IS_CONTAINER (container), 0);
+    g_return_val_if_fail(IPATCH_IS_CONTAINER(container), 0);
 
-  klass = IPATCH_CONTAINER_GET_CLASS (container);
+    klass = IPATCH_CONTAINER_GET_CLASS(container);
 
-  if (klass->virtual_types)
-    return (klass->virtual_types ());
-  else return (NULL);
+    if(klass->virtual_types)
+    {
+        return (klass->virtual_types());
+    }
+    else
+    {
+        return (NULL);
+    }
 }
 
 /**
@@ -270,23 +286,28 @@ ipatch_container_get_virtual_types (IpatchContainer *container)
  * modified or freed.
  */
 const GType *
-ipatch_container_type_get_child_types (GType container_type)
+ipatch_container_type_get_child_types(GType container_type)
 {
-  IpatchContainerClass *klass;
-  const GType *types;
+    IpatchContainerClass *klass;
+    const GType *types;
 
-  g_return_val_if_fail (g_type_is_a (container_type, IPATCH_TYPE_CONTAINER),
-			NULL);
+    g_return_val_if_fail(g_type_is_a(container_type, IPATCH_TYPE_CONTAINER),
+                         NULL);
 
-  klass = g_type_class_ref (container_type);
+    klass = g_type_class_ref(container_type);
 
-  if (klass->child_types)
-    types = klass->child_types ();
-  else types = NULL;
+    if(klass->child_types)
+    {
+        types = klass->child_types();
+    }
+    else
+    {
+        types = NULL;
+    }
 
-  g_type_class_unref (klass);
+    g_type_class_unref(klass);
 
-  return (types);
+    return (types);
 }
 
 /**
@@ -301,46 +322,50 @@ ipatch_container_type_get_child_types (GType container_type)
  * MT-NOTE: If position in list is critical the container item should
  * be locked and ipatch_container_insert_iter() used instead (see other
  * special requirements for using this function).
- * Only inserting in the first or last position (@pos is 0 or less than 0) 
+ * Only inserting in the first or last position (@pos is 0 or less than 0)
  * is guaranteed.
  */
 void
-ipatch_container_insert (IpatchContainer *container, IpatchItem *item, int pos)
+ipatch_container_insert(IpatchContainer *container, IpatchItem *item, int pos)
 {
-  const GType *child_types;
-  IpatchIter iter;
-  GType type;
+    const GType *child_types;
+    IpatchIter iter;
+    GType type;
 
-  g_return_if_fail (IPATCH_IS_CONTAINER (container));
-  g_return_if_fail (IPATCH_IS_ITEM (item));
+    g_return_if_fail(IPATCH_IS_CONTAINER(container));
+    g_return_if_fail(IPATCH_IS_ITEM(item));
 
-  type = G_OBJECT_TYPE (item);
+    type = G_OBJECT_TYPE(item);
 
-  /* get container child types */
-  child_types = ipatch_container_get_child_types (container);
+    /* get container child types */
+    child_types = ipatch_container_get_child_types(container);
 
-  for (; *child_types; child_types++)	/* loop over child types */
-    if (g_type_is_a (type, *child_types)) /* item type matches child type? */
-      break;
+    for(; *child_types; child_types++)	/* loop over child types */
+        if(g_type_is_a(type, *child_types))   /* item type matches child type? */
+        {
+            break;
+        }
 
-  if (*child_types)	/* matching child type found? */
+    if(*child_types)	/* matching child type found? */
     {
-      IPATCH_ITEM_WLOCK (container);
-      ipatch_container_init_iter (container, &iter, *child_types);
+        IPATCH_ITEM_WLOCK(container);
+        ipatch_container_init_iter(container, &iter, *child_types);
 
-      /* if position is less than 1 or off the end, get last object */
-      if (pos < 0 || !ipatch_iter_index (&iter, pos))
-	ipatch_iter_last (&iter);
+        /* if position is less than 1 or off the end, get last object */
+        if(pos < 0 || !ipatch_iter_index(&iter, pos))
+        {
+            ipatch_iter_last(&iter);
+        }
 
-      ipatch_container_insert_iter (container, item, &iter);
+        ipatch_container_insert_iter(container, item, &iter);
 
-      IPATCH_ITEM_WUNLOCK (container);
+        IPATCH_ITEM_WUNLOCK(container);
 
-      ipatch_container_add_notify (container, item);	/* container add notify */
+        ipatch_container_add_notify(container, item);	/* container add notify */
     }
-  else
-    g_critical (IPATCH_CONTAINER_ERRMSG_INVALID_CHILD_2, g_type_name (type),
-		g_type_name (G_OBJECT_TYPE (container)));
+    else
+        g_critical(IPATCH_CONTAINER_ERRMSG_INVALID_CHILD_2, g_type_name(type),
+                   g_type_name(G_OBJECT_TYPE(container)));
 }
 
 /**
@@ -351,9 +376,9 @@ ipatch_container_insert (IpatchContainer *container, IpatchItem *item, int pos)
  * Appends an item to a container's children.
  */
 void
-ipatch_container_append (IpatchContainer *container, IpatchItem *item)
+ipatch_container_append(IpatchContainer *container, IpatchItem *item)
 {
-  ipatch_container_insert (container, item, -1);
+    ipatch_container_insert(container, item, -1);
 }
 
 /**
@@ -364,9 +389,9 @@ ipatch_container_append (IpatchContainer *container, IpatchItem *item)
  * Just an alias for ipatch_container_append().
  */
 void
-ipatch_container_add (IpatchContainer *container, IpatchItem *item)
+ipatch_container_add(IpatchContainer *container, IpatchItem *item)
 {
-  ipatch_container_insert (container, item, -1);
+    ipatch_container_insert(container, item, -1);
 }
 
 /**
@@ -377,9 +402,9 @@ ipatch_container_add (IpatchContainer *container, IpatchItem *item)
  * Prepends an item to a container's children.
  */
 void
-ipatch_container_prepend (IpatchContainer *container, IpatchItem *item)
+ipatch_container_prepend(IpatchContainer *container, IpatchItem *item)
 {
-  ipatch_container_insert (container, item, 0);
+    ipatch_container_insert(container, item, 0);
 }
 
 /**
@@ -390,50 +415,60 @@ ipatch_container_prepend (IpatchContainer *container, IpatchItem *item)
  * Removes an @item from @container.
  */
 void
-ipatch_container_remove (IpatchContainer *container, IpatchItem *item)
+ipatch_container_remove(IpatchContainer *container, IpatchItem *item)
 {
-  const GType *child_types;
-  IpatchIter iter;
-  GType type;
-  GObject *obj;
+    const GType *child_types;
+    IpatchIter iter;
+    GType type;
+    GObject *obj;
 
-  g_return_if_fail (IPATCH_IS_CONTAINER (container));
-  g_return_if_fail (IPATCH_IS_ITEM (item));
-  g_return_if_fail (ipatch_item_peek_parent (item) == (IpatchItem *)container);
+    g_return_if_fail(IPATCH_IS_CONTAINER(container));
+    g_return_if_fail(IPATCH_IS_ITEM(item));
+    g_return_if_fail(ipatch_item_peek_parent(item) == (IpatchItem *)container);
 
-  /* do container remove notify (despite the fact that the remove could be
-   * invalid, not actually a child of container) */
-  ipatch_container_remove_notify (container, item);
+    /* do container remove notify (despite the fact that the remove could be
+     * invalid, not actually a child of container) */
+    ipatch_container_remove_notify(container, item);
 
-  type = G_OBJECT_TYPE (item);
+    type = G_OBJECT_TYPE(item);
 
-  /* get container child types */
-  child_types = ipatch_container_get_child_types (container);
-  while (*child_types)		/* loop over child types */
+    /* get container child types */
+    child_types = ipatch_container_get_child_types(container);
+
+    while(*child_types)		/* loop over child types */
     {
-      if (g_type_is_a (type, *child_types)) /* item type matches child type? */
-	{
-	  IPATCH_ITEM_WLOCK (container);
-	  ipatch_container_init_iter (container, &iter, *child_types);
+        if(g_type_is_a(type, *child_types))   /* item type matches child type? */
+        {
+            IPATCH_ITEM_WLOCK(container);
+            ipatch_container_init_iter(container, &iter, *child_types);
 
-	  /* search for @item */
-	  obj = ipatch_iter_first (&iter);
-	  while (obj && obj != (GObject *)item)
-	    obj = ipatch_iter_next (&iter);
+            /* search for @item */
+            obj = ipatch_iter_first(&iter);
 
-	  /* remove the object if found */
-	  if (obj) ipatch_container_remove_iter (container, &iter);
+            while(obj && obj != (GObject *)item)
+            {
+                obj = ipatch_iter_next(&iter);
+            }
 
-	  IPATCH_ITEM_WUNLOCK (container);
+            /* remove the object if found */
+            if(obj)
+            {
+                ipatch_container_remove_iter(container, &iter);
+            }
 
-	  if (obj) return; /* return if removed, otherwise keep searching */
-	}
+            IPATCH_ITEM_WUNLOCK(container);
 
-      child_types++;
+            if(obj)
+            {
+                return;    /* return if removed, otherwise keep searching */
+            }
+        }
+
+        child_types++;
     }
 
-  g_critical ("Child of type '%s' not found in parent of type '%s'",
-	      g_type_name (type), g_type_name (G_OBJECT_TYPE (container)));
+    g_critical("Child of type '%s' not found in parent of type '%s'",
+               g_type_name(type), g_type_name(G_OBJECT_TYPE(container)));
 }
 
 /**
@@ -443,25 +478,27 @@ ipatch_container_remove (IpatchContainer *container, IpatchItem *item)
  * Removes all items from a @container object.
  */
 void
-ipatch_container_remove_all (IpatchContainer *container)
+ipatch_container_remove_all(IpatchContainer *container)
 {
-  IpatchList *list;
-  const GType *child_types, *ptype;
-  GList *p;
+    IpatchList *list;
+    const GType *child_types, *ptype;
+    GList *p;
 
-  g_return_if_fail (IPATCH_IS_CONTAINER (container));
+    g_return_if_fail(IPATCH_IS_CONTAINER(container));
 
-  child_types = ipatch_container_get_child_types (container);
+    child_types = ipatch_container_get_child_types(container);
 
-  /* loop over child types */
-  for (ptype = child_types; *ptype; ptype++)
+    /* loop over child types */
+    for(ptype = child_types; *ptype; ptype++)
     {
-      list = ipatch_container_get_children (container, *ptype);	/* ++ ref new list */
+        list = ipatch_container_get_children(container, *ptype);	/* ++ ref new list */
 
-      for (p = list->items; p; p = p->next)
-	ipatch_container_remove (container, (IpatchItem *)(p->data));
+        for(p = list->items; p; p = p->next)
+        {
+            ipatch_container_remove(container, (IpatchItem *)(p->data));
+        }
 
-      g_object_unref (list);	/* -- unref list */
+        g_object_unref(list);	/* -- unref list */
     }
 }
 
@@ -476,31 +513,32 @@ ipatch_container_remove_all (IpatchContainer *container)
  * Returns: Count of children of @type in @container.
  */
 guint
-ipatch_container_count (IpatchContainer *container, GType type)
+ipatch_container_count(IpatchContainer *container, GType type)
 {
-  const GType *child_types;
-  IpatchIter iter;
-  int count = 0;
+    const GType *child_types;
+    IpatchIter iter;
+    int count = 0;
 
-  g_return_val_if_fail (IPATCH_IS_CONTAINER (container), 0);
-  g_return_val_if_fail (g_type_is_a (type, G_TYPE_OBJECT), 0);
+    g_return_val_if_fail(IPATCH_IS_CONTAINER(container), 0);
+    g_return_val_if_fail(g_type_is_a(type, G_TYPE_OBJECT), 0);
 
-  /* get container child types */
-  child_types = ipatch_container_get_child_types (container);
-  while (*child_types)		/* loop over child types */
+    /* get container child types */
+    child_types = ipatch_container_get_child_types(container);
+
+    while(*child_types)		/* loop over child types */
     {
-      if (g_type_is_a (*child_types, type)) /* child type matches type? */
-	{
-	  IPATCH_ITEM_RLOCK (container);
-	  ipatch_container_init_iter (container, &iter, *child_types);
-	  count += ipatch_iter_count (&iter);
-	  IPATCH_ITEM_RUNLOCK (container);
-	}
+        if(g_type_is_a(*child_types, type))   /* child type matches type? */
+        {
+            IPATCH_ITEM_RLOCK(container);
+            ipatch_container_init_iter(container, &iter, *child_types);
+            count += ipatch_iter_count(&iter);
+            IPATCH_ITEM_RUNLOCK(container);
+        }
 
-      child_types++;
+        child_types++;
     }
 
-  return (count);
+    return (count);
 }
 
 /**
@@ -516,16 +554,19 @@ ipatch_container_count (IpatchContainer *container, GType type)
  * appended to them, unused MIDI locale is found, etc).
  */
 void
-ipatch_container_make_unique (IpatchContainer *container, IpatchItem *item)
+ipatch_container_make_unique(IpatchContainer *container, IpatchItem *item)
 {
-  IpatchContainerClass *klass;
+    IpatchContainerClass *klass;
 
-  g_return_if_fail (IPATCH_IS_CONTAINER (container));
-  g_return_if_fail (IPATCH_IS_ITEM (item));
+    g_return_if_fail(IPATCH_IS_CONTAINER(container));
+    g_return_if_fail(IPATCH_IS_ITEM(item));
 
-  klass = IPATCH_CONTAINER_GET_CLASS (container);
-  if (klass->make_unique)
-    (*klass->make_unique)(container, item);
+    klass = IPATCH_CONTAINER_GET_CLASS(container);
+
+    if(klass->make_unique)
+    {
+        (*klass->make_unique)(container, item);
+    }
 }
 
 /**
@@ -537,15 +578,15 @@ ipatch_container_make_unique (IpatchContainer *container, IpatchItem *item)
  * sensitive properties are unique (see ipatch_container_make_unique()).
  */
 void
-ipatch_container_add_unique (IpatchContainer *container, IpatchItem *item)
+ipatch_container_add_unique(IpatchContainer *container, IpatchItem *item)
 {
-  g_return_if_fail (IPATCH_IS_CONTAINER (container));
-  g_return_if_fail (IPATCH_IS_ITEM (item));
+    g_return_if_fail(IPATCH_IS_CONTAINER(container));
+    g_return_if_fail(IPATCH_IS_ITEM(item));
 
-  IPATCH_ITEM_WLOCK (container);
-  ipatch_container_make_unique (container, item);
-  ipatch_container_append (container, item);
-  IPATCH_ITEM_WUNLOCK (container);
+    IPATCH_ITEM_WLOCK(container);
+    ipatch_container_make_unique(container, item);
+    ipatch_container_append(container, item);
+    IPATCH_ITEM_WUNLOCK(container);
 }
 
 /**
@@ -567,19 +608,19 @@ ipatch_container_add_unique (IpatchContainer *container, IpatchItem *item)
  * @iter are undefined.
  */
 gboolean
-ipatch_container_init_iter (IpatchContainer *container, IpatchIter *iter,
-			    GType type)
+ipatch_container_init_iter(IpatchContainer *container, IpatchIter *iter,
+                           GType type)
 {
-  IpatchContainerClass *klass;
+    IpatchContainerClass *klass;
 
-  g_return_val_if_fail (IPATCH_IS_CONTAINER (container), FALSE);
-  g_return_val_if_fail (iter != NULL, FALSE);
-  g_return_val_if_fail (g_type_is_a (type, IPATCH_TYPE_ITEM), FALSE);
+    g_return_val_if_fail(IPATCH_IS_CONTAINER(container), FALSE);
+    g_return_val_if_fail(iter != NULL, FALSE);
+    g_return_val_if_fail(g_type_is_a(type, IPATCH_TYPE_ITEM), FALSE);
 
-  klass = IPATCH_CONTAINER_GET_CLASS (container);
-  g_return_val_if_fail (klass->init_iter != NULL, FALSE);
+    klass = IPATCH_CONTAINER_GET_CLASS(container);
+    g_return_val_if_fail(klass->init_iter != NULL, FALSE);
 
-  return ((*klass->init_iter)(container, iter, type));
+    return ((*klass->init_iter)(container, iter, type));
 }
 
 /**
@@ -607,16 +648,16 @@ ipatch_container_init_iter (IpatchContainer *container, IpatchIter *iter,
  * access ensured, for the duration of this call and prior iterator functions.
  */
 void
-ipatch_container_insert_iter (IpatchContainer *container, IpatchItem *item,
-			      IpatchIter *iter)
+ipatch_container_insert_iter(IpatchContainer *container, IpatchItem *item,
+                             IpatchIter *iter)
 {
-  g_return_if_fail (IPATCH_IS_CONTAINER (container));
-  g_return_if_fail (IPATCH_IS_ITEM (item));
-  g_return_if_fail (iter != NULL);
+    g_return_if_fail(IPATCH_IS_CONTAINER(container));
+    g_return_if_fail(IPATCH_IS_ITEM(item));
+    g_return_if_fail(iter != NULL);
 
-  ipatch_iter_insert (iter, (GObject *)item);
-  g_object_ref ((GObject *)item); /* ++ ref object for container */
-  ipatch_item_set_parent (item, (IpatchItem *)container); /* set item parent */
+    ipatch_iter_insert(iter, (GObject *)item);
+    g_object_ref((GObject *)item);  /* ++ ref object for container */
+    ipatch_item_set_parent(item, (IpatchItem *)container);  /* set item parent */
 }
 
 /**
@@ -639,17 +680,17 @@ ipatch_container_insert_iter (IpatchContainer *container, IpatchItem *item,
  * access ensured, for the duration of this call and prior iterator functions.
  */
 void
-ipatch_container_remove_iter (IpatchContainer *container, IpatchIter *iter)
+ipatch_container_remove_iter(IpatchContainer *container, IpatchIter *iter)
 {
-  GObject *obj;
+    GObject *obj;
 
-  g_return_if_fail (IPATCH_IS_CONTAINER (container));
-  g_return_if_fail (iter != NULL);
+    g_return_if_fail(IPATCH_IS_CONTAINER(container));
+    g_return_if_fail(iter != NULL);
 
-  obj = ipatch_iter_get (iter);
-  g_return_if_fail (obj != NULL);
+    obj = ipatch_iter_get(iter);
+    g_return_if_fail(obj != NULL);
 
-  ipatch_iter_remove (iter);
-  ipatch_item_unparent (IPATCH_ITEM (obj)); /* unparent item */
-  g_object_unref (obj);		/* -- unref object for container */
+    ipatch_iter_remove(iter);
+    ipatch_item_unparent(IPATCH_ITEM(obj));   /* unparent item */
+    g_object_unref(obj);		/* -- unref object for container */
 }

@@ -45,17 +45,17 @@ typedef struct _IpatchSampleStoreSplit24Class IpatchSampleStoreSplit24Class;
 /* File sample store instance */
 struct _IpatchSampleStoreSplit24
 {
-  IpatchSampleStoreFile parent_instance;
-  guint loc_lsbytes;    /* pos of the least significant bytes of 24 bit audio */
+    IpatchSampleStoreFile parent_instance;
+    guint loc_lsbytes;    /* pos of the least significant bytes of 24 bit audio */
 };
 
 /* File sample store class */
 struct _IpatchSampleStoreSplit24Class
 {
-  IpatchSampleStoreFileClass parent_class;
+    IpatchSampleStoreFileClass parent_class;
 };
 
-GType ipatch_sample_store_split24_get_type (void);
-IpatchSample *ipatch_sample_store_split24_new (IpatchFile *file,
-                                               guint loc_16bit, guint loc_lsbytes);
+GType ipatch_sample_store_split24_get_type(void);
+IpatchSample *ipatch_sample_store_split24_new(IpatchFile *file,
+        guint loc_16bit, guint loc_lsbytes);
 #endif

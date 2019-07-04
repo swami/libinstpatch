@@ -75,13 +75,13 @@ GType type_under##_get_type (void) \
 /* virtual container object */
 struct _IpatchVirtualContainer
 {
-  IpatchItem parent_instance; /* derived from IpatchItem */
+    IpatchItem parent_instance; /* derived from IpatchItem */
 };
 
 /* virtual container class */
 struct _IpatchVirtualContainerClass
 {
-  IpatchItemClass parent_class;
+    IpatchItemClass parent_class;
 };
 
 
@@ -95,6 +95,6 @@ struct _IpatchVirtualContainerClass
 typedef void (*IpatchVirtualContainerConformFunc)(GObject *object);
 
 
-GType ipatch_virtual_container_get_type (void);
+GType ipatch_virtual_container_get_type(void);
 
 #endif

@@ -44,14 +44,14 @@ typedef struct _IpatchSampleStoreRamClass IpatchSampleStoreRamClass;
 /* RAM sample store instance */
 struct _IpatchSampleStoreRam
 {
-  IpatchSampleStore parent_instance;
-  gpointer location;    /* Pointer to the sample data in memory */
+    IpatchSampleStore parent_instance;
+    gpointer location;    /* Pointer to the sample data in memory */
 };
 
 /* RAM sample store class */
 struct _IpatchSampleStoreRamClass
 {
-  IpatchSampleStoreClass parent_class;
+    IpatchSampleStoreClass parent_class;
 };
 
 /**
@@ -63,7 +63,7 @@ struct _IpatchSampleStoreRamClass
  */
 typedef enum
 {
-  IPATCH_SAMPLE_STORE_RAM_ALLOCATED = 1 << IPATCH_SAMPLE_STORE_UNUSED_FLAG_SHIFT
+    IPATCH_SAMPLE_STORE_RAM_ALLOCATED = 1 << IPATCH_SAMPLE_STORE_UNUSED_FLAG_SHIFT
 } IpatchSampleStoreRamFlags;
 
 /**
@@ -73,8 +73,8 @@ typedef enum
 #define IPATCH_SAMPLE_STORE_RAM_UNUSED_FLAG_SHIFT \
   (IPATCH_SAMPLE_STORE_UNUSED_FLAG_SHIFT + 4)
 
-GType ipatch_sample_store_ram_get_type (void);
-IpatchSample *ipatch_sample_store_ram_new (gpointer location, gboolean free_data);
-IpatchSample *ipatch_sample_store_ram_get_blank (void);
+GType ipatch_sample_store_ram_get_type(void);
+IpatchSample *ipatch_sample_store_ram_new(gpointer location, gboolean free_data);
+IpatchSample *ipatch_sample_store_ram_get_blank(void);
 
 #endif

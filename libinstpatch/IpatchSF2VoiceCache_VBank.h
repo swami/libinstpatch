@@ -36,7 +36,7 @@ typedef IpatchConverterClass IpatchConverterVBankRegionToSF2VoiceCacheClass;
   (ipatch_converter_vbank_region_to_sf2_voice_cache_get_type ())
 
 
-GType ipatch_converter_vbank_inst_to_sf2_voice_cache_get_type (void);
-GType ipatch_converter_vbank_region_to_sf2_voice_cache_get_type (void);
+GType ipatch_converter_vbank_inst_to_sf2_voice_cache_get_type(void);
+GType ipatch_converter_vbank_region_to_sf2_voice_cache_get_type(void);
 
 #endif

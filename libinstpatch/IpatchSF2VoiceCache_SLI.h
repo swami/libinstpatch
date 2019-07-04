@@ -41,8 +41,8 @@ typedef IpatchConverterSF2VoiceCacheClass IpatchConverterSLISampleToSF2VoiceCach
 #define IPATCH_TYPE_CONVERTER_SLI_SAMPLE_TO_SF2_VOICE_CACHE \
   (ipatch_converter_sli_sample_to_sf2_voice_cache_get_type ())
 
-GType ipatch_converter_sli_inst_to_sf2_voice_cache_get_type (void);
-GType ipatch_converter_sli_zone_to_sf2_voice_cache_get_type (void);
-GType ipatch_converter_sli_sample_to_sf2_voice_cache_get_type (void);
+GType ipatch_converter_sli_inst_to_sf2_voice_cache_get_type(void);
+GType ipatch_converter_sli_zone_to_sf2_voice_cache_get_type(void);
+GType ipatch_converter_sli_sample_to_sf2_voice_cache_get_type(void);
 
 #endif

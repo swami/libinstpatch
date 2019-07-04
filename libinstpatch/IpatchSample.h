@@ -62,8 +62,8 @@ typedef struct _IpatchSampleHandle IpatchSampleHandle;
  * Returns: %TRUE on success, %FALSE otherwise (in which case an error should
  *   optionally be stored in @err).
  */
-typedef gboolean (*IpatchSampleHandleOpenFunc)(IpatchSampleHandle *handle,
-					       GError **err);
+typedef gboolean(*IpatchSampleHandleOpenFunc)(IpatchSampleHandle *handle,
+        GError **err);
 /**
  * IpatchSampleHandleCloseFunc:
  * @handle: Sample handle to close (as returned from #IpatchSampleHandleOpenFunc)
@@ -91,9 +91,9 @@ typedef void (*IpatchSampleHandleCloseFunc)(IpatchSampleHandle *handle);
  * Returns: Should return %TRUE on success, %FALSE otherwise (in which case
  * an error should optionally be stored in @err).
  */
-typedef gboolean (*IpatchSampleHandleReadFunc)(IpatchSampleHandle *handle,
-					       guint offset, guint frames,
-					       gpointer buf, GError **err);
+typedef gboolean(*IpatchSampleHandleReadFunc)(IpatchSampleHandle *handle,
+        guint offset, guint frames,
+        gpointer buf, GError **err);
 /**
  * IpatchSampleHandleWriteFunc:
  * @handle: Handle to write to (as returned from #IpatchSampleOpenFunc)
@@ -110,41 +110,41 @@ typedef gboolean (*IpatchSampleHandleReadFunc)(IpatchSampleHandle *handle,
  * Returns: Should return %TRUE on success, %FALSE otherwise (in which case
  * an error should optionally be stored in @err).
  */
-typedef gboolean (*IpatchSampleHandleWriteFunc)(IpatchSampleHandle *handle,
-					        guint offset, guint frames,
-					        gconstpointer buf, GError **err);
+typedef gboolean(*IpatchSampleHandleWriteFunc)(IpatchSampleHandle *handle,
+        guint offset, guint frames,
+        gconstpointer buf, GError **err);
 /* Sample interface */
 struct _IpatchSampleIface
 {
-  GTypeInterface parent_class;
+    GTypeInterface parent_class;
 
-  IpatchSampleHandleOpenFunc open;
-  IpatchSampleHandleCloseFunc close;
-  IpatchSampleHandleReadFunc read;
-  IpatchSampleHandleWriteFunc write;
+    IpatchSampleHandleOpenFunc open;
+    IpatchSampleHandleCloseFunc close;
+    IpatchSampleHandleReadFunc read;
+    IpatchSampleHandleWriteFunc write;
 
-  int *loop_types; /* -1 terminated array of supp. loop types (NULL = none) */
+    int *loop_types; /* -1 terminated array of supp. loop types (NULL = none) */
 };
 
 /* Sample handle for I/O operations */
 struct _IpatchSampleHandle
 {
-  IpatchSample *sample;		      /* The sample which this handle applies to */
-  IpatchSampleTransform *transform;   /* Set if sample is being converted */
-  IpatchSampleHandleReadFunc read;    /* Read method pointer (copied from IpatchItem interface) */
-  IpatchSampleHandleWriteFunc write;  /* Write method pointer (copied from IpatchItem interface) */
-  IpatchSampleHandleCloseFunc close;  /* Close method pointer (copied from IpatchItem interface) */
-  guint32 read_mode : 1;              /* TRUE if read mode, FALSE if write mode */
-  guint32 manual_transform : 1;       /* Methods handle sample transform */
-  guint32 release_transform : 1;      /* TRUE if transform should be released from transform pool */
-  guint32 format : 12;                /* Format to transform to */
-  guint32 reserved : 17;
-  guint32 channel_map;                /* Channel map for multi-channel audio transform */
-  gpointer data1;		      /* sample interface defined */
-  gpointer data2;		      /* sample interface defined */
-  gpointer data3;		      /* sample interface defined */
-  gpointer data4;		      /* sample interface defined */
-  guint32 reserved2;
+    IpatchSample *sample;		      /* The sample which this handle applies to */
+    IpatchSampleTransform *transform;   /* Set if sample is being converted */
+    IpatchSampleHandleReadFunc read;    /* Read method pointer (copied from IpatchItem interface) */
+    IpatchSampleHandleWriteFunc write;  /* Write method pointer (copied from IpatchItem interface) */
+    IpatchSampleHandleCloseFunc close;  /* Close method pointer (copied from IpatchItem interface) */
+    guint32 read_mode : 1;              /* TRUE if read mode, FALSE if write mode */
+    guint32 manual_transform : 1;       /* Methods handle sample transform */
+    guint32 release_transform : 1;      /* TRUE if transform should be released from transform pool */
+    guint32 format : 12;                /* Format to transform to */
+    guint32 reserved : 17;
+    guint32 channel_map;                /* Channel map for multi-channel audio transform */
+    gpointer data1;		      /* sample interface defined */
+    gpointer data2;		      /* sample interface defined */
+    gpointer data3;		      /* sample interface defined */
+    gpointer data4;		      /* sample interface defined */
+    guint32 reserved2;
 };
 
 /**
@@ -158,10 +158,10 @@ struct _IpatchSampleHandle
  */
 typedef enum
 {
-  IPATCH_SAMPLE_LOOP_NONE,
-  IPATCH_SAMPLE_LOOP_STANDARD,
-  IPATCH_SAMPLE_LOOP_RELEASE,
-  IPATCH_SAMPLE_LOOP_PINGPONG
+    IPATCH_SAMPLE_LOOP_NONE,
+    IPATCH_SAMPLE_LOOP_STANDARD,
+    IPATCH_SAMPLE_LOOP_RELEASE,
+    IPATCH_SAMPLE_LOOP_PINGPONG
 } IpatchSampleLoopType;
 
 /**
@@ -222,75 +222,75 @@ typedef enum
 extern int ipatch_sample_loop_types_standard[];
 extern int ipatch_sample_loop_types_standard_release[];
 
-GType ipatch_sample_get_type (void);
-int *ipatch_sample_get_loop_types (IpatchSample *sample);
-int *ipatch_sample_type_get_loop_types (GType type);
-int *ipatch_sample_get_loop_types_len (IpatchSample *sample, int *len);
-int *ipatch_sample_type_get_loop_types_len (GType type, int *len);
+GType ipatch_sample_get_type(void);
+int *ipatch_sample_get_loop_types(IpatchSample *sample);
+int *ipatch_sample_type_get_loop_types(GType type);
+int *ipatch_sample_get_loop_types_len(IpatchSample *sample, int *len);
+int *ipatch_sample_type_get_loop_types_len(GType type, int *len);
 
-void ipatch_sample_set_format (IpatchSample *sample, int format);
-int ipatch_sample_get_format (IpatchSample *sample);
-void ipatch_sample_set_size (IpatchSample *sample, guint size);
-guint ipatch_sample_get_size (IpatchSample *sample, guint *bytes);
-int ipatch_sample_get_frame_size (IpatchSample *sample);
-IpatchSampleData *ipatch_sample_get_sample_data (IpatchSample *sample);
-gboolean ipatch_sample_set_sample_data (IpatchSample *sample,
-                                        IpatchSampleData *sampledata);
+void ipatch_sample_set_format(IpatchSample *sample, int format);
+int ipatch_sample_get_format(IpatchSample *sample);
+void ipatch_sample_set_size(IpatchSample *sample, guint size);
+guint ipatch_sample_get_size(IpatchSample *sample, guint *bytes);
+int ipatch_sample_get_frame_size(IpatchSample *sample);
+IpatchSampleData *ipatch_sample_get_sample_data(IpatchSample *sample);
+gboolean ipatch_sample_set_sample_data(IpatchSample *sample,
+                                       IpatchSampleData *sampledata);
 
-gboolean ipatch_sample_read (IpatchSample *sample, guint offset, guint frames,
-                             gpointer buf, GError **err);
-gpointer ipatch_sample_read_size (IpatchSample *sample, guint offset, guint size, GError **err);
-gboolean ipatch_sample_write (IpatchSample *sample, guint offset, guint frames,
-                              gconstpointer buf, GError **err);
-gboolean ipatch_sample_write_size (IpatchSample *sample, guint offset,
-                                   gconstpointer buf, guint size, GError **err);
-gboolean ipatch_sample_read_transform (IpatchSample *sample, guint offset, guint frames,
-                                       gpointer buf, int format, guint32 channel_map,
+gboolean ipatch_sample_read(IpatchSample *sample, guint offset, guint frames,
+                            gpointer buf, GError **err);
+gpointer ipatch_sample_read_size(IpatchSample *sample, guint offset, guint size, GError **err);
+gboolean ipatch_sample_write(IpatchSample *sample, guint offset, guint frames,
+                             gconstpointer buf, GError **err);
+gboolean ipatch_sample_write_size(IpatchSample *sample, guint offset,
+                                  gconstpointer buf, guint size, GError **err);
+gboolean ipatch_sample_read_transform(IpatchSample *sample, guint offset, guint frames,
+                                      gpointer buf, int format, guint32 channel_map,
+                                      GError **err);
+gpointer ipatch_sample_read_transform_size(IpatchSample *sample, guint offset, guint size,
+        int format, guint32 channel_map, GError **err);
+gboolean ipatch_sample_write_transform(IpatchSample *sample, guint offset, guint frames,
+                                       gconstpointer buf, int format, guint32 channel_map,
                                        GError **err);
-gpointer ipatch_sample_read_transform_size (IpatchSample *sample, guint offset, guint size,
-                                            int format, guint32 channel_map, GError **err);
-gboolean ipatch_sample_write_transform (IpatchSample *sample, guint offset, guint frames,
-                                        gconstpointer buf, int format, guint32 channel_map,
-                                        GError **err);
-gboolean ipatch_sample_write_transform_size (IpatchSample *sample, guint offset,
-                                             gconstpointer buf, guint size, int format,
-                                             guint32 channel_map, GError **err);
-gboolean ipatch_sample_copy (IpatchSample *dest_sample, IpatchSample *src_sample,
-			     guint32 channel_map, GError **err);
-gboolean ipatch_sample_save_to_file (IpatchSample *sample, const char *filename,
-                                     int file_format, int sub_format, GError **err);
+gboolean ipatch_sample_write_transform_size(IpatchSample *sample, guint offset,
+        gconstpointer buf, guint size, int format,
+        guint32 channel_map, GError **err);
+gboolean ipatch_sample_copy(IpatchSample *dest_sample, IpatchSample *src_sample,
+                            guint32 channel_map, GError **err);
+gboolean ipatch_sample_save_to_file(IpatchSample *sample, const char *filename,
+                                    int file_format, int sub_format, GError **err);
 
-gboolean ipatch_sample_handle_open (IpatchSample *sample,
-				    IpatchSampleHandle *handle, char mode,
-				    int format, guint32 channel_map, GError **err);
-void ipatch_sample_handle_close (IpatchSampleHandle *handle);
-IpatchSampleTransform *ipatch_sample_handle_get_transform (IpatchSampleHandle *handle);
-void ipatch_sample_handle_set_transform (IpatchSampleHandle *handle,
-                                         IpatchSampleTransform *transform);
-int ipatch_sample_handle_get_format (IpatchSampleHandle *handle);
-int ipatch_sample_handle_get_frame_size (IpatchSampleHandle *handle);
-guint ipatch_sample_handle_get_max_frames (IpatchSampleHandle *handle);
-gpointer ipatch_sample_handle_read (IpatchSampleHandle *handle, guint offset, guint frames,
-				    gpointer buf, GError **err);
+gboolean ipatch_sample_handle_open(IpatchSample *sample,
+                                   IpatchSampleHandle *handle, char mode,
+                                   int format, guint32 channel_map, GError **err);
+void ipatch_sample_handle_close(IpatchSampleHandle *handle);
+IpatchSampleTransform *ipatch_sample_handle_get_transform(IpatchSampleHandle *handle);
+void ipatch_sample_handle_set_transform(IpatchSampleHandle *handle,
+                                        IpatchSampleTransform *transform);
+int ipatch_sample_handle_get_format(IpatchSampleHandle *handle);
+int ipatch_sample_handle_get_frame_size(IpatchSampleHandle *handle);
+guint ipatch_sample_handle_get_max_frames(IpatchSampleHandle *handle);
+gpointer ipatch_sample_handle_read(IpatchSampleHandle *handle, guint offset, guint frames,
+                                   gpointer buf, GError **err);
 gpointer
-ipatch_sample_handle_read_size (IpatchSampleHandle *handle, guint offset,
-                                guint size, GError **err);
-gboolean ipatch_sample_handle_write (IpatchSampleHandle *handle, guint offset, guint frames,
-				     gconstpointer buf, GError **err);
+ipatch_sample_handle_read_size(IpatchSampleHandle *handle, guint offset,
+                               guint size, GError **err);
+gboolean ipatch_sample_handle_write(IpatchSampleHandle *handle, guint offset, guint frames,
+                                    gconstpointer buf, GError **err);
 gboolean
-ipatch_sample_handle_write_size (IpatchSampleHandle *handle, guint offset,
-                                 gconstpointer buf, guint size, GError **err);
+ipatch_sample_handle_write_size(IpatchSampleHandle *handle, guint offset,
+                                gconstpointer buf, guint size, GError **err);
 
-gboolean ipatch_sample_handle_cascade_open (IpatchSampleHandle *handle,
-                                            IpatchSample *sample, GError **err);
+gboolean ipatch_sample_handle_cascade_open(IpatchSampleHandle *handle,
+        IpatchSample *sample, GError **err);
 
-GParamSpec *ipatch_sample_install_property (GObjectClass *oclass,
-					    guint property_id,
-					    const char *property_name);
-GParamSpec *ipatch_sample_install_property_readonly (GObjectClass *oclass,
-						     guint property_id,
-						     const char *property_name);
-GParamSpec *ipatch_sample_new_property_param_spec (const char *property_name,
-						   GParamFlags flags);
+GParamSpec *ipatch_sample_install_property(GObjectClass *oclass,
+        guint property_id,
+        const char *property_name);
+GParamSpec *ipatch_sample_install_property_readonly(GObjectClass *oclass,
+        guint property_id,
+        const char *property_name);
+GParamSpec *ipatch_sample_new_property_param_spec(const char *property_name,
+        GParamFlags flags);
 
 #endif

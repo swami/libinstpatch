@@ -20,7 +20,7 @@
 /**
  * SECTION: IpatchVirtualContainer_types
  * @short_description: Built in virtual container types
- * @see_also: 
+ * @see_also:
  * @stability: Stable
  */
 #include <glib.h>
@@ -39,49 +39,49 @@
 #include "i18n.h"
 
 IPATCH_VIRTUAL_CONTAINER_CREATE
-  (ipatch_virtual_dls2_melodic, IpatchVirtualDLS2Melodic,
-   _("Melodic Instruments"), _("Non percussion instruments"),
-   IPATCH_TYPE_DLS2_INST);
+(ipatch_virtual_dls2_melodic, IpatchVirtualDLS2Melodic,
+ _("Melodic Instruments"), _("Non percussion instruments"),
+ IPATCH_TYPE_DLS2_INST);
 IPATCH_VIRTUAL_CONTAINER_CREATE
-  (ipatch_virtual_dls2_percussion, IpatchVirtualDLS2Percussion,
-   _("Percussion Instruments"), _("Percussion Instruments"),
-   IPATCH_TYPE_DLS2_INST);
+(ipatch_virtual_dls2_percussion, IpatchVirtualDLS2Percussion,
+ _("Percussion Instruments"), _("Percussion Instruments"),
+ IPATCH_TYPE_DLS2_INST);
 IPATCH_VIRTUAL_CONTAINER_CREATE
-  (ipatch_virtual_dls2_samples, IpatchVirtualDLS2Samples,
-   _("Samples"), _("Samples"),
-   IPATCH_TYPE_DLS2_SAMPLE);
+(ipatch_virtual_dls2_samples, IpatchVirtualDLS2Samples,
+ _("Samples"), _("Samples"),
+ IPATCH_TYPE_DLS2_SAMPLE);
 
 IPATCH_VIRTUAL_CONTAINER_CREATE
-  (ipatch_virtual_gig_melodic, IpatchVirtualGigMelodic,
-   _("Melodic Instruments"), _("Non percussion instruments"),
-   IPATCH_TYPE_GIG_INST);
+(ipatch_virtual_gig_melodic, IpatchVirtualGigMelodic,
+ _("Melodic Instruments"), _("Non percussion instruments"),
+ IPATCH_TYPE_GIG_INST);
 IPATCH_VIRTUAL_CONTAINER_CREATE
-  (ipatch_virtual_gig_percussion, IpatchVirtualGigPercussion,
-   _("Percussion Instruments"), _("Percussion Instruments"),
-   IPATCH_TYPE_GIG_INST);
+(ipatch_virtual_gig_percussion, IpatchVirtualGigPercussion,
+ _("Percussion Instruments"), _("Percussion Instruments"),
+ IPATCH_TYPE_GIG_INST);
 IPATCH_VIRTUAL_CONTAINER_CREATE
-  (ipatch_virtual_gig_samples, IpatchVirtualGigSamples,
-   _("Samples"), _("Samples"), IPATCH_TYPE_GIG_SAMPLE);
+(ipatch_virtual_gig_samples, IpatchVirtualGigSamples,
+ _("Samples"), _("Samples"), IPATCH_TYPE_GIG_SAMPLE);
 
 IPATCH_VIRTUAL_CONTAINER_CREATE
-  (ipatch_virtual_sf2_inst, IpatchVirtualSF2Inst,
-   _("Instruments"), _("Instruments"), IPATCH_TYPE_SF2_INST);
+(ipatch_virtual_sf2_inst, IpatchVirtualSF2Inst,
+ _("Instruments"), _("Instruments"), IPATCH_TYPE_SF2_INST);
 IPATCH_VIRTUAL_CONTAINER_CREATE
-  (ipatch_virtual_sf2_melodic, IpatchVirtualSF2Melodic,
-   _("Melodic Presets"), _("Non percussion presets"), IPATCH_TYPE_SF2_PRESET);
+(ipatch_virtual_sf2_melodic, IpatchVirtualSF2Melodic,
+ _("Melodic Presets"), _("Non percussion presets"), IPATCH_TYPE_SF2_PRESET);
 IPATCH_VIRTUAL_CONTAINER_CREATE
-  (ipatch_virtual_sf2_percussion, IpatchVirtualSF2Percussion,
-   _("Percussion Presets"), _("Percussion Presets"), IPATCH_TYPE_SF2_PRESET);
+(ipatch_virtual_sf2_percussion, IpatchVirtualSF2Percussion,
+ _("Percussion Presets"), _("Percussion Presets"), IPATCH_TYPE_SF2_PRESET);
 IPATCH_VIRTUAL_CONTAINER_CREATE
-  (ipatch_virtual_sf2_samples, IpatchVirtualSF2Samples,
-   _("Samples"), _("Samples"), IPATCH_TYPE_SF2_SAMPLE);
+(ipatch_virtual_sf2_samples, IpatchVirtualSF2Samples,
+ _("Samples"), _("Samples"), IPATCH_TYPE_SF2_SAMPLE);
 IPATCH_VIRTUAL_CONTAINER_CREATE
-  (ipatch_virtual_sf2_rom, IpatchVirtualSF2Rom,
-   _("ROM Samples"), _("ROM Samples"), IPATCH_TYPE_SF2_SAMPLE);
+(ipatch_virtual_sf2_rom, IpatchVirtualSF2Rom,
+ _("ROM Samples"), _("ROM Samples"), IPATCH_TYPE_SF2_SAMPLE);
 
 IPATCH_VIRTUAL_CONTAINER_CREATE
-  (ipatch_virtual_sli_inst, IpatchVirtualSLIInst,
-   _("Instruments"), _("Instruments"), IPATCH_TYPE_SLI_INST);
+(ipatch_virtual_sli_inst, IpatchVirtualSLIInst,
+ _("Instruments"), _("Instruments"), IPATCH_TYPE_SLI_INST);
 IPATCH_VIRTUAL_CONTAINER_CREATE
-  (ipatch_virtual_sli_samples, IpatchVirtualSLISamples,
-   _("Samples"), _("Samples"), IPATCH_TYPE_SLI_SAMPLE);
+(ipatch_virtual_sli_samples, IpatchVirtualSLISamples,
+ _("Samples"), _("Samples"), IPATCH_TYPE_SLI_SAMPLE);

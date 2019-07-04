@@ -35,13 +35,13 @@
  */
 typedef struct
 {
-  guint32 buf[4];
-  guint32 bytes[2];
-  guint32 in[16];
+    guint32 buf[4];
+    guint32 bytes[2];
+    guint32 in[16];
 } IpatchMD5;
 
-void ipatch_md5_init (IpatchMD5 *ctx);
-void ipatch_md5_update (IpatchMD5 *ctx, guint8 const *buf, unsigned len);
-void ipatch_md5_final (IpatchMD5 *ctx, guint8 digest[16]);
+void ipatch_md5_init(IpatchMD5 *ctx);
+void ipatch_md5_update(IpatchMD5 *ctx, guint8 const *buf, unsigned len);
+void ipatch_md5_final(IpatchMD5 *ctx, guint8 digest[16]);
 
 #endif /* !MD5_H */

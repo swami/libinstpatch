@@ -47,19 +47,19 @@ typedef struct _IpatchGigSampleClass IpatchGigSampleClass;
 /* GigaSampler sample object */
 struct _IpatchGigSample
 {
-  IpatchDLS2Sample parent_instance;
+    IpatchDLS2Sample parent_instance;
 
-  guint32 group_number;	/* sample group number - FIXME - what exactly is it? */
+    guint32 group_number;	/* sample group number - FIXME - what exactly is it? */
 };
 
 struct _IpatchGigSampleClass
 {
-  IpatchDLS2SampleClass parent_class;
+    IpatchDLS2SampleClass parent_class;
 };
 
-GType ipatch_gig_sample_get_type (void);
-IpatchGigSample *ipatch_gig_sample_new (void);
-IpatchGigSample *ipatch_gig_sample_first (IpatchIter *iter);
-IpatchGigSample *ipatch_gig_sample_next (IpatchIter *iter);
+GType ipatch_gig_sample_get_type(void);
+IpatchGigSample *ipatch_gig_sample_new(void);
+IpatchGigSample *ipatch_gig_sample_first(IpatchIter *iter);
+IpatchGigSample *ipatch_gig_sample_next(IpatchIter *iter);
 
 #endif

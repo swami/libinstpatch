@@ -24,42 +24,42 @@
 /* SoundFont file preset header */
 struct _IpatchSF2Phdr
 {
-  char name[20];		/* preset name */
-  guint16 program;		/* MIDI program number */
-  guint16 bank;			/* MIDI bank number */
-  guint16 bag_index;	      /* index into preset bag (#IPFileBag) */
-  guint32 library;		/* Not used (preserved) */
-  guint32 genre;		/* Not used (preserved) */
-  guint32 morphology;		/* Not used (preserved) */
+    char name[20];		/* preset name */
+    guint16 program;		/* MIDI program number */
+    guint16 bank;			/* MIDI bank number */
+    guint16 bag_index;	      /* index into preset bag (#IPFileBag) */
+    guint32 library;		/* Not used (preserved) */
+    guint32 genre;		/* Not used (preserved) */
+    guint32 morphology;		/* Not used (preserved) */
 };
 
 /* SoundFont file instrument header */
 struct _IpatchSF2Ihdr
 {
-  char name[20];		/* name of instrument */
-  guint16 bag_index;		/* instrument bag index (#IPFileBag) */
+    char name[20];		/* name of instrument */
+    guint16 bag_index;		/* instrument bag index (#IPFileBag) */
 };
 
 /* SoundFont file sample header */
 struct _IpatchSF2Shdr
 {
-  char name[20];		/* sample name */
-  guint32 start;		/* offset to start of sample */
-  guint32 end;			/* offset to end of sample */
-  guint32 loop_start;		/* offset to start of loop */
-  guint32 loop_end;		/* offset to end of loop */
-  guint32 rate;			/* sample rate recorded at */
-  guint8 root_note;		/* root midi note number */
-  gint8 fine_tune;		/* pitch correction in cents */
-  guint16 link_index;	  /* linked sample index for stereo samples */
-  guint16 type;	       /* type of sample (see IpatchSF2SampleFlags) */
+    char name[20];		/* sample name */
+    guint32 start;		/* offset to start of sample */
+    guint32 end;			/* offset to end of sample */
+    guint32 loop_start;		/* offset to start of loop */
+    guint32 loop_end;		/* offset to end of loop */
+    guint32 rate;			/* sample rate recorded at */
+    guint8 root_note;		/* root midi note number */
+    gint8 fine_tune;		/* pitch correction in cents */
+    guint16 link_index;	  /* linked sample index for stereo samples */
+    guint16 type;	       /* type of sample (see IpatchSF2SampleFlags) */
 };
 
 /* SoundFont file bag (zone), indexes for zone's generators and modulators */
 struct _IpatchSF2Bag
 {
-  guint16 mod_index;		/* index into modulator list */
-  guint16 gen_index;		/* index into generator list */
+    guint16 mod_index;		/* index into modulator list */
+    guint16 gen_index;		/* index into generator list */
 };
 
 
@@ -101,11 +101,11 @@ struct _IpatchSF2Bag
  */
 typedef enum
 {
-  IPATCH_SF2_FILE_SAMPLE_TYPE_MONO      = 1 << 0,
-  IPATCH_SF2_FILE_SAMPLE_TYPE_RIGHT     = 1 << 1,
-  IPATCH_SF2_FILE_SAMPLE_TYPE_LEFT      = 1 << 2,
-  IPATCH_SF2_FILE_SAMPLE_TYPE_LINKED    = 1 << 3,
-  IPATCH_SF2_FILE_SAMPLE_TYPE_ROM       = 1 << 15
+    IPATCH_SF2_FILE_SAMPLE_TYPE_MONO      = 1 << 0,
+    IPATCH_SF2_FILE_SAMPLE_TYPE_RIGHT     = 1 << 1,
+    IPATCH_SF2_FILE_SAMPLE_TYPE_LEFT      = 1 << 2,
+    IPATCH_SF2_FILE_SAMPLE_TYPE_LINKED    = 1 << 3,
+    IPATCH_SF2_FILE_SAMPLE_TYPE_ROM       = 1 << 15
 } IpatchSF2FileSampleType;
 
 #endif

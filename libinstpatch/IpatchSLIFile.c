@@ -22,7 +22,7 @@
 /**
  * SECTION: IpatchSLIFile
  * @short_description: Spectralis file object
- * @see_also: 
+ * @see_also:
  *
  * A #IpatchFile object type for Spectralis instrument and instrument collection
  * files.
@@ -34,58 +34,62 @@
 #include "IpatchSLIFile_priv.h"
 #include "ipatch_priv.h"
 
-static gboolean ipatch_sli_file_identify (IpatchFile *file,
-                                          IpatchFileHandle *handle, GError **err);
+static gboolean ipatch_sli_file_identify(IpatchFile *file,
+        IpatchFileHandle *handle, GError **err);
 
-G_DEFINE_TYPE (IpatchSLIFile, ipatch_sli_file, IPATCH_TYPE_FILE);
+G_DEFINE_TYPE(IpatchSLIFile, ipatch_sli_file, IPATCH_TYPE_FILE);
 
 
 /* Spectralis file class init function */
 static void
-ipatch_sli_file_class_init (IpatchSLIFileClass *klass)
+ipatch_sli_file_class_init(IpatchSLIFileClass *klass)
 {
-  IpatchFileClass *file_class = IPATCH_FILE_CLASS (klass);
+    IpatchFileClass *file_class = IPATCH_FILE_CLASS(klass);
 
-  file_class->identify = ipatch_sli_file_identify;
+    file_class->identify = ipatch_sli_file_identify;
 }
 
 static void
-ipatch_sli_file_init (IpatchSLIFile *file)
+ipatch_sli_file_init(IpatchSLIFile *file)
 {
 }
 
 /* Spectralis file identification method */
 static gboolean
-ipatch_sli_file_identify (IpatchFile *file, IpatchFileHandle *handle, GError **err)
+ipatch_sli_file_identify(IpatchFile *file, IpatchFileHandle *handle, GError **err)
 {
-  guint32 buf[3];
-  char *filename;
-  int len;
+    guint32 buf[3];
+    char *filename;
+    int len;
 
-  if (handle)   /* Test content */
-  {
-    if (!ipatch_file_read (handle, buf, 12, err))
-      return (FALSE);
-
-    if (buf[0] == IPATCH_SLI_FOURCC_SIFI && buf[2] == 0x100)
-      return (TRUE);
-  }  /* Test file name extension */
-  else if ((filename = ipatch_file_get_name (file)))    /* ++ alloc file name */
-  {
-    len = strlen (filename);
-
-    if (len >= 4 &&
-        (g_ascii_strcasecmp (filename + len - 4, ".slc") == 0 ||
-         g_ascii_strcasecmp (filename + len - 4, ".sli") == 0))
+    if(handle)    /* Test content */
     {
-      g_free (filename);        /* -- free file name */
-      return (TRUE);
+        if(!ipatch_file_read(handle, buf, 12, err))
+        {
+            return (FALSE);
+        }
+
+        if(buf[0] == IPATCH_SLI_FOURCC_SIFI && buf[2] == 0x100)
+        {
+            return (TRUE);
+        }
+    }  /* Test file name extension */
+    else if((filename = ipatch_file_get_name(file)))      /* ++ alloc file name */
+    {
+        len = strlen(filename);
+
+        if(len >= 4 &&
+                (g_ascii_strcasecmp(filename + len - 4, ".slc") == 0 ||
+                 g_ascii_strcasecmp(filename + len - 4, ".sli") == 0))
+        {
+            g_free(filename);         /* -- free file name */
+            return (TRUE);
+        }
+
+        g_free(filename);         /* -- free file name */
     }
 
-    g_free (filename);        /* -- free file name */
-  }
-
-  return (FALSE);
+    return (FALSE);
 }
 
 /**
@@ -98,7 +102,7 @@ ipatch_sli_file_identify (IpatchFile *file, IpatchFileHandle *handle, GError **e
  * destroy the item.
  */
 IpatchSLIFile *
-ipatch_sli_file_new (void)
+ipatch_sli_file_new(void)
 {
-  return (IPATCH_SLI_FILE (g_object_new (IPATCH_TYPE_SLI_FILE, NULL)));
+    return (IPATCH_SLI_FILE(g_object_new(IPATCH_TYPE_SLI_FILE, NULL)));
 }

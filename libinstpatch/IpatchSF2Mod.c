@@ -20,7 +20,7 @@
 /**
  * SECTION: IpatchSF2Mod
  * @short_description: SoundFont modulators
- * @see_also: 
+ * @see_also:
  * @stability: Stable
  *
  * SoundFont modulators are used to define real time MIDI effect controls.
@@ -31,16 +31,16 @@
 #include "ipatch_priv.h"
 
 GType
-ipatch_sf2_mod_get_type (void)
+ipatch_sf2_mod_get_type(void)
 {
-  static GType type = 0;
+    static GType type = 0;
 
-  if (!type)
-    type = g_boxed_type_register_static ("IpatchSF2Mod",
-				(GBoxedCopyFunc)ipatch_sf2_mod_duplicate,
-				(GBoxedFreeFunc)ipatch_sf2_mod_free);
+    if(!type)
+        type = g_boxed_type_register_static("IpatchSF2Mod",
+                                            (GBoxedCopyFunc)ipatch_sf2_mod_duplicate,
+                                            (GBoxedFreeFunc)ipatch_sf2_mod_free);
 
-  return (type);
+    return (type);
 }
 
 /**
@@ -51,9 +51,9 @@ ipatch_sf2_mod_get_type (void)
  * Returns: New modulator
  */
 IpatchSF2Mod *
-ipatch_sf2_mod_new (void)
+ipatch_sf2_mod_new(void)
 {
-  return (g_slice_new0 (IpatchSF2Mod));
+    return (g_slice_new0(IpatchSF2Mod));
 }
 
 /**
@@ -63,10 +63,10 @@ ipatch_sf2_mod_new (void)
  * Free an #IpatchSF2Mod structure
  */
 void
-ipatch_sf2_mod_free (IpatchSF2Mod *mod)
+ipatch_sf2_mod_free(IpatchSF2Mod *mod)
 {
-  g_return_if_fail (mod != NULL);
-  g_slice_free (IpatchSF2Mod, mod);
+    g_return_if_fail(mod != NULL);
+    g_slice_free(IpatchSF2Mod, mod);
 }
 
 /**
@@ -78,20 +78,20 @@ ipatch_sf2_mod_free (IpatchSF2Mod *mod)
  * Returns: New duplicate modulator
  */
 IpatchSF2Mod *
-ipatch_sf2_mod_duplicate (const IpatchSF2Mod *mod)
+ipatch_sf2_mod_duplicate(const IpatchSF2Mod *mod)
 {
-  IpatchSF2Mod *newmod;
+    IpatchSF2Mod *newmod;
 
-  g_return_val_if_fail (mod != NULL, NULL);
+    g_return_val_if_fail(mod != NULL, NULL);
 
-  newmod = ipatch_sf2_mod_new ();
+    newmod = ipatch_sf2_mod_new();
 
-  newmod->src = mod->src;
-  newmod->dest = mod->dest;
-  newmod->amount = mod->amount;
-  newmod->amtsrc = mod->amtsrc;
-  newmod->trans = mod->trans;
+    newmod->src = mod->src;
+    newmod->dest = mod->dest;
+    newmod->amount = mod->amount;
+    newmod->amtsrc = mod->amtsrc;
+    newmod->trans = mod->trans;
 
-  return (newmod);
+    return (newmod);
 }
 

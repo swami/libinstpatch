@@ -69,25 +69,25 @@ typedef struct _IpatchSF2Bag IpatchSF2Bag;
 /* SoundFont file object (derived from IpatchFile) */
 struct _IpatchSF2File
 {
-  IpatchFile parent_instance;
-  guint32 sample_pos;		/* position in file of the sample data */
-  guint32 sample_size;		/* sample data chunk size (in samples) */
-  guint32 sample24_pos;	/* position in file of LS bytes of 24 bit samples or 0 */
+    IpatchFile parent_instance;
+    guint32 sample_pos;		/* position in file of the sample data */
+    guint32 sample_size;		/* sample data chunk size (in samples) */
+    guint32 sample24_pos;	/* position in file of LS bytes of 24 bit samples or 0 */
 };
 
 /* SoundFont file class (derived from IpatchFile) */
 struct _IpatchSF2FileClass
 {
-  IpatchFileClass parent_class;
+    IpatchFileClass parent_class;
 };
 
-GType ipatch_sf2_file_get_type (void);
-IpatchSF2File *ipatch_sf2_file_new (void);
-void ipatch_sf2_file_set_sample_pos (IpatchSF2File *file, guint sample_pos);
-guint ipatch_sf2_file_get_sample_pos (IpatchSF2File *file);
-void ipatch_sf2_file_set_sample_size (IpatchSF2File *file, guint sample_size);
-guint ipatch_sf2_file_get_sample_size (IpatchSF2File *file);
-void ipatch_sf2_file_set_sample24_pos (IpatchSF2File *file, guint sample24_pos);
-guint ipatch_sf2_file_get_sample24_pos (IpatchSF2File *file);
+GType ipatch_sf2_file_get_type(void);
+IpatchSF2File *ipatch_sf2_file_new(void);
+void ipatch_sf2_file_set_sample_pos(IpatchSF2File *file, guint sample_pos);
+guint ipatch_sf2_file_get_sample_pos(IpatchSF2File *file);
+void ipatch_sf2_file_set_sample_size(IpatchSF2File *file, guint sample_size);
+guint ipatch_sf2_file_get_sample_size(IpatchSF2File *file);
+void ipatch_sf2_file_set_sample24_pos(IpatchSF2File *file, guint sample24_pos);
+guint ipatch_sf2_file_get_sample24_pos(IpatchSF2File *file);
 
 #endif

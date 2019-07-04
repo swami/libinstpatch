@@ -48,22 +48,22 @@ typedef struct _IpatchVBankRegionClass IpatchVBankRegionClass;
 /* Virtual bank region */
 struct _IpatchVBankRegion
 {
-  IpatchItem parent_instance;
+    IpatchItem parent_instance;
 
-  /*< private >*/
-  IpatchItem *item; 	/* Referenced item or NULL (if unresolved) */
-  char **id_props;	/* prop/val pairs which ID item or NULL (if resolved) */
-  guint file_index;	/* Index of file in IpatchVBank parent (if unresolved) */
+    /*< private >*/
+    IpatchItem *item; 	/* Referenced item or NULL (if unresolved) */
+    char **id_props;	/* prop/val pairs which ID item or NULL (if resolved) */
+    guint file_index;	/* Index of file in IpatchVBank parent (if unresolved) */
 
-  IpatchRange note_range;	/* MIDI note range of this region */
-  guint8 note_range_mode;	/* #IpatchVBankRegionNoteRangeMode */
-  gint8 root_note;		/* MIDI root note value */
-  guint8 root_note_mode;	/* #IpatchVBankRegionRootNoteMode */
+    IpatchRange note_range;	/* MIDI note range of this region */
+    guint8 note_range_mode;	/* #IpatchVBankRegionNoteRangeMode */
+    gint8 root_note;		/* MIDI root note value */
+    guint8 root_note_mode;	/* #IpatchVBankRegionRootNoteMode */
 };
 
 struct _IpatchVBankRegionClass
 {
-  IpatchItemClass parent_class;
+    IpatchItemClass parent_class;
 };
 
 /**
@@ -79,8 +79,8 @@ struct _IpatchVBankRegionClass
  */
 typedef enum
 {
-  IPATCH_VBANK_REGION_NOTE_RANGE_MODE_INTERSECT	= 0,
-  IPATCH_VBANK_REGION_NOTE_RANGE_MODE_OVERRIDE	= 1
+    IPATCH_VBANK_REGION_NOTE_RANGE_MODE_INTERSECT	= 0,
+    IPATCH_VBANK_REGION_NOTE_RANGE_MODE_OVERRIDE	= 1
 } IpatchVBankRegionNoteRangeMode;
 
 /**
@@ -92,22 +92,22 @@ typedef enum
  */
 typedef enum
 {
-  IPATCH_VBANK_REGION_ROOT_NOTE_MODE_OFFSET	= 0,
-  IPATCH_VBANK_REGION_ROOT_NOTE_MODE_OVERRIDE	= 1
+    IPATCH_VBANK_REGION_ROOT_NOTE_MODE_OFFSET	= 0,
+    IPATCH_VBANK_REGION_ROOT_NOTE_MODE_OVERRIDE	= 1
 } IpatchVBankRegionRootNoteMode;
 
-GType ipatch_vbank_region_get_type (void);
-IpatchVBankRegion *ipatch_vbank_region_new (void);
+GType ipatch_vbank_region_get_type(void);
+IpatchVBankRegion *ipatch_vbank_region_new(void);
 
-IpatchVBankRegion *ipatch_vbank_region_first (IpatchIter *iter);
-IpatchVBankRegion *ipatch_vbank_region_next (IpatchIter *iter);
+IpatchVBankRegion *ipatch_vbank_region_first(IpatchIter *iter);
+IpatchVBankRegion *ipatch_vbank_region_next(IpatchIter *iter);
 
-void ipatch_vbank_region_set_id_props (IpatchVBankRegion *region,
-				       char **id_props);
-char **ipatch_vbank_region_get_id_props (IpatchVBankRegion *region,
-					 guint *n_elements);
-void ipatch_vbank_region_set_item (IpatchVBankRegion *region, IpatchItem *item);
-IpatchItem *ipatch_vbank_region_get_item (IpatchVBankRegion *region);
+void ipatch_vbank_region_set_id_props(IpatchVBankRegion *region,
+                                      char **id_props);
+char **ipatch_vbank_region_get_id_props(IpatchVBankRegion *region,
+                                        guint *n_elements);
+void ipatch_vbank_region_set_item(IpatchVBankRegion *region, IpatchItem *item);
+IpatchItem *ipatch_vbank_region_get_item(IpatchVBankRegion *region);
 
 #endif
 

@@ -50,18 +50,18 @@ typedef struct _IpatchSF2ZoneClass IpatchSF2ZoneClass;
 /* SoundFont zone item */
 struct _IpatchSF2Zone
 {
-  IpatchItem parent_instance;
+    IpatchItem parent_instance;
 
-  /*< private >*/
+    /*< private >*/
 
-  IpatchItem *item;		/* referenced item */
-  GSList *mods;			/* modulators */
-  IpatchSF2GenArray genarray;	/* generator array */
+    IpatchItem *item;		/* referenced item */
+    GSList *mods;			/* modulators */
+    IpatchSF2GenArray genarray;	/* generator array */
 };
 
 struct _IpatchSF2ZoneClass
 {
-  IpatchItemClass parent_class;
+    IpatchItemClass parent_class;
 };
 
 /* reserve 2 flags */
@@ -82,16 +82,16 @@ struct _IpatchSF2ZoneClass
 #define IPATCH_SF2_ZONE_GEN_CLEAR_FLAG(zone, genid) \
   IPATCH_SF2_GEN_ARRAY_CLEAR_FLAG (&((IpatchSF2Zone *)(zone))->genarray, genid)
 
-GType ipatch_sf2_zone_get_type (void);
+GType ipatch_sf2_zone_get_type(void);
 
-IpatchSF2Zone *ipatch_sf2_zone_first (IpatchIter *iter);
-IpatchSF2Zone *ipatch_sf2_zone_next (IpatchIter *iter);
+IpatchSF2Zone *ipatch_sf2_zone_first(IpatchIter *iter);
+IpatchSF2Zone *ipatch_sf2_zone_next(IpatchIter *iter);
 
-void ipatch_sf2_zone_set_link_item (IpatchSF2Zone *zone, IpatchItem *item);
-gboolean ipatch_sf2_zone_set_link_item_no_notify (IpatchSF2Zone *zone,
-						  IpatchItem *item,
-						  IpatchItem **olditem);
-IpatchItem *ipatch_sf2_zone_get_link_item (IpatchSF2Zone *zone);
-IpatchItem *ipatch_sf2_zone_peek_link_item (IpatchSF2Zone *zone);
+void ipatch_sf2_zone_set_link_item(IpatchSF2Zone *zone, IpatchItem *item);
+gboolean ipatch_sf2_zone_set_link_item_no_notify(IpatchSF2Zone *zone,
+        IpatchItem *item,
+        IpatchItem **olditem);
+IpatchItem *ipatch_sf2_zone_get_link_item(IpatchSF2Zone *zone);
+IpatchItem *ipatch_sf2_zone_peek_link_item(IpatchSF2Zone *zone);
 
 #endif

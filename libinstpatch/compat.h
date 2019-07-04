@@ -31,13 +31,13 @@
 
 typedef struct _GWeakRef
 {
-  gpointer obj;
+    gpointer obj;
 } GWeakRef;
 
-void g_weak_ref_init (GWeakRef *weak_ref, gpointer object);
-void g_weak_ref_clear (GWeakRef *weak_ref);
-gpointer g_weak_ref_get (GWeakRef *weak_ref);
-void g_weak_ref_set (GWeakRef *weak_ref, gpointer object);
+void g_weak_ref_init(GWeakRef *weak_ref, gpointer object);
+void g_weak_ref_clear(GWeakRef *weak_ref);
+gpointer g_weak_ref_get(GWeakRef *weak_ref);
+void g_weak_ref_set(GWeakRef *weak_ref, gpointer object);
 
 #endif
 
@@ -46,7 +46,7 @@ void g_weak_ref_set (GWeakRef *weak_ref, gpointer object);
 
 #define IPATCH_COMPAT_SLIST_FREE_FULL   1
 
-void g_slist_free_full (GSList *list, GDestroyNotify free_func);
+void g_slist_free_full(GSList *list, GDestroyNotify free_func);
 
 #endif
 

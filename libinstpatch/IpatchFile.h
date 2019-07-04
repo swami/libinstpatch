@@ -48,39 +48,39 @@ typedef struct _IpatchFileHandle IpatchFileHandle;
 /* IO function table for IpatchFile instances */
 struct _IpatchFileIOFuncs
 {
-  gboolean (*open)(IpatchFileHandle *handle, const char *mode, GError **err);
-  void (*close)(IpatchFileHandle *handle);
-  GIOStatus (*read)(IpatchFileHandle *handle, gpointer buf, guint size,
-		    guint *bytes_read, GError **err);
-  GIOStatus (*write)(IpatchFileHandle *handle, gconstpointer buf, guint size,
-		     GError **err);
-  GIOStatus (*seek)(IpatchFileHandle *handle, int offset, GSeekType type, GError **err);
-  int (*getfd)(IpatchFileHandle *handle); /* optional get file descriptor method */
-  int (*get_size)(IpatchFile *file, GError **err);  /* optional get size method */
+    gboolean(*open)(IpatchFileHandle *handle, const char *mode, GError **err);
+    void (*close)(IpatchFileHandle *handle);
+    GIOStatus(*read)(IpatchFileHandle *handle, gpointer buf, guint size,
+                     guint *bytes_read, GError **err);
+    GIOStatus(*write)(IpatchFileHandle *handle, gconstpointer buf, guint size,
+                      GError **err);
+    GIOStatus(*seek)(IpatchFileHandle *handle, int offset, GSeekType type, GError **err);
+    int (*getfd)(IpatchFileHandle *handle); /* optional get file descriptor method */
+    int (*get_size)(IpatchFile *file, GError **err);  /* optional get size method */
 };
 
 /* File object */
 struct _IpatchFile
 {
-  IpatchItem parent_instance;
+    IpatchItem parent_instance;
 
-  /*< private >*/
+    /*< private >*/
 
-  IpatchFileIOFuncs *iofuncs;	/* per instance I/O methods */
-  char *file_name;		/* not always set */
-  GIOChannel *iochan;           /* assigned directly with ipatch_file_set_(fd/iochan) */
-  GHashTable *ref_hash;         /* registered objects referencing this file: objectPtr -> GWeakRef */
-  guint open_count;             /* count of open file handles */
+    IpatchFileIOFuncs *iofuncs;	/* per instance I/O methods */
+    char *file_name;		/* not always set */
+    GIOChannel *iochan;           /* assigned directly with ipatch_file_set_(fd/iochan) */
+    GHashTable *ref_hash;         /* registered objects referencing this file: objectPtr -> GWeakRef */
+    guint open_count;             /* count of open file handles */
 };
 
 /* File object class */
 struct _IpatchFileClass
 {
-  IpatchItemClass parent_class;
+    IpatchItemClass parent_class;
 
-  /* File identify method */
-  gboolean (*identify)(IpatchFile *file, IpatchFileHandle *handle, GError **err);
-  int identify_order;   /* Identify execution order (see #IpatchFileIdentifyOrder, 0 = default) */
+    /* File identify method */
+    gboolean(*identify)(IpatchFile *file, IpatchFileHandle *handle, GError **err);
+    int identify_order;   /* Identify execution order (see #IpatchFileIdentifyOrder, 0 = default) */
 };
 
 /**
@@ -91,9 +91,9 @@ struct _IpatchFileClass
  */
 typedef enum
 {
-  IPATCH_FILE_FLAG_SWAP = 1 << (IPATCH_ITEM_UNUSED_FLAG_SHIFT),
-  IPATCH_FILE_FLAG_BIG_ENDIAN = 1 << (IPATCH_ITEM_UNUSED_FLAG_SHIFT + 1),
-  IPATCH_FILE_FLAG_FREE_IOFUNCS = 1 << (IPATCH_ITEM_UNUSED_FLAG_SHIFT + 2)
+    IPATCH_FILE_FLAG_SWAP = 1 << (IPATCH_ITEM_UNUSED_FLAG_SHIFT),
+    IPATCH_FILE_FLAG_BIG_ENDIAN = 1 << (IPATCH_ITEM_UNUSED_FLAG_SHIFT + 1),
+    IPATCH_FILE_FLAG_FREE_IOFUNCS = 1 << (IPATCH_ITEM_UNUSED_FLAG_SHIFT + 2)
 } IpatchFileFlags;
 
 /**
@@ -109,9 +109,9 @@ typedef enum
  */
 typedef enum
 {
-  IPATCH_FILE_IDENTIFY_ORDER_LAST = -10,
-  IPATCH_FILE_IDENTIFY_ORDER_DEFAULT = 0,
-  IPATCH_FILE_IDENTIFY_ORDER_FIRST = 10
+    IPATCH_FILE_IDENTIFY_ORDER_LAST = -10,
+    IPATCH_FILE_IDENTIFY_ORDER_DEFAULT = 0,
+    IPATCH_FILE_IDENTIFY_ORDER_FIRST = 10
 } IpatchFileIdentifyOrder;
 
 /**
@@ -149,133 +149,133 @@ typedef enum
  */
 struct _IpatchFileHandle
 {
-  IpatchFile *file;		/* Parent file object */
-  guint position;               /* Current file position */
-  GByteArray *buf;              /* For buffered reads/writes */
-  guint buf_position;           /* Current position in buffer */
-  GIOChannel *iochan;		/* glib IO channel (default methods) */
-  gpointer data;                /* iofuncs defined data */
+    IpatchFile *file;		/* Parent file object */
+    guint position;               /* Current file position */
+    GByteArray *buf;              /* For buffered reads/writes */
+    guint buf_position;           /* Current position in buffer */
+    GIOChannel *iochan;		/* glib IO channel (default methods) */
+    gpointer data;                /* iofuncs defined data */
 };
 
 
-GType ipatch_file_get_type (void);
-GType ipatch_file_handle_get_type (void);
-IpatchFile *ipatch_file_new (void);
-IpatchFile *ipatch_file_pool_new (const char *file_name, gboolean *created);
-IpatchFile *ipatch_file_pool_lookup (const char *file_name);
+GType ipatch_file_get_type(void);
+GType ipatch_file_handle_get_type(void);
+IpatchFile *ipatch_file_new(void);
+IpatchFile *ipatch_file_pool_new(const char *file_name, gboolean *created);
+IpatchFile *ipatch_file_pool_lookup(const char *file_name);
 
-void ipatch_file_ref_from_object (IpatchFile *file, GObject *object);
-void ipatch_file_unref_from_object (IpatchFile *file, GObject *object);
-gboolean ipatch_file_test_ref_object (IpatchFile *file, GObject *object);
-IpatchList *ipatch_file_get_refs (IpatchFile *file);
-IpatchList *ipatch_file_get_refs_by_type (IpatchFile *file, GType type);
+void ipatch_file_ref_from_object(IpatchFile *file, GObject *object);
+void ipatch_file_unref_from_object(IpatchFile *file, GObject *object);
+gboolean ipatch_file_test_ref_object(IpatchFile *file, GObject *object);
+IpatchList *ipatch_file_get_refs(IpatchFile *file);
+IpatchList *ipatch_file_get_refs_by_type(IpatchFile *file, GType type);
 
-void ipatch_file_set_name (IpatchFile *file, const char *file_name);
-char *ipatch_file_get_name (IpatchFile *file);
-gboolean ipatch_file_rename (IpatchFile *file, const char *new_name, GError **err);
-gboolean ipatch_file_unlink (IpatchFile *file, GError **err);
-gboolean ipatch_file_replace (IpatchFile *newfile, IpatchFile *oldfile, GError **err);
-IpatchFileHandle *ipatch_file_open (IpatchFile *file, const char *file_name,
-                                    const char *mode, GError **err);
-void ipatch_file_assign_fd (IpatchFile *file, int fd, gboolean close_on_finalize);
-void ipatch_file_assign_io_channel (IpatchFile *file, GIOChannel *iochan);
-GIOChannel *ipatch_file_get_io_channel (IpatchFileHandle *handle);
-int ipatch_file_get_fd (IpatchFileHandle *handle);
-void ipatch_file_close (IpatchFileHandle *handle);
+void ipatch_file_set_name(IpatchFile *file, const char *file_name);
+char *ipatch_file_get_name(IpatchFile *file);
+gboolean ipatch_file_rename(IpatchFile *file, const char *new_name, GError **err);
+gboolean ipatch_file_unlink(IpatchFile *file, GError **err);
+gboolean ipatch_file_replace(IpatchFile *newfile, IpatchFile *oldfile, GError **err);
+IpatchFileHandle *ipatch_file_open(IpatchFile *file, const char *file_name,
+                                   const char *mode, GError **err);
+void ipatch_file_assign_fd(IpatchFile *file, int fd, gboolean close_on_finalize);
+void ipatch_file_assign_io_channel(IpatchFile *file, GIOChannel *iochan);
+GIOChannel *ipatch_file_get_io_channel(IpatchFileHandle *handle);
+int ipatch_file_get_fd(IpatchFileHandle *handle);
+void ipatch_file_close(IpatchFileHandle *handle);
 
-guint ipatch_file_get_position (IpatchFileHandle *handle);
-void ipatch_file_update_position (IpatchFileHandle *handle, guint offset);
+guint ipatch_file_get_position(IpatchFileHandle *handle);
+void ipatch_file_update_position(IpatchFileHandle *handle, guint offset);
 
-gboolean ipatch_file_read (IpatchFileHandle *handle, gpointer buf, guint size,
-			   GError **err);
-GIOStatus ipatch_file_read_eof (IpatchFileHandle *handle, gpointer buf, guint size,
-				guint *bytes_read, GError **err);
-gboolean ipatch_file_write (IpatchFileHandle *handle, gconstpointer buf,
-                            guint size, GError **err);
+gboolean ipatch_file_read(IpatchFileHandle *handle, gpointer buf, guint size,
+                          GError **err);
+GIOStatus ipatch_file_read_eof(IpatchFileHandle *handle, gpointer buf, guint size,
+                               guint *bytes_read, GError **err);
+gboolean ipatch_file_write(IpatchFileHandle *handle, gconstpointer buf,
+                           guint size, GError **err);
 #define ipatch_file_skip(handle, offset, err) \
   ipatch_file_seek (handle, offset, G_SEEK_CUR, err)
-gboolean ipatch_file_seek (IpatchFileHandle *handle, int offset, GSeekType type,
-			   GError **err);
-GIOStatus ipatch_file_seek_eof (IpatchFileHandle *handle, int offset,
-                                GSeekType type, GError **err);
-int ipatch_file_get_size (IpatchFile *file, GError **err);
-GType ipatch_file_identify (IpatchFile *file, GError **err);
-GType ipatch_file_identify_name (const char *filename, GError **err);
-GType ipatch_file_identify_by_ext (IpatchFile *file);
-IpatchFileHandle *ipatch_file_identify_open (const char *file_name, GError **err);
-IpatchFile *ipatch_file_identify_new (const char *file_name, GError **err);
+gboolean ipatch_file_seek(IpatchFileHandle *handle, int offset, GSeekType type,
+                          GError **err);
+GIOStatus ipatch_file_seek_eof(IpatchFileHandle *handle, int offset,
+                               GSeekType type, GError **err);
+int ipatch_file_get_size(IpatchFile *file, GError **err);
+GType ipatch_file_identify(IpatchFile *file, GError **err);
+GType ipatch_file_identify_name(const char *filename, GError **err);
+GType ipatch_file_identify_by_ext(IpatchFile *file);
+IpatchFileHandle *ipatch_file_identify_open(const char *file_name, GError **err);
+IpatchFile *ipatch_file_identify_new(const char *file_name, GError **err);
 
-void ipatch_file_set_little_endian (IpatchFile *file);
-void ipatch_file_set_big_endian (IpatchFile *file);
+void ipatch_file_set_little_endian(IpatchFile *file);
+void ipatch_file_set_big_endian(IpatchFile *file);
 
-gboolean ipatch_file_read_u8 (IpatchFileHandle *handle, guint8 *val, GError **err);
-gboolean ipatch_file_read_u16 (IpatchFileHandle *handle, guint16 *val, GError **err);
-gboolean ipatch_file_read_u32 (IpatchFileHandle *handle, guint32 *val, GError **err);
-gboolean ipatch_file_read_u64 (IpatchFileHandle *handle, guint64 *val, GError **err);
-gboolean ipatch_file_read_s8 (IpatchFileHandle *handle, gint8 *val, GError **err);
-gboolean ipatch_file_read_s16 (IpatchFileHandle *handle, gint16 *val, GError **err);
-gboolean ipatch_file_read_s32 (IpatchFileHandle *handle, gint32 *val, GError **err);
-gboolean ipatch_file_read_s64 (IpatchFileHandle *handle, gint64 *val, GError **err);
+gboolean ipatch_file_read_u8(IpatchFileHandle *handle, guint8 *val, GError **err);
+gboolean ipatch_file_read_u16(IpatchFileHandle *handle, guint16 *val, GError **err);
+gboolean ipatch_file_read_u32(IpatchFileHandle *handle, guint32 *val, GError **err);
+gboolean ipatch_file_read_u64(IpatchFileHandle *handle, guint64 *val, GError **err);
+gboolean ipatch_file_read_s8(IpatchFileHandle *handle, gint8 *val, GError **err);
+gboolean ipatch_file_read_s16(IpatchFileHandle *handle, gint16 *val, GError **err);
+gboolean ipatch_file_read_s32(IpatchFileHandle *handle, gint32 *val, GError **err);
+gboolean ipatch_file_read_s64(IpatchFileHandle *handle, gint64 *val, GError **err);
 
-gboolean ipatch_file_write_u8 (IpatchFileHandle *handle, guint8 val, GError **err);
-gboolean ipatch_file_write_u16 (IpatchFileHandle *handle, guint16 val, GError **err);
-gboolean ipatch_file_write_u32 (IpatchFileHandle *handle, guint32 val, GError **err);
-gboolean ipatch_file_write_u64 (IpatchFileHandle *handle, guint64 val, GError **err);
-gboolean ipatch_file_write_s8 (IpatchFileHandle *handle, gint8 val, GError **err);
-gboolean ipatch_file_write_s16 (IpatchFileHandle *handle, gint16 val, GError **err);
-gboolean ipatch_file_write_s32 (IpatchFileHandle *handle, gint32 val, GError **err);
-gboolean ipatch_file_write_s64 (IpatchFileHandle *handle, gint64 val, GError **err);
+gboolean ipatch_file_write_u8(IpatchFileHandle *handle, guint8 val, GError **err);
+gboolean ipatch_file_write_u16(IpatchFileHandle *handle, guint16 val, GError **err);
+gboolean ipatch_file_write_u32(IpatchFileHandle *handle, guint32 val, GError **err);
+gboolean ipatch_file_write_u64(IpatchFileHandle *handle, guint64 val, GError **err);
+gboolean ipatch_file_write_s8(IpatchFileHandle *handle, gint8 val, GError **err);
+gboolean ipatch_file_write_s16(IpatchFileHandle *handle, gint16 val, GError **err);
+gboolean ipatch_file_write_s32(IpatchFileHandle *handle, gint32 val, GError **err);
+gboolean ipatch_file_write_s64(IpatchFileHandle *handle, gint64 val, GError **err);
 
-gboolean ipatch_file_buf_load (IpatchFileHandle *handle, guint size, GError **err);
-void ipatch_file_buf_read (IpatchFileHandle *handle, gpointer buf, guint size);
-void ipatch_file_buf_write (IpatchFileHandle *handle, gconstpointer buf,
-			    guint size);
+gboolean ipatch_file_buf_load(IpatchFileHandle *handle, guint size, GError **err);
+void ipatch_file_buf_read(IpatchFileHandle *handle, gpointer buf, guint size);
+void ipatch_file_buf_write(IpatchFileHandle *handle, gconstpointer buf,
+                           guint size);
 #define ipatch_file_buf_zero(filebuf, size) \
   ipatch_file_buf_memset(filebuf, 0, size)
-void ipatch_file_buf_memset (IpatchFileHandle *handle, char c, guint size);
-void ipatch_file_buf_set_size (IpatchFileHandle *handle, guint size);
-gboolean ipatch_file_buf_commit (IpatchFileHandle *handle, GError **err);
+void ipatch_file_buf_memset(IpatchFileHandle *handle, char c, guint size);
+void ipatch_file_buf_set_size(IpatchFileHandle *handle, guint size);
+gboolean ipatch_file_buf_commit(IpatchFileHandle *handle, GError **err);
 #define ipatch_file_buf_skip(filebuf, offset) \
   ipatch_file_buf_seek (filebuf, offset, G_SEEK_CUR)
-void ipatch_file_buf_seek (IpatchFileHandle *handle, int offset, GSeekType type);
+void ipatch_file_buf_seek(IpatchFileHandle *handle, int offset, GSeekType type);
 
-guint8 ipatch_file_buf_read_u8 (IpatchFileHandle *handle);
-guint16 ipatch_file_buf_read_u16 (IpatchFileHandle *handle);
-guint32 ipatch_file_buf_read_u32 (IpatchFileHandle *handle);
-guint64 ipatch_file_buf_read_u64 (IpatchFileHandle *handle);
-gint8 ipatch_file_buf_read_s8 (IpatchFileHandle *handle);
-gint16 ipatch_file_buf_read_s16 (IpatchFileHandle *handle);
-gint32 ipatch_file_buf_read_s32 (IpatchFileHandle *handle);
-gint64 ipatch_file_buf_read_s64 (IpatchFileHandle *handle);
+guint8 ipatch_file_buf_read_u8(IpatchFileHandle *handle);
+guint16 ipatch_file_buf_read_u16(IpatchFileHandle *handle);
+guint32 ipatch_file_buf_read_u32(IpatchFileHandle *handle);
+guint64 ipatch_file_buf_read_u64(IpatchFileHandle *handle);
+gint8 ipatch_file_buf_read_s8(IpatchFileHandle *handle);
+gint16 ipatch_file_buf_read_s16(IpatchFileHandle *handle);
+gint32 ipatch_file_buf_read_s32(IpatchFileHandle *handle);
+gint64 ipatch_file_buf_read_s64(IpatchFileHandle *handle);
 
-void ipatch_file_buf_write_u8 (IpatchFileHandle *handle, guint8 val);
-void ipatch_file_buf_write_u16 (IpatchFileHandle *handle, guint16 val);
-void ipatch_file_buf_write_u32 (IpatchFileHandle *handle, guint32 val);
-void ipatch_file_buf_write_u64 (IpatchFileHandle *handle, guint64 val);
-void ipatch_file_buf_write_s8 (IpatchFileHandle *handle, gint8 val);
-void ipatch_file_buf_write_s16 (IpatchFileHandle *handle, gint16 val);
-void ipatch_file_buf_write_s32 (IpatchFileHandle *handle, gint32 val);
-void ipatch_file_buf_write_s64 (IpatchFileHandle *handle, gint64 val);
+void ipatch_file_buf_write_u8(IpatchFileHandle *handle, guint8 val);
+void ipatch_file_buf_write_u16(IpatchFileHandle *handle, guint16 val);
+void ipatch_file_buf_write_u32(IpatchFileHandle *handle, guint32 val);
+void ipatch_file_buf_write_u64(IpatchFileHandle *handle, guint64 val);
+void ipatch_file_buf_write_s8(IpatchFileHandle *handle, gint8 val);
+void ipatch_file_buf_write_s16(IpatchFileHandle *handle, gint16 val);
+void ipatch_file_buf_write_s32(IpatchFileHandle *handle, gint32 val);
+void ipatch_file_buf_write_s64(IpatchFileHandle *handle, gint64 val);
 
-void ipatch_file_set_iofuncs_static (IpatchFile *file,
-				     IpatchFileIOFuncs *funcs);
-void ipatch_file_set_iofuncs (IpatchFile *file,
-			      const IpatchFileIOFuncs *funcs);
-void ipatch_file_get_iofuncs (IpatchFile *file, IpatchFileIOFuncs *out_funcs);
-void ipatch_file_set_iofuncs_null (IpatchFile *file);
+void ipatch_file_set_iofuncs_static(IpatchFile *file,
+                                    IpatchFileIOFuncs *funcs);
+void ipatch_file_set_iofuncs(IpatchFile *file,
+                             const IpatchFileIOFuncs *funcs);
+void ipatch_file_get_iofuncs(IpatchFile *file, IpatchFileIOFuncs *out_funcs);
+void ipatch_file_set_iofuncs_null(IpatchFile *file);
 
-gboolean ipatch_file_default_open_method (IpatchFileHandle *handle, const char *mode,
-					  GError **err);
-void ipatch_file_default_close_method (IpatchFileHandle *handle);
-GIOStatus ipatch_file_default_read_method (IpatchFileHandle *handle, gpointer buf,
-					   guint size, guint *bytes_read,
-					   GError **err);
-GIOStatus ipatch_file_default_write_method (IpatchFileHandle *handle,
-					    gconstpointer buf,
-					    guint size, GError **err);
-GIOStatus ipatch_file_default_seek_method (IpatchFileHandle *handle, int offset,
-					   GSeekType type, GError **err);
-int ipatch_file_default_getfd_method (IpatchFileHandle *handle);
-int ipatch_file_default_get_size_method (IpatchFile *file, GError **err);
+gboolean ipatch_file_default_open_method(IpatchFileHandle *handle, const char *mode,
+        GError **err);
+void ipatch_file_default_close_method(IpatchFileHandle *handle);
+GIOStatus ipatch_file_default_read_method(IpatchFileHandle *handle, gpointer buf,
+        guint size, guint *bytes_read,
+        GError **err);
+GIOStatus ipatch_file_default_write_method(IpatchFileHandle *handle,
+        gconstpointer buf,
+        guint size, GError **err);
+GIOStatus ipatch_file_default_seek_method(IpatchFileHandle *handle, int offset,
+        GSeekType type, GError **err);
+int ipatch_file_default_getfd_method(IpatchFileHandle *handle);
+int ipatch_file_default_get_size_method(IpatchFile *file, GError **err);
 
 #endif

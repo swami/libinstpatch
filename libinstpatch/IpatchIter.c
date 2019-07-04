@@ -20,7 +20,7 @@
 /**
  * SECTION: IpatchIter
  * @short_description: Iterator instance
- * @see_also: 
+ * @see_also:
  * @stability: Stable
  *
  * A boxed type (structure) used for abstracting manipulation of object lists.
@@ -31,40 +31,40 @@
 /* IpatchIter methods for GSList type lists */
 IpatchIterMethods ipatch_iter_GSList_methods =
 {
-  ipatch_iter_GSList_get,
-  ipatch_iter_GSList_next,
-  ipatch_iter_GSList_first,
-  ipatch_iter_GSList_last,
-  ipatch_iter_GSList_index,
-  ipatch_iter_GSList_insert,
-  ipatch_iter_GSList_remove,
-  ipatch_iter_GSList_count
+    ipatch_iter_GSList_get,
+    ipatch_iter_GSList_next,
+    ipatch_iter_GSList_first,
+    ipatch_iter_GSList_last,
+    ipatch_iter_GSList_index,
+    ipatch_iter_GSList_insert,
+    ipatch_iter_GSList_remove,
+    ipatch_iter_GSList_count
 };
 
 /* IpatchIter methods for GList type lists */
 IpatchIterMethods ipatch_iter_GList_methods =
 {
-  ipatch_iter_GList_get,
-  ipatch_iter_GList_next,
-  ipatch_iter_GList_first,
-  ipatch_iter_GList_last,
-  ipatch_iter_GList_index,
-  ipatch_iter_GList_insert,
-  ipatch_iter_GList_remove,
-  ipatch_iter_GList_count
+    ipatch_iter_GList_get,
+    ipatch_iter_GList_next,
+    ipatch_iter_GList_first,
+    ipatch_iter_GList_last,
+    ipatch_iter_GList_index,
+    ipatch_iter_GList_insert,
+    ipatch_iter_GList_remove,
+    ipatch_iter_GList_count
 };
 
 /* IpatchIter methods for arrays */
 IpatchIterMethods ipatch_iter_array_methods =
 {
-  ipatch_iter_array_get,
-  ipatch_iter_array_next,
-  ipatch_iter_array_first,
-  ipatch_iter_array_last,
-  ipatch_iter_array_index,
-  ipatch_iter_array_insert,
-  ipatch_iter_array_remove,
-  ipatch_iter_array_count
+    ipatch_iter_array_get,
+    ipatch_iter_array_next,
+    ipatch_iter_array_first,
+    ipatch_iter_array_last,
+    ipatch_iter_array_index,
+    ipatch_iter_array_insert,
+    ipatch_iter_array_remove,
+    ipatch_iter_array_count
 };
 
 /**
@@ -75,15 +75,16 @@ IpatchIterMethods ipatch_iter_array_methods =
  * Returns: GType of #IpatchIter structures.
  */
 GType
-ipatch_iter_get_type (void)
+ipatch_iter_get_type(void)
 {
-  static GType type = 0;
+    static GType type = 0;
 
-  if (!type)
-    type = g_boxed_type_register_static ("IpatchIter",
-					 (GBoxedCopyFunc)ipatch_iter_duplicate,
-					 (GBoxedFreeFunc)ipatch_iter_free);
-  return (type);
+    if(!type)
+        type = g_boxed_type_register_static("IpatchIter",
+                                            (GBoxedCopyFunc)ipatch_iter_duplicate,
+                                            (GBoxedFreeFunc)ipatch_iter_free);
+
+    return (type);
 }
 
 /**
@@ -96,11 +97,11 @@ ipatch_iter_get_type (void)
  *   ipatch_iter_free() when finished with it.
  */
 IpatchIter *
-ipatch_iter_alloc (void)
+ipatch_iter_alloc(void)
 {
-  IpatchIter *iter;
-  iter = g_new0 (IpatchIter, 1);
-  return (iter);
+    IpatchIter *iter;
+    iter = g_new0(IpatchIter, 1);
+    return (iter);
 }
 
 /**
@@ -112,9 +113,9 @@ ipatch_iter_alloc (void)
  * stack.
  */
 void
-ipatch_iter_free (IpatchIter *iter)
+ipatch_iter_free(IpatchIter *iter)
 {
-  g_free (iter);
+    g_free(iter);
 }
 
 /**
@@ -129,13 +130,13 @@ ipatch_iter_free (IpatchIter *iter)
  * ipatch_iter_free() when finished.
  */
 IpatchIter *
-ipatch_iter_duplicate (IpatchIter *iter)
+ipatch_iter_duplicate(IpatchIter *iter)
 {
-  IpatchIter *newiter;
+    IpatchIter *newiter;
 
-  newiter = ipatch_iter_alloc ();
-  *newiter = *iter;
-  return (newiter);
+    newiter = ipatch_iter_alloc();
+    *newiter = *iter;
+    return (newiter);
 }
 
 /**
@@ -146,14 +147,14 @@ ipatch_iter_duplicate (IpatchIter *iter)
  * Initialize an iterator to iterate over a GSList.
  */
 void
-ipatch_iter_GSList_init (IpatchIter *iter, GSList **list)
+ipatch_iter_GSList_init(IpatchIter *iter, GSList **list)
 {
-  g_return_if_fail (iter != NULL);
-  g_return_if_fail (list != NULL);
+    g_return_if_fail(iter != NULL);
+    g_return_if_fail(list != NULL);
 
-  iter->methods = &ipatch_iter_GSList_methods;
-  IPATCH_ITER_GSLIST_SET_LIST (iter, list);
-  IPATCH_ITER_GSLIST_SET_POS (iter, NULL);
+    iter->methods = &ipatch_iter_GSList_methods;
+    IPATCH_ITER_GSLIST_SET_LIST(iter, list);
+    IPATCH_ITER_GSLIST_SET_POS(iter, NULL);
 }
 
 /**
@@ -165,14 +166,14 @@ ipatch_iter_GSList_init (IpatchIter *iter, GSList **list)
  * Returns: Current item or %NULL if no current item.
  */
 gpointer
-ipatch_iter_GSList_get (IpatchIter *iter)
+ipatch_iter_GSList_get(IpatchIter *iter)
 {
-  GSList *pos;
+    GSList *pos;
 
-  g_return_val_if_fail (iter != NULL, NULL);
+    g_return_val_if_fail(iter != NULL, NULL);
 
-  pos = IPATCH_ITER_GSLIST_GET_POS (iter);
-  return (pos ? (gpointer)(pos->data) : NULL);
+    pos = IPATCH_ITER_GSLIST_GET_POS(iter);
+    return (pos ? (gpointer)(pos->data) : NULL);
 }
 
 /**
@@ -185,16 +186,21 @@ ipatch_iter_GSList_get (IpatchIter *iter)
  * Returns: Next item or %NULL if no more items.
  */
 gpointer
-ipatch_iter_GSList_next (IpatchIter *iter)
+ipatch_iter_GSList_next(IpatchIter *iter)
 {
-  GSList *pos;
+    GSList *pos;
 
-  g_return_val_if_fail (iter != NULL, NULL);
+    g_return_val_if_fail(iter != NULL, NULL);
 
-  pos = IPATCH_ITER_GSLIST_GET_POS (iter);
-  if (pos) pos = g_slist_next (pos);
-  IPATCH_ITER_GSLIST_SET_POS (iter, pos); /* set current position */
-  return (pos ? (gpointer)(pos->data) : NULL);
+    pos = IPATCH_ITER_GSLIST_GET_POS(iter);
+
+    if(pos)
+    {
+        pos = g_slist_next(pos);
+    }
+
+    IPATCH_ITER_GSLIST_SET_POS(iter, pos);  /* set current position */
+    return (pos ? (gpointer)(pos->data) : NULL);
 }
 
 /**
@@ -207,18 +213,18 @@ ipatch_iter_GSList_next (IpatchIter *iter)
  * Returns: First item or %NULL if GSList is empty.
  */
 gpointer
-ipatch_iter_GSList_first (IpatchIter *iter)
+ipatch_iter_GSList_first(IpatchIter *iter)
 {
-  GSList **list, *pos;
+    GSList **list, *pos;
 
-  g_return_val_if_fail (iter != NULL, NULL);
+    g_return_val_if_fail(iter != NULL, NULL);
 
-  list = IPATCH_ITER_GSLIST_GET_LIST (iter); /* list pointer */
-  g_return_val_if_fail (list != NULL, NULL);
+    list = IPATCH_ITER_GSLIST_GET_LIST(iter);  /* list pointer */
+    g_return_val_if_fail(list != NULL, NULL);
 
-  pos = *list;
-  IPATCH_ITER_GSLIST_SET_POS (iter, pos); /* set position */
-  return (pos ? (gpointer)(pos->data) : NULL);
+    pos = *list;
+    IPATCH_ITER_GSLIST_SET_POS(iter, pos);  /* set position */
+    return (pos ? (gpointer)(pos->data) : NULL);
 }
 
 /**
@@ -231,18 +237,18 @@ ipatch_iter_GSList_first (IpatchIter *iter)
  * Returns: Last item or %NULL if GSList is empty.
  */
 gpointer
-ipatch_iter_GSList_last (IpatchIter *iter)
+ipatch_iter_GSList_last(IpatchIter *iter)
 {
-  GSList **list, *pos;
+    GSList **list, *pos;
 
-  g_return_val_if_fail (iter != NULL, NULL);
+    g_return_val_if_fail(iter != NULL, NULL);
 
-  list = IPATCH_ITER_GSLIST_GET_LIST (iter);
-  g_return_val_if_fail (list != NULL, NULL);
+    list = IPATCH_ITER_GSLIST_GET_LIST(iter);
+    g_return_val_if_fail(list != NULL, NULL);
 
-  pos = g_slist_last (*list);
-  IPATCH_ITER_GSLIST_SET_POS (iter, pos); /* set current position */
-  return (pos ? (gpointer)(pos->data) : NULL);
+    pos = g_slist_last(*list);
+    IPATCH_ITER_GSLIST_SET_POS(iter, pos);  /* set current position */
+    return (pos ? (gpointer)(pos->data) : NULL);
 }
 
 /**
@@ -257,18 +263,18 @@ ipatch_iter_GSList_last (IpatchIter *iter)
  * the end of the GSList.
  */
 gpointer
-ipatch_iter_GSList_index (IpatchIter *iter, int index)
+ipatch_iter_GSList_index(IpatchIter *iter, int index)
 {
-  GSList **list, *pos;
+    GSList **list, *pos;
 
-  g_return_val_if_fail (iter != NULL, NULL);
+    g_return_val_if_fail(iter != NULL, NULL);
 
-  list = IPATCH_ITER_GSLIST_GET_LIST (iter);
-  g_return_val_if_fail (list != NULL, NULL);
+    list = IPATCH_ITER_GSLIST_GET_LIST(iter);
+    g_return_val_if_fail(list != NULL, NULL);
 
-  pos = g_slist_nth (*list, index);
-  IPATCH_ITER_GSLIST_SET_POS (iter, pos); /* set current position */
-  return (pos ? (gpointer)(pos->data) : NULL);
+    pos = g_slist_nth(*list, index);
+    IPATCH_ITER_GSLIST_SET_POS(iter, pos);  /* set current position */
+    return (pos ? (gpointer)(pos->data) : NULL);
 }
 
 /**
@@ -279,25 +285,25 @@ ipatch_iter_GSList_index (IpatchIter *iter, int index)
  * GSList item iterator method to insert an item pointer.
  */
 void
-ipatch_iter_GSList_insert (IpatchIter *iter, gpointer item)
+ipatch_iter_GSList_insert(IpatchIter *iter, gpointer item)
 {
-  GSList **list, *pos;
+    GSList **list, *pos;
 
-  g_return_if_fail (iter != NULL);
+    g_return_if_fail(iter != NULL);
 
-  if ((pos = IPATCH_ITER_GSLIST_GET_POS (iter))) /* position set? */
+    if((pos = IPATCH_ITER_GSLIST_GET_POS(iter)))   /* position set? */
     {
-      pos = g_slist_insert (pos, item, 1); /* insert after position */
-      IPATCH_ITER_GSLIST_SET_POS (iter, g_slist_next (pos)); /* update pos */
+        pos = g_slist_insert(pos, item, 1);  /* insert after position */
+        IPATCH_ITER_GSLIST_SET_POS(iter, g_slist_next(pos));   /* update pos */
     }
-  else				/* position not set */
+    else				/* position not set */
     {
-      list = IPATCH_ITER_GSLIST_GET_LIST (iter);
-      g_return_if_fail (list != NULL);
+        list = IPATCH_ITER_GSLIST_GET_LIST(iter);
+        g_return_if_fail(list != NULL);
 
-      pos = g_slist_prepend (*list, item); /* prepend */
-      IPATCH_ITER_GSLIST_SET_POS (iter, pos); /* set current position */
-      *list = pos;		/* set root of list */
+        pos = g_slist_prepend(*list, item);  /* prepend */
+        IPATCH_ITER_GSLIST_SET_POS(iter, pos);  /* set current position */
+        *list = pos;		/* set root of list */
     }
 }
 
@@ -309,21 +315,22 @@ ipatch_iter_GSList_insert (IpatchIter *iter, gpointer item)
  * the current position.
  */
 void
-ipatch_iter_GSList_remove (IpatchIter *iter)
+ipatch_iter_GSList_remove(IpatchIter *iter)
 {
-  GSList **list, *pos;
+    GSList **list, *pos;
 
-  g_return_if_fail (iter != NULL);
+    g_return_if_fail(iter != NULL);
 
-  list = IPATCH_ITER_GSLIST_GET_LIST (iter);
-  g_return_if_fail (list != NULL);
+    list = IPATCH_ITER_GSLIST_GET_LIST(iter);
+    g_return_if_fail(list != NULL);
 
-  /* advance current position if set */
-  pos = IPATCH_ITER_GSLIST_GET_POS (iter);
-  if (pos)
+    /* advance current position if set */
+    pos = IPATCH_ITER_GSLIST_GET_POS(iter);
+
+    if(pos)
     {
-      IPATCH_ITER_GSLIST_SET_POS (iter, g_slist_next (pos));
-      *list = g_slist_delete_link (*list, pos);
+        IPATCH_ITER_GSLIST_SET_POS(iter, g_slist_next(pos));
+        *list = g_slist_delete_link(*list, pos);
     }
 }
 
@@ -336,16 +343,16 @@ ipatch_iter_GSList_remove (IpatchIter *iter)
  * Returns: Count of items in GSList iterator.
  */
 int
-ipatch_iter_GSList_count (IpatchIter *iter)
+ipatch_iter_GSList_count(IpatchIter *iter)
 {
-  GSList **list;
+    GSList **list;
 
-  g_return_val_if_fail (iter != NULL, 0);
+    g_return_val_if_fail(iter != NULL, 0);
 
-  list = IPATCH_ITER_GSLIST_GET_LIST (iter);
-  g_return_val_if_fail (list != NULL, 0);
+    list = IPATCH_ITER_GSLIST_GET_LIST(iter);
+    g_return_val_if_fail(list != NULL, 0);
 
-  return (g_slist_length (*list));
+    return (g_slist_length(*list));
 }
 
 
@@ -357,13 +364,13 @@ ipatch_iter_GSList_count (IpatchIter *iter)
  * Initialize an iterator to iterate over a GList.
  */
 void
-ipatch_iter_GList_init (IpatchIter *iter, GList **list)
+ipatch_iter_GList_init(IpatchIter *iter, GList **list)
 {
-  g_return_if_fail (iter != NULL);
+    g_return_if_fail(iter != NULL);
 
-  iter->methods = &ipatch_iter_GList_methods;
-  IPATCH_ITER_GLIST_SET_LIST (iter, list);
-  IPATCH_ITER_GLIST_SET_POS (iter, NULL);
+    iter->methods = &ipatch_iter_GList_methods;
+    IPATCH_ITER_GLIST_SET_LIST(iter, list);
+    IPATCH_ITER_GLIST_SET_POS(iter, NULL);
 }
 
 /**
@@ -375,14 +382,14 @@ ipatch_iter_GList_init (IpatchIter *iter, GList **list)
  * Returns: Current item or %NULL if no current item.
  */
 gpointer
-ipatch_iter_GList_get (IpatchIter *iter)
+ipatch_iter_GList_get(IpatchIter *iter)
 {
-  GList *pos;
+    GList *pos;
 
-  g_return_val_if_fail (iter != NULL, NULL);
+    g_return_val_if_fail(iter != NULL, NULL);
 
-  pos = IPATCH_ITER_GLIST_GET_POS (iter);
-  return (pos ? (gpointer)(pos->data) : NULL);
+    pos = IPATCH_ITER_GLIST_GET_POS(iter);
+    return (pos ? (gpointer)(pos->data) : NULL);
 }
 
 /**
@@ -395,16 +402,21 @@ ipatch_iter_GList_get (IpatchIter *iter)
  * Returns: Next item or %NULL if no more items.
  */
 gpointer
-ipatch_iter_GList_next (IpatchIter *iter)
+ipatch_iter_GList_next(IpatchIter *iter)
 {
-  GList *pos;
+    GList *pos;
 
-  g_return_val_if_fail (iter != NULL, NULL);
+    g_return_val_if_fail(iter != NULL, NULL);
 
-  pos = IPATCH_ITER_GLIST_GET_POS (iter);
-  if (pos) pos = g_list_next (pos);
-  IPATCH_ITER_GLIST_SET_POS (iter, pos); /* set current position */
-  return (pos ? (gpointer)(pos->data) : NULL);
+    pos = IPATCH_ITER_GLIST_GET_POS(iter);
+
+    if(pos)
+    {
+        pos = g_list_next(pos);
+    }
+
+    IPATCH_ITER_GLIST_SET_POS(iter, pos);  /* set current position */
+    return (pos ? (gpointer)(pos->data) : NULL);
 }
 
 /**
@@ -417,18 +429,18 @@ ipatch_iter_GList_next (IpatchIter *iter)
  * Returns: First item or %NULL if GList is empty.
  */
 gpointer
-ipatch_iter_GList_first (IpatchIter *iter)
+ipatch_iter_GList_first(IpatchIter *iter)
 {
-  GList **list, *pos;
+    GList **list, *pos;
 
-  g_return_val_if_fail (iter != NULL, NULL);
+    g_return_val_if_fail(iter != NULL, NULL);
 
-  list = IPATCH_ITER_GLIST_GET_LIST (iter); /* list pointer */
-  g_return_val_if_fail (list != NULL, NULL);
+    list = IPATCH_ITER_GLIST_GET_LIST(iter);  /* list pointer */
+    g_return_val_if_fail(list != NULL, NULL);
 
-  pos = *list;
-  IPATCH_ITER_GLIST_SET_POS (iter, pos); /* set position */
-  return (pos ? (gpointer)(pos->data) : NULL);
+    pos = *list;
+    IPATCH_ITER_GLIST_SET_POS(iter, pos);  /* set position */
+    return (pos ? (gpointer)(pos->data) : NULL);
 }
 
 /**
@@ -441,18 +453,18 @@ ipatch_iter_GList_first (IpatchIter *iter)
  * Returns: Last item or %NULL if GList is empty.
  */
 gpointer
-ipatch_iter_GList_last (IpatchIter *iter)
+ipatch_iter_GList_last(IpatchIter *iter)
 {
-  GList **list, *pos;
+    GList **list, *pos;
 
-  g_return_val_if_fail (iter != NULL, NULL);
+    g_return_val_if_fail(iter != NULL, NULL);
 
-  list = IPATCH_ITER_GLIST_GET_LIST (iter);
-  g_return_val_if_fail (list != NULL, NULL);
+    list = IPATCH_ITER_GLIST_GET_LIST(iter);
+    g_return_val_if_fail(list != NULL, NULL);
 
-  pos = g_list_last (*list);
-  IPATCH_ITER_GLIST_SET_POS (iter, pos); /* set current position */
-  return (pos ? (gpointer)(pos->data) : NULL);
+    pos = g_list_last(*list);
+    IPATCH_ITER_GLIST_SET_POS(iter, pos);  /* set current position */
+    return (pos ? (gpointer)(pos->data) : NULL);
 }
 
 /**
@@ -467,18 +479,18 @@ ipatch_iter_GList_last (IpatchIter *iter)
  * the end of the GList.
  */
 gpointer
-ipatch_iter_GList_index (IpatchIter *iter, int index)
+ipatch_iter_GList_index(IpatchIter *iter, int index)
 {
-  GList **list, *pos;
+    GList **list, *pos;
 
-  g_return_val_if_fail (iter != NULL, NULL);
+    g_return_val_if_fail(iter != NULL, NULL);
 
-  list = IPATCH_ITER_GLIST_GET_LIST (iter);
-  g_return_val_if_fail (list != NULL, NULL);
+    list = IPATCH_ITER_GLIST_GET_LIST(iter);
+    g_return_val_if_fail(list != NULL, NULL);
 
-  pos = g_list_nth (*list, index);
-  IPATCH_ITER_GLIST_SET_POS (iter, pos); /* set current position */
-  return (pos ? (gpointer)(pos->data) : NULL);
+    pos = g_list_nth(*list, index);
+    IPATCH_ITER_GLIST_SET_POS(iter, pos);  /* set current position */
+    return (pos ? (gpointer)(pos->data) : NULL);
 }
 
 /**
@@ -489,25 +501,25 @@ ipatch_iter_GList_index (IpatchIter *iter, int index)
  * GList item iterator method to insert an item pointer.
  */
 void
-ipatch_iter_GList_insert (IpatchIter *iter, gpointer item)
+ipatch_iter_GList_insert(IpatchIter *iter, gpointer item)
 {
-  GList **list, *pos;
+    GList **list, *pos;
 
-  g_return_if_fail (iter != NULL);
+    g_return_if_fail(iter != NULL);
 
-  if ((pos = IPATCH_ITER_GLIST_GET_POS (iter))) /* position set? */
+    if((pos = IPATCH_ITER_GLIST_GET_POS(iter)))   /* position set? */
     {
-      pos = g_list_insert (pos, item, 1); /* insert after position */
-      IPATCH_ITER_GLIST_SET_POS (iter, g_list_next (pos)); /* update pos */
+        pos = g_list_insert(pos, item, 1);  /* insert after position */
+        IPATCH_ITER_GLIST_SET_POS(iter, g_list_next(pos));   /* update pos */
     }
-  else				/* position not set */
+    else				/* position not set */
     {
-      list = IPATCH_ITER_GLIST_GET_LIST (iter);
-      g_return_if_fail (list != NULL);
+        list = IPATCH_ITER_GLIST_GET_LIST(iter);
+        g_return_if_fail(list != NULL);
 
-      pos = g_list_prepend (*list, item); /* prepend */
-      IPATCH_ITER_GLIST_SET_POS (iter, pos); /* set current position */
-      *list = pos;		/* set root of list */
+        pos = g_list_prepend(*list, item);  /* prepend */
+        IPATCH_ITER_GLIST_SET_POS(iter, pos);  /* set current position */
+        *list = pos;		/* set root of list */
     }
 }
 
@@ -519,21 +531,22 @@ ipatch_iter_GList_insert (IpatchIter *iter, gpointer item)
  * the current position.
  */
 void
-ipatch_iter_GList_remove (IpatchIter *iter)
+ipatch_iter_GList_remove(IpatchIter *iter)
 {
-  GList **list, *pos;
+    GList **list, *pos;
 
-  g_return_if_fail (iter != NULL);
+    g_return_if_fail(iter != NULL);
 
-  list = IPATCH_ITER_GLIST_GET_LIST (iter);
-  g_return_if_fail (list != NULL);
+    list = IPATCH_ITER_GLIST_GET_LIST(iter);
+    g_return_if_fail(list != NULL);
 
-  /* advance current position if set */
-  pos = IPATCH_ITER_GLIST_GET_POS (iter);
-  if (pos)
+    /* advance current position if set */
+    pos = IPATCH_ITER_GLIST_GET_POS(iter);
+
+    if(pos)
     {
-      IPATCH_ITER_GLIST_SET_POS (iter, g_list_next (pos));
-      *list = g_list_delete_link (*list, pos);
+        IPATCH_ITER_GLIST_SET_POS(iter, g_list_next(pos));
+        *list = g_list_delete_link(*list, pos);
     }
 }
 
@@ -546,16 +559,16 @@ ipatch_iter_GList_remove (IpatchIter *iter)
  * Returns: Count of items in GList iterator.
  */
 int
-ipatch_iter_GList_count (IpatchIter *iter)
+ipatch_iter_GList_count(IpatchIter *iter)
 {
-  GList **list;
+    GList **list;
 
-  g_return_val_if_fail (iter != NULL, 0);
+    g_return_val_if_fail(iter != NULL, 0);
 
-  list = IPATCH_ITER_GLIST_GET_LIST (iter);
-  g_return_val_if_fail (list != NULL, 0);
+    list = IPATCH_ITER_GLIST_GET_LIST(iter);
+    g_return_val_if_fail(list != NULL, 0);
 
-  return (g_list_length (*list));
+    return (g_list_length(*list));
 }
 
 
@@ -568,15 +581,15 @@ ipatch_iter_GList_count (IpatchIter *iter)
  * Initialize an iterator to iterate over an array (read only).
  */
 void
-ipatch_iter_array_init (IpatchIter *iter, gpointer *array, guint size)
+ipatch_iter_array_init(IpatchIter *iter, gpointer *array, guint size)
 {
-  g_return_if_fail (iter != NULL);
-  g_return_if_fail (array != NULL);
+    g_return_if_fail(iter != NULL);
+    g_return_if_fail(array != NULL);
 
-  iter->methods = &ipatch_iter_array_methods;
-  IPATCH_ITER_ARRAY_SET_ARRAY (iter, array);
-  IPATCH_ITER_ARRAY_SET_SIZE (iter, size);
-  IPATCH_ITER_ARRAY_SET_POS (iter, -1);		/* init to no position */
+    iter->methods = &ipatch_iter_array_methods;
+    IPATCH_ITER_ARRAY_SET_ARRAY(iter, array);
+    IPATCH_ITER_ARRAY_SET_SIZE(iter, size);
+    IPATCH_ITER_ARRAY_SET_POS(iter, -1);		/* init to no position */
 }
 
 /**
@@ -588,18 +601,18 @@ ipatch_iter_array_init (IpatchIter *iter, gpointer *array, guint size)
  * Returns: Current item or %NULL if no current item.
  */
 gpointer
-ipatch_iter_array_get (IpatchIter *iter)
+ipatch_iter_array_get(IpatchIter *iter)
 {
-  gpointer *array;
-  int pos;
+    gpointer *array;
+    int pos;
 
-  g_return_val_if_fail (iter != NULL, NULL);
+    g_return_val_if_fail(iter != NULL, NULL);
 
-  array = IPATCH_ITER_ARRAY_GET_ARRAY (iter);
-  g_return_val_if_fail (array != NULL, NULL);
+    array = IPATCH_ITER_ARRAY_GET_ARRAY(iter);
+    g_return_val_if_fail(array != NULL, NULL);
 
-  pos = IPATCH_ITER_ARRAY_GET_POS (iter);
-  return ((pos != -1) ? array[pos] : NULL);
+    pos = IPATCH_ITER_ARRAY_GET_POS(iter);
+    return ((pos != -1) ? array[pos] : NULL);
 }
 
 /**
@@ -612,25 +625,31 @@ ipatch_iter_array_get (IpatchIter *iter)
  * Returns: Next item or %NULL if no more items.
  */
 gpointer
-ipatch_iter_array_next (IpatchIter *iter)
+ipatch_iter_array_next(IpatchIter *iter)
 {
-  gpointer *array;
-  guint pos,size;
+    gpointer *array;
+    guint pos, size;
 
-  g_return_val_if_fail (iter != NULL, NULL);
+    g_return_val_if_fail(iter != NULL, NULL);
 
-  array = IPATCH_ITER_ARRAY_GET_ARRAY (iter);
-  g_return_val_if_fail (array != NULL, NULL);
+    array = IPATCH_ITER_ARRAY_GET_ARRAY(iter);
+    g_return_val_if_fail(array != NULL, NULL);
 
-  pos = (guint)IPATCH_ITER_ARRAY_GET_POS (iter);
-  size = IPATCH_ITER_ARRAY_GET_SIZE (iter);
+    pos = (guint)IPATCH_ITER_ARRAY_GET_POS(iter);
+    size = IPATCH_ITER_ARRAY_GET_SIZE(iter);
 
-  if (pos >= 0 && (pos + 1) < size) pos++;
-  else pos = -1;
+    if(pos >= 0 && (pos + 1) < size)
+    {
+        pos++;
+    }
+    else
+    {
+        pos = -1;
+    }
 
-  IPATCH_ITER_ARRAY_SET_POS (iter, pos); /* update position */
+    IPATCH_ITER_ARRAY_SET_POS(iter, pos);  /* update position */
 
-  return ((pos != -1) ? array[pos] : NULL);
+    return ((pos != -1) ? array[pos] : NULL);
 }
 
 /**
@@ -643,23 +662,27 @@ ipatch_iter_array_next (IpatchIter *iter)
  * Returns: First item or %NULL if array is empty.
  */
 gpointer
-ipatch_iter_array_first (IpatchIter *iter)
+ipatch_iter_array_first(IpatchIter *iter)
 {
-  gpointer *array;
-  int pos = 0;
-  guint size;
+    gpointer *array;
+    int pos = 0;
+    guint size;
 
-  g_return_val_if_fail (iter != NULL, NULL);
+    g_return_val_if_fail(iter != NULL, NULL);
 
-  array = IPATCH_ITER_ARRAY_GET_ARRAY (iter);
-  g_return_val_if_fail (array != NULL, NULL);
+    array = IPATCH_ITER_ARRAY_GET_ARRAY(iter);
+    g_return_val_if_fail(array != NULL, NULL);
 
-  size = IPATCH_ITER_ARRAY_GET_SIZE (iter);
-  if (size == 0) pos = -1;
+    size = IPATCH_ITER_ARRAY_GET_SIZE(iter);
 
-  IPATCH_ITER_ARRAY_SET_POS (iter, pos);
+    if(size == 0)
+    {
+        pos = -1;
+    }
 
-  return ((pos != -1) ? array[pos] : NULL);
+    IPATCH_ITER_ARRAY_SET_POS(iter, pos);
+
+    return ((pos != -1) ? array[pos] : NULL);
 }
 
 /**
@@ -672,24 +695,31 @@ ipatch_iter_array_first (IpatchIter *iter)
  * Returns: Last item or %NULL if array is empty.
  */
 gpointer
-ipatch_iter_array_last (IpatchIter *iter)
+ipatch_iter_array_last(IpatchIter *iter)
 {
-  gpointer *array;
-  int pos;
-  guint size;
+    gpointer *array;
+    int pos;
+    guint size;
 
-  g_return_val_if_fail (iter != NULL, NULL);
+    g_return_val_if_fail(iter != NULL, NULL);
 
-  array = IPATCH_ITER_ARRAY_GET_ARRAY (iter);
-  g_return_val_if_fail (array != NULL, NULL);
+    array = IPATCH_ITER_ARRAY_GET_ARRAY(iter);
+    g_return_val_if_fail(array != NULL, NULL);
 
-  size = IPATCH_ITER_ARRAY_GET_SIZE (iter);
-  if (size > 0) pos = size - 1;
-  else pos = -1;
+    size = IPATCH_ITER_ARRAY_GET_SIZE(iter);
 
-  IPATCH_ITER_ARRAY_SET_POS (iter, pos);
+    if(size > 0)
+    {
+        pos = size - 1;
+    }
+    else
+    {
+        pos = -1;
+    }
 
-  return ((pos != -1) ? array[pos] : NULL);
+    IPATCH_ITER_ARRAY_SET_POS(iter, pos);
+
+    return ((pos != -1) ? array[pos] : NULL);
 }
 
 /**
@@ -704,22 +734,26 @@ ipatch_iter_array_last (IpatchIter *iter)
  * the end of the array.
  */
 gpointer
-ipatch_iter_array_index (IpatchIter *iter, int index)
+ipatch_iter_array_index(IpatchIter *iter, int index)
 {
-  gpointer *array;
-  int size;
+    gpointer *array;
+    int size;
 
-  g_return_val_if_fail (iter != NULL, NULL);
+    g_return_val_if_fail(iter != NULL, NULL);
 
-  array = IPATCH_ITER_ARRAY_GET_ARRAY (iter);
-  g_return_val_if_fail (array != NULL, NULL);
+    array = IPATCH_ITER_ARRAY_GET_ARRAY(iter);
+    g_return_val_if_fail(array != NULL, NULL);
 
-  size = (int)IPATCH_ITER_ARRAY_GET_SIZE (iter);
-  if (index < 0 || index >= size) index = -1;
+    size = (int)IPATCH_ITER_ARRAY_GET_SIZE(iter);
 
-  IPATCH_ITER_ARRAY_SET_POS (iter, index);
+    if(index < 0 || index >= size)
+    {
+        index = -1;
+    }
 
-  return ((index != -1) ? array[index] : NULL);
+    IPATCH_ITER_ARRAY_SET_POS(iter, index);
+
+    return ((index != -1) ? array[index] : NULL);
 }
 
 /**
@@ -730,9 +764,9 @@ ipatch_iter_array_index (IpatchIter *iter, int index)
  * array item iterator method to insert an item pointer.
  */
 void
-ipatch_iter_array_insert (IpatchIter *iter, gpointer item)
+ipatch_iter_array_insert(IpatchIter *iter, gpointer item)
 {
-  g_return_if_reached ();
+    g_return_if_reached();
 }
 
 /**
@@ -743,9 +777,9 @@ ipatch_iter_array_insert (IpatchIter *iter, gpointer item)
  * the current position.
  */
 void
-ipatch_iter_array_remove (IpatchIter *iter)
+ipatch_iter_array_remove(IpatchIter *iter)
 {
-  g_return_if_reached ();
+    g_return_if_reached();
 }
 
 /**
@@ -757,12 +791,12 @@ ipatch_iter_array_remove (IpatchIter *iter)
  * Returns: Count of items in array iterator.
  */
 int
-ipatch_iter_array_count (IpatchIter *iter)
+ipatch_iter_array_count(IpatchIter *iter)
 {
-  guint size;
+    guint size;
 
-  g_return_val_if_fail (iter != NULL, 0);
+    g_return_val_if_fail(iter != NULL, 0);
 
-  size = IPATCH_ITER_ARRAY_GET_SIZE (iter);
-  return (size);
+    size = IPATCH_ITER_ARRAY_GET_SIZE(iter);
+    return (size);
 }

@@ -51,10 +51,10 @@ typedef IpatchConverterSF2VoiceCacheClass IpatchConverterSF2SampleToSF2VoiceCach
   (ipatch_converter_sf2_sample_to_sf2_voice_cache_get_type ())
 
 
-GType ipatch_converter_sf2_preset_to_sf2_voice_cache_get_type (void);
-GType ipatch_converter_sf2_pzone_to_sf2_voice_cache_get_type (void);
-GType ipatch_converter_sf2_inst_to_sf2_voice_cache_get_type (void);
-GType ipatch_converter_sf2_izone_to_sf2_voice_cache_get_type (void);
-GType ipatch_converter_sf2_sample_to_sf2_voice_cache_get_type (void);
+GType ipatch_converter_sf2_preset_to_sf2_voice_cache_get_type(void);
+GType ipatch_converter_sf2_pzone_to_sf2_voice_cache_get_type(void);
+GType ipatch_converter_sf2_inst_to_sf2_voice_cache_get_type(void);
+GType ipatch_converter_sf2_izone_to_sf2_voice_cache_get_type(void);
+GType ipatch_converter_sf2_sample_to_sf2_voice_cache_get_type(void);
 
 #endif

@@ -49,21 +49,21 @@ typedef struct _IpatchDLS2InstClass IpatchDLS2InstClass;
 /* DLS instrument object */
 struct _IpatchDLS2Inst
 {
-  IpatchContainer parent_instance;
+    IpatchContainer parent_instance;
 
-  guint16 bank;			/* MIDI locale Bank */
-  guint16 program;		/* MIDI locale Program */
+    guint16 bank;			/* MIDI locale Bank */
+    guint16 program;		/* MIDI locale Program */
 
-  IpatchDLS2Info *info;	       /* info strings */
-  GSList *regions;	     /* list of IpatchDLS2Region structures */
-  GSList *conns;	/* list of global IpatchDLS2Conn structures */
+    IpatchDLS2Info *info;	       /* info strings */
+    GSList *regions;	     /* list of IpatchDLS2Region structures */
+    GSList *conns;	/* list of global IpatchDLS2Conn structures */
 
-  guint8 *dlid;			/* 16 byte unique ID or NULL */
+    guint8 *dlid;			/* 16 byte unique ID or NULL */
 };
 
 struct _IpatchDLS2InstClass
 {
-  IpatchContainerClass parent_class;
+    IpatchContainerClass parent_class;
 };
 
 /**
@@ -78,7 +78,7 @@ struct _IpatchDLS2InstClass
  */
 typedef enum
 {
-  IPATCH_DLS2_INST_PERCUSSION = 1 << IPATCH_CONTAINER_UNUSED_FLAG_SHIFT
+    IPATCH_DLS2_INST_PERCUSSION = 1 << IPATCH_CONTAINER_UNUSED_FLAG_SHIFT
 } IpatchDLS2InstFlags;
 
 /**
@@ -89,32 +89,32 @@ typedef enum
   (IPATCH_CONTAINER_UNUSED_FLAG_SHIFT + 1)
 
 
-GType ipatch_dls2_inst_get_type (void);
-IpatchDLS2Inst *ipatch_dls2_inst_new (void);
+GType ipatch_dls2_inst_get_type(void);
+IpatchDLS2Inst *ipatch_dls2_inst_new(void);
 
 #define ipatch_dls2_inst_get_regions(inst) \
     ipatch_container_get_children (IPATCH_CONTAINER (inst), \
 				   IPATCH_TYPE_DLS2_REGION)
 
-IpatchDLS2Inst *ipatch_dls2_inst_first (IpatchIter *iter);
-IpatchDLS2Inst *ipatch_dls2_inst_next (IpatchIter *iter);
+IpatchDLS2Inst *ipatch_dls2_inst_first(IpatchIter *iter);
+IpatchDLS2Inst *ipatch_dls2_inst_next(IpatchIter *iter);
 
-char *ipatch_dls2_inst_get_info (IpatchDLS2Inst *inst, guint32 fourcc);
-void ipatch_dls2_inst_set_info (IpatchDLS2Inst *inst, guint32 fourcc,
-				const char *val);
-void ipatch_dls2_inst_set_midi_locale (IpatchDLS2Inst *inst, int bank,
-				       int program);
-void ipatch_dls2_inst_get_midi_locale (IpatchDLS2Inst *inst, int *bank,
-				       int *program);
-int ipatch_dls2_inst_compare (const IpatchDLS2Inst *p1,
-			      const IpatchDLS2Inst *p2);
+char *ipatch_dls2_inst_get_info(IpatchDLS2Inst *inst, guint32 fourcc);
+void ipatch_dls2_inst_set_info(IpatchDLS2Inst *inst, guint32 fourcc,
+                               const char *val);
+void ipatch_dls2_inst_set_midi_locale(IpatchDLS2Inst *inst, int bank,
+                                      int program);
+void ipatch_dls2_inst_get_midi_locale(IpatchDLS2Inst *inst, int *bank,
+                                      int *program);
+int ipatch_dls2_inst_compare(const IpatchDLS2Inst *p1,
+                             const IpatchDLS2Inst *p2);
 
-GSList *ipatch_dls2_inst_get_conns (IpatchDLS2Inst *inst);
-void ipatch_dls2_inst_set_conn (IpatchDLS2Inst *inst,
-				const IpatchDLS2Conn *conn);
-void ipatch_dls2_inst_unset_conn (IpatchDLS2Inst *inst,
-				  const IpatchDLS2Conn *conn);
-void ipatch_dls2_inst_unset_all_conns (IpatchDLS2Inst *inst);
-guint ipatch_dls2_inst_conn_count (IpatchDLS2Inst *inst);
+GSList *ipatch_dls2_inst_get_conns(IpatchDLS2Inst *inst);
+void ipatch_dls2_inst_set_conn(IpatchDLS2Inst *inst,
+                               const IpatchDLS2Conn *conn);
+void ipatch_dls2_inst_unset_conn(IpatchDLS2Inst *inst,
+                                 const IpatchDLS2Conn *conn);
+void ipatch_dls2_inst_unset_all_conns(IpatchDLS2Inst *inst);
+guint ipatch_dls2_inst_conn_count(IpatchDLS2Inst *inst);
 
 #endif

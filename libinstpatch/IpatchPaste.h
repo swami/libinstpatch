@@ -47,33 +47,33 @@ typedef struct _IpatchPasteClass IpatchPasteClass;
 /* paste instance */
 struct _IpatchPaste
 {
-  GObject parent_instance;	/* derived from GObject */
+    GObject parent_instance;	/* derived from GObject */
 
-  /* only available during a paste operation */
-  IpatchItem *dest;		/* current destination */
+    /* only available during a paste operation */
+    IpatchItem *dest;		/* current destination */
 
-  /*< private >*/
+    /*< private >*/
 
-  GSList *add_list;	        /* list of AddItemBag operations */
-  GSList *add_list_last;        /* last item in add_list for append optimization */
-  GHashTable *add_hash;	/* hash of original -> AddItemBag (see IpatchPaste.c) */
+    GSList *add_list;	        /* list of AddItemBag operations */
+    GSList *add_list_last;        /* last item in add_list for append optimization */
+    GHashTable *add_hash;	/* hash of original -> AddItemBag (see IpatchPaste.c) */
 
-  GSList *link_list;	/* list of LinkItemBag operations (in reverse order) */
+    GSList *link_list;	/* list of LinkItemBag operations (in reverse order) */
 };
 
 /* conversion class */
 struct _IpatchPasteClass
 {
-  GObjectClass parent_class;
+    GObjectClass parent_class;
 };
 
 /* choice values for when a item conflict occurs */
 typedef enum
 {
-  IPATCH_PASTE_CHOICE_IGNORE,	/* item will be pasted (conflict remains) */
-  IPATCH_PASTE_CHOICE_REPLACE,	/* replace item */
-  IPATCH_PASTE_CHOICE_KEEP,	/* keep existing item (reverse replace) */
-  IPATCH_PASTE_CHOICE_CANCEL	/* cancel the current operation */
+    IPATCH_PASTE_CHOICE_IGNORE,	/* item will be pasted (conflict remains) */
+    IPATCH_PASTE_CHOICE_REPLACE,	/* replace item */
+    IPATCH_PASTE_CHOICE_KEEP,	/* keep existing item (reverse replace) */
+    IPATCH_PASTE_CHOICE_CANCEL	/* cancel the current operation */
 } IpatchPasteChoice;
 
 /**
@@ -85,7 +85,7 @@ typedef enum
  *
  * Returns: %TRUE if paste supported by this handler, %FALSE otherwise
  */
-typedef gboolean (*IpatchPasteTestFunc)(IpatchItem *dest, IpatchItem *src);
+typedef gboolean(*IpatchPasteTestFunc)(IpatchItem *dest, IpatchItem *src);
 
 /**
  * IpatchPasteExecFunc:
@@ -101,8 +101,8 @@ typedef gboolean (*IpatchPasteTestFunc)(IpatchItem *dest, IpatchItem *src);
  *
  * Returns: %TRUE on success, %FALSE on error (in which case @err may be set).
  */
-typedef gboolean (*IpatchPasteExecFunc)(IpatchPaste *paste, IpatchItem *dest,
-					IpatchItem *src, GError **err);
+typedef gboolean(*IpatchPasteExecFunc)(IpatchPaste *paste, IpatchItem *dest,
+                                       IpatchItem *src, GError **err);
 
 /**
  * IpatchPasteResolveFunc:
@@ -114,62 +114,62 @@ typedef gboolean (*IpatchPasteExecFunc)(IpatchPaste *paste, IpatchItem *dest,
  *
  * Returns: Return a choice value for how the conflict should be handled.
  */
-typedef IpatchPasteChoice (*IpatchPasteResolveFunc)
-  (IpatchPaste *paste, IpatchItem *conflict, IpatchItem *item);
+typedef IpatchPasteChoice(*IpatchPasteResolveFunc)
+(IpatchPaste *paste, IpatchItem *conflict, IpatchItem *item);
 
 /* priority levels for paste handlers */
 typedef enum
 {
-  /* 0 value is an alias for IPATCH_PASTE_PRIORITY_DEFAULT */
+    /* 0 value is an alias for IPATCH_PASTE_PRIORITY_DEFAULT */
 
-  IPATCH_PASTE_PRIORITY_LOWEST  = 1,
-  IPATCH_PASTE_PRIORITY_LOW     = 25,
-  IPATCH_PASTE_PRIORITY_DEFAULT = 50,
-  IPATCH_PASTE_PRIORITY_HIGH    = 75,
-  IPATCH_PASTE_PRIORITY_HIGHEST = 100
+    IPATCH_PASTE_PRIORITY_LOWEST  = 1,
+    IPATCH_PASTE_PRIORITY_LOW     = 25,
+    IPATCH_PASTE_PRIORITY_DEFAULT = 50,
+    IPATCH_PASTE_PRIORITY_HIGH    = 75,
+    IPATCH_PASTE_PRIORITY_HIGHEST = 100
 } IpatchPastePriority;
 
 #define IPATCH_PASTE_FLAGS_PRIORITY_MASK   0x7F
 
 
-void ipatch_register_paste_handler (IpatchPasteTestFunc test_func,
-				    IpatchPasteExecFunc exec_func, int flags);
+void ipatch_register_paste_handler(IpatchPasteTestFunc test_func,
+                                   IpatchPasteExecFunc exec_func, int flags);
 int
-ipatch_register_paste_handler_full (IpatchPasteTestFunc test_func,
-			            IpatchPasteExecFunc exec_func,
-			            GDestroyNotify notify_func,
-                                    gpointer user_data, int flags);
+ipatch_register_paste_handler_full(IpatchPasteTestFunc test_func,
+                                   IpatchPasteExecFunc exec_func,
+                                   GDestroyNotify notify_func,
+                                   gpointer user_data, int flags);
 
-gboolean ipatch_is_paste_possible (IpatchItem *dest, IpatchItem *src);
-gboolean ipatch_simple_paste (IpatchItem *dest, IpatchItem *src, GError **err);
+gboolean ipatch_is_paste_possible(IpatchItem *dest, IpatchItem *src);
+gboolean ipatch_simple_paste(IpatchItem *dest, IpatchItem *src, GError **err);
 
-GType ipatch_paste_get_type (void);
-IpatchPaste *ipatch_paste_new (void);
-gboolean ipatch_paste_objects (IpatchPaste *paste, IpatchItem *dest,
-			       IpatchItem *src, GError **err);
-gboolean ipatch_paste_resolve (IpatchPaste *paste,
-			       IpatchPasteResolveFunc resolve_func,
-			       gpointer user_data);
-gboolean ipatch_paste_finish (IpatchPaste *paste, GError **err);
-IpatchList *ipatch_paste_get_add_list (IpatchPaste *paste);
+GType ipatch_paste_get_type(void);
+IpatchPaste *ipatch_paste_new(void);
+gboolean ipatch_paste_objects(IpatchPaste *paste, IpatchItem *dest,
+                              IpatchItem *src, GError **err);
+gboolean ipatch_paste_resolve(IpatchPaste *paste,
+                              IpatchPasteResolveFunc resolve_func,
+                              gpointer user_data);
+gboolean ipatch_paste_finish(IpatchPaste *paste, GError **err);
+IpatchList *ipatch_paste_get_add_list(IpatchPaste *paste);
 
-void ipatch_paste_object_add (IpatchPaste *paste, IpatchItem *additem,
-			      IpatchContainer *parent, IpatchItem *orig);
-IpatchItem *ipatch_paste_object_add_duplicate (IpatchPaste *paste,
-					       IpatchItem *item,
-					       IpatchContainer *parent);
-IpatchItem *ipatch_paste_object_add_duplicate_deep (IpatchPaste *paste,
-						    IpatchItem *item,
-						    IpatchContainer *parent);
-gboolean ipatch_paste_object_add_convert (IpatchPaste *paste,
-					  GType conv_type, IpatchItem *item,
-					  IpatchContainer *parent,
-                                          IpatchList **item_list,
-					  GError **err);
-void ipatch_paste_object_link (IpatchPaste *paste, IpatchItem *from,
-			       IpatchItem *to);
+void ipatch_paste_object_add(IpatchPaste *paste, IpatchItem *additem,
+                             IpatchContainer *parent, IpatchItem *orig);
+IpatchItem *ipatch_paste_object_add_duplicate(IpatchPaste *paste,
+        IpatchItem *item,
+        IpatchContainer *parent);
+IpatchItem *ipatch_paste_object_add_duplicate_deep(IpatchPaste *paste,
+        IpatchItem *item,
+        IpatchContainer *parent);
+gboolean ipatch_paste_object_add_convert(IpatchPaste *paste,
+        GType conv_type, IpatchItem *item,
+        IpatchContainer *parent,
+        IpatchList **item_list,
+        GError **err);
+void ipatch_paste_object_link(IpatchPaste *paste, IpatchItem *from,
+                              IpatchItem *to);
 
-gboolean ipatch_paste_default_test_func (IpatchItem *dest, IpatchItem *src);
-gboolean ipatch_paste_default_exec_func (IpatchPaste *paste, IpatchItem *dest,
-					 IpatchItem *src, GError **err);
+gboolean ipatch_paste_default_test_func(IpatchItem *dest, IpatchItem *src);
+gboolean ipatch_paste_default_exec_func(IpatchPaste *paste, IpatchItem *dest,
+                                        IpatchItem *src, GError **err);
 #endif

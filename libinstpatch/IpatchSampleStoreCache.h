@@ -44,17 +44,17 @@ typedef struct _IpatchSampleStoreCacheClass IpatchSampleStoreCacheClass;
 /* RAM sample store instance */
 struct _IpatchSampleStoreCache
 {
-  IpatchSampleStore parent_instance;
-  gpointer location;    /* Pointer to the sample data in memory */
-  guint32 channel_map;  /* Channel map of cached sample in reference to native sample */
-  glong last_open;      /* Unix time of last open or 0 if currently open */
-  int open_count;       /* Current number of opens (atomic int) */
+    IpatchSampleStore parent_instance;
+    gpointer location;    /* Pointer to the sample data in memory */
+    guint32 channel_map;  /* Channel map of cached sample in reference to native sample */
+    glong last_open;      /* Unix time of last open or 0 if currently open */
+    int open_count;       /* Current number of opens (atomic int) */
 };
 
 /* RAM sample store class */
 struct _IpatchSampleStoreCacheClass
 {
-  IpatchSampleStoreClass parent_class;
+    IpatchSampleStoreClass parent_class;
 };
 
 /**
@@ -92,9 +92,9 @@ struct _IpatchSampleStoreCacheClass
 #define IPATCH_SAMPLE_STORE_CACHE_UNUSED_FLAG_SHIFT \
   (IPATCH_SAMPLE_STORE_UNUSED_FLAG_SHIFT + 4)
 
-GType ipatch_sample_store_cache_get_type (void);
-IpatchSample *ipatch_sample_store_cache_new (gpointer location);
-void ipatch_sample_store_cache_open (IpatchSampleStoreCache *store);
-void ipatch_sample_store_cache_close (IpatchSampleStoreCache *store);
+GType ipatch_sample_store_cache_get_type(void);
+IpatchSample *ipatch_sample_store_cache_new(gpointer location);
+void ipatch_sample_store_cache_open(IpatchSampleStoreCache *store);
+void ipatch_sample_store_cache_close(IpatchSampleStoreCache *store);
 
 #endif

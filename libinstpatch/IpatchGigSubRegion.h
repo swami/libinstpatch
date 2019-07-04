@@ -49,23 +49,23 @@ typedef struct _IpatchGigSubRegionClass IpatchGigSubRegionClass;
 /* a GigaSampler sub region */
 struct _IpatchGigSubRegion
 {
-  IpatchItem parent_instance;
+    IpatchItem parent_instance;
 
-  IpatchGigEffects effects;	/* effects for this sub region */
-  IpatchGigSample *sample;	/* sample for this sub region */
-  IpatchDLS2SampleInfo *sample_info; /* sample info override or NULL */
+    IpatchGigEffects effects;	/* effects for this sub region */
+    IpatchGigSample *sample;	/* sample for this sub region */
+    IpatchDLS2SampleInfo *sample_info; /* sample info override or NULL */
 };
 
 /* GigaSampler sub region class */
 struct _IpatchGigSubRegionClass
 {
-  IpatchItemClass parent_class;
+    IpatchItemClass parent_class;
 };
 
 /* Flags crammed into IpatchItem flags */
 typedef enum
 {
-  IPATCH_GIG_SUB_REGION_SAMPLE_INFO_OVERRIDE = 1 << IPATCH_ITEM_UNUSED_FLAG_SHIFT
+    IPATCH_GIG_SUB_REGION_SAMPLE_INFO_OVERRIDE = 1 << IPATCH_ITEM_UNUSED_FLAG_SHIFT
 } IpatchGigSubRegionFlags;
 
 /**
@@ -76,14 +76,14 @@ typedef enum
   (IPATCH_ITEM_UNUSED_FLAG_SHIFT + 4)
 
 
-GType ipatch_gig_sub_region_get_type (void);
-IpatchGigSubRegion *ipatch_gig_sub_region_new (void);
+GType ipatch_gig_sub_region_get_type(void);
+IpatchGigSubRegion *ipatch_gig_sub_region_new(void);
 
-IpatchGigSubRegion *ipatch_gig_sub_region_first (IpatchIter *iter);
-IpatchGigSubRegion *ipatch_gig_sub_region_next (IpatchIter *iter);
+IpatchGigSubRegion *ipatch_gig_sub_region_first(IpatchIter *iter);
+IpatchGigSubRegion *ipatch_gig_sub_region_next(IpatchIter *iter);
 
-IpatchGigSample *ipatch_gig_sub_region_get_sample (IpatchGigSubRegion *subregion);
-void ipatch_gig_sub_region_set_sample (IpatchGigSubRegion *subregion,
-				       IpatchGigSample *sample);
+IpatchGigSample *ipatch_gig_sub_region_get_sample(IpatchGigSubRegion *subregion);
+void ipatch_gig_sub_region_set_sample(IpatchGigSubRegion *subregion,
+                                      IpatchGigSample *sample);
 
 #endif

@@ -43,56 +43,56 @@
 
 
 static gboolean
-ipatch_sf2_gen_item_set_gen_flag_no_notify (IpatchSF2GenItem *item, guint genid,
-					    gboolean setflag);
+ipatch_sf2_gen_item_set_gen_flag_no_notify(IpatchSF2GenItem *item, guint genid,
+        gboolean setflag);
 
 /* non realtime synthesis parameters */
 static const guint8 non_realtime[] =
 {
-  IPATCH_SF2_GEN_SAMPLE_START,
-  IPATCH_SF2_GEN_SAMPLE_END,
-  IPATCH_SF2_GEN_SAMPLE_COARSE_START,
-  IPATCH_SF2_GEN_SAMPLE_COARSE_END,
-  IPATCH_SF2_GEN_NOTE_TO_MOD_ENV_HOLD,
-  IPATCH_SF2_GEN_NOTE_TO_MOD_ENV_DECAY,
-  IPATCH_SF2_GEN_NOTE_TO_VOL_ENV_HOLD,
-  IPATCH_SF2_GEN_NOTE_TO_VOL_ENV_DECAY,
-  IPATCH_SF2_GEN_INSTRUMENT_ID,
-  IPATCH_SF2_GEN_NOTE_RANGE,
-  IPATCH_SF2_GEN_VELOCITY_RANGE,
-  IPATCH_SF2_GEN_FIXED_NOTE,
-  IPATCH_SF2_GEN_FIXED_VELOCITY,
-  IPATCH_SF2_GEN_SAMPLE_ID,
-  IPATCH_SF2_GEN_SAMPLE_MODES,
-  IPATCH_SF2_GEN_EXCLUSIVE_CLASS,
-  IPATCH_SF2_GEN_ROOT_NOTE_OVERRIDE
+    IPATCH_SF2_GEN_SAMPLE_START,
+    IPATCH_SF2_GEN_SAMPLE_END,
+    IPATCH_SF2_GEN_SAMPLE_COARSE_START,
+    IPATCH_SF2_GEN_SAMPLE_COARSE_END,
+    IPATCH_SF2_GEN_NOTE_TO_MOD_ENV_HOLD,
+    IPATCH_SF2_GEN_NOTE_TO_MOD_ENV_DECAY,
+    IPATCH_SF2_GEN_NOTE_TO_VOL_ENV_HOLD,
+    IPATCH_SF2_GEN_NOTE_TO_VOL_ENV_DECAY,
+    IPATCH_SF2_GEN_INSTRUMENT_ID,
+    IPATCH_SF2_GEN_NOTE_RANGE,
+    IPATCH_SF2_GEN_VELOCITY_RANGE,
+    IPATCH_SF2_GEN_FIXED_NOTE,
+    IPATCH_SF2_GEN_FIXED_VELOCITY,
+    IPATCH_SF2_GEN_SAMPLE_ID,
+    IPATCH_SF2_GEN_SAMPLE_MODES,
+    IPATCH_SF2_GEN_EXCLUSIVE_CLASS,
+    IPATCH_SF2_GEN_ROOT_NOTE_OVERRIDE
 };
 
 
 GType
-ipatch_sf2_gen_item_get_type (void)
+ipatch_sf2_gen_item_get_type(void)
 {
-  static GType itype = 0;
+    static GType itype = 0;
 
-  if (!itype)
+    if(!itype)
     {
-      static const GTypeInfo info =
-	{
-	  sizeof (IpatchSF2GenItemIface),
-	  NULL,			/* base_init */
-	  NULL,			/* base_finalize */
-	  (GClassInitFunc) NULL,
-	  (GClassFinalizeFunc) NULL
-	};
+        static const GTypeInfo info =
+        {
+            sizeof(IpatchSF2GenItemIface),
+            NULL,			/* base_init */
+            NULL,			/* base_finalize */
+            (GClassInitFunc) NULL,
+            (GClassFinalizeFunc) NULL
+        };
 
-      itype = g_type_register_static (G_TYPE_INTERFACE, "IpatchSF2GenItem",
-				      &info, 0);
+        itype = g_type_register_static(G_TYPE_INTERFACE, "IpatchSF2GenItem",
+                                       &info, 0);
 
-      /* IpatchSF2GenItemIface types must be IpatchItem objects (for locking) */
-      g_type_interface_add_prerequisite (itype, IPATCH_TYPE_ITEM);
+        /* IpatchSF2GenItemIface types must be IpatchItem objects (for locking) */
+        g_type_interface_add_prerequisite(itype, IPATCH_TYPE_ITEM);
     }
 
-  return (itype);
+    return (itype);
 }
 
 /**
@@ -108,28 +108,28 @@ ipatch_sf2_gen_item_get_type (void)
  * ID.
  */
 gboolean
-ipatch_sf2_gen_item_get_amount (IpatchSF2GenItem *item, guint genid,
-				IpatchSF2GenAmount *out_amt)
+ipatch_sf2_gen_item_get_amount(IpatchSF2GenItem *item, guint genid,
+                               IpatchSF2GenAmount *out_amt)
 {
-  IpatchSF2GenItemIface *iface;
-  IpatchSF2GenArray *genarray;
-  gboolean set;
+    IpatchSF2GenItemIface *iface;
+    IpatchSF2GenArray *genarray;
+    gboolean set;
 
-  g_return_val_if_fail (IPATCH_IS_SF2_GEN_ITEM (item), FALSE);
-  g_return_val_if_fail (genid < IPATCH_SF2_GEN_COUNT, FALSE);
-  g_return_val_if_fail (out_amt != NULL, FALSE);
+    g_return_val_if_fail(IPATCH_IS_SF2_GEN_ITEM(item), FALSE);
+    g_return_val_if_fail(genid < IPATCH_SF2_GEN_COUNT, FALSE);
+    g_return_val_if_fail(out_amt != NULL, FALSE);
 
-  /* get pointer to genarray from IpatchSF2GenItemIface->genarray_ofs */
-  iface = IPATCH_SF2_GEN_ITEM_GET_IFACE (item);
-  g_return_val_if_fail (iface->genarray_ofs != 0, FALSE);
-  genarray = (IpatchSF2GenArray *)G_STRUCT_MEMBER_P (item, iface->genarray_ofs);
+    /* get pointer to genarray from IpatchSF2GenItemIface->genarray_ofs */
+    iface = IPATCH_SF2_GEN_ITEM_GET_IFACE(item);
+    g_return_val_if_fail(iface->genarray_ofs != 0, FALSE);
+    genarray = (IpatchSF2GenArray *)G_STRUCT_MEMBER_P(item, iface->genarray_ofs);
 
-  IPATCH_ITEM_RLOCK (item);
-  *out_amt = genarray->values[genid];
-  set = IPATCH_SF2_GEN_ARRAY_TEST_FLAG (genarray, genid);
-  IPATCH_ITEM_RUNLOCK (item);
+    IPATCH_ITEM_RLOCK(item);
+    *out_amt = genarray->values[genid];
+    set = IPATCH_SF2_GEN_ARRAY_TEST_FLAG(genarray, genid);
+    IPATCH_ITEM_RUNLOCK(item);
 
-  return (set);
+    return (set);
 }
 
 /**
@@ -144,60 +144,60 @@ ipatch_sf2_gen_item_get_amount (IpatchSF2GenItem *item, guint genid,
  * property if it was unset before.
  */
 void
-ipatch_sf2_gen_item_set_amount (IpatchSF2GenItem *item, guint genid,
-				IpatchSF2GenAmount *amt)
+ipatch_sf2_gen_item_set_amount(IpatchSF2GenItem *item, guint genid,
+                               IpatchSF2GenAmount *amt)
 {
-  IpatchSF2GenItemIface *iface;
-  IpatchSF2GenArray *genarray;
-  IpatchSF2GenType propstype;
-  GParamSpec *pspec;
-  IpatchSF2GenAmount oldamt;
-  GValue oldval = { 0 }, newval = { 0 };
-  gboolean valchanged = FALSE, oldset;
+    IpatchSF2GenItemIface *iface;
+    IpatchSF2GenArray *genarray;
+    IpatchSF2GenType propstype;
+    GParamSpec *pspec;
+    IpatchSF2GenAmount oldamt;
+    GValue oldval = { 0 }, newval = { 0 };
+    gboolean valchanged = FALSE, oldset;
 
-  g_return_if_fail (IPATCH_IS_ITEM (item));
-  g_return_if_fail (amt != NULL);
+    g_return_if_fail(IPATCH_IS_ITEM(item));
+    g_return_if_fail(amt != NULL);
 
-  iface = IPATCH_SF2_GEN_ITEM_GET_IFACE (item);
-  propstype = iface->propstype;	/* propstype for this class */
+    iface = IPATCH_SF2_GEN_ITEM_GET_IFACE(item);
+    propstype = iface->propstype;	/* propstype for this class */
 
-  g_return_if_fail (ipatch_sf2_gen_is_valid (genid, propstype));
+    g_return_if_fail(ipatch_sf2_gen_is_valid(genid, propstype));
 
-  /* get pointer to genarray from IpatchSF2GenItemIface->genarray_ofs */
-  g_return_if_fail (iface->genarray_ofs != 0);
-  genarray = (IpatchSF2GenArray *)G_STRUCT_MEMBER_P (item, iface->genarray_ofs);
+    /* get pointer to genarray from IpatchSF2GenItemIface->genarray_ofs */
+    g_return_if_fail(iface->genarray_ofs != 0);
+    genarray = (IpatchSF2GenArray *)G_STRUCT_MEMBER_P(item, iface->genarray_ofs);
 
-  IPATCH_ITEM_WLOCK (item);
+    IPATCH_ITEM_WLOCK(item);
 
-  /* has different value? */
-  if (genarray->values[genid].sword != amt->sword)
+    /* has different value? */
+    if(genarray->values[genid].sword != amt->sword)
     {
-      oldamt = genarray->values[genid];	/* store old val for notify */
-      genarray->values[genid] = *amt;
-      valchanged = TRUE;
+        oldamt = genarray->values[genid];	/* store old val for notify */
+        genarray->values[genid] = *amt;
+        valchanged = TRUE;
     }
 
-  oldset = IPATCH_SF2_GEN_ARRAY_TEST_FLAG (genarray, genid);
-  IPATCH_SF2_GEN_ARRAY_SET_FLAG (genarray, genid); /* value is set */
+    oldset = IPATCH_SF2_GEN_ARRAY_TEST_FLAG(genarray, genid);
+    IPATCH_SF2_GEN_ARRAY_SET_FLAG(genarray, genid);  /* value is set */
 
-  IPATCH_ITEM_WUNLOCK (item);
+    IPATCH_ITEM_WUNLOCK(item);
 
-  if (valchanged)  /* do the property change notify if it actually changed */
+    if(valchanged)   /* do the property change notify if it actually changed */
     {
-      pspec = iface->specs[genid];
-      ipatch_sf2_gen_amount_to_value (genid, amt, &newval);
-      ipatch_sf2_gen_amount_to_value (genid, &oldamt, &oldval);
-      ipatch_item_prop_notify (IPATCH_ITEM (item), pspec, &newval, &oldval);
-      g_value_unset (&newval);
-      g_value_unset (&oldval);
+        pspec = iface->specs[genid];
+        ipatch_sf2_gen_amount_to_value(genid, amt, &newval);
+        ipatch_sf2_gen_amount_to_value(genid, &oldamt, &oldval);
+        ipatch_item_prop_notify(IPATCH_ITEM(item), pspec, &newval, &oldval);
+        g_value_unset(&newval);
+        g_value_unset(&oldval);
     }
 
-  if (oldset != TRUE)	/* "set" state of property changed? */
+    if(oldset != TRUE)	/* "set" state of property changed? */
     {
-      pspec = iface->setspecs[genid];
-      ipatch_item_prop_notify (IPATCH_ITEM (item), pspec,
-			       ipatch_util_value_bool_true,
-			       ipatch_util_value_bool_false);
+        pspec = iface->setspecs[genid];
+        ipatch_item_prop_notify(IPATCH_ITEM(item), pspec,
+                                ipatch_util_value_bool_true,
+                                ipatch_util_value_bool_false);
     }
 }
 
@@ -214,24 +214,26 @@ ipatch_sf2_gen_item_set_amount (IpatchSF2GenItem *item, guint genid,
  * property if it was set before.
  */
 void
-ipatch_sf2_gen_item_set_gen_flag (IpatchSF2GenItem *item, guint genid,
-				  gboolean setflag)
+ipatch_sf2_gen_item_set_gen_flag(IpatchSF2GenItem *item, guint genid,
+                                 gboolean setflag)
 {
-  IpatchSF2GenItemIface *iface;
-  GParamSpec *pspec;
+    IpatchSF2GenItemIface *iface;
+    GParamSpec *pspec;
 
-  if (!ipatch_sf2_gen_item_set_gen_flag_no_notify (item, genid, setflag))
-    return;
+    if(!ipatch_sf2_gen_item_set_gen_flag_no_notify(item, genid, setflag))
+    {
+        return;
+    }
 
-  iface = IPATCH_SF2_GEN_ITEM_GET_IFACE (item);
-  g_return_if_fail (iface != NULL);
+    iface = IPATCH_SF2_GEN_ITEM_GET_IFACE(item);
+    g_return_if_fail(iface != NULL);
 
-  /* do "-set" property notify */
-  pspec = iface->setspecs[genid];
+    /* do "-set" property notify */
+    pspec = iface->setspecs[genid];
 
-  ipatch_item_prop_notify (IPATCH_ITEM (item), pspec,
-			   IPATCH_UTIL_VALUE_BOOL (setflag),
-			   IPATCH_UTIL_VALUE_BOOL (!setflag));
+    ipatch_item_prop_notify(IPATCH_ITEM(item), pspec,
+                            IPATCH_UTIL_VALUE_BOOL(setflag),
+                            IPATCH_UTIL_VALUE_BOOL(!setflag));
 }
 
 /* Like ipatch_sf2_gen_item_set_gen_flag() but doesn't do "-set" property notify.
@@ -239,69 +241,79 @@ ipatch_sf2_gen_item_set_gen_flag (IpatchSF2GenItem *item, guint genid,
  * if the effective amount has changed. Caller can check if "-set" parameter
  * changed from return value (TRUE if changed from old value). */
 static gboolean
-ipatch_sf2_gen_item_set_gen_flag_no_notify (IpatchSF2GenItem *item, guint genid,
-					    gboolean setflag)
+ipatch_sf2_gen_item_set_gen_flag_no_notify(IpatchSF2GenItem *item, guint genid,
+        gboolean setflag)
 {
-  IpatchSF2GenItemIface *iface;
-  IpatchSF2GenArray *genarray;
-  IpatchSF2GenType propstype;
-  GParamSpec *pspec;
-  IpatchSF2GenAmount oldamt, defamt;
-  GValue newval = { 0 }, oldval = { 0 };
-  gboolean valchanged = FALSE, oldset;
+    IpatchSF2GenItemIface *iface;
+    IpatchSF2GenArray *genarray;
+    IpatchSF2GenType propstype;
+    GParamSpec *pspec;
+    IpatchSF2GenAmount oldamt, defamt;
+    GValue newval = { 0 }, oldval = { 0 };
+    gboolean valchanged = FALSE, oldset;
 
-  g_return_val_if_fail (IPATCH_IS_SF2_GEN_ITEM (item), FALSE);
+    g_return_val_if_fail(IPATCH_IS_SF2_GEN_ITEM(item), FALSE);
 
-  iface = IPATCH_SF2_GEN_ITEM_GET_IFACE (item);
-  propstype = iface->propstype;	/* propstype for this class */
+    iface = IPATCH_SF2_GEN_ITEM_GET_IFACE(item);
+    propstype = iface->propstype;	/* propstype for this class */
 
-  g_return_val_if_fail (ipatch_sf2_gen_is_valid (genid, propstype), FALSE);
+    g_return_val_if_fail(ipatch_sf2_gen_is_valid(genid, propstype), FALSE);
 
-  /* get pointer to genarray from IpatchSF2GenItemIface->genarray_ofs */
-  g_return_val_if_fail (iface->genarray_ofs != 0, FALSE);
-  genarray = (IpatchSF2GenArray *)G_STRUCT_MEMBER_P (item, iface->genarray_ofs);
+    /* get pointer to genarray from IpatchSF2GenItemIface->genarray_ofs */
+    g_return_val_if_fail(iface->genarray_ofs != 0, FALSE);
+    genarray = (IpatchSF2GenArray *)G_STRUCT_MEMBER_P(item, iface->genarray_ofs);
 
-  /* grab default val from gen info table if absolute instrument gen or a range
-     offset preset gen, otherwise offset gens are 0 by default */
-  if (!setflag)
+    /* grab default val from gen info table if absolute instrument gen or a range
+       offset preset gen, otherwise offset gens are 0 by default */
+    if(!setflag)
     {
-      if ((propstype & 0x1) == IPATCH_SF2_GEN_PROPS_INST
-	  || ipatch_sf2_gen_info[genid].unit == IPATCH_UNIT_TYPE_RANGE)
-	defamt = ipatch_sf2_gen_info[genid].def;
-      else defamt.sword = 0;
+        if((propstype & 0x1) == IPATCH_SF2_GEN_PROPS_INST
+                || ipatch_sf2_gen_info[genid].unit == IPATCH_UNIT_TYPE_RANGE)
+        {
+            defamt = ipatch_sf2_gen_info[genid].def;
+        }
+        else
+        {
+            defamt.sword = 0;
+        }
     }
 
-  IPATCH_ITEM_WLOCK (item);
+    IPATCH_ITEM_WLOCK(item);
 
-  /* unsetting flag and amount has different value than default? */
-  if (!setflag && genarray->values[genid].sword != defamt.sword)
+    /* unsetting flag and amount has different value than default? */
+    if(!setflag && genarray->values[genid].sword != defamt.sword)
     {
-      oldamt = genarray->values[genid];
-      genarray->values[genid] = defamt;
-      valchanged = TRUE;
+        oldamt = genarray->values[genid];
+        genarray->values[genid] = defamt;
+        valchanged = TRUE;
     }
 
-  oldset = IPATCH_SF2_GEN_ARRAY_TEST_FLAG (genarray, genid);
+    oldset = IPATCH_SF2_GEN_ARRAY_TEST_FLAG(genarray, genid);
 
-  /* set/unset flag as requested */
-  if (setflag)
-    IPATCH_SF2_GEN_ARRAY_SET_FLAG (genarray, genid);
-  else IPATCH_SF2_GEN_ARRAY_CLEAR_FLAG (genarray, genid);
-
-  IPATCH_ITEM_WUNLOCK (item);
-
-  /* do the property change notify if it actually changed */
-  if (valchanged)
+    /* set/unset flag as requested */
+    if(setflag)
     {
-      pspec = iface->specs[genid];
-      ipatch_sf2_gen_amount_to_value (genid, &defamt, &newval);
-      ipatch_sf2_gen_amount_to_value (genid, &oldamt, &oldval);
-      ipatch_item_prop_notify (IPATCH_ITEM (item), pspec, &newval, &oldval);
-      g_value_unset (&newval);
-      g_value_unset (&oldval);
+        IPATCH_SF2_GEN_ARRAY_SET_FLAG(genarray, genid);
+    }
+    else
+    {
+        IPATCH_SF2_GEN_ARRAY_CLEAR_FLAG(genarray, genid);
     }
 
-  return (setflag != oldset);
+    IPATCH_ITEM_WUNLOCK(item);
+
+    /* do the property change notify if it actually changed */
+    if(valchanged)
+    {
+        pspec = iface->specs[genid];
+        ipatch_sf2_gen_amount_to_value(genid, &defamt, &newval);
+        ipatch_sf2_gen_amount_to_value(genid, &oldamt, &oldval);
+        ipatch_item_prop_notify(IPATCH_ITEM(item), pspec, &newval, &oldval);
+        g_value_unset(&newval);
+        g_value_unset(&oldval);
+    }
+
+    return (setflag != oldset);
 }
 
 /**
@@ -313,26 +325,31 @@ ipatch_sf2_gen_item_set_gen_flag_no_notify (IpatchSF2GenItem *item, guint genid,
  * Returns: Count of "set" generators.
  */
 guint
-ipatch_sf2_gen_item_count_set (IpatchSF2GenItem *item)
+ipatch_sf2_gen_item_count_set(IpatchSF2GenItem *item)
 {
-  IpatchSF2GenItemIface *iface;
-  IpatchSF2GenArray *genarray;
-  guint count = 0;
-  guint64 v;
+    IpatchSF2GenItemIface *iface;
+    IpatchSF2GenArray *genarray;
+    guint count = 0;
+    guint64 v;
 
-  g_return_val_if_fail (IPATCH_IS_SF2_GEN_ITEM (item), 0);
+    g_return_val_if_fail(IPATCH_IS_SF2_GEN_ITEM(item), 0);
 
-  /* get pointer to genarray from IpatchSF2GenItemIface->genarray_ofs */
-  iface = IPATCH_SF2_GEN_ITEM_GET_IFACE (item);
-  g_return_val_if_fail (iface->genarray_ofs != 0, 0);
-  genarray = (IpatchSF2GenArray *)G_STRUCT_MEMBER_P (item, iface->genarray_ofs);
+    /* get pointer to genarray from IpatchSF2GenItemIface->genarray_ofs */
+    iface = IPATCH_SF2_GEN_ITEM_GET_IFACE(item);
+    g_return_val_if_fail(iface->genarray_ofs != 0, 0);
+    genarray = (IpatchSF2GenArray *)G_STRUCT_MEMBER_P(item, iface->genarray_ofs);
 
-  IPATCH_ITEM_RLOCK (item);
-  for (v = genarray->flags; v; v >>= 1) 
-    if (v & 0x1) count++;
-  IPATCH_ITEM_RUNLOCK (item);
+    IPATCH_ITEM_RLOCK(item);
 
-  return (count);
+    for(v = genarray->flags; v; v >>= 1)
+        if(v & 0x1)
+        {
+            count++;
+        }
+
+    IPATCH_ITEM_RUNLOCK(item);
+
+    return (count);
 }
 
 /**
@@ -343,22 +360,22 @@ ipatch_sf2_gen_item_count_set (IpatchSF2GenItem *item)
  * Copies an item's generators to a caller supplied generator array.
  */
 void
-ipatch_sf2_gen_item_copy_all (IpatchSF2GenItem *item, IpatchSF2GenArray *array)
+ipatch_sf2_gen_item_copy_all(IpatchSF2GenItem *item, IpatchSF2GenArray *array)
 {
-  IpatchSF2GenItemIface *iface;
-  IpatchSF2GenArray *genarray;
+    IpatchSF2GenItemIface *iface;
+    IpatchSF2GenArray *genarray;
 
-  g_return_if_fail (IPATCH_IS_SF2_GEN_ITEM (item));
-  g_return_if_fail (array != NULL);
+    g_return_if_fail(IPATCH_IS_SF2_GEN_ITEM(item));
+    g_return_if_fail(array != NULL);
 
-  /* get pointer to genarray from IpatchSF2GenItemIface->genarray_ofs */
-  iface = IPATCH_SF2_GEN_ITEM_GET_IFACE (item);
-  g_return_if_fail (iface->genarray_ofs != 0);
-  genarray = (IpatchSF2GenArray *)G_STRUCT_MEMBER_P (item, iface->genarray_ofs);
+    /* get pointer to genarray from IpatchSF2GenItemIface->genarray_ofs */
+    iface = IPATCH_SF2_GEN_ITEM_GET_IFACE(item);
+    g_return_if_fail(iface->genarray_ofs != 0);
+    genarray = (IpatchSF2GenArray *)G_STRUCT_MEMBER_P(item, iface->genarray_ofs);
 
-  IPATCH_ITEM_RLOCK (item);
-  memcpy (array, genarray, sizeof (IpatchSF2GenArray));
-  IPATCH_ITEM_RUNLOCK (item);
+    IPATCH_ITEM_RLOCK(item);
+    memcpy(array, genarray, sizeof(IpatchSF2GenArray));
+    IPATCH_ITEM_RUNLOCK(item);
 }
 
 /**
@@ -373,32 +390,35 @@ ipatch_sf2_gen_item_copy_all (IpatchSF2GenItem *item, IpatchSF2GenArray *array)
  * any generators in @item, despite "set" being in the name.
  */
 void
-ipatch_sf2_gen_item_copy_set (IpatchSF2GenItem *item, IpatchSF2GenArray *array)
+ipatch_sf2_gen_item_copy_set(IpatchSF2GenItem *item, IpatchSF2GenArray *array)
 {
-  IpatchSF2GenItemIface *iface;
-  IpatchSF2GenArray *genarray;
-  IpatchSF2GenAmount *vals;
-  guint64 v;
-  int i;
+    IpatchSF2GenItemIface *iface;
+    IpatchSF2GenArray *genarray;
+    IpatchSF2GenAmount *vals;
+    guint64 v;
+    int i;
 
-  g_return_if_fail (IPATCH_IS_SF2_GEN_ITEM (item));
-  g_return_if_fail (array != NULL);
+    g_return_if_fail(IPATCH_IS_SF2_GEN_ITEM(item));
+    g_return_if_fail(array != NULL);
 
-  /* get pointer to genarray from IpatchSF2GenItemIface->genarray_ofs */
-  iface = IPATCH_SF2_GEN_ITEM_GET_IFACE (item);
-  g_return_if_fail (iface->genarray_ofs != 0);
-  genarray = (IpatchSF2GenArray *)G_STRUCT_MEMBER_P (item, iface->genarray_ofs);
+    /* get pointer to genarray from IpatchSF2GenItemIface->genarray_ofs */
+    iface = IPATCH_SF2_GEN_ITEM_GET_IFACE(item);
+    g_return_if_fail(iface->genarray_ofs != 0);
+    genarray = (IpatchSF2GenArray *)G_STRUCT_MEMBER_P(item, iface->genarray_ofs);
 
-  IPATCH_ITEM_RLOCK (item);
+    IPATCH_ITEM_RLOCK(item);
 
-  vals = genarray->values;
-  v = genarray->flags;
-  array->flags |= v;	  /* set destination array bits from source */
+    vals = genarray->values;
+    v = genarray->flags;
+    array->flags |= v;	  /* set destination array bits from source */
 
-  for (i = 0; v != 0; i++, v >>= 1)
-    if (v & 0x1) array->values[i] = vals[i]; /* only copy set values */
+    for(i = 0; v != 0; i++, v >>= 1)
+        if(v & 0x1)
+        {
+            array->values[i] = vals[i];    /* only copy set values */
+        }
 
-  IPATCH_ITEM_RUNLOCK (item);
+    IPATCH_ITEM_RUNLOCK(item);
 }
 
 /**
@@ -411,25 +431,25 @@ ipatch_sf2_gen_item_copy_set (IpatchSF2GenItem *item, IpatchSF2GenArray *array)
  * Only a convenience function really.
  */
 void
-ipatch_sf2_gen_item_set_note_range (IpatchSF2GenItem *item, int low, int high)
+ipatch_sf2_gen_item_set_note_range(IpatchSF2GenItem *item, int low, int high)
 {
-  IpatchSF2GenAmount amt;
+    IpatchSF2GenAmount amt;
 
-  g_return_if_fail (IPATCH_IS_SF2_GEN_ITEM (item));
-  g_return_if_fail (low >= 0 && low <= 127);
-  g_return_if_fail (high >= 0 && high <= 127);
+    g_return_if_fail(IPATCH_IS_SF2_GEN_ITEM(item));
+    g_return_if_fail(low >= 0 && low <= 127);
+    g_return_if_fail(high >= 0 && high <= 127);
 
-  if (low > high)		/* swap if backwards */
+    if(low > high)		/* swap if backwards */
     {
-      int temp = low;
-      low = high;
-      high = temp;
+        int temp = low;
+        low = high;
+        high = temp;
     }
 
-  amt.range.low = low;
-  amt.range.high = high;
+    amt.range.low = low;
+    amt.range.high = high;
 
-  ipatch_sf2_gen_item_set_amount (item, IPATCH_SF2_GEN_NOTE_RANGE, &amt);
+    ipatch_sf2_gen_item_set_amount(item, IPATCH_SF2_GEN_NOTE_RANGE, &amt);
 }
 
 /**
@@ -442,25 +462,25 @@ ipatch_sf2_gen_item_set_note_range (IpatchSF2GenItem *item, int low, int high)
  * Only a convenience function really.
  */
 void
-ipatch_sf2_gen_item_set_velocity_range (IpatchSF2GenItem *item, int low, int high)
+ipatch_sf2_gen_item_set_velocity_range(IpatchSF2GenItem *item, int low, int high)
 {
-  IpatchSF2GenAmount amt;
+    IpatchSF2GenAmount amt;
 
-  g_return_if_fail (IPATCH_IS_SF2_GEN_ITEM (item));
-  g_return_if_fail (low >= 0 && low <= 127);
-  g_return_if_fail (high >= 0 && high <= 127);
+    g_return_if_fail(IPATCH_IS_SF2_GEN_ITEM(item));
+    g_return_if_fail(low >= 0 && low <= 127);
+    g_return_if_fail(high >= 0 && high <= 127);
 
-  if (low > high)		/* swap if backwards */
+    if(low > high)		/* swap if backwards */
     {
-      int temp = low;
-      low = high;
-      high = temp;
+        int temp = low;
+        low = high;
+        high = temp;
     }
 
-  amt.range.low = low;
-  amt.range.high = high;
+    amt.range.low = low;
+    amt.range.high = high;
 
-  ipatch_sf2_gen_item_set_amount (item, IPATCH_SF2_GEN_VELOCITY_RANGE, &amt);
+    ipatch_sf2_gen_item_set_amount(item, IPATCH_SF2_GEN_VELOCITY_RANGE, &amt);
 }
 
 /**
@@ -474,31 +494,31 @@ ipatch_sf2_gen_item_set_velocity_range (IpatchSF2GenItem *item, int low, int hig
  * Returns: %TRUE if @item is in @note and @velocity range, %FALSE otherwise
  */
 gboolean
-ipatch_sf2_gen_item_in_range (IpatchSF2GenItem *item, int note, int velocity)
+ipatch_sf2_gen_item_in_range(IpatchSF2GenItem *item, int note, int velocity)
 {
-  IpatchSF2GenAmount *noteamt, *velamt;
-  IpatchSF2GenItemIface *iface;
-  IpatchSF2GenArray *genarray;
-  gboolean in_range;
+    IpatchSF2GenAmount *noteamt, *velamt;
+    IpatchSF2GenItemIface *iface;
+    IpatchSF2GenArray *genarray;
+    gboolean in_range;
 
-  g_return_val_if_fail (IPATCH_IS_SF2_GEN_ITEM (item), FALSE);
+    g_return_val_if_fail(IPATCH_IS_SF2_GEN_ITEM(item), FALSE);
 
-  /* get pointer to genarray from IpatchSF2GenItemIface->genarray_ofs */
-  iface = IPATCH_SF2_GEN_ITEM_GET_IFACE (item);
-  g_return_val_if_fail (iface->genarray_ofs != 0, 0);
-  genarray = (IpatchSF2GenArray *)G_STRUCT_MEMBER_P (item, iface->genarray_ofs);
+    /* get pointer to genarray from IpatchSF2GenItemIface->genarray_ofs */
+    iface = IPATCH_SF2_GEN_ITEM_GET_IFACE(item);
+    g_return_val_if_fail(iface->genarray_ofs != 0, 0);
+    genarray = (IpatchSF2GenArray *)G_STRUCT_MEMBER_P(item, iface->genarray_ofs);
 
-  IPATCH_ITEM_RLOCK (item);
-  noteamt = &genarray->values[IPATCH_SF2_GEN_NOTE_RANGE];
-  velamt = &genarray->values[IPATCH_SF2_GEN_VELOCITY_RANGE];
+    IPATCH_ITEM_RLOCK(item);
+    noteamt = &genarray->values[IPATCH_SF2_GEN_NOTE_RANGE];
+    velamt = &genarray->values[IPATCH_SF2_GEN_VELOCITY_RANGE];
 
-  in_range = ((note == -1) || (note >= noteamt->range.low
-			       && note <= noteamt->range.high))
-    && ((velocity == -1) || (velocity >= velamt->range.low
-			     && velocity <= velamt->range.high));
-  IPATCH_ITEM_RUNLOCK (item);
+    in_range = ((note == -1) || (note >= noteamt->range.low
+                                 && note <= noteamt->range.high))
+               && ((velocity == -1) || (velocity >= velamt->range.low
+                                        && velocity <= velamt->range.high));
+    IPATCH_ITEM_RUNLOCK(item);
 
-  return (in_range);
+    return (in_range);
 }
 
 /**
@@ -513,27 +533,27 @@ ipatch_sf2_gen_item_in_range (IpatchSF2GenItem *item, int note, int velocity)
  *   both do not.
  */
 gboolean
-ipatch_sf2_gen_item_intersect_test (IpatchSF2GenItem *item,
-                                    const IpatchSF2GenArray *genarray)
+ipatch_sf2_gen_item_intersect_test(IpatchSF2GenItem *item,
+                                   const IpatchSF2GenArray *genarray)
 {
-  IpatchSF2GenAmount noteamt, velamt;
-  IpatchSF2GenItemIface *iface;
-  IpatchSF2GenArray *itemgenarray;
+    IpatchSF2GenAmount noteamt, velamt;
+    IpatchSF2GenItemIface *iface;
+    IpatchSF2GenArray *itemgenarray;
 
-  g_return_val_if_fail (IPATCH_IS_SF2_GEN_ITEM (item), FALSE);
+    g_return_val_if_fail(IPATCH_IS_SF2_GEN_ITEM(item), FALSE);
 
-  /* get pointer to genarray from IpatchSF2GenItemIface->genarray_ofs */
-  iface = IPATCH_SF2_GEN_ITEM_GET_IFACE (item);
-  g_return_val_if_fail (iface->genarray_ofs != 0, 0);
-  itemgenarray = (IpatchSF2GenArray *)G_STRUCT_MEMBER_P (item, iface->genarray_ofs);
+    /* get pointer to genarray from IpatchSF2GenItemIface->genarray_ofs */
+    iface = IPATCH_SF2_GEN_ITEM_GET_IFACE(item);
+    g_return_val_if_fail(iface->genarray_ofs != 0, 0);
+    itemgenarray = (IpatchSF2GenArray *)G_STRUCT_MEMBER_P(item, iface->genarray_ofs);
 
-  IPATCH_ITEM_RLOCK (item);
-  noteamt = itemgenarray->values[IPATCH_SF2_GEN_NOTE_RANGE];
-  velamt = itemgenarray->values[IPATCH_SF2_GEN_VELOCITY_RANGE];
-  IPATCH_ITEM_RUNLOCK (item);
+    IPATCH_ITEM_RLOCK(item);
+    noteamt = itemgenarray->values[IPATCH_SF2_GEN_NOTE_RANGE];
+    velamt = itemgenarray->values[IPATCH_SF2_GEN_VELOCITY_RANGE];
+    IPATCH_ITEM_RUNLOCK(item);
 
-  return ipatch_sf2_gen_range_intersect_test (&noteamt, &genarray->values[IPATCH_SF2_GEN_NOTE_RANGE])
-    && ipatch_sf2_gen_range_intersect_test (&velamt, &genarray->values[IPATCH_SF2_GEN_VELOCITY_RANGE]);
+    return ipatch_sf2_gen_range_intersect_test(&noteamt, &genarray->values[IPATCH_SF2_GEN_NOTE_RANGE])
+           && ipatch_sf2_gen_range_intersect_test(&velamt, &genarray->values[IPATCH_SF2_GEN_VELOCITY_RANGE]);
 }
 
 /**
@@ -547,17 +567,17 @@ ipatch_sf2_gen_item_intersect_test (IpatchSF2GenItem *item,
  *   the given @genid for @klass is not valid.
  */
 GParamSpec *
-ipatch_sf2_gen_item_class_get_pspec (GObjectClass *klass, guint genid)
+ipatch_sf2_gen_item_class_get_pspec(GObjectClass *klass, guint genid)
 {
-  IpatchSF2GenItemIface *gen_item_iface;
+    IpatchSF2GenItemIface *gen_item_iface;
 
-  g_return_val_if_fail (genid < IPATCH_SF2_GEN_COUNT, NULL);
-  g_return_val_if_fail (klass != NULL, NULL);
+    g_return_val_if_fail(genid < IPATCH_SF2_GEN_COUNT, NULL);
+    g_return_val_if_fail(klass != NULL, NULL);
 
-  gen_item_iface = g_type_interface_peek (klass, IPATCH_TYPE_SF2_GEN_ITEM);
-  g_return_val_if_fail (gen_item_iface != NULL, NULL);
+    gen_item_iface = g_type_interface_peek(klass, IPATCH_TYPE_SF2_GEN_ITEM);
+    g_return_val_if_fail(gen_item_iface != NULL, NULL);
 
-  return (gen_item_iface->specs[genid]);
+    return (gen_item_iface->specs[genid]);
 }
 
 /**
@@ -572,17 +592,17 @@ ipatch_sf2_gen_item_class_get_pspec (GObjectClass *klass, guint genid)
  *   %NULL if the given @genid or @klass are not valid.
  */
 GParamSpec *
-ipatch_sf2_gen_item_class_get_pspec_set (GObjectClass *klass, guint genid)
+ipatch_sf2_gen_item_class_get_pspec_set(GObjectClass *klass, guint genid)
 {
-  IpatchSF2GenItemIface *gen_item_iface;
+    IpatchSF2GenItemIface *gen_item_iface;
 
-  g_return_val_if_fail (genid < IPATCH_SF2_GEN_COUNT, NULL);
-  g_return_val_if_fail (klass != NULL, NULL);
+    g_return_val_if_fail(genid < IPATCH_SF2_GEN_COUNT, NULL);
+    g_return_val_if_fail(klass != NULL, NULL);
 
-  gen_item_iface = g_type_interface_peek (klass, IPATCH_TYPE_SF2_GEN_ITEM);
-  g_return_val_if_fail (gen_item_iface != NULL, NULL);
+    gen_item_iface = g_type_interface_peek(klass, IPATCH_TYPE_SF2_GEN_ITEM);
+    g_return_val_if_fail(gen_item_iface != NULL, NULL);
 
-  return (gen_item_iface->setspecs[genid]);
+    return (gen_item_iface->setspecs[genid]);
 }
 
 /**
@@ -603,100 +623,113 @@ ipatch_sf2_gen_item_class_get_pspec_set (GObjectClass *klass, guint genid)
  * not yet been initialized, so values need to be passed to the interface init
  * function. */
 void
-ipatch_sf2_gen_item_iface_install_properties (GObjectClass *klass,
-                                              IpatchSF2GenPropsType propstype,
-                                              GParamSpec ***specs,
-                                              GParamSpec ***setspecs)
+ipatch_sf2_gen_item_iface_install_properties(GObjectClass *klass,
+        IpatchSF2GenPropsType propstype,
+        GParamSpec ***specs,
+        GParamSpec ***setspecs)
 {
-  GEnumClass *enum_class;
-  GEnumValue *enum_value;
-  GParamSpec *pspec;
-  char *set_name;
-  const IpatchSF2GenInfo *gen_info;
-  int nonrt_index = 0;		/* non realtime generator array index */
-  gboolean ispreset;
-  int i, diff, unit;
+    GEnumClass *enum_class;
+    GEnumValue *enum_value;
+    GParamSpec *pspec;
+    char *set_name;
+    const IpatchSF2GenInfo *gen_info;
+    int nonrt_index = 0;		/* non realtime generator array index */
+    gboolean ispreset;
+    int i, diff, unit;
 
-  ispreset = propstype & 1;
+    ispreset = propstype & 1;
 
-  /* get generator type GObject enum */
-  enum_class = g_type_class_ref (IPATCH_TYPE_SF2_GEN_TYPE);
-  g_return_if_fail (enum_class != NULL);
+    /* get generator type GObject enum */
+    enum_class = g_type_class_ref(IPATCH_TYPE_SF2_GEN_TYPE);
+    g_return_if_fail(enum_class != NULL);
 
-  *specs = g_new (GParamSpec *, IPATCH_SF2_GEN_COUNT);
-  *setspecs = g_new (GParamSpec *, IPATCH_SF2_GEN_COUNT);
+    *specs = g_new(GParamSpec *, IPATCH_SF2_GEN_COUNT);
+    *setspecs = g_new(GParamSpec *, IPATCH_SF2_GEN_COUNT);
 
-  /* install generator properties */
-  for (i = 0; i < IPATCH_SF2_GEN_COUNT; i++)
-    { /* gen is valid for zone type? */
-      if (!ipatch_sf2_gen_is_valid (i, propstype)) continue;
+    /* install generator properties */
+    for(i = 0; i < IPATCH_SF2_GEN_COUNT; i++)
+    {
+        /* gen is valid for zone type? */
+        if(!ipatch_sf2_gen_is_valid(i, propstype))
+        {
+            continue;
+        }
 
-      gen_info = &ipatch_sf2_gen_info[i];
-      enum_value = g_enum_get_value (enum_class, i);
-      if (gen_info->unit == IPATCH_UNIT_TYPE_RANGE)
-	pspec = ipatch_param_spec_range (enum_value->value_nick,
-		    _(gen_info->label),
-		    _(gen_info->descr ? gen_info->descr : gen_info->label),
-		    0, 127, 0, 127, G_PARAM_READWRITE);
-      /* allow 30 bit number which stores fine and coarse (32k) values */
-      else if (gen_info->unit == IPATCH_UNIT_TYPE_SAMPLES)
-	pspec = g_param_spec_int (enum_value->value_nick,
-		    _(gen_info->label),
-		    _(gen_info->descr ? gen_info->descr : gen_info->label),
-		    ispreset ? -0x03FFFFFFF : 0, 0x03FFFFFFF, 0,
-		    G_PARAM_READWRITE);
-      else if (!ispreset)	/* integer absolute property */
-	pspec = g_param_spec_int (enum_value->value_nick,
-		    _(gen_info->label),
-		    _(gen_info->descr ? gen_info->descr : gen_info->label),
-		    gen_info->min.sword, gen_info->max.sword,
-		    gen_info->def.sword, G_PARAM_READWRITE);
-      else			/* integer offset property */
-	{
-	  diff = (int)gen_info->max.sword - gen_info->min.sword;
-	  pspec = g_param_spec_int (enum_value->value_nick,
-		      _(gen_info->label),
-		      _(gen_info->descr ? gen_info->descr : gen_info->label),
-		      -diff, diff, 0, G_PARAM_READWRITE);
-	}
+        gen_info = &ipatch_sf2_gen_info[i];
+        enum_value = g_enum_get_value(enum_class, i);
 
-      /* all generators affect synthesis */
-      pspec->flags |= IPATCH_PARAM_SYNTH;
+        if(gen_info->unit == IPATCH_UNIT_TYPE_RANGE)
+            pspec = ipatch_param_spec_range(enum_value->value_nick,
+                                            _(gen_info->label),
+                                            _(gen_info->descr ? gen_info->descr : gen_info->label),
+                                            0, 127, 0, 127, G_PARAM_READWRITE);
+        /* allow 30 bit number which stores fine and coarse (32k) values */
+        else if(gen_info->unit == IPATCH_UNIT_TYPE_SAMPLES)
+            pspec = g_param_spec_int(enum_value->value_nick,
+                                     _(gen_info->label),
+                                     _(gen_info->descr ? gen_info->descr : gen_info->label),
+                                     ispreset ? -0x03FFFFFFF : 0, 0x03FFFFFFF, 0,
+                                     G_PARAM_READWRITE);
+        else if(!ispreset)	/* integer absolute property */
+            pspec = g_param_spec_int(enum_value->value_nick,
+                                     _(gen_info->label),
+                                     _(gen_info->descr ? gen_info->descr : gen_info->label),
+                                     gen_info->min.sword, gen_info->max.sword,
+                                     gen_info->def.sword, G_PARAM_READWRITE);
+        else			/* integer offset property */
+        {
+            diff = (int)gen_info->max.sword - gen_info->min.sword;
+            pspec = g_param_spec_int(enum_value->value_nick,
+                                     _(gen_info->label),
+                                     _(gen_info->descr ? gen_info->descr : gen_info->label),
+                                     -diff, diff, 0, G_PARAM_READWRITE);
+        }
 
-      /* if generator is not in non_realtime generator array.. */
-      if (nonrt_index >= G_N_ELEMENTS (non_realtime)
-	  || non_realtime[nonrt_index] != i)
-	pspec->flags |= IPATCH_PARAM_SYNTH_REALTIME; /* set realtime flag */
-      else if (non_realtime[nonrt_index] == i)
-	nonrt_index++;  /* current gen is non realtime, adv to next index */
+        /* all generators affect synthesis */
+        pspec->flags |= IPATCH_PARAM_SYNTH;
 
-      /* install the property */
-      g_object_class_install_property (klass, i + IPATCH_SF2_GEN_ITEM_FIRST_PROP_ID, pspec);
+        /* if generator is not in non_realtime generator array.. */
+        if(nonrt_index >= G_N_ELEMENTS(non_realtime)
+                || non_realtime[nonrt_index] != i)
+        {
+            pspec->flags |= IPATCH_PARAM_SYNTH_REALTIME;    /* set realtime flag */
+        }
+        else if(non_realtime[nonrt_index] == i)
+        {
+            nonrt_index++;    /* current gen is non realtime, adv to next index */
+        }
 
-      unit = gen_info->unit;
+        /* install the property */
+        g_object_class_install_property(klass, i + IPATCH_SF2_GEN_ITEM_FIRST_PROP_ID, pspec);
 
-      /* set parameter unit type extended property */
-      if (ispreset)
-      {
-        if (unit == IPATCH_UNIT_TYPE_SF2_ABS_PITCH)
-          unit = IPATCH_UNIT_TYPE_SF2_OFS_PITCH;
-        else if (unit == IPATCH_UNIT_TYPE_SF2_ABS_TIME)
-          unit = IPATCH_UNIT_TYPE_SF2_OFS_PITCH;
-      }
+        unit = gen_info->unit;
 
-      ipatch_param_set (pspec, "unit-type", unit, NULL);
+        /* set parameter unit type extended property */
+        if(ispreset)
+        {
+            if(unit == IPATCH_UNIT_TYPE_SF2_ABS_PITCH)
+            {
+                unit = IPATCH_UNIT_TYPE_SF2_OFS_PITCH;
+            }
+            else if(unit == IPATCH_UNIT_TYPE_SF2_ABS_TIME)
+            {
+                unit = IPATCH_UNIT_TYPE_SF2_OFS_PITCH;
+            }
+        }
 
-      (*specs)[i] = g_param_spec_ref (pspec);  /* add to parameter spec array */
+        ipatch_param_set(pspec, "unit-type", unit, NULL);
 
-      /* create prop-set property and add to setspecs array */
-      set_name = g_strconcat (enum_value->value_nick, "-set", NULL);
-      pspec = g_param_spec_boolean (set_name, NULL, NULL, FALSE, G_PARAM_READWRITE);
-      g_free (set_name);
+        (*specs)[i] = g_param_spec_ref(pspec);   /* add to parameter spec array */
 
-      (*setspecs)[i] = g_param_spec_ref (pspec);      /* add to set spec array */
+        /* create prop-set property and add to setspecs array */
+        set_name = g_strconcat(enum_value->value_nick, "-set", NULL);
+        pspec = g_param_spec_boolean(set_name, NULL, NULL, FALSE, G_PARAM_READWRITE);
+        g_free(set_name);
 
-      /* install "-set" property */
-      g_object_class_install_property (klass, i + IPATCH_SF2_GEN_ITEM_FIRST_PROP_SET_ID, pspec);
+        (*setspecs)[i] = g_param_spec_ref(pspec);       /* add to set spec array */
+
+        /* install "-set" property */
+        g_object_class_install_property(klass, i + IPATCH_SF2_GEN_ITEM_FIRST_PROP_SET_ID, pspec);
     } /* for loop */
 }
 
@@ -711,160 +744,180 @@ ipatch_sf2_gen_item_iface_install_properties (GObjectClass *klass,
  * Returns: %TRUE if @property_id handled, %FALSE otherwise
  */
 gboolean
-ipatch_sf2_gen_item_iface_set_property (IpatchSF2GenItem *item,
-				        guint property_id, const GValue *value)
+ipatch_sf2_gen_item_iface_set_property(IpatchSF2GenItem *item,
+                                       guint property_id, const GValue *value)
 {
-  IpatchSF2GenItemIface *iface;
-  IpatchSF2GenArray *genarray;
-  const IpatchSF2GenInfo *gen_info;
-  IpatchSF2GenAmount amt;
-  IpatchRange *range;
-  int genid, coarse, val;
-  gboolean oldset, oldcoarseset = 0, newcoarseset = 0;
-  IpatchSF2GenAmount oldcoarseamt, newcoarseamt;
-  gboolean coarsevalchanged = FALSE;
-  GParamSpec *pspec;
-  GValue newval = { 0 }, oldval = { 0 };
-  gboolean setflag;
+    IpatchSF2GenItemIface *iface;
+    IpatchSF2GenArray *genarray;
+    const IpatchSF2GenInfo *gen_info;
+    IpatchSF2GenAmount amt;
+    IpatchRange *range;
+    int genid, coarse, val;
+    gboolean oldset, oldcoarseset = 0, newcoarseset = 0;
+    IpatchSF2GenAmount oldcoarseamt, newcoarseamt;
+    gboolean coarsevalchanged = FALSE;
+    GParamSpec *pspec;
+    GValue newval = { 0 }, oldval = { 0 };
+    gboolean setflag;
 
-  iface = IPATCH_SF2_GEN_ITEM_GET_IFACE (item);
+    iface = IPATCH_SF2_GEN_ITEM_GET_IFACE(item);
 
-  /* a "-set" property? */
-  if (property_id >= IPATCH_SF2_GEN_ITEM_FIRST_PROP_SET_ID
-      && property_id < IPATCH_SF2_GEN_ITEM_FIRST_PROP_SET_ID + IPATCH_SF2_GEN_COUNT)
+    /* a "-set" property? */
+    if(property_id >= IPATCH_SF2_GEN_ITEM_FIRST_PROP_SET_ID
+            && property_id < IPATCH_SF2_GEN_ITEM_FIRST_PROP_SET_ID + IPATCH_SF2_GEN_COUNT)
     {
-      genid = property_id - IPATCH_SF2_GEN_ITEM_FIRST_PROP_SET_ID;
+        genid = property_id - IPATCH_SF2_GEN_ITEM_FIRST_PROP_SET_ID;
 
-      /* generator valid for zone type? */
-      if (!ipatch_sf2_gen_is_valid (genid, iface->propstype)) return (FALSE);
+        /* generator valid for zone type? */
+        if(!ipatch_sf2_gen_is_valid(genid, iface->propstype))
+        {
+            return (FALSE);
+        }
 
-      setflag = g_value_get_boolean (value);
-      ipatch_sf2_gen_item_set_gen_flag_no_notify (item, genid, setflag);
+        setflag = g_value_get_boolean(value);
+        ipatch_sf2_gen_item_set_gen_flag_no_notify(item, genid, setflag);
 
-      return (TRUE);
+        return (TRUE);
     }
 
-  /* regular generator property? */
-  if (property_id < IPATCH_SF2_GEN_ITEM_FIRST_PROP_ID
-      || property_id >= IPATCH_SF2_GEN_ITEM_FIRST_PROP_ID + IPATCH_SF2_GEN_COUNT)
-    return (FALSE);
-
-  genid = property_id - IPATCH_SF2_GEN_ITEM_FIRST_PROP_ID;
-
-  /* generator valid for zone type? */
-  if (!ipatch_sf2_gen_is_valid (genid, iface->propstype)) return (FALSE);
-
-  /* get pointer to genarray from IpatchSF2GenItemIface->genarray_ofs */
-  g_return_val_if_fail (iface->genarray_ofs != 0, FALSE);
-  genarray = (IpatchSF2GenArray *)G_STRUCT_MEMBER_P (item, iface->genarray_ofs);
-
-  gen_info = &ipatch_sf2_gen_info [genid];
-
-  if (gen_info->unit == IPATCH_UNIT_TYPE_SAMPLES)
-    { /* set 2 generators - fine and coarse (32k) sample values */
-      if (genid == IPATCH_SF2_GEN_SAMPLE_START)
-	coarse = IPATCH_SF2_GEN_SAMPLE_COARSE_START;
-      else if (genid == IPATCH_SF2_GEN_SAMPLE_END)
-	coarse = IPATCH_SF2_GEN_SAMPLE_COARSE_END;
-      else if (genid == IPATCH_SF2_GEN_SAMPLE_LOOP_START)
-	coarse = IPATCH_SF2_GEN_SAMPLE_COARSE_LOOP_START;
-      else if (genid == IPATCH_SF2_GEN_SAMPLE_LOOP_END)
-	coarse = IPATCH_SF2_GEN_SAMPLE_COARSE_LOOP_END;
-      else g_return_val_if_fail (NOT_REACHED, FALSE);
-
-      val = g_value_get_int (value);
-      newcoarseamt.uword = val >> 15;
-
-      IPATCH_ITEM_WLOCK (item); /* atomically set both gens */
-
-      /* prop notify done by IpatchItem methods, so just set value */
-      genarray->values[genid].uword = val & 0x7FFF;
-
-      oldset = IPATCH_SF2_GEN_ARRAY_TEST_FLAG (genarray, genid);
-      IPATCH_SF2_GEN_ARRAY_SET_FLAG (genarray, genid); /* value is set */
-
-      /* only set coarse value if it has changed */
-      if (genarray->values[coarse].uword != newcoarseamt.uword)
-	{
-	  oldcoarseamt = genarray->values[coarse];
-	  genarray->values[coarse] = newcoarseamt;
-	  coarsevalchanged = TRUE;
-
-	  oldcoarseset = IPATCH_SF2_GEN_ARRAY_TEST_FLAG (genarray, genid);
-
-	  if (val != 0)
-	    {
-	      IPATCH_SF2_GEN_ARRAY_SET_FLAG (genarray, genid); /* value is set */
-	      newcoarseset = 1;
-	    }
-	  else
-	    {
-	      IPATCH_SF2_GEN_ARRAY_CLEAR_FLAG (genarray, genid); /* value is unset */
-	      newcoarseset = 0;
-	    }
-	}
-
-      IPATCH_ITEM_WUNLOCK (item);
-
-      if (oldset != TRUE)	/* "set" state of property changed? */
-	{
-	  pspec = iface->setspecs[genid];
-	  ipatch_item_prop_notify (IPATCH_ITEM (item), pspec, ipatch_util_value_bool_true,
-				   ipatch_util_value_bool_false);
-	}
-
-      if (coarsevalchanged)  /* do the property change notify if it actually changed */
-	{
-	  pspec = iface->specs[coarse];
-	  ipatch_sf2_gen_amount_to_value (genid, &newcoarseamt, &newval);
-	  ipatch_sf2_gen_amount_to_value (genid, &oldcoarseamt, &oldval);
-	  ipatch_item_prop_notify (IPATCH_ITEM (item), pspec, &newval, &oldval);
-	  g_value_unset (&newval);
-	  g_value_unset (&oldval);
-	}
-    
-      if (oldcoarseset != newcoarseset)	/* "set" state of property changed? */
-	{
-	  pspec = iface->setspecs[coarse];
-	  ipatch_item_prop_notify (IPATCH_ITEM (item), pspec,
-				   IPATCH_UTIL_VALUE_BOOL (newcoarseset),
-				   IPATCH_UTIL_VALUE_BOOL (oldcoarseset));
-	}
-    }
-  else
+    /* regular generator property? */
+    if(property_id < IPATCH_SF2_GEN_ITEM_FIRST_PROP_ID
+            || property_id >= IPATCH_SF2_GEN_ITEM_FIRST_PROP_ID + IPATCH_SF2_GEN_COUNT)
     {
-      if (gen_info->unit == IPATCH_UNIT_TYPE_RANGE) /* range property? */
-      {
-	range = ipatch_value_get_range (value);
-	amt.range.low = range->low;
-	amt.range.high = range->high;
-      }
-      else
-      {
-	val = g_value_get_int (value);
-	amt.sword = val;
-      }
-
-      IPATCH_ITEM_WLOCK (item);
-
-      /* prop notify done by IpatchItem methods, so just set value */
-      genarray->values[genid] = amt;
-
-      /* get old value of set flag, and then set it (if no already) */
-      oldset = IPATCH_SF2_GEN_ARRAY_TEST_FLAG (genarray, genid);
-      IPATCH_SF2_GEN_ARRAY_SET_FLAG (genarray, genid); /* value is set */
-
-      IPATCH_ITEM_WUNLOCK (item);
-
-      if (oldset != TRUE)	/* "set" state of property changed? */
-	{
-	  pspec = iface->setspecs[genid];
-	  ipatch_item_prop_notify (IPATCH_ITEM (item), pspec, ipatch_util_value_bool_true,
-				   ipatch_util_value_bool_false);
-	}
+        return (FALSE);
     }
 
-  return (TRUE);
+    genid = property_id - IPATCH_SF2_GEN_ITEM_FIRST_PROP_ID;
+
+    /* generator valid for zone type? */
+    if(!ipatch_sf2_gen_is_valid(genid, iface->propstype))
+    {
+        return (FALSE);
+    }
+
+    /* get pointer to genarray from IpatchSF2GenItemIface->genarray_ofs */
+    g_return_val_if_fail(iface->genarray_ofs != 0, FALSE);
+    genarray = (IpatchSF2GenArray *)G_STRUCT_MEMBER_P(item, iface->genarray_ofs);
+
+    gen_info = &ipatch_sf2_gen_info [genid];
+
+    if(gen_info->unit == IPATCH_UNIT_TYPE_SAMPLES)
+    {
+        /* set 2 generators - fine and coarse (32k) sample values */
+        if(genid == IPATCH_SF2_GEN_SAMPLE_START)
+        {
+            coarse = IPATCH_SF2_GEN_SAMPLE_COARSE_START;
+        }
+        else if(genid == IPATCH_SF2_GEN_SAMPLE_END)
+        {
+            coarse = IPATCH_SF2_GEN_SAMPLE_COARSE_END;
+        }
+        else if(genid == IPATCH_SF2_GEN_SAMPLE_LOOP_START)
+        {
+            coarse = IPATCH_SF2_GEN_SAMPLE_COARSE_LOOP_START;
+        }
+        else if(genid == IPATCH_SF2_GEN_SAMPLE_LOOP_END)
+        {
+            coarse = IPATCH_SF2_GEN_SAMPLE_COARSE_LOOP_END;
+        }
+        else
+        {
+            g_return_val_if_fail(NOT_REACHED, FALSE);
+        }
+
+        val = g_value_get_int(value);
+        newcoarseamt.uword = val >> 15;
+
+        IPATCH_ITEM_WLOCK(item);  /* atomically set both gens */
+
+        /* prop notify done by IpatchItem methods, so just set value */
+        genarray->values[genid].uword = val & 0x7FFF;
+
+        oldset = IPATCH_SF2_GEN_ARRAY_TEST_FLAG(genarray, genid);
+        IPATCH_SF2_GEN_ARRAY_SET_FLAG(genarray, genid);  /* value is set */
+
+        /* only set coarse value if it has changed */
+        if(genarray->values[coarse].uword != newcoarseamt.uword)
+        {
+            oldcoarseamt = genarray->values[coarse];
+            genarray->values[coarse] = newcoarseamt;
+            coarsevalchanged = TRUE;
+
+            oldcoarseset = IPATCH_SF2_GEN_ARRAY_TEST_FLAG(genarray, genid);
+
+            if(val != 0)
+            {
+                IPATCH_SF2_GEN_ARRAY_SET_FLAG(genarray, genid);  /* value is set */
+                newcoarseset = 1;
+            }
+            else
+            {
+                IPATCH_SF2_GEN_ARRAY_CLEAR_FLAG(genarray, genid);  /* value is unset */
+                newcoarseset = 0;
+            }
+        }
+
+        IPATCH_ITEM_WUNLOCK(item);
+
+        if(oldset != TRUE)	/* "set" state of property changed? */
+        {
+            pspec = iface->setspecs[genid];
+            ipatch_item_prop_notify(IPATCH_ITEM(item), pspec, ipatch_util_value_bool_true,
+                                    ipatch_util_value_bool_false);
+        }
+
+        if(coarsevalchanged)   /* do the property change notify if it actually changed */
+        {
+            pspec = iface->specs[coarse];
+            ipatch_sf2_gen_amount_to_value(genid, &newcoarseamt, &newval);
+            ipatch_sf2_gen_amount_to_value(genid, &oldcoarseamt, &oldval);
+            ipatch_item_prop_notify(IPATCH_ITEM(item), pspec, &newval, &oldval);
+            g_value_unset(&newval);
+            g_value_unset(&oldval);
+        }
+
+        if(oldcoarseset != newcoarseset)	/* "set" state of property changed? */
+        {
+            pspec = iface->setspecs[coarse];
+            ipatch_item_prop_notify(IPATCH_ITEM(item), pspec,
+                                    IPATCH_UTIL_VALUE_BOOL(newcoarseset),
+                                    IPATCH_UTIL_VALUE_BOOL(oldcoarseset));
+        }
+    }
+    else
+    {
+        if(gen_info->unit == IPATCH_UNIT_TYPE_RANGE)  /* range property? */
+        {
+            range = ipatch_value_get_range(value);
+            amt.range.low = range->low;
+            amt.range.high = range->high;
+        }
+        else
+        {
+            val = g_value_get_int(value);
+            amt.sword = val;
+        }
+
+        IPATCH_ITEM_WLOCK(item);
+
+        /* prop notify done by IpatchItem methods, so just set value */
+        genarray->values[genid] = amt;
+
+        /* get old value of set flag, and then set it (if no already) */
+        oldset = IPATCH_SF2_GEN_ARRAY_TEST_FLAG(genarray, genid);
+        IPATCH_SF2_GEN_ARRAY_SET_FLAG(genarray, genid);  /* value is set */
+
+        IPATCH_ITEM_WUNLOCK(item);
+
+        if(oldset != TRUE)	/* "set" state of property changed? */
+        {
+            pspec = iface->setspecs[genid];
+            ipatch_item_prop_notify(IPATCH_ITEM(item), pspec, ipatch_util_value_bool_true,
+                                    ipatch_util_value_bool_false);
+        }
+    }
+
+    return (TRUE);
 }
 
 /**
@@ -878,82 +931,105 @@ ipatch_sf2_gen_item_iface_set_property (IpatchSF2GenItem *item,
  * Returns: %TRUE if @property_id handled, %FALSE otherwise
  */
 gboolean
-ipatch_sf2_gen_item_iface_get_property (IpatchSF2GenItem *item, guint property_id,
-					GValue *value)
+ipatch_sf2_gen_item_iface_get_property(IpatchSF2GenItem *item, guint property_id,
+                                       GValue *value)
 {
-  IpatchSF2GenItemIface *iface;
-  IpatchSF2GenArray *genarray;
-  const IpatchSF2GenInfo *gen_info;
-  IpatchSF2GenAmount amt;
-  IpatchRange range;
-  int genid, coarse, val;
-  gboolean setflag;
+    IpatchSF2GenItemIface *iface;
+    IpatchSF2GenArray *genarray;
+    const IpatchSF2GenInfo *gen_info;
+    IpatchSF2GenAmount amt;
+    IpatchRange range;
+    int genid, coarse, val;
+    gboolean setflag;
 
-  iface = IPATCH_SF2_GEN_ITEM_GET_IFACE (item);
+    iface = IPATCH_SF2_GEN_ITEM_GET_IFACE(item);
 
-  /* get pointer to genarray from IpatchSF2GenItemIface->genarray_ofs */
-  g_return_val_if_fail (iface->genarray_ofs != 0, FALSE);
-  genarray = (IpatchSF2GenArray *)G_STRUCT_MEMBER_P (item, iface->genarray_ofs);
+    /* get pointer to genarray from IpatchSF2GenItemIface->genarray_ofs */
+    g_return_val_if_fail(iface->genarray_ofs != 0, FALSE);
+    genarray = (IpatchSF2GenArray *)G_STRUCT_MEMBER_P(item, iface->genarray_ofs);
 
-  /* a "-set" property? */
-  if (property_id >= IPATCH_SF2_GEN_ITEM_FIRST_PROP_SET_ID
-      && property_id < IPATCH_SF2_GEN_ITEM_FIRST_PROP_SET_ID + IPATCH_SF2_GEN_COUNT)
+    /* a "-set" property? */
+    if(property_id >= IPATCH_SF2_GEN_ITEM_FIRST_PROP_SET_ID
+            && property_id < IPATCH_SF2_GEN_ITEM_FIRST_PROP_SET_ID + IPATCH_SF2_GEN_COUNT)
     {
-      genid = property_id - IPATCH_SF2_GEN_ITEM_FIRST_PROP_SET_ID;
+        genid = property_id - IPATCH_SF2_GEN_ITEM_FIRST_PROP_SET_ID;
 
-      /* generator valid for zone type? */
-      if (!ipatch_sf2_gen_is_valid (genid, iface->propstype)) return (FALSE);
+        /* generator valid for zone type? */
+        if(!ipatch_sf2_gen_is_valid(genid, iface->propstype))
+        {
+            return (FALSE);
+        }
 
-      IPATCH_ITEM_RLOCK (item);
-      setflag = IPATCH_SF2_GEN_ARRAY_TEST_FLAG (genarray, genid);
-      IPATCH_ITEM_RUNLOCK (item);
+        IPATCH_ITEM_RLOCK(item);
+        setflag = IPATCH_SF2_GEN_ARRAY_TEST_FLAG(genarray, genid);
+        IPATCH_ITEM_RUNLOCK(item);
 
-      g_value_set_boolean (value, setflag);
-      return (TRUE);
+        g_value_set_boolean(value, setflag);
+        return (TRUE);
     }
 
-  /* regular generator property? */
-  if (property_id < IPATCH_SF2_GEN_ITEM_FIRST_PROP_ID
-      || property_id >= IPATCH_SF2_GEN_ITEM_FIRST_PROP_ID + IPATCH_SF2_GEN_COUNT)
-    return (FALSE);
-
-  genid = property_id - IPATCH_SF2_GEN_ITEM_FIRST_PROP_ID;
-
-  /* generator valid for propstype? */
-  if (!ipatch_sf2_gen_is_valid (genid, iface->propstype)) return (FALSE);
-
-  gen_info = &ipatch_sf2_gen_info [genid];
-
-  if (gen_info->unit == IPATCH_UNIT_TYPE_RANGE) /* range property? */
+    /* regular generator property? */
+    if(property_id < IPATCH_SF2_GEN_ITEM_FIRST_PROP_ID
+            || property_id >= IPATCH_SF2_GEN_ITEM_FIRST_PROP_ID + IPATCH_SF2_GEN_COUNT)
     {
-      IPATCH_ITEM_WLOCK (item); /* OPTME - lock might not be necessary? */
-      amt = genarray->values[genid];
-      IPATCH_ITEM_WUNLOCK (item);
-
-      range.low = amt.range.low;
-      range.high = amt.range.high;
-      ipatch_value_set_range (value, &range);
+        return (FALSE);
     }
-  else if (gen_info->unit == IPATCH_UNIT_TYPE_SAMPLES)
-    { /* get 2 generators - fine and coarse (32k) sample values */
-      if (genid == IPATCH_SF2_GEN_SAMPLE_START)
-	coarse = IPATCH_SF2_GEN_SAMPLE_COARSE_START;
-      else if (genid == IPATCH_SF2_GEN_SAMPLE_END)
-	coarse = IPATCH_SF2_GEN_SAMPLE_COARSE_END;
-      else if (genid == IPATCH_SF2_GEN_SAMPLE_LOOP_START)
-	coarse = IPATCH_SF2_GEN_SAMPLE_COARSE_LOOP_START;
-      else if (genid == IPATCH_SF2_GEN_SAMPLE_LOOP_END)
-	coarse = IPATCH_SF2_GEN_SAMPLE_COARSE_LOOP_END;
-      else g_return_val_if_fail (NOT_REACHED, FALSE);
 
-      IPATCH_ITEM_WLOCK (item); /* atomically get both gens */
-      val = genarray->values[genid].uword;
-      val |= genarray->values[coarse].uword << 15;
-      IPATCH_ITEM_WUNLOCK (item);
+    genid = property_id - IPATCH_SF2_GEN_ITEM_FIRST_PROP_ID;
 
-      g_value_set_int (value, val);
+    /* generator valid for propstype? */
+    if(!ipatch_sf2_gen_is_valid(genid, iface->propstype))
+    {
+        return (FALSE);
+    }
+
+    gen_info = &ipatch_sf2_gen_info [genid];
+
+    if(gen_info->unit == IPATCH_UNIT_TYPE_RANGE)  /* range property? */
+    {
+        IPATCH_ITEM_WLOCK(item);  /* OPTME - lock might not be necessary? */
+        amt = genarray->values[genid];
+        IPATCH_ITEM_WUNLOCK(item);
+
+        range.low = amt.range.low;
+        range.high = amt.range.high;
+        ipatch_value_set_range(value, &range);
+    }
+    else if(gen_info->unit == IPATCH_UNIT_TYPE_SAMPLES)
+    {
+        /* get 2 generators - fine and coarse (32k) sample values */
+        if(genid == IPATCH_SF2_GEN_SAMPLE_START)
+        {
+            coarse = IPATCH_SF2_GEN_SAMPLE_COARSE_START;
+        }
+        else if(genid == IPATCH_SF2_GEN_SAMPLE_END)
+        {
+            coarse = IPATCH_SF2_GEN_SAMPLE_COARSE_END;
+        }
+        else if(genid == IPATCH_SF2_GEN_SAMPLE_LOOP_START)
+        {
+            coarse = IPATCH_SF2_GEN_SAMPLE_COARSE_LOOP_START;
+        }
+        else if(genid == IPATCH_SF2_GEN_SAMPLE_LOOP_END)
+        {
+            coarse = IPATCH_SF2_GEN_SAMPLE_COARSE_LOOP_END;
+        }
+        else
+        {
+            g_return_val_if_fail(NOT_REACHED, FALSE);
+        }
+
+        IPATCH_ITEM_WLOCK(item);  /* atomically get both gens */
+        val = genarray->values[genid].uword;
+        val |= genarray->values[coarse].uword << 15;
+        IPATCH_ITEM_WUNLOCK(item);
+
+        g_value_set_int(value, val);
     }	/* sword read is atomic */
-  else g_value_set_int (value, genarray->values[genid].sword);
+    else
+    {
+        g_value_set_int(value, genarray->values[genid].sword);
+    }
 
-  return (TRUE);
+    return (TRUE);
 }
