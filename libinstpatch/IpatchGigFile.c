@@ -20,7 +20,7 @@
 /**
  * SECTION: IpatchGigFile
  * @short_description: GigaSampler file object
- * @see_also: 
+ * @see_also:
  * @stability: Stable
  *
  * File type for GigaSampler files.
@@ -36,23 +36,23 @@
 #include "i18n.h"
 #include "misc.h"
 
-static gboolean ipatch_gig_file_identify_method (IpatchFile *file,
-                                                 IpatchFileHandle *handle, GError **err);
+static gboolean ipatch_gig_file_identify_method(IpatchFile *file,
+        IpatchFileHandle *handle, GError **err);
 
-G_DEFINE_TYPE (IpatchGigFile, ipatch_gig_file, IPATCH_TYPE_DLS_FILE);
+G_DEFINE_TYPE(IpatchGigFile, ipatch_gig_file, IPATCH_TYPE_DLS_FILE);
 
 
 /* GigaSampler file class init function */
 static void
-ipatch_gig_file_class_init (IpatchGigFileClass *klass)
+ipatch_gig_file_class_init(IpatchGigFileClass *klass)
 {
-  IpatchFileClass *file_class = IPATCH_FILE_CLASS (klass);
-  file_class->identify = ipatch_gig_file_identify_method;
-  /* load_object method handled by parent class IpatchDLSFile */
+    IpatchFileClass *file_class = IPATCH_FILE_CLASS(klass);
+    file_class->identify = ipatch_gig_file_identify_method;
+    /* load_object method handled by parent class IpatchDLSFile */
 }
 
 static void
-ipatch_gig_file_init (IpatchGigFile *file)
+ipatch_gig_file_init(IpatchGigFile *file)
 {
 }
 
@@ -63,32 +63,41 @@ ipatch_gig_file_init (IpatchGigFile *file)
  * proprietary chunks (usually 3lnk in an instrument region).
  */
 static gboolean
-ipatch_gig_file_identify_method (IpatchFile *file, IpatchFileHandle *handle,
-                                 GError **err)
+ipatch_gig_file_identify_method(IpatchFile *file, IpatchFileHandle *handle,
+                                GError **err)
 {
-  char *filename;
-  guint32 buf[3];
-  gboolean retval = TRUE;
-  int len;
+    char *filename;
+    guint32 buf[3];
+    gboolean retval = TRUE;
+    int len;
 
-  filename = ipatch_file_get_name (file);       /* ++ alloc file name */
-  if (!filename) return (FALSE);
+    filename = ipatch_file_get_name(file);        /* ++ alloc file name */
 
-  len = strlen (filename);
+    if(!filename)
+    {
+        return (FALSE);
+    }
 
-  if (len < 4 || g_ascii_strcasecmp (filename + len - 4, ".gig") != 0)
-    retval = FALSE;
+    len = strlen(filename);
 
-  g_free (filename);    /* -- free file name */
+    if(len < 4 || g_ascii_strcasecmp(filename + len - 4, ".gig") != 0)
+    {
+        retval = FALSE;
+    }
 
-  if (handle && retval)
-  { /* Check for DLS signature */
-    if (!ipatch_file_read (handle, buf, 12, err)
-        || buf[0] != IPATCH_FOURCC_RIFF || buf[2] != IPATCH_DLS_FOURCC_DLS)
-      retval = FALSE;
-  }
+    g_free(filename);     /* -- free file name */
 
-  return (retval);
+    if(handle && retval)
+    {
+        /* Check for DLS signature */
+        if(!ipatch_file_read(handle, buf, 12, err)
+                || buf[0] != IPATCH_FOURCC_RIFF || buf[2] != IPATCH_DLS_FOURCC_DLS)
+        {
+            retval = FALSE;
+        }
+    }
+
+    return (retval);
 }
 
 /**
@@ -100,7 +109,7 @@ ipatch_gig_file_identify_method (IpatchFile *file, IpatchFileHandle *handle,
  * Caller owns the reference and removing it will destroy the item.
  */
 IpatchGigFile *
-ipatch_gig_file_new (void)
+ipatch_gig_file_new(void)
 {
-  return (IPATCH_GIG_FILE (g_object_new (IPATCH_TYPE_GIG_FILE, NULL)));
+    return (IPATCH_GIG_FILE(g_object_new(IPATCH_TYPE_GIG_FILE, NULL)));
 }

@@ -57,57 +57,57 @@ typedef struct _IpatchItemClass IpatchItemClass;
  * Returns: Pointer to item to use for link property (can be the @link item
  * if the duplicated/copied item is local to the same file).
  */
-typedef IpatchItem * (*IpatchItemCopyLinkFunc)(IpatchItem *item,
-					       IpatchItem *link,
-					       gpointer user_data);
+typedef IpatchItem *(*IpatchItemCopyLinkFunc)(IpatchItem *item,
+        IpatchItem *link,
+        gpointer user_data);
 
 /* Base patch item object */
 struct _IpatchItem
 {
-  GObject object;
+    GObject object;
 
-  /*< private >*/
+    /*< private >*/
 
-  int flags;		/* flag field (atomic int ops used) */
-  IpatchItem *parent;	/* parent item or NULL if not parented or root */
-  IpatchItem *base; 	/* base parent object or NULL */
-  GStaticRecMutex *mutex;  /* pointer to mutex (could be a parent's mutex) */
+    int flags;		/* flag field (atomic int ops used) */
+    IpatchItem *parent;	/* parent item or NULL if not parented or root */
+    IpatchItem *base; 	/* base parent object or NULL */
+    GStaticRecMutex *mutex;  /* pointer to mutex (could be a parent's mutex) */
 };
 
 /* Base patch item class */
 struct _IpatchItemClass
 {
-  GObjectClass parent_class;
+    GObjectClass parent_class;
 
-  /*< public >*/
+    /*< public >*/
 
-  gboolean mutex_slave;	/* set to TRUE to use parent thread mutex */
+    gboolean mutex_slave;	/* set to TRUE to use parent thread mutex */
 
-  /* methods */
-  void (*item_set_property)(GObject *object, guint property_id,
-			    const GValue *value, GParamSpec *pspec);
-  void (*copy)(IpatchItem *dest, IpatchItem *src,
-	       IpatchItemCopyLinkFunc link_func, gpointer user_data);
-  void (*remove)(IpatchItem *item);
+    /* methods */
+    void (*item_set_property)(GObject *object, guint property_id,
+                              const GValue *value, GParamSpec *pspec);
+    void (*copy)(IpatchItem *dest, IpatchItem *src,
+                 IpatchItemCopyLinkFunc link_func, gpointer user_data);
+    void (*remove)(IpatchItem *item);
 
-/**
- * remove_full:
- * @item: Item to remove references to/from
- * @full: %TRUE removes all references to and from @item, %FALSE removes only references to @item
- *
- * Removes references to/from (depending on the value of @full) @item of other objects in the same
- * #IpatchBase object.  The remove method can be used instead for default behavior of removing item's
- * children if it is a container and @full is TRUE.
- *
- * Since: 1.1.0
- */
-  void (*remove_full)(IpatchItem *item, gboolean full);
+    /**
+     * remove_full:
+     * @item: Item to remove references to/from
+     * @full: %TRUE removes all references to and from @item, %FALSE removes only references to @item
+     *
+     * Removes references to/from (depending on the value of @full) @item of other objects in the same
+     * #IpatchBase object.  The remove method can be used instead for default behavior of removing item's
+     * children if it is a container and @full is TRUE.
+     *
+     * Since: 1.1.0
+     */
+    void (*remove_full)(IpatchItem *item, gboolean full);
 };
 
 typedef enum
 {
-  IPATCH_ITEM_HOOKS_ACTIVE = 1 << 0,  /* hook callbacks active? */
-  IPATCH_ITEM_FREE_MUTEX   = 1 << 1   /* TRUE if item should free its mutex */
+    IPATCH_ITEM_HOOKS_ACTIVE = 1 << 0,  /* hook callbacks active? */
+    IPATCH_ITEM_FREE_MUTEX   = 1 << 1   /* TRUE if item should free its mutex */
 } IpatchItemFlags;
 
 /**
@@ -139,17 +139,17 @@ typedef enum
  */
 typedef struct
 {
-  IpatchItem *item;		/* item whose property changed */
-  GParamSpec *pspec;		/* property spec of the property that changed */
-  const GValue *new_value;	/* new value of the property */
-  const GValue *old_value;	/* old value of the property (can be NULL!) */
-  gpointer user_data;		/* user defined data, defined on connect */
+    IpatchItem *item;		/* item whose property changed */
+    GParamSpec *pspec;		/* property spec of the property that changed */
+    const GValue *new_value;	/* new value of the property */
+    const GValue *old_value;	/* old value of the property (can be NULL!) */
+    gpointer user_data;		/* user defined data, defined on connect */
 
-  /* per event data */
-  struct
+    /* per event data */
+    struct
     {
-      gpointer data;		/* implementation defined data per event */
-      GDestroyNotify destroy;	/* function called to cleanup for @data */
+        gpointer data;		/* implementation defined data per event */
+        GDestroyNotify destroy;	/* function called to cleanup for @data */
     } eventdata[4];
 } IpatchItemPropNotify;
 
@@ -182,7 +182,7 @@ typedef void (*IpatchItemPropCallback)(IpatchItemPropNotify *notify);
  * disconnected.
  */
 typedef void (*IpatchItemPropDisconnect)(IpatchItem *item, GParamSpec *pspec,
-					 gpointer user_data);
+        gpointer user_data);
 
 /* Convenience macro used by IpatchItem copy methods to call a copy link
    function, or use the link pointer directly if function is NULL */
@@ -199,80 +199,80 @@ extern GParamSpec *ipatch_item_pspec_title;
 */
 GParamSpec *ipatch_item_get_pspec_title(void);
 
-GType ipatch_item_get_type (void);
-int ipatch_item_get_flags (gpointer item);
-void ipatch_item_set_flags (gpointer item, int flags);
-void ipatch_item_clear_flags (gpointer item, int flags);
-void ipatch_item_set_parent (IpatchItem *item, IpatchItem *parent);
-void ipatch_item_unparent (IpatchItem *item);
-IpatchItem *ipatch_item_get_parent (IpatchItem *item);
-IpatchItem *ipatch_item_peek_parent (IpatchItem *item);
-IpatchItem *ipatch_item_get_base (IpatchItem *item);
-IpatchItem *ipatch_item_peek_base (IpatchItem *item);
-IpatchItem *ipatch_item_get_ancestor_by_type (IpatchItem *item,
-					      GType ancestor_type);
-IpatchItem *ipatch_item_peek_ancestor_by_type (IpatchItem *item,
-					       GType ancestor_type);
-void ipatch_item_remove (IpatchItem *item);
-void ipatch_item_remove_full (IpatchItem *item, gboolean full);
-void ipatch_item_remove_recursive (IpatchItem *item, gboolean full);
-void ipatch_item_changed (IpatchItem *item);
-void ipatch_item_get_property_fast (IpatchItem *item, GParamSpec *pspec,
-				    GValue *value);
-void ipatch_item_copy (IpatchItem *dest, IpatchItem *src);
-void ipatch_item_copy_link_func (IpatchItem *dest, IpatchItem *src,
-				 IpatchItemCopyLinkFunc link_func,
-				 gpointer user_data);
-void ipatch_item_copy_replace (IpatchItem *dest, IpatchItem *src,
-			       GHashTable *repl_hash);
-IpatchItem *ipatch_item_duplicate (IpatchItem *item);
-IpatchItem *ipatch_item_duplicate_link_func (IpatchItem *item,
-					     IpatchItemCopyLinkFunc link_func,
-					     gpointer user_data);
-IpatchItem *ipatch_item_duplicate_replace (IpatchItem *item,
-					   GHashTable *repl_hash);
-IpatchList *ipatch_item_duplicate_deep (IpatchItem *item);
-IpatchItem *ipatch_item_copy_link_func_deep (IpatchItem *item, IpatchItem *link,
-					     gpointer user_data);
-IpatchItem *ipatch_item_copy_link_func_hash (IpatchItem *item, IpatchItem *link,
-					     gpointer user_data);
-gboolean ipatch_item_type_can_conflict (GType item_type);
-GParamSpec **ipatch_item_type_get_unique_specs (GType item_type,
-						guint32 *groups);
-GValueArray *ipatch_item_get_unique_props (IpatchItem *item);
-guint ipatch_item_test_conflict (IpatchItem *item1, IpatchItem *item2);
-void ipatch_item_set_atomic (gpointer item,
-			     const char *first_property_name, ...);
-void ipatch_item_get_atomic (gpointer item,
-			     const char *first_property_name, ...);
-IpatchItem *ipatch_item_first (IpatchIter *iter);
-IpatchItem *ipatch_item_next (IpatchIter *iter);
+GType ipatch_item_get_type(void);
+int ipatch_item_get_flags(gpointer item);
+void ipatch_item_set_flags(gpointer item, int flags);
+void ipatch_item_clear_flags(gpointer item, int flags);
+void ipatch_item_set_parent(IpatchItem *item, IpatchItem *parent);
+void ipatch_item_unparent(IpatchItem *item);
+IpatchItem *ipatch_item_get_parent(IpatchItem *item);
+IpatchItem *ipatch_item_peek_parent(IpatchItem *item);
+IpatchItem *ipatch_item_get_base(IpatchItem *item);
+IpatchItem *ipatch_item_peek_base(IpatchItem *item);
+IpatchItem *ipatch_item_get_ancestor_by_type(IpatchItem *item,
+        GType ancestor_type);
+IpatchItem *ipatch_item_peek_ancestor_by_type(IpatchItem *item,
+        GType ancestor_type);
+void ipatch_item_remove(IpatchItem *item);
+void ipatch_item_remove_full(IpatchItem *item, gboolean full);
+void ipatch_item_remove_recursive(IpatchItem *item, gboolean full);
+void ipatch_item_changed(IpatchItem *item);
+void ipatch_item_get_property_fast(IpatchItem *item, GParamSpec *pspec,
+                                   GValue *value);
+void ipatch_item_copy(IpatchItem *dest, IpatchItem *src);
+void ipatch_item_copy_link_func(IpatchItem *dest, IpatchItem *src,
+                                IpatchItemCopyLinkFunc link_func,
+                                gpointer user_data);
+void ipatch_item_copy_replace(IpatchItem *dest, IpatchItem *src,
+                              GHashTable *repl_hash);
+IpatchItem *ipatch_item_duplicate(IpatchItem *item);
+IpatchItem *ipatch_item_duplicate_link_func(IpatchItem *item,
+        IpatchItemCopyLinkFunc link_func,
+        gpointer user_data);
+IpatchItem *ipatch_item_duplicate_replace(IpatchItem *item,
+        GHashTable *repl_hash);
+IpatchList *ipatch_item_duplicate_deep(IpatchItem *item);
+IpatchItem *ipatch_item_copy_link_func_deep(IpatchItem *item, IpatchItem *link,
+        gpointer user_data);
+IpatchItem *ipatch_item_copy_link_func_hash(IpatchItem *item, IpatchItem *link,
+        gpointer user_data);
+gboolean ipatch_item_type_can_conflict(GType item_type);
+GParamSpec **ipatch_item_type_get_unique_specs(GType item_type,
+        guint32 *groups);
+GValueArray *ipatch_item_get_unique_props(IpatchItem *item);
+guint ipatch_item_test_conflict(IpatchItem *item1, IpatchItem *item2);
+void ipatch_item_set_atomic(gpointer item,
+                            const char *first_property_name, ...);
+void ipatch_item_get_atomic(gpointer item,
+                            const char *first_property_name, ...);
+IpatchItem *ipatch_item_first(IpatchIter *iter);
+IpatchItem *ipatch_item_next(IpatchIter *iter);
 
 
 /* in IpatchItemProp.c */
 
 
-void ipatch_item_prop_notify (IpatchItem *item, GParamSpec *pspec,
-			      const GValue *new_value, const GValue *old_value);
-void ipatch_item_prop_notify_by_name (IpatchItem *item, const char *prop_name,
-				      const GValue *new_value,
-				      const GValue *old_value);
-guint ipatch_item_prop_connect (IpatchItem *item, GParamSpec *pspec,
-				IpatchItemPropCallback callback,
-				IpatchItemPropDisconnect disconnect,
-				gpointer user_data);
-guint ipatch_item_prop_connect_by_name (IpatchItem *item,
-					const char *prop_name,
-					IpatchItemPropCallback callback,
-					IpatchItemPropDisconnect disconnect,
-					gpointer user_data);
-void ipatch_item_prop_disconnect (guint handler_id);
-void ipatch_item_prop_disconnect_matched (IpatchItem *item,
-					  GParamSpec *pspec,
-					  IpatchItemPropCallback callback,
-					  gpointer user_data);
-void ipatch_item_prop_disconnect_by_name (IpatchItem *item,
-					  const char *prop_name,
-					  IpatchItemPropCallback callback,
-					  gpointer user_data);
+void ipatch_item_prop_notify(IpatchItem *item, GParamSpec *pspec,
+                             const GValue *new_value, const GValue *old_value);
+void ipatch_item_prop_notify_by_name(IpatchItem *item, const char *prop_name,
+                                     const GValue *new_value,
+                                     const GValue *old_value);
+guint ipatch_item_prop_connect(IpatchItem *item, GParamSpec *pspec,
+                               IpatchItemPropCallback callback,
+                               IpatchItemPropDisconnect disconnect,
+                               gpointer user_data);
+guint ipatch_item_prop_connect_by_name(IpatchItem *item,
+                                       const char *prop_name,
+                                       IpatchItemPropCallback callback,
+                                       IpatchItemPropDisconnect disconnect,
+                                       gpointer user_data);
+void ipatch_item_prop_disconnect(guint handler_id);
+void ipatch_item_prop_disconnect_matched(IpatchItem *item,
+        GParamSpec *pspec,
+        IpatchItemPropCallback callback,
+        gpointer user_data);
+void ipatch_item_prop_disconnect_by_name(IpatchItem *item,
+        const char *prop_name,
+        IpatchItemPropCallback callback,
+        gpointer user_data);
 #endif

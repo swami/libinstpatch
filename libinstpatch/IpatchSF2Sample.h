@@ -50,23 +50,23 @@ typedef struct _IpatchSF2SampleClass IpatchSF2SampleClass;
 /* SoundFont sample item */
 struct _IpatchSF2Sample
 {
-  IpatchItem parent_instance;
+    IpatchItem parent_instance;
 
-  IpatchSampleData *sample_data; /* sample data object */
-  char *name;			/* name of sample */
-  int rate;                     /* sample rate */
-  guint32 loop_start;		/* loop start offset (in samples) */
-  guint32 loop_end;		/* loop end offset (in samples, first sample
+    IpatchSampleData *sample_data; /* sample data object */
+    char *name;			/* name of sample */
+    int rate;                     /* sample rate */
+    guint32 loop_start;		/* loop start offset (in samples) */
+    guint32 loop_end;		/* loop end offset (in samples, first sample
 				   AFTER loop actually) */
-  guint8 root_note;		/* root midi note number */
-  gint8 fine_tune;		/* fine tuning in cents */
-  guint8 channel;		/* IpatchSF2SampleChannel */
-  GWeakRef linked;	        /* linked sample pointer or NULL */
+    guint8 root_note;		/* root midi note number */
+    gint8 fine_tune;		/* fine tuning in cents */
+    guint8 channel;		/* IpatchSF2SampleChannel */
+    GWeakRef linked;	        /* linked sample pointer or NULL */
 };
 
 struct _IpatchSF2SampleClass
 {
-  IpatchItemClass parent_class;
+    IpatchItemClass parent_class;
 };
 
 /* sampletype flag defines */
@@ -82,9 +82,9 @@ struct _IpatchSF2SampleClass
  */
 typedef enum
 {
-  IPATCH_SF2_SAMPLE_CHANNEL_MONO,
-  IPATCH_SF2_SAMPLE_CHANNEL_LEFT,
-  IPATCH_SF2_SAMPLE_CHANNEL_RIGHT
+    IPATCH_SF2_SAMPLE_CHANNEL_MONO,
+    IPATCH_SF2_SAMPLE_CHANNEL_LEFT,
+    IPATCH_SF2_SAMPLE_CHANNEL_RIGHT
 } IpatchSF2SampleChannel;
 
 /* sample rate and length constraints */
@@ -111,7 +111,7 @@ typedef enum
  */
 typedef enum
 {
-  IPATCH_SF2_SAMPLE_FLAG_ROM = (1 << IPATCH_ITEM_UNUSED_FLAG_SHIFT)
+    IPATCH_SF2_SAMPLE_FLAG_ROM = (1 << IPATCH_ITEM_UNUSED_FLAG_SHIFT)
 } IpatchSF2SampleFlags;
 
 /**
@@ -121,22 +121,22 @@ typedef enum
 #define IPATCH_SF2_SAMPLE_UNUSED_FLAG_SHIFT \
   (IPATCH_ITEM_UNUSED_FLAG_SHIFT + 4)
 
-GType ipatch_sf2_sample_get_type (void);
-IpatchSF2Sample *ipatch_sf2_sample_new (void);
+GType ipatch_sf2_sample_get_type(void);
+IpatchSF2Sample *ipatch_sf2_sample_new(void);
 
-IpatchSF2Sample *ipatch_sf2_sample_first (IpatchIter *iter);
-IpatchSF2Sample *ipatch_sf2_sample_next (IpatchIter *iter);
+IpatchSF2Sample *ipatch_sf2_sample_first(IpatchIter *iter);
+IpatchSF2Sample *ipatch_sf2_sample_next(IpatchIter *iter);
 
-void ipatch_sf2_sample_set_name (IpatchSF2Sample *sample, const char *name);
-char *ipatch_sf2_sample_get_name (IpatchSF2Sample *sample);
-void ipatch_sf2_sample_set_data (IpatchSF2Sample *sample,
-				 IpatchSampleData *sampledata);
-IpatchSampleData *ipatch_sf2_sample_get_data (IpatchSF2Sample *sample);
-IpatchSampleData *ipatch_sf2_sample_peek_data (IpatchSF2Sample *sample);
-void ipatch_sf2_sample_set_linked (IpatchSF2Sample *sample,
-				   IpatchSF2Sample *linked);
-IpatchSF2Sample *ipatch_sf2_sample_get_linked (IpatchSF2Sample *sample);
-IpatchSF2Sample *ipatch_sf2_sample_peek_linked (IpatchSF2Sample *sample);
-void ipatch_sf2_sample_set_blank (IpatchSF2Sample *sample);
+void ipatch_sf2_sample_set_name(IpatchSF2Sample *sample, const char *name);
+char *ipatch_sf2_sample_get_name(IpatchSF2Sample *sample);
+void ipatch_sf2_sample_set_data(IpatchSF2Sample *sample,
+                                IpatchSampleData *sampledata);
+IpatchSampleData *ipatch_sf2_sample_get_data(IpatchSF2Sample *sample);
+IpatchSampleData *ipatch_sf2_sample_peek_data(IpatchSF2Sample *sample);
+void ipatch_sf2_sample_set_linked(IpatchSF2Sample *sample,
+                                  IpatchSF2Sample *linked);
+IpatchSF2Sample *ipatch_sf2_sample_get_linked(IpatchSF2Sample *sample);
+IpatchSF2Sample *ipatch_sf2_sample_peek_linked(IpatchSF2Sample *sample);
+void ipatch_sf2_sample_set_blank(IpatchSF2Sample *sample);
 
 #endif

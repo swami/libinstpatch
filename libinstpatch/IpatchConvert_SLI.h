@@ -28,10 +28,10 @@
 
 typedef struct
 {
-  IpatchConverter parent_instance;
+    IpatchConverter parent_instance;
 
-  /*< private >*/
-  gboolean create_stores;
+    /*< private >*/
+    gboolean create_stores;
 } IpatchConverterSLIToFile;
 
 typedef IpatchConverterClass IpatchConverterSLIToFileClass;
@@ -48,9 +48,9 @@ typedef IpatchConverterClass IpatchConverterFileToSLISampleClass;
 #define IPATCH_TYPE_CONVERTER_FILE_TO_SLI_SAMPLE \
   (ipatch_converter_file_to_sli_sample_get_type ())
 
-GType ipatch_converter_sli_to_file_get_type (void);
-GType ipatch_converter_file_to_sli_get_type (void);
-GType ipatch_converter_file_to_sli_sample_get_type (void);
+GType ipatch_converter_sli_to_file_get_type(void);
+GType ipatch_converter_file_to_sli_get_type(void);
+GType ipatch_converter_file_to_sli_sample_get_type(void);
 
 #endif
 

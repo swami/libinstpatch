@@ -40,57 +40,57 @@ typedef void (*IpatchSampleTransformFunc)(IpatchSampleTransform *transform);
 /* sample transform object */
 struct _IpatchSampleTransform
 {
-  guint16 src_format;		/* source sample format */
-  guint16 dest_format;		/* destination sample format */
-  guint8 channel_map[8];        /* channel mapping for multi-channel audio */
-  guint8 buf1_max_frame;	/* max bytes per frame for buf1 */
-  guint8 buf2_max_frame;	/* max bytes per frame for buf2 */
-  guint8 func_count;		/* number of functions in funcs array */
-  guint8 free_buffers;		/* set to TRUE if buffers need to be freed */
-  guint max_frames;		/* max frames that can be converted in batch */
-  guint frames;			/* number of frames to transform */
-  guint samples; /* # of samples for current transform func (not frames!)*/
-  gpointer buf1;		/* buffer 1 (first input) */
-  gpointer buf2;		/* buffer 2 */
-  guint combined_size;	/* size in bytes of both buffers (if combined) */
-  gpointer reserved1;           /* Reserved field */
-  gpointer reserved2;           /* Reserved field */
+    guint16 src_format;		/* source sample format */
+    guint16 dest_format;		/* destination sample format */
+    guint8 channel_map[8];        /* channel mapping for multi-channel audio */
+    guint8 buf1_max_frame;	/* max bytes per frame for buf1 */
+    guint8 buf2_max_frame;	/* max bytes per frame for buf2 */
+    guint8 func_count;		/* number of functions in funcs array */
+    guint8 free_buffers;		/* set to TRUE if buffers need to be freed */
+    guint max_frames;		/* max frames that can be converted in batch */
+    guint frames;			/* number of frames to transform */
+    guint samples; /* # of samples for current transform func (not frames!)*/
+    gpointer buf1;		/* buffer 1 (first input) */
+    gpointer buf2;		/* buffer 2 */
+    guint combined_size;	/* size in bytes of both buffers (if combined) */
+    gpointer reserved1;           /* Reserved field */
+    gpointer reserved2;           /* Reserved field */
 
-  /* array of transform funcs */
-  IpatchSampleTransformFunc funcs[IPATCH_SAMPLE_MAX_TRANSFORM_FUNCS];
+    /* array of transform funcs */
+    IpatchSampleTransformFunc funcs[IPATCH_SAMPLE_MAX_TRANSFORM_FUNCS];
 };
 
-GType ipatch_sample_transform_get_type (void);
+GType ipatch_sample_transform_get_type(void);
 IpatchSampleTransform *ipatch_sample_transform_new
-  (int src_format, int dest_format, guint32 channel_map);
-void ipatch_sample_transform_free (IpatchSampleTransform *transform);
-IpatchSampleTransform *ipatch_sample_transform_duplicate (const IpatchSampleTransform *transform);
-void ipatch_sample_transform_init (IpatchSampleTransform *transform);
+(int src_format, int dest_format, guint32 channel_map);
+void ipatch_sample_transform_free(IpatchSampleTransform *transform);
+IpatchSampleTransform *ipatch_sample_transform_duplicate(const IpatchSampleTransform *transform);
+void ipatch_sample_transform_init(IpatchSampleTransform *transform);
 IpatchSampleTransform *ipatch_sample_transform_pool_acquire
-  (int src_format, int dest_format, guint32 channel_map);
-void ipatch_sample_transform_pool_release (IpatchSampleTransform *transform);
-void ipatch_sample_transform_set_formats (IpatchSampleTransform *transform,
-					  int src_format, int dest_format,
-                                          guint32 channel_map);
-void ipatch_sample_transform_alloc (IpatchSampleTransform *transform,
-				    guint frames);
-int ipatch_sample_transform_alloc_size (IpatchSampleTransform *transform,
-					guint size);
-void ipatch_sample_transform_free_buffers (IpatchSampleTransform *transform);
-guint ipatch_sample_transform_set_buffers_size (IpatchSampleTransform *transform,
-						gpointer buf, guint size);
-void ipatch_sample_transform_get_buffers (IpatchSampleTransform *transform,
-					  gpointer *buf1, gpointer *buf2);
-void ipatch_sample_transform_get_frame_sizes (IpatchSampleTransform *transform,
-					      guint *buf1_size,
-					      guint *buf2_size);
-guint ipatch_sample_transform_get_max_frames (IpatchSampleTransform *transform);
-gpointer ipatch_sample_transform_convert (IpatchSampleTransform *transform,
-					  gconstpointer src, gpointer dest,
-					  guint frames);
-gpointer ipatch_sample_transform_convert_sizes (IpatchSampleTransform *transform,
-                                                gconstpointer src, guint src_size,
-                                                guint *dest_size);
-gpointer ipatch_sample_transform_convert_single (IpatchSampleTransform *transform,
-						 guint frames);
+(int src_format, int dest_format, guint32 channel_map);
+void ipatch_sample_transform_pool_release(IpatchSampleTransform *transform);
+void ipatch_sample_transform_set_formats(IpatchSampleTransform *transform,
+        int src_format, int dest_format,
+        guint32 channel_map);
+void ipatch_sample_transform_alloc(IpatchSampleTransform *transform,
+                                   guint frames);
+int ipatch_sample_transform_alloc_size(IpatchSampleTransform *transform,
+                                       guint size);
+void ipatch_sample_transform_free_buffers(IpatchSampleTransform *transform);
+guint ipatch_sample_transform_set_buffers_size(IpatchSampleTransform *transform,
+        gpointer buf, guint size);
+void ipatch_sample_transform_get_buffers(IpatchSampleTransform *transform,
+        gpointer *buf1, gpointer *buf2);
+void ipatch_sample_transform_get_frame_sizes(IpatchSampleTransform *transform,
+        guint *buf1_size,
+        guint *buf2_size);
+guint ipatch_sample_transform_get_max_frames(IpatchSampleTransform *transform);
+gpointer ipatch_sample_transform_convert(IpatchSampleTransform *transform,
+        gconstpointer src, gpointer dest,
+        guint frames);
+gpointer ipatch_sample_transform_convert_sizes(IpatchSampleTransform *transform,
+        gconstpointer src, guint src_size,
+        guint *dest_size);
+gpointer ipatch_sample_transform_convert_single(IpatchSampleTransform *transform,
+        guint frames);
 #endif

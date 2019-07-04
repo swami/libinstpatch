@@ -52,7 +52,7 @@
  */
 
 /* defined in IpatchConvert_DLS2.c */
-gboolean _file_to_dls2_sample_convert (IpatchConverter *converter, GError **err);
+gboolean _file_to_dls2_sample_convert(IpatchConverter *converter, GError **err);
 
 
 /**
@@ -61,22 +61,22 @@ gboolean _file_to_dls2_sample_convert (IpatchConverter *converter, GError **err)
  * Init routine for GigaSampler conversion types
  */
 void
-_ipatch_convert_gig_init (void)
+_ipatch_convert_gig_init(void)
 {
-  g_type_class_ref (IPATCH_TYPE_CONVERTER_GIG_TO_FILE);
-  ipatch_register_converter_map (IPATCH_TYPE_CONVERTER_GIG_TO_FILE, 0, 0,
-				 IPATCH_TYPE_GIG, 0, 1,
-				 IPATCH_TYPE_GIG_FILE, IPATCH_TYPE_FILE, 1);
+    g_type_class_ref(IPATCH_TYPE_CONVERTER_GIG_TO_FILE);
+    ipatch_register_converter_map(IPATCH_TYPE_CONVERTER_GIG_TO_FILE, 0, 0,
+                                  IPATCH_TYPE_GIG, 0, 1,
+                                  IPATCH_TYPE_GIG_FILE, IPATCH_TYPE_FILE, 1);
 
-  g_type_class_ref (IPATCH_TYPE_CONVERTER_FILE_TO_GIG);
-  ipatch_register_converter_map (IPATCH_TYPE_CONVERTER_FILE_TO_GIG, 0, 0,
-				 IPATCH_TYPE_GIG_FILE, 0, 1,
-				 IPATCH_TYPE_GIG, IPATCH_TYPE_BASE, 0);
+    g_type_class_ref(IPATCH_TYPE_CONVERTER_FILE_TO_GIG);
+    ipatch_register_converter_map(IPATCH_TYPE_CONVERTER_FILE_TO_GIG, 0, 0,
+                                  IPATCH_TYPE_GIG_FILE, 0, 1,
+                                  IPATCH_TYPE_GIG, IPATCH_TYPE_BASE, 0);
 
-  g_type_class_ref (IPATCH_TYPE_CONVERTER_FILE_TO_GIG_SAMPLE);
-  ipatch_register_converter_map (IPATCH_TYPE_CONVERTER_FILE_TO_GIG_SAMPLE, 0, 0,
-				 IPATCH_TYPE_SND_FILE, 0, 1,
-				 IPATCH_TYPE_GIG_SAMPLE, 0, 1);
+    g_type_class_ref(IPATCH_TYPE_CONVERTER_FILE_TO_GIG_SAMPLE);
+    ipatch_register_converter_map(IPATCH_TYPE_CONVERTER_FILE_TO_GIG_SAMPLE, 0, 0,
+                                  IPATCH_TYPE_SND_FILE, 0, 1,
+                                  IPATCH_TYPE_GIG_SAMPLE, 0, 1);
 }
 
 /* ===============
@@ -84,53 +84,64 @@ _ipatch_convert_gig_init (void)
  * =============== */
 
 static gboolean
-_gig_to_file_convert (IpatchConverter *converter, GError **err)
+_gig_to_file_convert(IpatchConverter *converter, GError **err)
 {
-  IpatchGig *gig;
-  IpatchGigFile *file;
-  IpatchFileHandle *handle;
-  IpatchDLSWriter *writer;
-  int retval;
+    IpatchGig *gig;
+    IpatchGigFile *file;
+    IpatchFileHandle *handle;
+    IpatchDLSWriter *writer;
+    int retval;
 
-  gig = IPATCH_GIG (IPATCH_CONVERTER_INPUT (converter));
-  file = IPATCH_GIG_FILE (IPATCH_CONVERTER_OUTPUT (converter));
+    gig = IPATCH_GIG(IPATCH_CONVERTER_INPUT(converter));
+    file = IPATCH_GIG_FILE(IPATCH_CONVERTER_OUTPUT(converter));
 
-  handle = ipatch_file_open (IPATCH_FILE (file), NULL, "w", err);
-  if (!handle) return (FALSE);
+    handle = ipatch_file_open(IPATCH_FILE(file), NULL, "w", err);
 
-  /* ++ ref new writer */
-  writer = ipatch_dls_writer_new (handle, IPATCH_DLS2 (gig));
-  retval = ipatch_dls_writer_save (writer, err);
-  g_object_unref (writer);	/* -- unref writer */
+    if(!handle)
+    {
+        return (FALSE);
+    }
 
-  return (retval);
+    /* ++ ref new writer */
+    writer = ipatch_dls_writer_new(handle, IPATCH_DLS2(gig));
+    retval = ipatch_dls_writer_save(writer, err);
+    g_object_unref(writer);	/* -- unref writer */
+
+    return (retval);
 }
 
 static gboolean
-_file_to_gig_convert (IpatchConverter *converter, GError **err)
+_file_to_gig_convert(IpatchConverter *converter, GError **err)
 {
-  IpatchDLS2 *dls;
-  IpatchGigFile *file;
-  IpatchFileHandle *handle;
-  IpatchDLSReader *reader;
+    IpatchDLS2 *dls;
+    IpatchGigFile *file;
+    IpatchFileHandle *handle;
+    IpatchDLSReader *reader;
 
-  file = IPATCH_GIG_FILE (IPATCH_CONVERTER_INPUT (converter));
+    file = IPATCH_GIG_FILE(IPATCH_CONVERTER_INPUT(converter));
 
-  handle = ipatch_file_open (IPATCH_FILE (file), NULL, "r", err);
-  if (!handle) return (FALSE);
+    handle = ipatch_file_open(IPATCH_FILE(file), NULL, "r", err);
 
-  /* ++ ref new reader */
-  reader = ipatch_dls_reader_new (handle);
-  dls = ipatch_dls_reader_load (reader, err); /* ++ ref loaded DLS object */
-  g_object_unref (reader);	/* -- unref reader */
-
-  if (dls)
+    if(!handle)
     {
-      ipatch_converter_add_output (converter, G_OBJECT (dls));
-      g_object_unref (dls);	/* -- unref loaded Gig object */
-      return (TRUE);
+        return (FALSE);
     }
-  else return (FALSE);
+
+    /* ++ ref new reader */
+    reader = ipatch_dls_reader_new(handle);
+    dls = ipatch_dls_reader_load(reader, err);  /* ++ ref loaded DLS object */
+    g_object_unref(reader);	/* -- unref reader */
+
+    if(dls)
+    {
+        ipatch_converter_add_output(converter, G_OBJECT(dls));
+        g_object_unref(dls);	/* -- unref loaded Gig object */
+        return (TRUE);
+    }
+    else
+    {
+        return (FALSE);
+    }
 }
 
 #define _file_to_gig_sample_convert _file_to_dls2_sample_convert;

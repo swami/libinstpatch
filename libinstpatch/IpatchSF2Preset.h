@@ -50,45 +50,45 @@ typedef struct _IpatchSF2PresetClass IpatchSF2PresetClass;
 /* SoundFont preset item */
 struct _IpatchSF2Preset
 {
-  IpatchContainer parent_instance;
+    IpatchContainer parent_instance;
 
-  char *name;			/* name of preset */
-  guint16 program;		/* MIDI preset map number */
-  guint16 bank;			/* MIDI bank map number */
-  GSList *zones;		/* list of preset zones */
-  GSList *mods;			/* modulators for global zone */
-  IpatchSF2GenArray genarray;	/* generator array for global zone */
+    char *name;			/* name of preset */
+    guint16 program;		/* MIDI preset map number */
+    guint16 bank;			/* MIDI bank map number */
+    GSList *zones;		/* list of preset zones */
+    GSList *mods;			/* modulators for global zone */
+    IpatchSF2GenArray genarray;	/* generator array for global zone */
 
-  guint32 library;		/* Not used (preserved) */
-  guint32 genre;		/* Not used (preserved) */
-  guint32 morphology;		/* Not used (preserved) */
+    guint32 library;		/* Not used (preserved) */
+    guint32 genre;		/* Not used (preserved) */
+    guint32 morphology;		/* Not used (preserved) */
 };
 
 struct _IpatchSF2PresetClass
 {
-  IpatchContainerClass parent_class;
+    IpatchContainerClass parent_class;
 };
 
-GType ipatch_sf2_preset_get_type (void);
-IpatchSF2Preset *ipatch_sf2_preset_new (void);
+GType ipatch_sf2_preset_get_type(void);
+IpatchSF2Preset *ipatch_sf2_preset_new(void);
 
 #define ipatch_sf2_preset_get_zones(preset) \
     ipatch_container_get_children (IPATCH_CONTAINER (preset), \
 				   IPATCH_TYPE_SF2_ZONE)
 
-IpatchSF2Preset *ipatch_sf2_preset_first (IpatchIter *iter);
-IpatchSF2Preset *ipatch_sf2_preset_next (IpatchIter *iter);
+IpatchSF2Preset *ipatch_sf2_preset_first(IpatchIter *iter);
+IpatchSF2Preset *ipatch_sf2_preset_next(IpatchIter *iter);
 
-void ipatch_sf2_preset_new_zone (IpatchSF2Preset *preset, IpatchSF2Inst *inst);
+void ipatch_sf2_preset_new_zone(IpatchSF2Preset *preset, IpatchSF2Inst *inst);
 
-void ipatch_sf2_preset_set_name (IpatchSF2Preset *preset, const char *name);
-char *ipatch_sf2_preset_get_name (IpatchSF2Preset *preset);
-void ipatch_sf2_preset_set_midi_locale (IpatchSF2Preset *preset,
-					int bank, int program);
-void ipatch_sf2_preset_get_midi_locale (IpatchSF2Preset *preset,
-					int *bank, int *program);
+void ipatch_sf2_preset_set_name(IpatchSF2Preset *preset, const char *name);
+char *ipatch_sf2_preset_get_name(IpatchSF2Preset *preset);
+void ipatch_sf2_preset_set_midi_locale(IpatchSF2Preset *preset,
+                                       int bank, int program);
+void ipatch_sf2_preset_get_midi_locale(IpatchSF2Preset *preset,
+                                       int *bank, int *program);
 
-int ipatch_sf2_preset_compare (const IpatchSF2Preset *p1,
-			       const IpatchSF2Preset *p2);
+int ipatch_sf2_preset_compare(const IpatchSF2Preset *p1,
+                              const IpatchSF2Preset *p2);
 
 #endif

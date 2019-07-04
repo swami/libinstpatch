@@ -49,21 +49,21 @@ typedef struct _IpatchSF2PZoneClass IpatchSF2PZoneClass;
 /* SoundFont pzone item */
 struct _IpatchSF2PZone
 {
-  IpatchSF2Zone parent_instance;
+    IpatchSF2Zone parent_instance;
 };
 
 struct _IpatchSF2PZoneClass
 {
-  IpatchSF2ZoneClass parent_class;
+    IpatchSF2ZoneClass parent_class;
 };
 
-GType ipatch_sf2_pzone_get_type (void);
-IpatchSF2PZone *ipatch_sf2_pzone_new (void);
+GType ipatch_sf2_pzone_get_type(void);
+IpatchSF2PZone *ipatch_sf2_pzone_new(void);
 
-IpatchSF2PZone *ipatch_sf2_pzone_first (IpatchIter *iter);
-IpatchSF2PZone *ipatch_sf2_pzone_next (IpatchIter *iter);
+IpatchSF2PZone *ipatch_sf2_pzone_first(IpatchIter *iter);
+IpatchSF2PZone *ipatch_sf2_pzone_next(IpatchIter *iter);
 
-void ipatch_sf2_pzone_set_inst (IpatchSF2PZone *pzone, IpatchSF2Inst *inst);
-IpatchSF2Inst *ipatch_sf2_pzone_get_inst (IpatchSF2PZone *pzone);
+void ipatch_sf2_pzone_set_inst(IpatchSF2PZone *pzone, IpatchSF2Inst *inst);
+IpatchSF2Inst *ipatch_sf2_pzone_get_inst(IpatchSF2PZone *pzone);
 
 #endif

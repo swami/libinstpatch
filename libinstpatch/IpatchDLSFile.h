@@ -69,16 +69,16 @@ typedef struct _IpatchDLSFileClass IpatchDLSFileClass;
 /* DLS file object (derived from IpatchFile) */
 struct _IpatchDLSFile
 {
-  IpatchFile parent_instance;
+    IpatchFile parent_instance;
 };
 
 /* DLS file class (derived from IpatchFile) */
 struct _IpatchDLSFileClass
 {
-  IpatchFileClass parent_class;
+    IpatchFileClass parent_class;
 };
 
-GType ipatch_dls_file_get_type (void);
-IpatchDLSFile *ipatch_dls_file_new (void);
+GType ipatch_dls_file_get_type(void);
+IpatchDLSFile *ipatch_dls_file_new(void);
 
 #endif

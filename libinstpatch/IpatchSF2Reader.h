@@ -45,30 +45,30 @@ typedef struct _IpatchSF2ReaderClass IpatchSF2ReaderClass;
 /* SoundFont parser object */
 struct _IpatchSF2Reader
 {
-  IpatchRiff parent_instance; /* derived from IpatchRiff */
-  IpatchSF2 *sf;	      /* SoundFont object to load file into */
+    IpatchRiff parent_instance; /* derived from IpatchRiff */
+    IpatchSF2 *sf;	      /* SoundFont object to load file into */
 
-  /*< private >*/
-  guint16 *pbag_table;
-  guint pbag_count;
-  guint16 *ibag_table;
-  guint ibag_count;
-  IpatchSF2Inst **inst_table;
-  guint inst_count;
-  IpatchSF2Sample **sample_table;
-  guint sample_count;
+    /*< private >*/
+    guint16 *pbag_table;
+    guint pbag_count;
+    guint16 *ibag_table;
+    guint ibag_count;
+    IpatchSF2Inst **inst_table;
+    guint inst_count;
+    IpatchSF2Sample **sample_table;
+    guint sample_count;
 };
 
 /* RIFF parser class */
 struct _IpatchSF2ReaderClass
 {
-  IpatchRiffClass parent_class;
+    IpatchRiffClass parent_class;
 };
 
-GType ipatch_sf2_reader_get_type (void);
-IpatchSF2Reader *ipatch_sf2_reader_new (IpatchFileHandle *handle);
-void ipatch_sf2_reader_set_file_handle (IpatchSF2Reader *reader,
-                                        IpatchFileHandle *handle);
-IpatchSF2 *ipatch_sf2_reader_load (IpatchSF2Reader *reader, GError **err);
+GType ipatch_sf2_reader_get_type(void);
+IpatchSF2Reader *ipatch_sf2_reader_new(IpatchFileHandle *handle);
+void ipatch_sf2_reader_set_file_handle(IpatchSF2Reader *reader,
+                                       IpatchFileHandle *handle);
+IpatchSF2 *ipatch_sf2_reader_load(IpatchSF2Reader *reader, GError **err);
 
 #endif

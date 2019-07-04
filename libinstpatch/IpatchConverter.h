@@ -65,9 +65,9 @@ typedef struct _IpatchConverterInfo IpatchConverterInfo;
  * Returns: Existing converted item satisfying @link and @newtype, or %NULL
  * otherwise.
  */
-typedef GObject * (*IpatchConverterLinkLookupFunc)
-  (IpatchConverter *converter, GObject *item, GObject *link, GType newtype,
-   gpointer user_data);
+typedef GObject *(*IpatchConverterLinkLookupFunc)
+(IpatchConverter *converter, GObject *item, GObject *link, GType newtype,
+ gpointer user_data);
 
 /**
  * IpatchConverterLinkNotifyFunc:
@@ -86,62 +86,62 @@ typedef GObject * (*IpatchConverterLinkLookupFunc)
  * this function will be called with the newly converted link object.
  */
 typedef void (*IpatchConverterLinkNotifyFunc)
-  (IpatchConverter *converter, GObject *orig, GObject *conv, GType newtype,
-   gpointer user_data);
+(IpatchConverter *converter, GObject *orig, GObject *conv, GType newtype,
+ gpointer user_data);
 
 /* conversion instance */
 struct _IpatchConverter
 {
-  GObject parent_instance;	/* derived from GObject */
+    GObject parent_instance;	/* derived from GObject */
 
-  int flags;			/* IpatchConverterFlags */
+    int flags;			/* IpatchConverterFlags */
 
-  GList *inputs;	       /* list of input GObjects to convert */
-  GList *outputs;	   /* list of new converted output GObjects */
+    GList *inputs;	       /* list of input GObjects to convert */
+    GList *outputs;	   /* list of new converted output GObjects */
 
-  /* callbacks for object link interception */
-  IpatchConverterLinkLookupFunc *link_lookup;
-  IpatchConverterLinkNotifyFunc *link_notify;
-  GDestroyNotify notify_func;   // Callback for when the above callbacks are removed/replaced
-  gpointer user_data;           // User data passed to notify_func (not the other callbacks)
+    /* callbacks for object link interception */
+    IpatchConverterLinkLookupFunc *link_lookup;
+    IpatchConverterLinkNotifyFunc *link_notify;
+    GDestroyNotify notify_func;   // Callback for when the above callbacks are removed/replaced
+    gpointer user_data;           // User data passed to notify_func (not the other callbacks)
 
-  float progress;		/* 0.0 - 1.0 progress property */
+    float progress;		/* 0.0 - 1.0 progress property */
 
-  /* conversion ratings (0.0 - 1.0 = worst - best). For container objects
-     ratings can be done individually on the children, then min_rate/max_rate
-     will be useful */
-  float min_rate;		/* minimum rating amongst all items */
-  float max_rate;		/* maximum rating amongst all items */
-  float avg_rate;		/* average rating for all items */
-  float sum_rate;		/* sum of all ratings (to calculate avg) */
-  int item_count;	     /* count of children items being rated */
+    /* conversion ratings (0.0 - 1.0 = worst - best). For container objects
+       ratings can be done individually on the children, then min_rate/max_rate
+       will be useful */
+    float min_rate;		/* minimum rating amongst all items */
+    float max_rate;		/* maximum rating amongst all items */
+    float avg_rate;		/* average rating for all items */
+    float sum_rate;		/* sum of all ratings (to calculate avg) */
+    int item_count;	     /* count of children items being rated */
 
-  gboolean rate_items; /* set to TRUE to log a rating for each child item */
+    gboolean rate_items; /* set to TRUE to log a rating for each child item */
 
-  /* conversion log */
-  GList *log; /* LogEntry list (defined in IpatchConverter.c, prepended) */
+    /* conversion log */
+    GList *log; /* LogEntry list (defined in IpatchConverter.c, prepended) */
 };
 
 /* conversion class */
 struct _IpatchConverterClass
 {
-  GObjectClass parent_class;
+    GObjectClass parent_class;
 
-  /* methods */
-  gboolean (*verify)(IpatchConverter *converter, char **failmsg);
-  void (*init)(IpatchConverter *converter);
-  gboolean (*convert)(IpatchConverter *converter, GError **err);
-  char * (*notes)(IpatchConverter *converter);
+    /* methods */
+    gboolean(*verify)(IpatchConverter *converter, char **failmsg);
+    void (*init)(IpatchConverter *converter);
+    gboolean(*convert)(IpatchConverter *converter, GError **err);
+    char *(*notes)(IpatchConverter *converter);
 };
 
 /* type for log entries */
 typedef enum
 {
-  IPATCH_CONVERTER_LOG_RATING,	/* log a rating update */
-  IPATCH_CONVERTER_LOG_INFO,	/* informational only */
-  IPATCH_CONVERTER_LOG_WARN,	/* warning */
-  IPATCH_CONVERTER_LOG_CRITICAL, /* critical (but non fatal) message */
-  IPATCH_CONVERTER_LOG_FATAL	/* fatal error */
+    IPATCH_CONVERTER_LOG_RATING,	/* log a rating update */
+    IPATCH_CONVERTER_LOG_INFO,	/* informational only */
+    IPATCH_CONVERTER_LOG_WARN,	/* warning */
+    IPATCH_CONVERTER_LOG_CRITICAL, /* critical (but non fatal) message */
+    IPATCH_CONVERTER_LOG_FATAL	/* fatal error */
 } IpatchConverterLogType;
 
 /* mask for type field (IpatchConverterLogType) */
@@ -159,8 +159,8 @@ typedef enum
 /* enum used for src_count and dest_count fields in class */
 typedef enum
 {
-  IPATCH_CONVERTER_COUNT_ONE_OR_MORE  = -1,	/* 1 or more objects */
-  IPATCH_CONVERTER_COUNT_ZERO_OR_MORE = -2	/* 0 or more objects */
+    IPATCH_CONVERTER_COUNT_ONE_OR_MORE  = -1,	/* 1 or more objects */
+    IPATCH_CONVERTER_COUNT_ZERO_OR_MORE = -2	/* 0 or more objects */
 } IpatchConverterCount;
 
 /**
@@ -174,20 +174,20 @@ typedef enum
  */
 typedef enum
 {
-  IPATCH_CONVERTER_SRC_DERIVED     = 1 << 8,
-  IPATCH_CONVERTER_DEST_DERIVED    = 1 << 9,
+    IPATCH_CONVERTER_SRC_DERIVED     = 1 << 8,
+    IPATCH_CONVERTER_DEST_DERIVED    = 1 << 9,
 } IpatchConverterFlags;
 
 /* priority levels for converter mappings */
 typedef enum
 {
-  /* 0 value is an alias for IPATCH_CONVERTER_PRIORITY_DEFAULT */
+    /* 0 value is an alias for IPATCH_CONVERTER_PRIORITY_DEFAULT */
 
-  IPATCH_CONVERTER_PRIORITY_LOWEST  = 1,
-  IPATCH_CONVERTER_PRIORITY_LOW     = 25,
-  IPATCH_CONVERTER_PRIORITY_DEFAULT = 50,
-  IPATCH_CONVERTER_PRIORITY_HIGH    = 75,
-  IPATCH_CONVERTER_PRIORITY_HIGHEST = 100
+    IPATCH_CONVERTER_PRIORITY_LOWEST  = 1,
+    IPATCH_CONVERTER_PRIORITY_LOW     = 25,
+    IPATCH_CONVERTER_PRIORITY_DEFAULT = 50,
+    IPATCH_CONVERTER_PRIORITY_HIGH    = 75,
+    IPATCH_CONVERTER_PRIORITY_HIGHEST = 100
 } IpatchConverterPriority;
 
 /**
@@ -205,73 +205,73 @@ typedef enum
  */
 struct _IpatchConverterInfo
 {
-  GType conv_type;
-  GType src_type;
-  GType src_match;
-  GType dest_type;
-  GType dest_match;
-  guint8 flags;
-  guint8 priority;
-  gint8 src_count;
-  gint8 dest_count;
+    GType conv_type;
+    GType src_type;
+    GType src_match;
+    GType dest_type;
+    GType dest_match;
+    guint8 flags;
+    guint8 priority;
+    gint8 src_count;
+    gint8 dest_count;
 };
 
-gboolean ipatch_convert_objects (GObject *input, GObject *output, GError **err);
-GObject *ipatch_convert_object_to_type (GObject *object, GType type,
-					GError **err);
-IpatchList *ipatch_convert_object_to_type_multi (GObject *object, GType type,
-                                                 GError **err);
-GList *ipatch_convert_object_to_type_multi_list (GObject *object, GType type, GError **err);
-IpatchList *ipatch_convert_object_to_type_multi_set (GObject *object, GType type,
-                                                     GError **err,
-                                                     const char *first_property_name, ...);
-GList *ipatch_convert_object_to_type_multi_set_vlist (GObject *object, GType type, GError **err,
-                                                      const char *first_property_name, va_list args);
+gboolean ipatch_convert_objects(GObject *input, GObject *output, GError **err);
+GObject *ipatch_convert_object_to_type(GObject *object, GType type,
+                                       GError **err);
+IpatchList *ipatch_convert_object_to_type_multi(GObject *object, GType type,
+        GError **err);
+GList *ipatch_convert_object_to_type_multi_list(GObject *object, GType type, GError **err);
+IpatchList *ipatch_convert_object_to_type_multi_set(GObject *object, GType type,
+        GError **err,
+        const char *first_property_name, ...);
+GList *ipatch_convert_object_to_type_multi_set_vlist(GObject *object, GType type, GError **err,
+        const char *first_property_name, va_list args);
 
-IpatchConverter *ipatch_create_converter (GType src_type, GType dest_type);
-IpatchConverter *ipatch_create_converter_for_objects (GObject *input, GObject *output, GError **err);
-IpatchConverter *ipatch_create_converter_for_object_to_type (GObject *object, GType dest_type, GError **err);
+IpatchConverter *ipatch_create_converter(GType src_type, GType dest_type);
+IpatchConverter *ipatch_create_converter_for_objects(GObject *input, GObject *output, GError **err);
+IpatchConverter *ipatch_create_converter_for_object_to_type(GObject *object, GType dest_type, GError **err);
 
-void ipatch_register_converter_map (GType conv_type, guint8 flags, guint8 priority,
-                                    GType src_type, GType src_match, gint8 src_count,
-                                    GType dest_type, GType dest_match, gint8 dest_count);
-GType ipatch_find_converter (GType src_type, GType dest_type);
-GType *ipatch_find_converters (GType src_type, GType dest_type, guint flags);
-const IpatchConverterInfo *ipatch_lookup_converter_info (GType conv_type, GType src_type, GType dest_type);
-const IpatchConverterInfo *ipatch_get_converter_info (GType conv_type);
+void ipatch_register_converter_map(GType conv_type, guint8 flags, guint8 priority,
+                                   GType src_type, GType src_match, gint8 src_count,
+                                   GType dest_type, GType dest_match, gint8 dest_count);
+GType ipatch_find_converter(GType src_type, GType dest_type);
+GType *ipatch_find_converters(GType src_type, GType dest_type, guint flags);
+const IpatchConverterInfo *ipatch_lookup_converter_info(GType conv_type, GType src_type, GType dest_type);
+const IpatchConverterInfo *ipatch_get_converter_info(GType conv_type);
 
-GType ipatch_converter_get_type (void);
-void ipatch_converter_add_input (IpatchConverter *converter, GObject *object);
-void ipatch_converter_add_output (IpatchConverter *converter, GObject *object);
-void ipatch_converter_add_inputs (IpatchConverter *converter, GList *objects);
-void ipatch_converter_add_outputs (IpatchConverter *converter, GList *objects);
-GObject *ipatch_converter_get_input (IpatchConverter *converter);
-GObject *ipatch_converter_get_output (IpatchConverter *converter);
-IpatchList *ipatch_converter_get_inputs (IpatchConverter *converter);
-GList *ipatch_converter_get_inputs_list (IpatchConverter *converter);
-IpatchList *ipatch_converter_get_outputs (IpatchConverter *converter);
-GList *ipatch_converter_get_outputs_list (IpatchConverter *converter);
+GType ipatch_converter_get_type(void);
+void ipatch_converter_add_input(IpatchConverter *converter, GObject *object);
+void ipatch_converter_add_output(IpatchConverter *converter, GObject *object);
+void ipatch_converter_add_inputs(IpatchConverter *converter, GList *objects);
+void ipatch_converter_add_outputs(IpatchConverter *converter, GList *objects);
+GObject *ipatch_converter_get_input(IpatchConverter *converter);
+GObject *ipatch_converter_get_output(IpatchConverter *converter);
+IpatchList *ipatch_converter_get_inputs(IpatchConverter *converter);
+GList *ipatch_converter_get_inputs_list(IpatchConverter *converter);
+IpatchList *ipatch_converter_get_outputs(IpatchConverter *converter);
+GList *ipatch_converter_get_outputs_list(IpatchConverter *converter);
 
-gboolean ipatch_converter_verify (IpatchConverter *converter, char **failmsg);
-void ipatch_converter_init (IpatchConverter *converter);
-gboolean ipatch_converter_convert (IpatchConverter *converter, GError **err);
-void ipatch_converter_reset (IpatchConverter *converter);
+gboolean ipatch_converter_verify(IpatchConverter *converter, char **failmsg);
+void ipatch_converter_init(IpatchConverter *converter);
+gboolean ipatch_converter_convert(IpatchConverter *converter, GError **err);
+void ipatch_converter_reset(IpatchConverter *converter);
 
-char *ipatch_converter_get_notes (IpatchConverter *converter);
+char *ipatch_converter_get_notes(IpatchConverter *converter);
 
-void ipatch_converter_log (IpatchConverter *converter, GObject *item,
-			   int type, char *msg);
-void ipatch_converter_log_printf (IpatchConverter *converter, GObject *item,
-				  int type, const char *fmt, ...);
-gboolean ipatch_converter_log_next (IpatchConverter *converter, gpointer *pos,
-				    GObject **item, int *type, char **msg);
+void ipatch_converter_log(IpatchConverter *converter, GObject *item,
+                          int type, char *msg);
+void ipatch_converter_log_printf(IpatchConverter *converter, GObject *item,
+                                 int type, const char *fmt, ...);
+gboolean ipatch_converter_log_next(IpatchConverter *converter, gpointer *pos,
+                                   GObject **item, int *type, char **msg);
 
-void ipatch_converter_set_link_funcs (IpatchConverter *converter,
-				IpatchConverterLinkLookupFunc *link_lookup,
-				IpatchConverterLinkNotifyFunc *link_notify);
+void ipatch_converter_set_link_funcs(IpatchConverter *converter,
+                                     IpatchConverterLinkLookupFunc *link_lookup,
+                                     IpatchConverterLinkNotifyFunc *link_notify);
 void
-ipatch_converter_set_link_funcs_full (IpatchConverter *converter,
-                                      IpatchConverterLinkLookupFunc *link_lookup,
-                                      IpatchConverterLinkNotifyFunc *link_notify,
-                                      GDestroyNotify notify_func, gpointer user_data);
+ipatch_converter_set_link_funcs_full(IpatchConverter *converter,
+                                     IpatchConverterLinkLookupFunc *link_lookup,
+                                     IpatchConverterLinkNotifyFunc *link_notify,
+                                     GDestroyNotify notify_func, gpointer user_data);
 #endif

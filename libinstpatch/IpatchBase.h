@@ -55,8 +55,8 @@ typedef struct _IpatchBaseClass IpatchBaseClass;
  */
 typedef enum
 {
-  IPATCH_BASE_CHANGED = 1 << IPATCH_ITEM_UNUSED_FLAG_SHIFT,
-  IPATCH_BASE_SAVED   = 1 << (IPATCH_ITEM_UNUSED_FLAG_SHIFT + 1)
+    IPATCH_BASE_CHANGED = 1 << IPATCH_ITEM_UNUSED_FLAG_SHIFT,
+    IPATCH_BASE_SAVED   = 1 << (IPATCH_ITEM_UNUSED_FLAG_SHIFT + 1)
 } IpatchBaseFlags;
 
 /* we reserve a couple flags for backwards compatible expansion */
@@ -68,22 +68,22 @@ typedef enum
 /* patch base object */
 struct _IpatchBase
 {
-  IpatchContainer parent_instance; /* derived from IpatchContainer */
+    IpatchContainer parent_instance; /* derived from IpatchContainer */
 
-  /*< private >*/
+    /*< private >*/
 
-  IpatchFile *file;		/* file object associated with this patch */
+    IpatchFile *file;		/* file object associated with this patch */
 };
 
 /* SoundFont class */
 struct _IpatchBaseClass
 {
-  IpatchContainerClass parent_class;
+    IpatchContainerClass parent_class;
 
-  /* methods */
-  void (*find_unused_locale)(IpatchBase *base, int *bank, int *program,
-			     const IpatchItem *exclude, gboolean percussion);
-  IpatchItem * (*find_item_by_locale)(IpatchBase *base, int bank, int program);
+    /* methods */
+    void (*find_unused_locale)(IpatchBase *base, int *bank, int *program,
+                               const IpatchItem *exclude, gboolean percussion);
+    IpatchItem *(*find_item_by_locale)(IpatchBase *base, int bank, int program);
 };
 
 /**
@@ -91,25 +91,25 @@ struct _IpatchBaseClass
  */
 #define IPATCH_BASE_DEFAULT_NAME "Untitled"
 
-GType ipatch_base_get_type (void);
-char *ipatch_base_type_get_mime_type (GType base_type);
-void ipatch_base_set_file (IpatchBase *base, IpatchFile *file);
-IpatchFile *ipatch_base_get_file (IpatchBase *base);
-void ipatch_base_set_file_name (IpatchBase *base, const char *file_name);
-char *ipatch_base_get_file_name (IpatchBase *base);
+GType ipatch_base_get_type(void);
+char *ipatch_base_type_get_mime_type(GType base_type);
+void ipatch_base_set_file(IpatchBase *base, IpatchFile *file);
+IpatchFile *ipatch_base_get_file(IpatchBase *base);
+void ipatch_base_set_file_name(IpatchBase *base, const char *file_name);
+char *ipatch_base_get_file_name(IpatchBase *base);
 
-void ipatch_base_find_unused_midi_locale (IpatchBase *base,
-					  int *bank, int *program,
-					  const IpatchItem *exclude,
-					  gboolean percussion);
-IpatchItem *ipatch_base_find_item_by_midi_locale (IpatchBase *base, int bank,
-						  int program);
+void ipatch_base_find_unused_midi_locale(IpatchBase *base,
+        int *bank, int *program,
+        const IpatchItem *exclude,
+        gboolean percussion);
+IpatchItem *ipatch_base_find_item_by_midi_locale(IpatchBase *base, int bank,
+        int program);
 
-gboolean ipatch_base_save (IpatchBase *base, GError **err);
-gboolean ipatch_base_save_to_filename (IpatchBase *base, const char *filename, GError **err);
-gboolean ipatch_base_save_a_copy (IpatchBase *base, const char *filename, GError **err);
-gboolean ipatch_base_close (IpatchBase *base, GError **err);
-gboolean ipatch_close_base_list (IpatchList *list, GError **err);
+gboolean ipatch_base_save(IpatchBase *base, GError **err);
+gboolean ipatch_base_save_to_filename(IpatchBase *base, const char *filename, GError **err);
+gboolean ipatch_base_save_a_copy(IpatchBase *base, const char *filename, GError **err);
+gboolean ipatch_base_close(IpatchBase *base, GError **err);
+gboolean ipatch_close_base_list(IpatchList *list, GError **err);
 
 #endif
 

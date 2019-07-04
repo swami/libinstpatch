@@ -47,25 +47,25 @@ typedef struct _IpatchSLIWriterClass IpatchSLIWriterClass;
  * so this object is not derived from IpatchRiff class */
 struct _IpatchSLIWriter
 {
-  GObject parent_instance;      /* derived from GObject */
-  IpatchFileHandle *handle;     /* file object being written */
-  IpatchSLI *orig_sli;	        /* original SLI object */
-  IpatchSLI *sli;	        /* duplicated SLI object to save */
-  GHashTable *sample_hash;	/* sample => SampleHashValue hash */
-  IpatchList *store_list;       /* list of stores, only set if ipatch_sli_writer_get_stores() was called */
+    GObject parent_instance;      /* derived from GObject */
+    IpatchFileHandle *handle;     /* file object being written */
+    IpatchSLI *orig_sli;	        /* original SLI object */
+    IpatchSLI *sli;	        /* duplicated SLI object to save */
+    GHashTable *sample_hash;	/* sample => SampleHashValue hash */
+    IpatchList *store_list;       /* list of stores, only set if ipatch_sli_writer_get_stores() was called */
 };
 
 /* Spectralis SLI/SLC writer class */
 struct _IpatchSLIWriterClass
 {
-  GObjectClass parent_class;
+    GObjectClass parent_class;
 };
 
-GType ipatch_sli_writer_get_type (void);
-IpatchSLIWriter *ipatch_sli_writer_new (IpatchFileHandle *handle, IpatchSLI *sli);
-void ipatch_sli_writer_set_patch (IpatchSLIWriter *writer, IpatchSLI *sli);
-void ipatch_sli_writer_set_file_handle (IpatchSLIWriter *writer, IpatchFileHandle *handle);
-gboolean ipatch_sli_writer_save (IpatchSLIWriter *writer, GError **err);
-IpatchList *ipatch_sli_writer_create_stores (IpatchSLIWriter *writer);
+GType ipatch_sli_writer_get_type(void);
+IpatchSLIWriter *ipatch_sli_writer_new(IpatchFileHandle *handle, IpatchSLI *sli);
+void ipatch_sli_writer_set_patch(IpatchSLIWriter *writer, IpatchSLI *sli);
+void ipatch_sli_writer_set_file_handle(IpatchSLIWriter *writer, IpatchFileHandle *handle);
+gboolean ipatch_sli_writer_save(IpatchSLIWriter *writer, GError **err);
+IpatchList *ipatch_sli_writer_create_stores(IpatchSLIWriter *writer);
 
 #endif

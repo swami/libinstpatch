@@ -36,180 +36,190 @@
 
 enum
 {
-  PROP_0,
+    PROP_0,
 
-  PROP_NAME,
-  PROP_TYPE,
-  PROP_SPLIT_COUNT
+    PROP_NAME,
+    PROP_TYPE,
+    PROP_SPLIT_COUNT
 };
 
-static void ipatch_gig_dimension_class_init (IpatchGigDimensionClass *klass);
-static void ipatch_gig_dimension_set_property (GObject *object,
-					       guint property_id,
-					       const GValue *value,
-					       GParamSpec *pspec);
-static void ipatch_gig_dimension_get_property (GObject *object,
-					       guint property_id,
-					       GValue *value,
-					       GParamSpec *pspec);
+static void ipatch_gig_dimension_class_init(IpatchGigDimensionClass *klass);
+static void ipatch_gig_dimension_set_property(GObject *object,
+        guint property_id,
+        const GValue *value,
+        GParamSpec *pspec);
+static void ipatch_gig_dimension_get_property(GObject *object,
+        guint property_id,
+        GValue *value,
+        GParamSpec *pspec);
 
-static void ipatch_gig_dimension_init (IpatchGigDimension *gig_dimension);
-static void ipatch_gig_dimension_finalize (GObject *gobject);
-static void ipatch_gig_dimension_item_copy (IpatchItem *dest, IpatchItem *src,
-					    IpatchItemCopyLinkFunc link_func,
-					    gpointer user_data);
+static void ipatch_gig_dimension_init(IpatchGigDimension *gig_dimension);
+static void ipatch_gig_dimension_finalize(GObject *gobject);
+static void ipatch_gig_dimension_item_copy(IpatchItem *dest, IpatchItem *src,
+        IpatchItemCopyLinkFunc link_func,
+        gpointer user_data);
 
 static GObjectClass *parent_class = NULL;
 
 
 GType
-ipatch_gig_dimension_get_type (void)
+ipatch_gig_dimension_get_type(void)
 {
-  static GType item_type = 0;
+    static GType item_type = 0;
 
-  if (!item_type) {
-    static const GTypeInfo item_info = {
-      sizeof (IpatchGigDimensionClass), NULL, NULL,
-      (GClassInitFunc)ipatch_gig_dimension_class_init, NULL, NULL,
-      sizeof (IpatchGigDimension), 0,
-      (GInstanceInitFunc)ipatch_gig_dimension_init,
-    };
+    if(!item_type)
+    {
+        static const GTypeInfo item_info =
+        {
+            sizeof(IpatchGigDimensionClass), NULL, NULL,
+            (GClassInitFunc)ipatch_gig_dimension_class_init, NULL, NULL,
+            sizeof(IpatchGigDimension), 0,
+            (GInstanceInitFunc)ipatch_gig_dimension_init,
+        };
 
-    item_type = g_type_register_static (IPATCH_TYPE_ITEM,
-					"IpatchGigDimension", &item_info, 0);
-  }
+        item_type = g_type_register_static(IPATCH_TYPE_ITEM,
+                                           "IpatchGigDimension", &item_info, 0);
+    }
 
-  return (item_type);
+    return (item_type);
 }
 
 static void
-ipatch_gig_dimension_class_init (IpatchGigDimensionClass *klass)
+ipatch_gig_dimension_class_init(IpatchGigDimensionClass *klass)
 {
-  GObjectClass *obj_class = G_OBJECT_CLASS (klass);
-  IpatchItemClass *item_class = IPATCH_ITEM_CLASS (klass);
+    GObjectClass *obj_class = G_OBJECT_CLASS(klass);
+    IpatchItemClass *item_class = IPATCH_ITEM_CLASS(klass);
 
-  parent_class = g_type_class_peek_parent (klass);
+    parent_class = g_type_class_peek_parent(klass);
 
-  obj_class->finalize = ipatch_gig_dimension_finalize;
-  obj_class->get_property = ipatch_gig_dimension_get_property;
+    obj_class->finalize = ipatch_gig_dimension_finalize;
+    obj_class->get_property = ipatch_gig_dimension_get_property;
 
-  item_class->item_set_property = ipatch_gig_dimension_set_property;
-  item_class->copy = ipatch_gig_dimension_item_copy;
+    item_class->item_set_property = ipatch_gig_dimension_set_property;
+    item_class->copy = ipatch_gig_dimension_item_copy;
 
-  /* use parent's mutex (IpatchGigRegion) */
-  item_class->mutex_slave = TRUE;
+    /* use parent's mutex (IpatchGigRegion) */
+    item_class->mutex_slave = TRUE;
 
-  g_object_class_override_property (obj_class, PROP_NAME, "title");
+    g_object_class_override_property(obj_class, PROP_NAME, "title");
 
-  g_object_class_install_property (obj_class, PROP_NAME,
-	    g_param_spec_string ("name", _("Name"),
-				 _("Dimension name"),
-				 NULL, G_PARAM_READWRITE));
-  g_object_class_install_property (obj_class, PROP_TYPE,
-	    g_param_spec_enum ("type", _("Type"),
-			       _("Dimension type"),
-			       IPATCH_TYPE_GIG_DIMENSION_TYPE,
-			       IPATCH_GIG_DIMENSION_NONE,
-			       G_PARAM_READWRITE));
-  g_object_class_install_property (obj_class, PROP_TYPE,
-	    g_param_spec_int ("split-count", _("Split count"),
-			      _("Number of split bits"),
-			      1, 5, 1, G_PARAM_READWRITE));
+    g_object_class_install_property(obj_class, PROP_NAME,
+                                    g_param_spec_string("name", _("Name"),
+                                            _("Dimension name"),
+                                            NULL, G_PARAM_READWRITE));
+    g_object_class_install_property(obj_class, PROP_TYPE,
+                                    g_param_spec_enum("type", _("Type"),
+                                            _("Dimension type"),
+                                            IPATCH_TYPE_GIG_DIMENSION_TYPE,
+                                            IPATCH_GIG_DIMENSION_NONE,
+                                            G_PARAM_READWRITE));
+    g_object_class_install_property(obj_class, PROP_TYPE,
+                                    g_param_spec_int("split-count", _("Split count"),
+                                            _("Number of split bits"),
+                                            1, 5, 1, G_PARAM_READWRITE));
 }
 
 static void
-ipatch_gig_dimension_set_property (GObject *object, guint property_id,
-				   const GValue *value, GParamSpec *pspec)
+ipatch_gig_dimension_set_property(GObject *object, guint property_id,
+                                  const GValue *value, GParamSpec *pspec)
 {
-  IpatchGigDimension *dimension = IPATCH_GIG_DIMENSION (object);
+    IpatchGigDimension *dimension = IPATCH_GIG_DIMENSION(object);
 
-  switch (property_id)
+    switch(property_id)
     {
     case PROP_NAME:
-      IPATCH_ITEM_WLOCK (dimension);
-      g_free (dimension->name);
-      dimension->name = g_value_dup_string (value);
-      IPATCH_ITEM_WUNLOCK (dimension);
+        IPATCH_ITEM_WLOCK(dimension);
+        g_free(dimension->name);
+        dimension->name = g_value_dup_string(value);
+        IPATCH_ITEM_WUNLOCK(dimension);
 
-      /* title property notify */
-      ipatch_item_prop_notify ((IpatchItem *)dimension, ipatch_item_pspec_title,
-			       value, NULL);
-      break;
+        /* title property notify */
+        ipatch_item_prop_notify((IpatchItem *)dimension, ipatch_item_pspec_title,
+                                value, NULL);
+        break;
+
     case PROP_TYPE:
-      dimension->type = g_value_get_enum (value);
-      break;
+        dimension->type = g_value_get_enum(value);
+        break;
+
     case PROP_SPLIT_COUNT:
-      dimension->split_count = g_value_get_int (value);
-      break;
+        dimension->split_count = g_value_get_int(value);
+        break;
+
     default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
-      return;
+        G_OBJECT_WARN_INVALID_PROPERTY_ID(object, property_id, pspec);
+        return;
     }
 }
 
 static void
-ipatch_gig_dimension_get_property (GObject *object, guint property_id,
-				   GValue *value, GParamSpec *pspec)
+ipatch_gig_dimension_get_property(GObject *object, guint property_id,
+                                  GValue *value, GParamSpec *pspec)
 {
-  IpatchGigDimension *dimension = IPATCH_GIG_DIMENSION (object);
+    IpatchGigDimension *dimension = IPATCH_GIG_DIMENSION(object);
 
-  switch (property_id)
+    switch(property_id)
     {
     case PROP_NAME:
-      IPATCH_ITEM_RLOCK (dimension);
-      g_value_set_string (value, dimension->name);
-      IPATCH_ITEM_RUNLOCK (dimension);
-      break;
+        IPATCH_ITEM_RLOCK(dimension);
+        g_value_set_string(value, dimension->name);
+        IPATCH_ITEM_RUNLOCK(dimension);
+        break;
+
     case PROP_TYPE:
-      g_value_set_enum (value, dimension->type);
-      break;
+        g_value_set_enum(value, dimension->type);
+        break;
+
     case PROP_SPLIT_COUNT:
-      g_value_set_int (value, dimension->split_count);
-      break;
+        g_value_set_int(value, dimension->split_count);
+        break;
+
     default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
-      break;
+        G_OBJECT_WARN_INVALID_PROPERTY_ID(object, property_id, pspec);
+        break;
     }
 }
 
 static void
-ipatch_gig_dimension_init (IpatchGigDimension *dimension)
+ipatch_gig_dimension_init(IpatchGigDimension *dimension)
 {
 }
 
 static void
-ipatch_gig_dimension_finalize (GObject *gobject)
+ipatch_gig_dimension_finalize(GObject *gobject)
 {
-  IpatchGigDimension *dimension = IPATCH_GIG_DIMENSION (gobject);
+    IpatchGigDimension *dimension = IPATCH_GIG_DIMENSION(gobject);
 
-  IPATCH_ITEM_WLOCK (dimension);
-  g_free (dimension->name);
-  dimension->name = NULL;
-  IPATCH_ITEM_WUNLOCK (dimension);
+    IPATCH_ITEM_WLOCK(dimension);
+    g_free(dimension->name);
+    dimension->name = NULL;
+    IPATCH_ITEM_WUNLOCK(dimension);
 
-  if (parent_class->finalize)
-    parent_class->finalize (gobject);
+    if(parent_class->finalize)
+    {
+        parent_class->finalize(gobject);
+    }
 }
 
 static void
-ipatch_gig_dimension_item_copy (IpatchItem *dest, IpatchItem *src,
-				IpatchItemCopyLinkFunc link_func,
-				gpointer user_data)
+ipatch_gig_dimension_item_copy(IpatchItem *dest, IpatchItem *src,
+                               IpatchItemCopyLinkFunc link_func,
+                               gpointer user_data)
 {
-  IpatchGigDimension *src_dim, *dest_dim;
+    IpatchGigDimension *src_dim, *dest_dim;
 
-  src_dim = IPATCH_GIG_DIMENSION (src);
-  dest_dim = IPATCH_GIG_DIMENSION (dest);
+    src_dim = IPATCH_GIG_DIMENSION(src);
+    dest_dim = IPATCH_GIG_DIMENSION(dest);
 
-  IPATCH_ITEM_RLOCK (src_dim);
+    IPATCH_ITEM_RLOCK(src_dim);
 
-  dest_dim->name = g_strdup (src_dim->name);
-  dest_dim->type = src_dim->type;
-  dest_dim->split_count = src_dim->split_count;
-  dest_dim->split_mask = src_dim->split_mask;
-  dest_dim->split_shift = src_dim->split_shift;
+    dest_dim->name = g_strdup(src_dim->name);
+    dest_dim->type = src_dim->type;
+    dest_dim->split_count = src_dim->split_count;
+    dest_dim->split_mask = src_dim->split_mask;
+    dest_dim->split_shift = src_dim->split_shift;
 
-  IPATCH_ITEM_RUNLOCK (src_dim);
+    IPATCH_ITEM_RUNLOCK(src_dim);
 }
 
 /**
@@ -221,9 +231,9 @@ ipatch_gig_dimension_item_copy (IpatchItem *dest, IpatchItem *src,
  * owns.
  */
 IpatchGigDimension *
-ipatch_gig_dimension_new (void)
+ipatch_gig_dimension_new(void)
 {
-  return (IPATCH_GIG_DIMENSION (g_object_new (IPATCH_TYPE_GIG_DIMENSION, NULL)));
+    return (IPATCH_GIG_DIMENSION(g_object_new(IPATCH_TYPE_GIG_DIMENSION, NULL)));
 }
 
 /**
@@ -236,14 +246,21 @@ ipatch_gig_dimension_new (void)
  * Returns: The first dimension in @iter or %NULL if empty.
  */
 IpatchGigDimension *
-ipatch_gig_dimension_first (IpatchIter *iter)
+ipatch_gig_dimension_first(IpatchIter *iter)
 {
-  GObject *obj;
-  g_return_val_if_fail (iter != NULL, NULL);
+    GObject *obj;
+    g_return_val_if_fail(iter != NULL, NULL);
 
-  obj = ipatch_iter_first (iter);
-  if (obj) return (IPATCH_GIG_DIMENSION (obj));
-  else return (NULL);
+    obj = ipatch_iter_first(iter);
+
+    if(obj)
+    {
+        return (IPATCH_GIG_DIMENSION(obj));
+    }
+    else
+    {
+        return (NULL);
+    }
 }
 
 /**
@@ -257,12 +274,19 @@ ipatch_gig_dimension_first (IpatchIter *iter)
  *   the list.
  */
 IpatchGigDimension *
-ipatch_gig_dimension_next (IpatchIter *iter)
+ipatch_gig_dimension_next(IpatchIter *iter)
 {
-  GObject *obj;
-  g_return_val_if_fail (iter != NULL, NULL);
+    GObject *obj;
+    g_return_val_if_fail(iter != NULL, NULL);
 
-  obj = ipatch_iter_next (iter);
-  if (obj) return (IPATCH_GIG_DIMENSION (obj));
-  else return (NULL);
+    obj = ipatch_iter_next(iter);
+
+    if(obj)
+    {
+        return (IPATCH_GIG_DIMENSION(obj));
+    }
+    else
+    {
+        return (NULL);
+    }
 }

@@ -27,54 +27,61 @@
  * g_weak_ref_init: (skip)
  */
 void
-g_weak_ref_init (GWeakRef *weak_ref, gpointer object)
+g_weak_ref_init(GWeakRef *weak_ref, gpointer object)
 {
-  weak_ref->obj = object;
-  if (object) g_object_add_weak_pointer ((GObject *)object, &weak_ref->obj);
+    weak_ref->obj = object;
+
+    if(object)
+    {
+        g_object_add_weak_pointer((GObject *)object, &weak_ref->obj);
+    }
 }
 
 /**
  * g_weak_ref_clear: (skip)
  */
 void
-g_weak_ref_clear (GWeakRef *weak_ref)
+g_weak_ref_clear(GWeakRef *weak_ref)
 {
-  GObject *object;
+    GObject *object;
 
-  object = weak_ref->obj;
+    object = weak_ref->obj;
 
-  if (object)
-  {
-    g_object_ref (object);      // ++ ref
-    g_object_remove_weak_pointer ((GObject *)object, &weak_ref->obj);
-    g_object_unref (object);    // -- unref
-    weak_ref->obj = NULL;
-  }
+    if(object)
+    {
+        g_object_ref(object);       // ++ ref
+        g_object_remove_weak_pointer((GObject *)object, &weak_ref->obj);
+        g_object_unref(object);     // -- unref
+        weak_ref->obj = NULL;
+    }
 }
 
 /**
  * g_weak_ref_get: (skip)
  */
 gpointer
-g_weak_ref_get (GWeakRef *weak_ref)
+g_weak_ref_get(GWeakRef *weak_ref)
 {
-  GObject *object;
+    GObject *object;
 
-  object = weak_ref->obj;
+    object = weak_ref->obj;
 
-  if (object) g_object_ref (object);      // ++ ref
+    if(object)
+    {
+        g_object_ref(object);    // ++ ref
+    }
 
-  return (object);              // !! caller takes over reference
+    return (object);              // !! caller takes over reference
 }
 
 /**
  * g_weak_ref_set: (skip)
  */
 void
-g_weak_ref_set (GWeakRef *weak_ref, gpointer object)
+g_weak_ref_set(GWeakRef *weak_ref, gpointer object)
 {
-  g_weak_ref_clear (weak_ref);
-  g_weak_ref_init (weak_ref, object);
+    g_weak_ref_clear(weak_ref);
+    g_weak_ref_init(weak_ref, object);
 }
 
 #endif
@@ -86,13 +93,15 @@ g_weak_ref_set (GWeakRef *weak_ref, gpointer object)
  * g_slist_free_full: (skip)
  */
 void
-g_slist_free_full (GSList *list, GDestroyNotify free_func)
+g_slist_free_full(GSList *list, GDestroyNotify free_func)
 {
-  GSList *p;
+    GSList *p;
 
-  for (p = list; p; p = g_slist_delete_link (p, p))
-    if (free_func)
-      free_func (p->data);
+    for(p = list; p; p = g_slist_delete_link(p, p))
+        if(free_func)
+        {
+            free_func(p->data);
+        }
 }
 
 #endif

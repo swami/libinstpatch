@@ -20,7 +20,7 @@
 /**
  * SECTION: util
  * @short_description: Utility functions
- * @see_also: 
+ * @see_also:
  * @stability: Stable
  */
 #include <glib.h>
@@ -40,16 +40,16 @@ GValue *ipatch_util_value_bool_false;
  * _ipatch_util_init: (skip)
  */
 void
-_ipatch_util_init (void)
+_ipatch_util_init(void)
 {
-  ipatch_util_value_bool_true = g_new0 (GValue, 1);
-  ipatch_util_value_bool_false = g_new0 (GValue, 1);
+    ipatch_util_value_bool_true = g_new0(GValue, 1);
+    ipatch_util_value_bool_false = g_new0(GValue, 1);
 
-  g_value_init (ipatch_util_value_bool_true, G_TYPE_BOOLEAN);
-  g_value_init (ipatch_util_value_bool_false, G_TYPE_BOOLEAN);
+    g_value_init(ipatch_util_value_bool_true, G_TYPE_BOOLEAN);
+    g_value_init(ipatch_util_value_bool_false, G_TYPE_BOOLEAN);
 
-  g_value_set_boolean (ipatch_util_value_bool_true, TRUE);
-  g_value_set_boolean (ipatch_util_value_bool_false, FALSE);
+    g_value_set_boolean(ipatch_util_value_bool_true, TRUE);
+    g_value_set_boolean(ipatch_util_value_bool_false, FALSE);
 }
 
 /**
@@ -61,72 +61,93 @@ _ipatch_util_init (void)
  * Returns: Hash value corresponding to the @val key.
  */
 guint
-ipatch_util_value_hash (GValue *val)
+ipatch_util_value_hash(GValue *val)
 {
-  GValueArray *valarray;
-  GType valtype;
-  const char *sval;
+    GValueArray *valarray;
+    GType valtype;
+    const char *sval;
 
-  /* so we can access a float value as its raw data without gcc bitching */
-  union
+    /* so we can access a float value as its raw data without gcc bitching */
+    union
     {
-      gfloat f;
-      guint32 i;
+        gfloat f;
+        guint32 i;
     } fval;
 
-  g_return_val_if_fail (G_IS_VALUE (val), 0);
+    g_return_val_if_fail(G_IS_VALUE(val), 0);
 
-  valtype = G_VALUE_TYPE (val);
+    valtype = G_VALUE_TYPE(val);
 
-  switch (G_TYPE_FUNDAMENTAL (valtype))
+    switch(G_TYPE_FUNDAMENTAL(valtype))
     {
     case G_TYPE_CHAR:
-      return (g_value_get_char (val));
+        return (g_value_get_char(val));
+
     case G_TYPE_UCHAR:
-      return (g_value_get_uchar (val));
+        return (g_value_get_uchar(val));
+
     case G_TYPE_BOOLEAN:
-      return (g_value_get_boolean (val));
+        return (g_value_get_boolean(val));
+
     case G_TYPE_INT:
-      return (g_value_get_int (val));
+        return (g_value_get_int(val));
+
     case G_TYPE_UINT:
-      return (g_value_get_uint (val));
+        return (g_value_get_uint(val));
+
     case G_TYPE_LONG:
-      return (g_value_get_long (val));
+        return (g_value_get_long(val));
+
     case G_TYPE_ULONG:
-      return (g_value_get_ulong (val));
+        return (g_value_get_ulong(val));
+
     case G_TYPE_INT64:
-      return (guint)(g_value_get_int64 (val));
+        return (guint)(g_value_get_int64(val));
+
     case G_TYPE_UINT64:
-      return (guint)(g_value_get_uint64 (val));
+        return (guint)(g_value_get_uint64(val));
+
     case G_TYPE_ENUM:
-      return (g_value_get_enum (val));
+        return (g_value_get_enum(val));
+
     case G_TYPE_FLAGS:
-      return (g_value_get_flags (val));
+        return (g_value_get_flags(val));
+
     case G_TYPE_FLOAT:
-      fval.f = g_value_get_float (val);
-      return (fval.i);	/* use the raw float data as hash */
+        fval.f = g_value_get_float(val);
+        return (fval.i);	/* use the raw float data as hash */
+
     case G_TYPE_DOUBLE:
-      fval.f = (gfloat)g_value_get_double (val);	/* convert double to float */
-      return (fval.i);		/* use the raw float data as hash */
+        fval.f = (gfloat)g_value_get_double(val);	/* convert double to float */
+        return (fval.i);		/* use the raw float data as hash */
+
     case G_TYPE_STRING:
-      sval = g_value_get_string (val);
-      return (sval ? g_str_hash (sval) : 0);
+        sval = g_value_get_string(val);
+        return (sval ? g_str_hash(sval) : 0);
+
     case G_TYPE_POINTER:
-      return (GPOINTER_TO_UINT (g_value_get_pointer (val)));
+        return (GPOINTER_TO_UINT(g_value_get_pointer(val)));
+
     case G_TYPE_BOXED:
-      if (valtype == G_TYPE_VALUE_ARRAY)	/* value array? */
-	{
-	  valarray = g_value_get_boxed (val);
-	  return (ipatch_util_value_array_hash (valarray));
-	}
-      else return (GPOINTER_TO_UINT (g_value_get_boxed (val)));
+        if(valtype == G_TYPE_VALUE_ARRAY)	/* value array? */
+        {
+            valarray = g_value_get_boxed(val);
+            return (ipatch_util_value_array_hash(valarray));
+        }
+        else
+        {
+            return (GPOINTER_TO_UINT(g_value_get_boxed(val)));
+        }
+
     case G_TYPE_PARAM:
-      return (GPOINTER_TO_UINT (g_value_get_param (val)));
+        return (GPOINTER_TO_UINT(g_value_get_param(val)));
+
     case G_TYPE_OBJECT:
-      return (GPOINTER_TO_UINT (g_value_get_object (val)));
+        return (GPOINTER_TO_UINT(g_value_get_object(val)));
+
     default:
-      g_assert_not_reached ();
-      return (0);	/* to keep compiler happy */
+        g_assert_not_reached();
+        return (0);	/* to keep compiler happy */
     }
 }
 
@@ -141,21 +162,24 @@ ipatch_util_value_hash (GValue *val)
  * by ipatch_util_value_hash() for each GValue in the array.
  */
 guint
-ipatch_util_value_array_hash (GValueArray *valarray)
+ipatch_util_value_array_hash(GValueArray *valarray)
 {
-  GValue *value;
-  guint hashval = 0;
-  guint i;
+    GValue *value;
+    guint hashval = 0;
+    guint i;
 
-  if (!valarray) return (0);
-
-  for (i = 0; i < valarray->n_values; i++)
+    if(!valarray)
     {
-      value = g_value_array_get_nth (valarray, i);
-      hashval += ipatch_util_value_hash (value);
+        return (0);
     }
 
-  return (hashval);
+    for(i = 0; i < valarray->n_values; i++)
+    {
+        value = g_value_array_get_nth(valarray, i);
+        hashval += ipatch_util_value_hash(value);
+    }
+
+    return (hashval);
 }
 
 /**
@@ -169,21 +193,21 @@ ipatch_util_value_array_hash (GValueArray *valarray)
  *   it is set to determine if an error really occurred.
  */
 guint64
-ipatch_util_file_size (const char *fname, GError **err)
+ipatch_util_file_size(const char *fname, GError **err)
 {
-  GStatBuf st;
+    GStatBuf st;
 
-  g_return_val_if_fail (fname != NULL, 0);
-  g_return_val_if_fail (!err || !*err, 0);
+    g_return_val_if_fail(fname != NULL, 0);
+    g_return_val_if_fail(!err || !*err, 0);
 
-  if (g_stat (fname, &st) != 0)
+    if(g_stat(fname, &st) != 0)
     {
-      g_set_error (err, IPATCH_ERROR, IPATCH_ERROR_IO,
-		   _("Error stating file '%s': %s"), fname, g_strerror (errno));
-      return (0);
+        g_set_error(err, IPATCH_ERROR, IPATCH_ERROR_IO,
+                    _("Error stating file '%s': %s"), fname, g_strerror(errno));
+        return (0);
     }
 
-  return (st.st_size);
+    return (st.st_size);
 }
 
 /**
@@ -198,20 +222,25 @@ ipatch_util_file_size (const char *fname, GError **err)
  * Since: 1.1.0
  */
 char *
-ipatch_util_abs_filename (const char *filename)
+ipatch_util_abs_filename(const char *filename)
 {
-  char *dirname, *abs_filename;
+    char *dirname, *abs_filename;
 
-  if (!filename) return (NULL);
+    if(!filename)
+    {
+        return (NULL);
+    }
 
-  if (g_path_is_absolute (filename))
-    return (g_strdup (filename));       // !! caller takes over allocation
+    if(g_path_is_absolute(filename))
+    {
+        return (g_strdup(filename));    // !! caller takes over allocation
+    }
 
-  dirname = g_get_current_dir ();       // ++ alloc
-  abs_filename = g_build_filename (dirname, filename, NULL);
-  g_free (dirname);                     // -- free
+    dirname = g_get_current_dir();        // ++ alloc
+    abs_filename = g_build_filename(dirname, filename, NULL);
+    g_free(dirname);                      // -- free
 
-  return (abs_filename);                // !! caller takes over allocation
+    return (abs_filename);                // !! caller takes over allocation
 }
 
 /**
@@ -224,10 +253,10 @@ ipatch_util_abs_filename (const char *filename)
  * Since: 1.1.0
  */
 void
-ipatch_util_weakref_destroy (gpointer value)
+ipatch_util_weakref_destroy(gpointer value)
 {
-  GWeakRef *weakref = value;
-  g_weak_ref_clear (weakref);
-  g_slice_free (GWeakRef, weakref);
+    GWeakRef *weakref = value;
+    g_weak_ref_clear(weakref);
+    g_slice_free(GWeakRef, weakref);
 }
 

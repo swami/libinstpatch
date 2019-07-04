@@ -60,10 +60,10 @@ typedef struct _IpatchSndFileClass IpatchSndFileClass;
  */
 typedef enum
 {
-  IPATCH_SND_FILE_ENDIAN_FILE,
-  IPATCH_SND_FILE_ENDIAN_LITTLE,
-  IPATCH_SND_FILE_ENDIAN_BIG,
-  IPATCH_SND_FILE_ENDIAN_CPU
+    IPATCH_SND_FILE_ENDIAN_FILE,
+    IPATCH_SND_FILE_ENDIAN_LITTLE,
+    IPATCH_SND_FILE_ENDIAN_BIG,
+    IPATCH_SND_FILE_ENDIAN_CPU
 } IpatchSndFileEndian;
 
 /**
@@ -90,21 +90,21 @@ typedef enum
 /* DLS file object (derived from IpatchFile) */
 struct _IpatchSndFile
 {
-  IpatchFile parent_instance;
+    IpatchFile parent_instance;
 };
 
 /* DLS file class (derived from IpatchFile) */
 struct _IpatchSndFileClass
 {
-  IpatchFileClass parent_class;
+    IpatchFileClass parent_class;
 };
 
 
-GType ipatch_snd_file_get_type (void);
-IpatchSndFile *ipatch_snd_file_new (void);
-GType ipatch_snd_file_format_get_type (void);
-GType ipatch_snd_file_sub_format_get_type (void);
-int *ipatch_snd_file_format_get_sub_formats (int format, guint *size);
-int ipatch_snd_file_sample_format_to_sub_format (int sample_format, int file_format);
+GType ipatch_snd_file_get_type(void);
+IpatchSndFile *ipatch_snd_file_new(void);
+GType ipatch_snd_file_format_get_type(void);
+GType ipatch_snd_file_sub_format_get_type(void);
+int *ipatch_snd_file_format_get_sub_formats(int format, guint *size);
+int ipatch_snd_file_sample_format_to_sub_format(int sample_format, int file_format);
 
 #endif

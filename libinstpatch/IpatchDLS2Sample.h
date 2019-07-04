@@ -54,32 +54,32 @@ typedef struct _IpatchDLS2SampleInfo IpatchDLS2SampleInfo;
 /* SoundFont sample item */
 struct _IpatchDLS2Sample
 {
-  IpatchItem parent_instance;
+    IpatchItem parent_instance;
 
-  int rate;                     /* sample rate */
-  IpatchDLS2SampleInfo *sample_info; /* sample data info (optional) */
-  IpatchDLS2Info *info;		/* info string values */
+    int rate;                     /* sample rate */
+    IpatchDLS2SampleInfo *sample_info; /* sample data info (optional) */
+    IpatchDLS2Info *info;		/* info string values */
 
-  IpatchSampleData *sample_data;    /* sample data object */
+    IpatchSampleData *sample_data;    /* sample data object */
 
-  guint8 *dlid;			/* 16 byte unique ID or NULL */
+    guint8 *dlid;			/* 16 byte unique ID or NULL */
 };
 
 struct _IpatchDLS2SampleClass
 {
-  IpatchItemClass parent_class;
+    IpatchItemClass parent_class;
 };
 
 /* DLS2 sample info, can also be defined in regions */
 struct _IpatchDLS2SampleInfo
 {
-  guint8 options; /* IpatchSampleLoopType and IpatchDLS2SampleFlags */
-  guint8 root_note;		/* root MIDI note number */
-  gint16 fine_tune;		/* fine tuning */
-  gint32 gain;			/* gain to apply to sample */
+    guint8 options; /* IpatchSampleLoopType and IpatchDLS2SampleFlags */
+    guint8 root_note;		/* root MIDI note number */
+    gint16 fine_tune;		/* fine tuning */
+    gint32 gain;			/* gain to apply to sample */
 
-  guint32 loop_start;		/* loop start offset (in samples) */
-  guint32 loop_end;		/* loop end offset (in samples) */
+    guint32 loop_start;		/* loop start offset (in samples) */
+    guint32 loop_end;		/* loop end offset (in samples) */
 };
 
 /* default values to initialize static IpatchDLS2SampleInfo with */
@@ -101,40 +101,40 @@ struct _IpatchDLS2SampleInfo
 /* flags crammed into sample info options field */
 typedef enum
 {
-  IPATCH_DLS2_SAMPLE_NO_TRUNCATION = 1 << 6,
-  IPATCH_DLS2_SAMPLE_NO_COMPRESSION = 1 << 7
+    IPATCH_DLS2_SAMPLE_NO_TRUNCATION = 1 << 6,
+    IPATCH_DLS2_SAMPLE_NO_COMPRESSION = 1 << 7
 } IpatchDLS2SampleFlags;
 
 #define IPATCH_DLS2_SAMPLE_LOOP_MASK   0x03
 #define IPATCH_DLS2_SAMPLE_FLAGS_MASK  0x0C0
 
-GType ipatch_dls2_sample_get_type (void);
-IpatchDLS2Sample *ipatch_dls2_sample_new (void);
+GType ipatch_dls2_sample_get_type(void);
+IpatchDLS2Sample *ipatch_dls2_sample_new(void);
 
-IpatchDLS2Sample *ipatch_dls2_sample_first (IpatchIter *iter);
-IpatchDLS2Sample *ipatch_dls2_sample_next (IpatchIter *iter);
+IpatchDLS2Sample *ipatch_dls2_sample_first(IpatchIter *iter);
+IpatchDLS2Sample *ipatch_dls2_sample_next(IpatchIter *iter);
 
-void ipatch_dls2_sample_set_data (IpatchDLS2Sample *sample,
-				  IpatchSampleData *sampledata);
-IpatchSampleData *ipatch_dls2_sample_get_data (IpatchDLS2Sample *sample);
-IpatchSampleData *ipatch_dls2_sample_peek_data (IpatchDLS2Sample *sample);
-void ipatch_dls2_sample_set_blank (IpatchDLS2Sample *sample);
+void ipatch_dls2_sample_set_data(IpatchDLS2Sample *sample,
+                                 IpatchSampleData *sampledata);
+IpatchSampleData *ipatch_dls2_sample_get_data(IpatchDLS2Sample *sample);
+IpatchSampleData *ipatch_dls2_sample_peek_data(IpatchDLS2Sample *sample);
+void ipatch_dls2_sample_set_blank(IpatchDLS2Sample *sample);
 
-GType ipatch_dls2_sample_info_get_type (void);
-IpatchDLS2SampleInfo *ipatch_dls2_sample_info_new (void);
-void ipatch_dls2_sample_info_free (IpatchDLS2SampleInfo *sample_info);
+GType ipatch_dls2_sample_info_get_type(void);
+IpatchDLS2SampleInfo *ipatch_dls2_sample_info_new(void);
+void ipatch_dls2_sample_info_free(IpatchDLS2SampleInfo *sample_info);
 IpatchDLS2SampleInfo *ipatch_dls2_sample_info_duplicate
-  (IpatchDLS2SampleInfo *sample_info);
-void ipatch_dls2_sample_info_init (IpatchDLS2SampleInfo *sample_info);
+(IpatchDLS2SampleInfo *sample_info);
+void ipatch_dls2_sample_info_init(IpatchDLS2SampleInfo *sample_info);
 void ipatch_dls2_sample_info_install_class_properties
-  (GObjectClass *obj_class);
-gboolean ipatch_dls2_sample_info_is_property_id_valid (guint property_id);
+(GObjectClass *obj_class);
+gboolean ipatch_dls2_sample_info_is_property_id_valid(guint property_id);
 gboolean ipatch_dls2_sample_info_set_property
-  (IpatchDLS2SampleInfo **sample_info, guint property_id,
-   const GValue *value);
+(IpatchDLS2SampleInfo **sample_info, guint property_id,
+ const GValue *value);
 gboolean ipatch_dls2_sample_info_get_property
-  (IpatchDLS2SampleInfo *sample_info, guint property_id, GValue *value);
-void ipatch_dls2_sample_info_notify_changes (IpatchItem *item,
-					     IpatchDLS2SampleInfo *newinfo,
-					     IpatchDLS2SampleInfo *oldinfo);
+(IpatchDLS2SampleInfo *sample_info, guint property_id, GValue *value);
+void ipatch_dls2_sample_info_notify_changes(IpatchItem *item,
+        IpatchDLS2SampleInfo *newinfo,
+        IpatchDLS2SampleInfo *oldinfo);
 #endif

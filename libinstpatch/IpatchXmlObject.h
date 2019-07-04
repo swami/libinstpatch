@@ -39,9 +39,9 @@
  * Returns: Should return %TRUE on success and %FALSE on error (in which
  *   case @err should be set).
  */
-typedef gboolean (*IpatchXmlEncodeFunc)(GNode *node, GObject *object,
-                                        GParamSpec *pspec, GValue *value,
-                                        GError **err);
+typedef gboolean(*IpatchXmlEncodeFunc)(GNode *node, GObject *object,
+                                       GParamSpec *pspec, GValue *value,
+                                       GError **err);
 /**
  * IpatchXmlDecodeFunc:
  * @node: XML node to be decoded
@@ -61,57 +61,57 @@ typedef gboolean (*IpatchXmlEncodeFunc)(GNode *node, GObject *object,
  * Returns: Should return TRUE on success, FALSE otherwise (in which case @err
  *   should be set)
  */
-typedef gboolean (*IpatchXmlDecodeFunc)(GNode *node, GObject *object,
-                                        GParamSpec *pspec, GValue *value,
-                                        GError **err);
+typedef gboolean(*IpatchXmlDecodeFunc)(GNode *node, GObject *object,
+                                       GParamSpec *pspec, GValue *value,
+                                       GError **err);
 
-void ipatch_xml_register_handler (GType type, const char *prop_name,
-                                  IpatchXmlEncodeFunc encode_func,
-                                  IpatchXmlDecodeFunc decode_func);
+void ipatch_xml_register_handler(GType type, const char *prop_name,
+                                 IpatchXmlEncodeFunc encode_func,
+                                 IpatchXmlDecodeFunc decode_func);
 void
-ipatch_xml_register_handler_full (GType type, const char *prop_name,
-                                  IpatchXmlEncodeFunc encode_func,
-                                  IpatchXmlDecodeFunc decode_func,
-                                  GDestroyNotify notify_func, gpointer user_data);
-gboolean ipatch_xml_lookup_handler (GType type, GParamSpec *pspec,
-                                    IpatchXmlEncodeFunc *encode_func,
-                                    IpatchXmlDecodeFunc *decode_func);
-gboolean ipatch_xml_lookup_handler_by_prop_name (GType type, const char *prop_name,
-                                                 IpatchXmlEncodeFunc *encode_func,
-                                                 IpatchXmlDecodeFunc *decode_func);
+ipatch_xml_register_handler_full(GType type, const char *prop_name,
+                                 IpatchXmlEncodeFunc encode_func,
+                                 IpatchXmlDecodeFunc decode_func,
+                                 GDestroyNotify notify_func, gpointer user_data);
+gboolean ipatch_xml_lookup_handler(GType type, GParamSpec *pspec,
+                                   IpatchXmlEncodeFunc *encode_func,
+                                   IpatchXmlDecodeFunc *decode_func);
+gboolean ipatch_xml_lookup_handler_by_prop_name(GType type, const char *prop_name,
+        IpatchXmlEncodeFunc *encode_func,
+        IpatchXmlDecodeFunc *decode_func);
 
-gboolean ipatch_xml_encode_object (GNode *node, GObject *object,
-			           gboolean create_element, GError **err);
-gboolean ipatch_xml_encode_property (GNode *node, GObject *object, GParamSpec *pspec,
-                                     gboolean create_element, GError **err);
-gboolean ipatch_xml_encode_property_by_name (GNode *node, GObject *object,
-                                             const char *propname,
-                                             gboolean create_element, GError **err);
-gboolean ipatch_xml_encode_value (GNode *node, GValue *value, GError **err);
+gboolean ipatch_xml_encode_object(GNode *node, GObject *object,
+                                  gboolean create_element, GError **err);
+gboolean ipatch_xml_encode_property(GNode *node, GObject *object, GParamSpec *pspec,
+                                    gboolean create_element, GError **err);
+gboolean ipatch_xml_encode_property_by_name(GNode *node, GObject *object,
+        const char *propname,
+        gboolean create_element, GError **err);
+gboolean ipatch_xml_encode_value(GNode *node, GValue *value, GError **err);
 
-gboolean ipatch_xml_decode_object (GNode *node, GObject *object, GError **err);
-gboolean ipatch_xml_decode_property (GNode *node, GObject *object, GParamSpec *pspec,
-                                     GError **err);
-gboolean ipatch_xml_decode_property_by_name (GNode *node, GObject *object,
-                                             const char *propname, GError **err);
-gboolean ipatch_xml_decode_value (GNode *node, GValue *value, GError **err);
+gboolean ipatch_xml_decode_object(GNode *node, GObject *object, GError **err);
+gboolean ipatch_xml_decode_property(GNode *node, GObject *object, GParamSpec *pspec,
+                                    GError **err);
+gboolean ipatch_xml_decode_property_by_name(GNode *node, GObject *object,
+        const char *propname, GError **err);
+gboolean ipatch_xml_decode_value(GNode *node, GValue *value, GError **err);
 
-gboolean ipatch_xml_default_encode_object_func (GNode *node, GObject *object,
-                                                GParamSpec *pspec, GValue *value,
-                                                GError **err);
-gboolean ipatch_xml_default_encode_property_func (GNode *node, GObject *object,
-                                                  GParamSpec *pspec, GValue *value,
-                                                  GError **err);
-gboolean ipatch_xml_default_encode_value_func (GNode *node, GObject *object,
-                                               GParamSpec *pspec, GValue *value,
-                                               GError **err);
-gboolean ipatch_xml_default_decode_object_func (GNode *node, GObject *object,
-                                                GParamSpec *pspec, GValue *value,
-                                                GError **err);
-gboolean ipatch_xml_default_decode_property_func (GNode *node, GObject *object,
-                                                  GParamSpec *pspec, GValue *value,
-                                                  GError **err);
-gboolean ipatch_xml_default_decode_value_func (GNode *node, GObject *object,
-                                               GParamSpec *pspec, GValue *value,
-                                               GError **err);
+gboolean ipatch_xml_default_encode_object_func(GNode *node, GObject *object,
+        GParamSpec *pspec, GValue *value,
+        GError **err);
+gboolean ipatch_xml_default_encode_property_func(GNode *node, GObject *object,
+        GParamSpec *pspec, GValue *value,
+        GError **err);
+gboolean ipatch_xml_default_encode_value_func(GNode *node, GObject *object,
+        GParamSpec *pspec, GValue *value,
+        GError **err);
+gboolean ipatch_xml_default_decode_object_func(GNode *node, GObject *object,
+        GParamSpec *pspec, GValue *value,
+        GError **err);
+gboolean ipatch_xml_default_decode_property_func(GNode *node, GObject *object,
+        GParamSpec *pspec, GValue *value,
+        GError **err);
+gboolean ipatch_xml_default_decode_value_func(GNode *node, GObject *object,
+        GParamSpec *pspec, GValue *value,
+        GError **err);
 #endif

@@ -62,48 +62,48 @@ typedef struct _IpatchSF2GenItemIface IpatchSF2GenItemIface;
 /* generator item interface */
 struct _IpatchSF2GenItemIface
 {
-  GTypeInterface parent_iface;
+    GTypeInterface parent_iface;
 
-  /*< public >*/
+    /*< public >*/
 
-  IpatchSF2GenPropsType propstype;	/* gen properties type for this class */
-  guint genarray_ofs;	/* offset in item instance to generator array pointer */
-  GParamSpec *specs[IPATCH_SF2_GEN_COUNT];  /* genid -> prop pspec array */
-  GParamSpec *setspecs[IPATCH_SF2_GEN_COUNT];  /* genid -> "-set" prop pspec array */
+    IpatchSF2GenPropsType propstype;	/* gen properties type for this class */
+    guint genarray_ofs;	/* offset in item instance to generator array pointer */
+    GParamSpec *specs[IPATCH_SF2_GEN_COUNT];  /* genid -> prop pspec array */
+    GParamSpec *setspecs[IPATCH_SF2_GEN_COUNT];  /* genid -> "-set" prop pspec array */
 };
 
-GType ipatch_sf2_gen_item_get_type (void);
+GType ipatch_sf2_gen_item_get_type(void);
 
-gboolean ipatch_sf2_gen_item_get_amount (IpatchSF2GenItem *item, guint genid,
-					 IpatchSF2GenAmount *out_amt);
-void ipatch_sf2_gen_item_set_amount (IpatchSF2GenItem *item, guint genid,
-				     IpatchSF2GenAmount *amt);
-void ipatch_sf2_gen_item_set_gen_flag (IpatchSF2GenItem *item, guint genid,
-				       gboolean setflag);
-guint ipatch_sf2_gen_item_count_set (IpatchSF2GenItem *item);
+gboolean ipatch_sf2_gen_item_get_amount(IpatchSF2GenItem *item, guint genid,
+                                        IpatchSF2GenAmount *out_amt);
+void ipatch_sf2_gen_item_set_amount(IpatchSF2GenItem *item, guint genid,
+                                    IpatchSF2GenAmount *amt);
+void ipatch_sf2_gen_item_set_gen_flag(IpatchSF2GenItem *item, guint genid,
+                                      gboolean setflag);
+guint ipatch_sf2_gen_item_count_set(IpatchSF2GenItem *item);
 
-void ipatch_sf2_gen_item_copy_all (IpatchSF2GenItem *item,
-				   IpatchSF2GenArray *array);
-void ipatch_sf2_gen_item_copy_set (IpatchSF2GenItem *item,
-				   IpatchSF2GenArray *array);
-void ipatch_sf2_gen_item_set_note_range (IpatchSF2GenItem *item, int low, int high);
-void ipatch_sf2_gen_item_set_velocity_range (IpatchSF2GenItem *item, int low, int high);
-gboolean ipatch_sf2_gen_item_in_range (IpatchSF2GenItem *item, int note, int velocity);
-gboolean ipatch_sf2_gen_item_intersect_test (IpatchSF2GenItem *item,
-                                             const IpatchSF2GenArray *genarray);
+void ipatch_sf2_gen_item_copy_all(IpatchSF2GenItem *item,
+                                  IpatchSF2GenArray *array);
+void ipatch_sf2_gen_item_copy_set(IpatchSF2GenItem *item,
+                                  IpatchSF2GenArray *array);
+void ipatch_sf2_gen_item_set_note_range(IpatchSF2GenItem *item, int low, int high);
+void ipatch_sf2_gen_item_set_velocity_range(IpatchSF2GenItem *item, int low, int high);
+gboolean ipatch_sf2_gen_item_in_range(IpatchSF2GenItem *item, int note, int velocity);
+gboolean ipatch_sf2_gen_item_intersect_test(IpatchSF2GenItem *item,
+        const IpatchSF2GenArray *genarray);
 
-GParamSpec *ipatch_sf2_gen_item_class_get_pspec (GObjectClass *klass, guint genid);
-GParamSpec *ipatch_sf2_gen_item_class_get_pspec_set (GObjectClass *klass, guint genid);
+GParamSpec *ipatch_sf2_gen_item_class_get_pspec(GObjectClass *klass, guint genid);
+GParamSpec *ipatch_sf2_gen_item_class_get_pspec_set(GObjectClass *klass, guint genid);
 
 void
-ipatch_sf2_gen_item_iface_install_properties (GObjectClass *klass,
-                                              IpatchSF2GenPropsType propstype,
-                                              GParamSpec ***specs,
-                                              GParamSpec ***setspecs);
+ipatch_sf2_gen_item_iface_install_properties(GObjectClass *klass,
+        IpatchSF2GenPropsType propstype,
+        GParamSpec ***specs,
+        GParamSpec ***setspecs);
 gboolean
-ipatch_sf2_gen_item_iface_set_property (IpatchSF2GenItem *item,
-					guint property_id, const GValue *value);
+ipatch_sf2_gen_item_iface_set_property(IpatchSF2GenItem *item,
+                                       guint property_id, const GValue *value);
 gboolean
-ipatch_sf2_gen_item_iface_get_property (IpatchSF2GenItem *item,
-					guint property_id, GValue *value);
+ipatch_sf2_gen_item_iface_get_property(IpatchSF2GenItem *item,
+                                       guint property_id, GValue *value);
 #endif

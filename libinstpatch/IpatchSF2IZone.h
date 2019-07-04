@@ -49,12 +49,12 @@ typedef struct _IpatchSF2IZoneClass IpatchSF2IZoneClass;
 /* SoundFont izone item */
 struct _IpatchSF2IZone
 {
-  IpatchSF2Zone parent_instance;
+    IpatchSF2Zone parent_instance;
 };
 
 struct _IpatchSF2IZoneClass
 {
-  IpatchSF2ZoneClass parent_class;
+    IpatchSF2ZoneClass parent_class;
 };
 
 /* reserve 2 flags */
@@ -62,15 +62,15 @@ struct _IpatchSF2IZoneClass
   (IPATCH_SF2_ZONE_UNUSED_FLAG_SHIFT + 2)
 
 
-GType ipatch_sf2_izone_get_type (void);
-IpatchSF2IZone *ipatch_sf2_izone_new (void);
+GType ipatch_sf2_izone_get_type(void);
+IpatchSF2IZone *ipatch_sf2_izone_new(void);
 
-IpatchSF2IZone *ipatch_sf2_izone_first (IpatchIter *iter);
-IpatchSF2IZone *ipatch_sf2_izone_next (IpatchIter *iter);
+IpatchSF2IZone *ipatch_sf2_izone_first(IpatchIter *iter);
+IpatchSF2IZone *ipatch_sf2_izone_next(IpatchIter *iter);
 
-void ipatch_sf2_izone_set_sample (IpatchSF2IZone *izone,
-				  IpatchSF2Sample *sample);
-IpatchSF2Sample *ipatch_sf2_izone_get_sample (IpatchSF2IZone *izone);
-IpatchSF2IZone *ipatch_sf2_izone_get_stereo_link (IpatchSF2IZone *izone);
+void ipatch_sf2_izone_set_sample(IpatchSF2IZone *izone,
+                                 IpatchSF2Sample *sample);
+IpatchSF2Sample *ipatch_sf2_izone_get_sample(IpatchSF2IZone *izone);
+IpatchSF2IZone *ipatch_sf2_izone_get_stereo_link(IpatchSF2IZone *izone);
 
 #endif

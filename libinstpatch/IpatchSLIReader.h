@@ -46,21 +46,21 @@ typedef struct _IpatchSLIReaderClass IpatchSLIReaderClass;
  * so this object is not derived from IpatchRiff class */
 struct _IpatchSLIReader
 {
-  GObject parent_instance;    /* derived from GObject */
-  IpatchFileHandle *handle;   /* file object being parsed */
-  IpatchSLI *sli;	      /* Spectralis object to load file into */
+    GObject parent_instance;    /* derived from GObject */
+    IpatchFileHandle *handle;   /* file object being parsed */
+    IpatchSLI *sli;	      /* Spectralis object to load file into */
 };
 
 /* Spectralis SLI/SLC file parser class */
 struct _IpatchSLIReaderClass
 {
-  GObjectClass parent_class;
+    GObjectClass parent_class;
 };
 
-GType ipatch_sli_reader_get_type (void);
-IpatchSLIReader *ipatch_sli_reader_new (IpatchFileHandle *handle);
-void ipatch_sli_reader_set_file_handle (IpatchSLIReader *reader,
-                                        IpatchFileHandle *handle);
-IpatchSLI *ipatch_sli_reader_load (IpatchSLIReader *reader, GError **err);
+GType ipatch_sli_reader_get_type(void);
+IpatchSLIReader *ipatch_sli_reader_new(IpatchFileHandle *handle);
+void ipatch_sli_reader_set_file_handle(IpatchSLIReader *reader,
+                                       IpatchFileHandle *handle);
+IpatchSLI *ipatch_sli_reader_load(IpatchSLIReader *reader, GError **err);
 
 #endif

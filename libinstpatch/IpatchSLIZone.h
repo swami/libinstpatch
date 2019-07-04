@@ -52,18 +52,18 @@ typedef struct _IpatchSLIZoneClass IpatchSLIZoneClass;
 /* SoundFont zone item */
 struct _IpatchSLIZone
 {
-  IpatchItem parent_instance;
+    IpatchItem parent_instance;
 
-  /*< private >*/
+    /*< private >*/
 
-  IpatchSLISample *sample;	/* referenced sample */
-  IpatchSF2GenArray genarray;	/* generator array */
-  int flags;                    /* misc flags */
+    IpatchSLISample *sample;	/* referenced sample */
+    IpatchSF2GenArray genarray;	/* generator array */
+    int flags;                    /* misc flags */
 };
 
 struct _IpatchSLIZoneClass
 {
-  IpatchItemClass parent_class;
+    IpatchItemClass parent_class;
 };
 
 /**
@@ -87,13 +87,13 @@ struct _IpatchSLIZoneClass
 #define IPATCH_SLI_ZONE_GEN_CLEAR_FLAG(zone, genid) \
   IPATCH_SLI_GEN_ARRAY_CLEAR_FLAG (&((IpatchSLIZone *)(zone))->genarray, genid)
 
-GType ipatch_sli_zone_get_type (void);
-IpatchSLIZone *ipatch_sli_zone_new (void);
+GType ipatch_sli_zone_get_type(void);
+IpatchSLIZone *ipatch_sli_zone_new(void);
 
-IpatchSLIZone *ipatch_sli_zone_first (IpatchIter *iter);
-IpatchSLIZone *ipatch_sli_zone_next (IpatchIter *iter);
+IpatchSLIZone *ipatch_sli_zone_first(IpatchIter *iter);
+IpatchSLIZone *ipatch_sli_zone_next(IpatchIter *iter);
 
-void ipatch_sli_zone_set_sample (IpatchSLIZone *zone, IpatchSLISample *sample);
-IpatchSLISample *ipatch_sli_zone_get_sample (IpatchSLIZone *zone);
-IpatchSLISample *ipatch_sli_zone_peek_sample (IpatchSLIZone *zone);
+void ipatch_sli_zone_set_sample(IpatchSLIZone *zone, IpatchSLISample *sample);
+IpatchSLISample *ipatch_sli_zone_get_sample(IpatchSLIZone *zone);
+IpatchSLISample *ipatch_sli_zone_peek_sample(IpatchSLIZone *zone);
 #endif

@@ -40,65 +40,65 @@
 /* structure used as hash key for xml_handlers */
 typedef struct
 {
-  GType type;
-  GParamSpec *pspec;
+    GType type;
+    GParamSpec *pspec;
 } HandlerHashKey;
 
 /* structure used as hash value for xml_handlers */
 typedef struct
 {
-  IpatchXmlEncodeFunc encode_func;
-  IpatchXmlDecodeFunc decode_func;
-  GDestroyNotify notify_func;
-  gpointer user_data;
+    IpatchXmlEncodeFunc encode_func;
+    IpatchXmlDecodeFunc decode_func;
+    GDestroyNotify notify_func;
+    gpointer user_data;
 } HandlerHashValue;
 
 
-static guint xml_handlers_hash_func (gconstpointer key);
-static gboolean xml_handlers_key_equal_func (gconstpointer a, gconstpointer b);
-static void xml_handlers_key_destroy_func (gpointer data);
-static void xml_handlers_value_destroy_func (gpointer data);
+static guint xml_handlers_hash_func(gconstpointer key);
+static gboolean xml_handlers_key_equal_func(gconstpointer a, gconstpointer b);
+static void xml_handlers_key_destroy_func(gpointer data);
+static void xml_handlers_value_destroy_func(gpointer data);
 
 /* Lock for xml_handlers */
-G_LOCK_DEFINE_STATIC (xml_handlers);
+G_LOCK_DEFINE_STATIC(xml_handlers);
 
 /* hash of XML handlers (HandlerHashKey -> HandlerHashValue) */
 static GHashTable *xml_handlers = NULL;
 
 
 void
-_ipatch_xml_object_init (void)
+_ipatch_xml_object_init(void)
 {
-  xml_handlers = g_hash_table_new_full (xml_handlers_hash_func,
-                                        xml_handlers_key_equal_func,
-                                        xml_handlers_key_destroy_func,
-                                        xml_handlers_value_destroy_func);
+    xml_handlers = g_hash_table_new_full(xml_handlers_hash_func,
+                                         xml_handlers_key_equal_func,
+                                         xml_handlers_key_destroy_func,
+                                         xml_handlers_value_destroy_func);
 }
 
 static guint
-xml_handlers_hash_func (gconstpointer key)
+xml_handlers_hash_func(gconstpointer key)
 {
-  HandlerHashKey *hkey = (HandlerHashKey *)key;
-  return (hkey->type + GPOINTER_TO_UINT (hkey->pspec));
+    HandlerHashKey *hkey = (HandlerHashKey *)key;
+    return (hkey->type + GPOINTER_TO_UINT(hkey->pspec));
 }
 
 static gboolean
-xml_handlers_key_equal_func (gconstpointer a, gconstpointer b)
+xml_handlers_key_equal_func(gconstpointer a, gconstpointer b)
 {
-  HandlerHashKey *akey = (HandlerHashKey *)a, *bkey = (HandlerHashKey *)b;
-  return (akey->type == bkey->type && akey->pspec == bkey->pspec);
+    HandlerHashKey *akey = (HandlerHashKey *)a, *bkey = (HandlerHashKey *)b;
+    return (akey->type == bkey->type && akey->pspec == bkey->pspec);
 }
 
 static void
-xml_handlers_key_destroy_func (gpointer data)
+xml_handlers_key_destroy_func(gpointer data)
 {
-  g_slice_free (HandlerHashKey, data);
+    g_slice_free(HandlerHashKey, data);
 }
 
 static void
-xml_handlers_value_destroy_func (gpointer data)
+xml_handlers_value_destroy_func(gpointer data)
 {
-  g_slice_free (HandlerHashValue, data);
+    g_slice_free(HandlerHashValue, data);
 }
 
 /**
@@ -113,11 +113,11 @@ xml_handlers_value_destroy_func (gpointer data)
  * GValue type.
  */
 void
-ipatch_xml_register_handler (GType type, const char *prop_name,
-                             IpatchXmlEncodeFunc encode_func,
-                             IpatchXmlDecodeFunc decode_func)
+ipatch_xml_register_handler(GType type, const char *prop_name,
+                            IpatchXmlEncodeFunc encode_func,
+                            IpatchXmlDecodeFunc decode_func)
 {
-  ipatch_xml_register_handler_full (type, prop_name, encode_func, decode_func, NULL, NULL);
+    ipatch_xml_register_handler_full(type, prop_name, encode_func, decode_func, NULL, NULL);
 }
 
 /**
@@ -136,42 +136,42 @@ ipatch_xml_register_handler (GType type, const char *prop_name,
  * Since: 1.1.0
  */
 void
-ipatch_xml_register_handler_full (GType type, const char *prop_name,
-                                  IpatchXmlEncodeFunc encode_func,
-                                  IpatchXmlDecodeFunc decode_func,
-                                  GDestroyNotify notify_func, gpointer user_data)
+ipatch_xml_register_handler_full(GType type, const char *prop_name,
+                                 IpatchXmlEncodeFunc encode_func,
+                                 IpatchXmlDecodeFunc decode_func,
+                                 GDestroyNotify notify_func, gpointer user_data)
 {
-  HandlerHashKey *key;
-  HandlerHashValue *val;
-  GParamSpec *pspec = NULL;
-  GObjectClass *obj_class;
+    HandlerHashKey *key;
+    HandlerHashValue *val;
+    GParamSpec *pspec = NULL;
+    GObjectClass *obj_class;
 
-  g_return_if_fail (type != 0);
-  g_return_if_fail (encode_func != NULL);
-  g_return_if_fail (decode_func != NULL);
+    g_return_if_fail(type != 0);
+    g_return_if_fail(encode_func != NULL);
+    g_return_if_fail(decode_func != NULL);
 
-  if (prop_name)
-  {
-    obj_class = g_type_class_peek (type);
-    g_return_if_fail (obj_class != NULL);
+    if(prop_name)
+    {
+        obj_class = g_type_class_peek(type);
+        g_return_if_fail(obj_class != NULL);
 
-    pspec = g_object_class_find_property (obj_class, prop_name);
-    g_return_if_fail (pspec != NULL);
-  }
+        pspec = g_object_class_find_property(obj_class, prop_name);
+        g_return_if_fail(pspec != NULL);
+    }
 
-  key = g_slice_new (HandlerHashKey);
-  key->type = type;
-  key->pspec = pspec;
+    key = g_slice_new(HandlerHashKey);
+    key->type = type;
+    key->pspec = pspec;
 
-  val = g_slice_new (HandlerHashValue);
-  val->encode_func = encode_func;
-  val->decode_func = decode_func;
-  val->notify_func = notify_func;
-  val->user_data = user_data;
+    val = g_slice_new(HandlerHashValue);
+    val->encode_func = encode_func;
+    val->decode_func = decode_func;
+    val->notify_func = notify_func;
+    val->user_data = user_data;
 
-  G_LOCK (xml_handlers);
-  g_hash_table_insert (xml_handlers, key, val);
-  G_UNLOCK (xml_handlers);
+    G_LOCK(xml_handlers);
+    g_hash_table_insert(xml_handlers, key, val);
+    G_UNLOCK(xml_handlers);
 }
 
 /**
@@ -188,26 +188,33 @@ ipatch_xml_register_handler_full (GType type, const char *prop_name,
  * Returns: %TRUE if handler found, %FALSE otherwise
  */
 gboolean
-ipatch_xml_lookup_handler (GType type, GParamSpec *pspec,
-                           IpatchXmlEncodeFunc *encode_func,
-                           IpatchXmlDecodeFunc *decode_func)
+ipatch_xml_lookup_handler(GType type, GParamSpec *pspec,
+                          IpatchXmlEncodeFunc *encode_func,
+                          IpatchXmlDecodeFunc *decode_func)
 {
-  HandlerHashValue *val;
-  HandlerHashKey key;
+    HandlerHashValue *val;
+    HandlerHashKey key;
 
-  g_return_val_if_fail (type != 0, FALSE);
+    g_return_val_if_fail(type != 0, FALSE);
 
-  key.type = type;
-  key.pspec = pspec;
+    key.type = type;
+    key.pspec = pspec;
 
-  G_LOCK (xml_handlers);
-  val = g_hash_table_lookup (xml_handlers, &key);
-  G_UNLOCK (xml_handlers);
+    G_LOCK(xml_handlers);
+    val = g_hash_table_lookup(xml_handlers, &key);
+    G_UNLOCK(xml_handlers);
 
-  if (encode_func) *encode_func = val ? val->encode_func : NULL;
-  if (decode_func) *decode_func = val ? val->decode_func : NULL;
+    if(encode_func)
+    {
+        *encode_func = val ? val->encode_func : NULL;
+    }
 
-  return (val != NULL);
+    if(decode_func)
+    {
+        *decode_func = val ? val->decode_func : NULL;
+    }
+
+    return (val != NULL);
 }
 
 /**
@@ -223,25 +230,25 @@ ipatch_xml_lookup_handler (GType type, GParamSpec *pspec,
  * Returns: %TRUE if handler found, %FALSE otherwise
  */
 gboolean
-ipatch_xml_lookup_handler_by_prop_name (GType type, const char *prop_name,
-                                        IpatchXmlEncodeFunc *encode_func,
-                                        IpatchXmlDecodeFunc *decode_func)
+ipatch_xml_lookup_handler_by_prop_name(GType type, const char *prop_name,
+                                       IpatchXmlEncodeFunc *encode_func,
+                                       IpatchXmlDecodeFunc *decode_func)
 {
-  GParamSpec *pspec = NULL;
-  GObjectClass *obj_class;
+    GParamSpec *pspec = NULL;
+    GObjectClass *obj_class;
 
-  g_return_val_if_fail (type != 0, FALSE);
+    g_return_val_if_fail(type != 0, FALSE);
 
-  if (prop_name)
-  {
-    obj_class = g_type_class_peek (type);
-    g_return_val_if_fail (obj_class != NULL, FALSE);
+    if(prop_name)
+    {
+        obj_class = g_type_class_peek(type);
+        g_return_val_if_fail(obj_class != NULL, FALSE);
 
-    pspec = g_object_class_find_property (obj_class, prop_name);
-    g_return_val_if_fail (pspec != NULL, FALSE);
-  }
+        pspec = g_object_class_find_property(obj_class, prop_name);
+        g_return_val_if_fail(pspec != NULL, FALSE);
+    }
 
-  return (ipatch_xml_lookup_handler (type, pspec, encode_func, decode_func));
+    return (ipatch_xml_lookup_handler(type, pspec, encode_func, decode_func));
 }
 
 /**
@@ -257,33 +264,40 @@ ipatch_xml_lookup_handler_by_prop_name (GType type, const char *prop_name,
  * Returns: %TRUE on success, %FALSE otherwise (in which case @err may be set).
  */
 gboolean
-ipatch_xml_encode_object (GNode *node, GObject *object,
-			  gboolean create_element, GError **err)
+ipatch_xml_encode_object(GNode *node, GObject *object,
+                         gboolean create_element, GError **err)
 {
-  IpatchXmlEncodeFunc encode_func;
-  GType type;
+    IpatchXmlEncodeFunc encode_func;
+    GType type;
 
-  g_return_val_if_fail (node != NULL, FALSE);
-  g_return_val_if_fail (G_IS_OBJECT (object), FALSE);
-  g_return_val_if_fail (!err || !*err, FALSE);
+    g_return_val_if_fail(node != NULL, FALSE);
+    g_return_val_if_fail(G_IS_OBJECT(object), FALSE);
+    g_return_val_if_fail(!err || !*err, FALSE);
 
-  type = G_OBJECT_TYPE (object);
+    type = G_OBJECT_TYPE(object);
 
-  /* search through type ancestry for Object handler */
-  do
-  {
-    if (ipatch_xml_lookup_handler (type, NULL, &encode_func, NULL)) break;
-  } while ((type = g_type_parent (type)));
+    /* search through type ancestry for Object handler */
+    do
+    {
+        if(ipatch_xml_lookup_handler(type, NULL, &encode_func, NULL))
+        {
+            break;
+        }
+    }
+    while((type = g_type_parent(type)));
 
-  /* not found? Use default Object encoder */
-  if (!type) encode_func = ipatch_xml_default_encode_object_func;
+    /* not found? Use default Object encoder */
+    if(!type)
+    {
+        encode_func = ipatch_xml_default_encode_object_func;
+    }
 
-  if (create_element)
-    node = ipatch_xml_new_node (node, "obj", NULL,
-                                "type", g_type_name (type),
-                                NULL);
+    if(create_element)
+        node = ipatch_xml_new_node(node, "obj", NULL,
+                                   "type", g_type_name(type),
+                                   NULL);
 
-  return (encode_func (node, object, NULL, NULL, err));
+    return (encode_func(node, object, NULL, NULL, err));
 }
 
 /**
@@ -300,35 +314,44 @@ ipatch_xml_encode_object (GNode *node, GObject *object,
  * Returns: %TRUE on success, %FALSE otherwise
  */
 gboolean
-ipatch_xml_encode_property (GNode *node, GObject *object, GParamSpec *pspec,
-                            gboolean create_element, GError **err)
+ipatch_xml_encode_property(GNode *node, GObject *object, GParamSpec *pspec,
+                           gboolean create_element, GError **err)
 {
-  IpatchXmlEncodeFunc encode_func;
-  GValue value = { 0 };
-  gboolean retval;
+    IpatchXmlEncodeFunc encode_func;
+    GValue value = { 0 };
+    gboolean retval;
 
-  g_return_val_if_fail (node != NULL, FALSE);
-  g_return_val_if_fail (G_IS_OBJECT (object), FALSE);
-  g_return_val_if_fail (G_IS_PARAM_SPEC (pspec), FALSE);
-  g_return_val_if_fail (!err || !*err, FALSE);
+    g_return_val_if_fail(node != NULL, FALSE);
+    g_return_val_if_fail(G_IS_OBJECT(object), FALSE);
+    g_return_val_if_fail(G_IS_PARAM_SPEC(pspec), FALSE);
+    g_return_val_if_fail(!err || !*err, FALSE);
 
-  /* ++ alloc value */
-  g_value_init (&value, G_PARAM_SPEC_VALUE_TYPE (pspec));
-  g_object_get_property (object, g_param_spec_get_name (pspec), &value);
+    /* ++ alloc value */
+    g_value_init(&value, G_PARAM_SPEC_VALUE_TYPE(pspec));
+    g_object_get_property(object, g_param_spec_get_name(pspec), &value);
 
-  if (create_element)
-    node = ipatch_xml_new_node (node, "prop", NULL, "name", pspec->name, NULL);
+    if(create_element)
+    {
+        node = ipatch_xml_new_node(node, "prop", NULL, "name", pspec->name, NULL);
+    }
 
-  if (!ipatch_xml_lookup_handler (pspec->owner_type, pspec, &encode_func, NULL))
-    retval = ipatch_xml_encode_value (node, &value, err);
-  else retval = encode_func (node, object, pspec, &value, err);
+    if(!ipatch_xml_lookup_handler(pspec->owner_type, pspec, &encode_func, NULL))
+    {
+        retval = ipatch_xml_encode_value(node, &value, err);
+    }
+    else
+    {
+        retval = encode_func(node, object, pspec, &value, err);
+    }
 
-  g_value_unset (&value);	/* -- free value */
+    g_value_unset(&value);	/* -- free value */
 
-  if (!retval && create_element)
-    ipatch_xml_destroy (node);	/* Cleanup after error (if create_element) */
+    if(!retval && create_element)
+    {
+        ipatch_xml_destroy(node);    /* Cleanup after error (if create_element) */
+    }
 
-  return (retval);
+    return (retval);
 }
 
 /**
@@ -345,21 +368,21 @@ ipatch_xml_encode_property (GNode *node, GObject *object, GParamSpec *pspec,
  * Returns: %TRUE on success, %FALSE otherwise
  */
 gboolean
-ipatch_xml_encode_property_by_name (GNode *node, GObject *object,
-                                    const char *propname,
-                                    gboolean create_element, GError **err)
+ipatch_xml_encode_property_by_name(GNode *node, GObject *object,
+                                   const char *propname,
+                                   gboolean create_element, GError **err)
 {
-  GParamSpec *pspec;
+    GParamSpec *pspec;
 
-  g_return_val_if_fail (node != NULL, FALSE);
-  g_return_val_if_fail (G_IS_OBJECT (object), FALSE);
-  g_return_val_if_fail (propname != NULL, FALSE);
-  g_return_val_if_fail (!err || !*err, FALSE);
+    g_return_val_if_fail(node != NULL, FALSE);
+    g_return_val_if_fail(G_IS_OBJECT(object), FALSE);
+    g_return_val_if_fail(propname != NULL, FALSE);
+    g_return_val_if_fail(!err || !*err, FALSE);
 
-  pspec = g_object_class_find_property (G_OBJECT_GET_CLASS (object), propname);
-  g_return_val_if_fail (pspec != NULL, FALSE);
+    pspec = g_object_class_find_property(G_OBJECT_GET_CLASS(object), propname);
+    g_return_val_if_fail(pspec != NULL, FALSE);
 
-  return (ipatch_xml_encode_property (node, object, pspec, create_element, err));
+    return (ipatch_xml_encode_property(node, object, pspec, create_element, err));
 }
 
 /**
@@ -373,18 +396,20 @@ ipatch_xml_encode_property_by_name (GNode *node, GObject *object,
  * Returns: TRUE on success, FALSE on error (@err may be set)
  */
 gboolean
-ipatch_xml_encode_value (GNode *node, GValue *value, GError **err)
+ipatch_xml_encode_value(GNode *node, GValue *value, GError **err)
 {
-  IpatchXmlEncodeFunc encode_func;
+    IpatchXmlEncodeFunc encode_func;
 
-  g_return_val_if_fail (node != NULL, FALSE);
-  g_return_val_if_fail (G_IS_VALUE (value), FALSE);
-  g_return_val_if_fail (!err || !*err, FALSE);
+    g_return_val_if_fail(node != NULL, FALSE);
+    g_return_val_if_fail(G_IS_VALUE(value), FALSE);
+    g_return_val_if_fail(!err || !*err, FALSE);
 
-  if (!ipatch_xml_lookup_handler (G_VALUE_TYPE (value), NULL, &encode_func, NULL))
-    encode_func = ipatch_xml_default_encode_value_func;
+    if(!ipatch_xml_lookup_handler(G_VALUE_TYPE(value), NULL, &encode_func, NULL))
+    {
+        encode_func = ipatch_xml_default_encode_value_func;
+    }
 
-  return (encode_func (node, NULL, NULL, value, err));
+    return (encode_func(node, NULL, NULL, value, err));
 }
 
 /**
@@ -399,27 +424,34 @@ ipatch_xml_encode_value (GNode *node, GValue *value, GError **err)
  * Returns: %TRUE on success, %FALSE otherwise (in which case @err may be set).
  */
 gboolean
-ipatch_xml_decode_object (GNode *node, GObject *object, GError **err)
+ipatch_xml_decode_object(GNode *node, GObject *object, GError **err)
 {
-  IpatchXmlDecodeFunc decode_func;
-  GType type;
+    IpatchXmlDecodeFunc decode_func;
+    GType type;
 
-  g_return_val_if_fail (node != NULL, FALSE);
-  g_return_val_if_fail (G_IS_OBJECT (object), FALSE);
-  g_return_val_if_fail (!err || !*err, FALSE);
+    g_return_val_if_fail(node != NULL, FALSE);
+    g_return_val_if_fail(G_IS_OBJECT(object), FALSE);
+    g_return_val_if_fail(!err || !*err, FALSE);
 
-  type = G_OBJECT_TYPE (object);
+    type = G_OBJECT_TYPE(object);
 
-  /* search through type ancestry for Object handler */
-  do
-  {
-    if (ipatch_xml_lookup_handler (type, NULL, NULL, &decode_func)) break;
-  } while ((type = g_type_parent (type)));
+    /* search through type ancestry for Object handler */
+    do
+    {
+        if(ipatch_xml_lookup_handler(type, NULL, NULL, &decode_func))
+        {
+            break;
+        }
+    }
+    while((type = g_type_parent(type)));
 
-  /* not found? Use default Object decoder */
-  if (!type) decode_func = ipatch_xml_default_decode_object_func;
+    /* not found? Use default Object decoder */
+    if(!type)
+    {
+        decode_func = ipatch_xml_default_decode_object_func;
+    }
 
-  return (decode_func (node, object, NULL, NULL, err));
+    return (decode_func(node, object, NULL, NULL, err));
 }
 
 /**
@@ -435,30 +467,38 @@ ipatch_xml_decode_object (GNode *node, GObject *object, GError **err)
  * Returns: %TRUE on success, %FALSE otherwise
  */
 gboolean
-ipatch_xml_decode_property (GNode *node, GObject *object, GParamSpec *pspec,
-                            GError **err)
+ipatch_xml_decode_property(GNode *node, GObject *object, GParamSpec *pspec,
+                           GError **err)
 {
-  IpatchXmlDecodeFunc decode_func;
-  GValue value = { 0 };
-  gboolean retval;
+    IpatchXmlDecodeFunc decode_func;
+    GValue value = { 0 };
+    gboolean retval;
 
-  g_return_val_if_fail (node != NULL, FALSE);
-  g_return_val_if_fail (G_IS_OBJECT (object), FALSE);
-  g_return_val_if_fail (G_IS_PARAM_SPEC (pspec), FALSE);
-  g_return_val_if_fail (!err || !*err, FALSE);
+    g_return_val_if_fail(node != NULL, FALSE);
+    g_return_val_if_fail(G_IS_OBJECT(object), FALSE);
+    g_return_val_if_fail(G_IS_PARAM_SPEC(pspec), FALSE);
+    g_return_val_if_fail(!err || !*err, FALSE);
 
-  /* ++ alloc value */
-  g_value_init (&value, G_PARAM_SPEC_VALUE_TYPE (pspec));
+    /* ++ alloc value */
+    g_value_init(&value, G_PARAM_SPEC_VALUE_TYPE(pspec));
 
-  if (!ipatch_xml_lookup_handler (pspec->owner_type, pspec, NULL, &decode_func))
-    retval = ipatch_xml_decode_value (node, &value, err);
-  else retval = decode_func (node, object, pspec, &value, err);
+    if(!ipatch_xml_lookup_handler(pspec->owner_type, pspec, NULL, &decode_func))
+    {
+        retval = ipatch_xml_decode_value(node, &value, err);
+    }
+    else
+    {
+        retval = decode_func(node, object, pspec, &value, err);
+    }
 
-  if (retval) g_object_set_property (object, pspec->name, &value);
+    if(retval)
+    {
+        g_object_set_property(object, pspec->name, &value);
+    }
 
-  g_value_unset (&value);	/* -- free value */
+    g_value_unset(&value);	/* -- free value */
 
-  return (retval);
+    return (retval);
 }
 
 /**
@@ -474,20 +514,20 @@ ipatch_xml_decode_property (GNode *node, GObject *object, GParamSpec *pspec,
  * Returns: %TRUE on success, %FALSE otherwise
  */
 gboolean
-ipatch_xml_decode_property_by_name (GNode *node, GObject *object,
-                                    const char *propname, GError **err)
+ipatch_xml_decode_property_by_name(GNode *node, GObject *object,
+                                   const char *propname, GError **err)
 {
-  GParamSpec *pspec;
+    GParamSpec *pspec;
 
-  g_return_val_if_fail (node != NULL, FALSE);
-  g_return_val_if_fail (G_IS_OBJECT (object), FALSE);
-  g_return_val_if_fail (propname != NULL, FALSE);
-  g_return_val_if_fail (!err || !*err, FALSE);
+    g_return_val_if_fail(node != NULL, FALSE);
+    g_return_val_if_fail(G_IS_OBJECT(object), FALSE);
+    g_return_val_if_fail(propname != NULL, FALSE);
+    g_return_val_if_fail(!err || !*err, FALSE);
 
-  pspec = g_object_class_find_property (G_OBJECT_GET_CLASS (object), propname);
-  g_return_val_if_fail (pspec != NULL, FALSE);
+    pspec = g_object_class_find_property(G_OBJECT_GET_CLASS(object), propname);
+    g_return_val_if_fail(pspec != NULL, FALSE);
 
-  return (ipatch_xml_decode_property (node, object, pspec, err));
+    return (ipatch_xml_decode_property(node, object, pspec, err));
 }
 
 /**
@@ -501,18 +541,20 @@ ipatch_xml_decode_property_by_name (GNode *node, GObject *object,
  * Returns: TRUE on success, FALSE on error (@err may be set)
  */
 gboolean
-ipatch_xml_decode_value (GNode *node, GValue *value, GError **err)
+ipatch_xml_decode_value(GNode *node, GValue *value, GError **err)
 {
-  IpatchXmlDecodeFunc decode_func;
+    IpatchXmlDecodeFunc decode_func;
 
-  g_return_val_if_fail (node != NULL, FALSE);
-  g_return_val_if_fail (G_IS_VALUE (value), FALSE);
-  g_return_val_if_fail (!err || !*err, FALSE);
+    g_return_val_if_fail(node != NULL, FALSE);
+    g_return_val_if_fail(G_IS_VALUE(value), FALSE);
+    g_return_val_if_fail(!err || !*err, FALSE);
 
-  if (!ipatch_xml_lookup_handler (G_VALUE_TYPE (value), NULL, NULL, &decode_func))
-    decode_func = ipatch_xml_default_decode_value_func;
+    if(!ipatch_xml_lookup_handler(G_VALUE_TYPE(value), NULL, NULL, &decode_func))
+    {
+        decode_func = ipatch_xml_default_decode_value_func;
+    }
 
-  return (decode_func (node, NULL, NULL, value, err));
+    return (decode_func(node, NULL, NULL, value, err));
 }
 
 /**
@@ -529,35 +571,39 @@ ipatch_xml_decode_value (GNode *node, GValue *value, GError **err)
  * Returns: TRUE on success, FALSE on error (@err may be set)
  */
 gboolean
-ipatch_xml_default_encode_object_func (GNode *node, GObject *object,
-                                       GParamSpec *pspec, GValue *value,
-                                       GError **err)
+ipatch_xml_default_encode_object_func(GNode *node, GObject *object,
+                                      GParamSpec *pspec, GValue *value,
+                                      GError **err)
 {
-  GParamSpec **pspecs;
-  GError *local_err = NULL;
-  guint n_props;
-  guint i;
+    GParamSpec **pspecs;
+    GError *local_err = NULL;
+    guint n_props;
+    guint i;
 
-  pspecs = g_object_class_list_properties (G_OBJECT_GET_CLASS (object),	 /* ++ alloc */
-					   &n_props);
-  for (i = 0; i < n_props; i++)
-  { /* Skip parameters marked as no save or not read/write */
-    if ((pspecs[i]->flags & IPATCH_PARAM_NO_SAVE)
-        || (pspecs[i]->flags & G_PARAM_READWRITE) != G_PARAM_READWRITE)
-      continue;
+    pspecs = g_object_class_list_properties(G_OBJECT_GET_CLASS(object),	   /* ++ alloc */
+                                            &n_props);
 
-    if (!ipatch_xml_encode_property (node, object, pspecs[i], TRUE, &local_err))  /* ++ alloc */
+    for(i = 0; i < n_props; i++)
     {
-      g_warning ("Failed to store property '%s' for object of type '%s': %s",
-		 pspecs[i]->name, g_type_name (G_OBJECT_TYPE (object)),
-		 ipatch_gerror_message (local_err));
-      g_clear_error (&local_err);
+        /* Skip parameters marked as no save or not read/write */
+        if((pspecs[i]->flags & IPATCH_PARAM_NO_SAVE)
+                || (pspecs[i]->flags & G_PARAM_READWRITE) != G_PARAM_READWRITE)
+        {
+            continue;
+        }
+
+        if(!ipatch_xml_encode_property(node, object, pspecs[i], TRUE, &local_err))    /* ++ alloc */
+        {
+            g_warning("Failed to store property '%s' for object of type '%s': %s",
+                      pspecs[i]->name, g_type_name(G_OBJECT_TYPE(object)),
+                      ipatch_gerror_message(local_err));
+            g_clear_error(&local_err);
+        }
     }
-  }
 
-  g_free (pspecs);	/* -- free */
+    g_free(pspecs);	/* -- free */
 
-  return (TRUE);
+    return (TRUE);
 }
 
 /**
@@ -574,11 +620,11 @@ ipatch_xml_default_encode_object_func (GNode *node, GObject *object,
  * Returns: TRUE on success, FALSE on error (@err may be set)
  */
 gboolean
-ipatch_xml_default_encode_property_func (GNode *node, GObject *object,
-                                         GParamSpec *pspec, GValue *value,
-                                         GError **err)
+ipatch_xml_default_encode_property_func(GNode *node, GObject *object,
+                                        GParamSpec *pspec, GValue *value,
+                                        GError **err)
 {
-  return (ipatch_xml_encode_value (node, value, err));
+    return (ipatch_xml_encode_value(node, value, err));
 }
 
 /**
@@ -595,87 +641,107 @@ ipatch_xml_default_encode_property_func (GNode *node, GObject *object,
  * Returns: TRUE on success, FALSE on error (@err may be set)
  */
 gboolean
-ipatch_xml_default_encode_value_func (GNode *node, GObject *object,
-                                      GParamSpec *pspec, GValue *value,
-                                      GError **err)
+ipatch_xml_default_encode_value_func(GNode *node, GObject *object,
+                                     GParamSpec *pspec, GValue *value,
+                                     GError **err)
 {
-  GType valtype;
-  const char *s;
+    GType valtype;
+    const char *s;
 
-  g_return_val_if_fail (node != NULL, FALSE);
-  g_return_val_if_fail (G_IS_VALUE (value), FALSE);
-  g_return_val_if_fail (!err || !*err, FALSE);
+    g_return_val_if_fail(node != NULL, FALSE);
+    g_return_val_if_fail(G_IS_VALUE(value), FALSE);
+    g_return_val_if_fail(!err || !*err, FALSE);
 
-  valtype = G_VALUE_TYPE (value);
+    valtype = G_VALUE_TYPE(value);
 
-  switch (G_TYPE_FUNDAMENTAL (valtype))
-  {
+    switch(G_TYPE_FUNDAMENTAL(valtype))
+    {
     case G_TYPE_CHAR:
-      ipatch_xml_set_value_printf (node, "%d", g_value_get_char (value));
-      return (TRUE);
+        ipatch_xml_set_value_printf(node, "%d", g_value_get_char(value));
+        return (TRUE);
+
     case G_TYPE_UCHAR:
-      ipatch_xml_set_value_printf (node, "%u", g_value_get_uchar (value));
-      return (TRUE);
+        ipatch_xml_set_value_printf(node, "%u", g_value_get_uchar(value));
+        return (TRUE);
+
     case G_TYPE_BOOLEAN:
-      ipatch_xml_set_value_printf (node, "%u", g_value_get_boolean (value) != 0);
-      return (TRUE);
+        ipatch_xml_set_value_printf(node, "%u", g_value_get_boolean(value) != 0);
+        return (TRUE);
+
     case G_TYPE_INT:
-      ipatch_xml_set_value_printf (node, "%d", g_value_get_int (value));
-      return (TRUE);
+        ipatch_xml_set_value_printf(node, "%d", g_value_get_int(value));
+        return (TRUE);
+
     case G_TYPE_UINT:
-      ipatch_xml_set_value_printf (node, "%u", g_value_get_uint (value));
-      return (TRUE);
+        ipatch_xml_set_value_printf(node, "%u", g_value_get_uint(value));
+        return (TRUE);
+
     case G_TYPE_LONG:
-      ipatch_xml_set_value_printf (node, "%ld", g_value_get_long (value));
-      return (TRUE);
+        ipatch_xml_set_value_printf(node, "%ld", g_value_get_long(value));
+        return (TRUE);
+
     case G_TYPE_ULONG:
-      ipatch_xml_set_value_printf (node, "%lu", g_value_get_ulong (value));
-      return (TRUE);
+        ipatch_xml_set_value_printf(node, "%lu", g_value_get_ulong(value));
+        return (TRUE);
+
     case G_TYPE_INT64:
-      ipatch_xml_set_value_printf (node, "%" G_GINT64_FORMAT,
-                                   g_value_get_int64 (value));
-      return (TRUE);
+        ipatch_xml_set_value_printf(node, "%" G_GINT64_FORMAT,
+                                    g_value_get_int64(value));
+        return (TRUE);
+
     case G_TYPE_UINT64:
-      ipatch_xml_set_value_printf (node, "%" G_GUINT64_FORMAT,
-                                   g_value_get_uint64 (value));
-      return (TRUE);
+        ipatch_xml_set_value_printf(node, "%" G_GUINT64_FORMAT,
+                                    g_value_get_uint64(value));
+        return (TRUE);
+
     case G_TYPE_ENUM:
-      ipatch_xml_set_value_printf (node, "%d", g_value_get_enum (value));
-      return (TRUE);
+        ipatch_xml_set_value_printf(node, "%d", g_value_get_enum(value));
+        return (TRUE);
+
     case G_TYPE_FLAGS:
-      ipatch_xml_set_value_printf (node, "%u", g_value_get_flags (value));
-      return (TRUE);
+        ipatch_xml_set_value_printf(node, "%u", g_value_get_flags(value));
+        return (TRUE);
+
     case G_TYPE_FLOAT:
-      ipatch_xml_set_value_printf (node, "%.*f", XML_FLOAT_PRECISION,
-                                   (double)g_value_get_float (value));
-      return (TRUE);
+        ipatch_xml_set_value_printf(node, "%.*f", XML_FLOAT_PRECISION,
+                                    (double)g_value_get_float(value));
+        return (TRUE);
+
     case G_TYPE_DOUBLE:
-      ipatch_xml_set_value_printf (node, "%.*f", XML_FLOAT_PRECISION,
-                                   g_value_get_double (value));
-      return (TRUE);
+        ipatch_xml_set_value_printf(node, "%.*f", XML_FLOAT_PRECISION,
+                                    g_value_get_double(value));
+        return (TRUE);
+
     case G_TYPE_STRING:
-      s = g_value_get_string (value);
+        s = g_value_get_string(value);
 
-      if (s) ipatch_xml_take_value (node, g_markup_escape_text (s, -1));
-      else ipatch_xml_set_value (node, NULL);
+        if(s)
+        {
+            ipatch_xml_take_value(node, g_markup_escape_text(s, -1));
+        }
+        else
+        {
+            ipatch_xml_set_value(node, NULL);
+        }
 
-      return (TRUE);
+        return (TRUE);
+
     default:
-      if (valtype == G_TYPE_GTYPE)
-      {
-        ipatch_xml_set_value (node, g_type_name (g_value_get_gtype (value)));
-	return (TRUE);
-      }
-      else
-      {
-	g_set_error (err, IPATCH_ERROR, IPATCH_ERROR_UNHANDLED_CONVERSION,
-		     "Unhandled GValue to XML conversion for type '%s'",
-		     g_type_name (valtype));
-        return (FALSE);
-      }
-  }
+        if(valtype == G_TYPE_GTYPE)
+        {
+            ipatch_xml_set_value(node, g_type_name(g_value_get_gtype(value)));
+            return (TRUE);
+        }
+        else
+        {
+            g_set_error(err, IPATCH_ERROR, IPATCH_ERROR_UNHANDLED_CONVERSION,
+                        "Unhandled GValue to XML conversion for type '%s'",
+                        g_type_name(valtype));
+            return (FALSE);
+        }
+    }
 
-  return (TRUE);
+    return (TRUE);
 }
 
 /**
@@ -692,51 +758,60 @@ ipatch_xml_default_encode_value_func (GNode *node, GObject *object,
  * Returns: TRUE on success, FALSE on error (@err may be set)
  */
 gboolean
-ipatch_xml_default_decode_object_func (GNode *node, GObject *object,
-                                       GParamSpec *pspec, GValue *value,
-                                       GError **err)
+ipatch_xml_default_decode_object_func(GNode *node, GObject *object,
+                                      GParamSpec *pspec, GValue *value,
+                                      GError **err)
 {
-  IpatchXmlNode *xmlnode;
-  GObjectClass *klass;
-  GParamSpec *prop;
-  const char *propname;
-  GError *local_err = NULL;
-  GNode *n;
+    IpatchXmlNode *xmlnode;
+    GObjectClass *klass;
+    GParamSpec *prop;
+    const char *propname;
+    GError *local_err = NULL;
+    GNode *n;
 
-  klass = G_OBJECT_GET_CLASS (object);
+    klass = G_OBJECT_GET_CLASS(object);
 
-  /* Look for property child nodes */
-  for (n = node->children; n; n = n->next)
-  {
-    xmlnode = (IpatchXmlNode *)(n->data);
-    if (strcmp (xmlnode->name, "prop") != 0) continue;
-
-    propname = ipatch_xml_get_attribute (n, "name");
-    if (!propname) continue;
-
-    prop = g_object_class_find_property (klass, propname);
-
-    if (prop)
+    /* Look for property child nodes */
+    for(n = node->children; n; n = n->next)
     {
-      if (prop->flags & IPATCH_PARAM_NO_SAVE)
-      {
-	g_warning (_("Ignoring non storeable XML object property '%s' for object type '%s'"),
-	           prop->name, g_type_name (G_OBJECT_TYPE (object)));
-	continue;
-      }
+        xmlnode = (IpatchXmlNode *)(n->data);
 
-      if (!ipatch_xml_decode_property (n, object, prop, &local_err))
-      {
-	g_warning (_("Failed to decode object property: %s"),
-	           ipatch_gerror_message (local_err));
-	g_clear_error (&local_err);
-      }
+        if(strcmp(xmlnode->name, "prop") != 0)
+        {
+            continue;
+        }
+
+        propname = ipatch_xml_get_attribute(n, "name");
+
+        if(!propname)
+        {
+            continue;
+        }
+
+        prop = g_object_class_find_property(klass, propname);
+
+        if(prop)
+        {
+            if(prop->flags & IPATCH_PARAM_NO_SAVE)
+            {
+                g_warning(_("Ignoring non storeable XML object property '%s' for object type '%s'"),
+                          prop->name, g_type_name(G_OBJECT_TYPE(object)));
+                continue;
+            }
+
+            if(!ipatch_xml_decode_property(n, object, prop, &local_err))
+            {
+                g_warning(_("Failed to decode object property: %s"),
+                          ipatch_gerror_message(local_err));
+                g_clear_error(&local_err);
+            }
+        }
+        else
+            g_warning(_("XML object property '%s' not valid for object type '%s'"),
+                      propname, g_type_name(G_OBJECT_TYPE(object)));
     }
-    else g_warning (_("XML object property '%s' not valid for object type '%s'"),
-                    propname, g_type_name (G_OBJECT_TYPE (object)));
-  }
 
-  return (TRUE);
+    return (TRUE);
 }
 
 /**
@@ -753,11 +828,11 @@ ipatch_xml_default_decode_object_func (GNode *node, GObject *object,
  * Returns: TRUE on success, FALSE on error (@err may be set)
  */
 gboolean
-ipatch_xml_default_decode_property_func (GNode *node, GObject *object,
-                                         GParamSpec *pspec, GValue *value,
-                                         GError **err)
+ipatch_xml_default_decode_property_func(GNode *node, GObject *object,
+                                        GParamSpec *pspec, GValue *value,
+                                        GError **err)
 {
-  return (ipatch_xml_decode_value (node, value, err));
+    return (ipatch_xml_decode_value(node, value, err));
 }
 
 /**
@@ -774,115 +849,199 @@ ipatch_xml_default_decode_property_func (GNode *node, GObject *object,
  * Returns: TRUE on success, FALSE on error (@err may be set)
  */
 gboolean
-ipatch_xml_default_decode_value_func (GNode *node, GObject *object,
-                                      GParamSpec *pspec, GValue *value,
-                                      GError **err)
+ipatch_xml_default_decode_value_func(GNode *node, GObject *object,
+                                     GParamSpec *pspec, GValue *value,
+                                     GError **err)
 {
-  GType valtype;
-  guint64 u64;
-  gint64 i64;
-  gulong lu;
-  glong li;
-  guint u;
-  int i;
-  float f;
-  double d;
-  const char *xml;
-  char *endptr;
+    GType valtype;
+    guint64 u64;
+    gint64 i64;
+    gulong lu;
+    glong li;
+    guint u;
+    int i;
+    float f;
+    double d;
+    const char *xml;
+    char *endptr;
 
-  valtype = G_VALUE_TYPE (value);
+    valtype = G_VALUE_TYPE(value);
 
-  xml = ipatch_xml_get_value (node);
-  if (!xml) xml = "";
+    xml = ipatch_xml_get_value(node);
 
-  switch (G_TYPE_FUNDAMENTAL (valtype))
-  {
+    if(!xml)
+    {
+        xml = "";
+    }
+
+    switch(G_TYPE_FUNDAMENTAL(valtype))
+    {
     case G_TYPE_CHAR:
-      if (sscanf (xml, "%d", &i) != 1) goto malformed_err;
-      if (i < G_MININT8 || i > G_MAXINT8) goto range_err;
-      g_value_set_char (value, i);
-      break;
-    case G_TYPE_UCHAR:
-      if (sscanf (xml, "%u", &u) != 1) goto malformed_err;
-      if (u > G_MAXUINT8) goto range_err;
-      g_value_set_uchar (value, u);
-      break;
-    case G_TYPE_BOOLEAN:
-      if (sscanf (xml, "%u", &u) != 1) goto malformed_err;
-      if (u > 1) goto range_err;
-      g_value_set_boolean (value, u);
-      break;
-    case G_TYPE_INT:
-      if (sscanf (xml, "%d", &i) != 1) goto malformed_err;
-      g_value_set_int (value, i);
-      break;
-    case G_TYPE_UINT:
-      if (sscanf (xml, "%u", &u) != 1) goto malformed_err;
-      g_value_set_uint (value, u);
-      break;
-    case G_TYPE_LONG:
-      if (sscanf (xml, "%ld", &li) != 1) goto malformed_err;
-      g_value_set_long (value, li);
-      break;
-    case G_TYPE_ULONG:
-      if (sscanf (xml, "%lu", &lu) != 1) goto malformed_err;
-      g_value_set_ulong (value, lu);
-      break;
-    case G_TYPE_INT64:
-      i64 = g_ascii_strtoll (xml, &endptr, 10);
-      if (endptr == xml) goto malformed_err;
-      g_value_set_int64 (value, i64);
-      break;
-    case G_TYPE_UINT64:
-      u64 = g_ascii_strtoull (xml, &endptr, 10);
-      if (endptr == xml) goto malformed_err;
-      g_value_set_uint64 (value, u64);
-      break;
-    case G_TYPE_ENUM:
-      if (sscanf (xml, "%d", &i) != 1) goto malformed_err;
-      g_value_set_enum (value, i);
-      break;
-    case G_TYPE_FLAGS:
-      if (sscanf (xml, "%u", &u) != 1) goto malformed_err;
-      g_value_set_flags (value, u);
-      break;
-    case G_TYPE_FLOAT:
-      if (sscanf (xml, "%f", &f) != 1) goto malformed_err;
-      g_value_set_float (value, f);
-      break;
-    case G_TYPE_DOUBLE:
-      if (sscanf (xml, "%lf", &d) != 1) goto malformed_err;
-      g_value_set_double (value, d);
-      break;
-    case G_TYPE_STRING:
-      g_value_set_string (value, xml);
-      break;
-    default:
-      if (valtype == G_TYPE_GTYPE)
-      {
-        g_value_set_gtype (value, g_type_from_name (xml));
-        return (TRUE);
-      }
-      else
-      {
-        g_set_error (err, IPATCH_ERROR, IPATCH_ERROR_UNHANDLED_CONVERSION,
-		     "Unhandled XML to GValue conversion for type '%s'",
-		     g_type_name (valtype));
-        return (FALSE);
-      }
-  }
+        if(sscanf(xml, "%d", &i) != 1)
+        {
+            goto malformed_err;
+        }
 
-  return (TRUE);
+        if(i < G_MININT8 || i > G_MAXINT8)
+        {
+            goto range_err;
+        }
+
+        g_value_set_char(value, i);
+        break;
+
+    case G_TYPE_UCHAR:
+        if(sscanf(xml, "%u", &u) != 1)
+        {
+            goto malformed_err;
+        }
+
+        if(u > G_MAXUINT8)
+        {
+            goto range_err;
+        }
+
+        g_value_set_uchar(value, u);
+        break;
+
+    case G_TYPE_BOOLEAN:
+        if(sscanf(xml, "%u", &u) != 1)
+        {
+            goto malformed_err;
+        }
+
+        if(u > 1)
+        {
+            goto range_err;
+        }
+
+        g_value_set_boolean(value, u);
+        break;
+
+    case G_TYPE_INT:
+        if(sscanf(xml, "%d", &i) != 1)
+        {
+            goto malformed_err;
+        }
+
+        g_value_set_int(value, i);
+        break;
+
+    case G_TYPE_UINT:
+        if(sscanf(xml, "%u", &u) != 1)
+        {
+            goto malformed_err;
+        }
+
+        g_value_set_uint(value, u);
+        break;
+
+    case G_TYPE_LONG:
+        if(sscanf(xml, "%ld", &li) != 1)
+        {
+            goto malformed_err;
+        }
+
+        g_value_set_long(value, li);
+        break;
+
+    case G_TYPE_ULONG:
+        if(sscanf(xml, "%lu", &lu) != 1)
+        {
+            goto malformed_err;
+        }
+
+        g_value_set_ulong(value, lu);
+        break;
+
+    case G_TYPE_INT64:
+        i64 = g_ascii_strtoll(xml, &endptr, 10);
+
+        if(endptr == xml)
+        {
+            goto malformed_err;
+        }
+
+        g_value_set_int64(value, i64);
+        break;
+
+    case G_TYPE_UINT64:
+        u64 = g_ascii_strtoull(xml, &endptr, 10);
+
+        if(endptr == xml)
+        {
+            goto malformed_err;
+        }
+
+        g_value_set_uint64(value, u64);
+        break;
+
+    case G_TYPE_ENUM:
+        if(sscanf(xml, "%d", &i) != 1)
+        {
+            goto malformed_err;
+        }
+
+        g_value_set_enum(value, i);
+        break;
+
+    case G_TYPE_FLAGS:
+        if(sscanf(xml, "%u", &u) != 1)
+        {
+            goto malformed_err;
+        }
+
+        g_value_set_flags(value, u);
+        break;
+
+    case G_TYPE_FLOAT:
+        if(sscanf(xml, "%f", &f) != 1)
+        {
+            goto malformed_err;
+        }
+
+        g_value_set_float(value, f);
+        break;
+
+    case G_TYPE_DOUBLE:
+        if(sscanf(xml, "%lf", &d) != 1)
+        {
+            goto malformed_err;
+        }
+
+        g_value_set_double(value, d);
+        break;
+
+    case G_TYPE_STRING:
+        g_value_set_string(value, xml);
+        break;
+
+    default:
+        if(valtype == G_TYPE_GTYPE)
+        {
+            g_value_set_gtype(value, g_type_from_name(xml));
+            return (TRUE);
+        }
+        else
+        {
+            g_set_error(err, IPATCH_ERROR, IPATCH_ERROR_UNHANDLED_CONVERSION,
+                        "Unhandled XML to GValue conversion for type '%s'",
+                        g_type_name(valtype));
+            return (FALSE);
+        }
+    }
+
+    return (TRUE);
 
 malformed_err:
-  g_set_error (err, IPATCH_ERROR, IPATCH_ERROR_INVALID,
-	       "Invalid XML GValue '%s' for type '%s'", xml,
-	       g_type_name (valtype));
-  return (FALSE);
+    g_set_error(err, IPATCH_ERROR, IPATCH_ERROR_INVALID,
+                "Invalid XML GValue '%s' for type '%s'", xml,
+                g_type_name(valtype));
+    return (FALSE);
 
 range_err:
-  g_set_error (err, IPATCH_ERROR, IPATCH_ERROR_INVALID,
-	       "Out of range XML GValue '%s' for type '%s'", xml,
-	       g_type_name (valtype));
-  return (FALSE);
+    g_set_error(err, IPATCH_ERROR, IPATCH_ERROR_INVALID,
+                "Out of range XML GValue '%s' for type '%s'", xml,
+                g_type_name(valtype));
+    return (FALSE);
 }

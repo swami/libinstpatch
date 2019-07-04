@@ -33,20 +33,20 @@ typedef GSList IpatchSF2ModList;
 /* GSList has a glib boxed type */
 #define IPATCH_TYPE_SF2_MOD_LIST   (ipatch_sf2_mod_list_get_type ())
 
-GType ipatch_sf2_mod_list_get_type (void);
+GType ipatch_sf2_mod_list_get_type(void);
 
-GSList *ipatch_sf2_mod_list_duplicate (const GSList *list);
-GSList *ipatch_sf2_mod_list_override (const GSList *alist,
-                                                const GSList *blist, gboolean copy);
-GSList *ipatch_sf2_mod_list_override_copy (const GSList *alist, const GSList *blist);
-void ipatch_sf2_mod_list_free (GSList *list, gboolean free_mods);
-void ipatch_sf2_mod_list_boxed_free (GSList *list);
-GSList *ipatch_sf2_mod_list_insert (GSList *mods, const IpatchSF2Mod *modvals, int pos);
-GSList *ipatch_sf2_mod_list_remove (GSList *mods, const IpatchSF2Mod *modvals,
-                                              gboolean *changed);
-gboolean ipatch_sf2_mod_list_change (GSList *mods, const IpatchSF2Mod *oldvals,
-				     const IpatchSF2Mod *newvals);
-GSList *ipatch_sf2_mod_list_offset (const GSList *alist, const GSList *blist);
-G_CONST_RETURN GSList *ipatch_sf2_mod_list_get_default (void);
+GSList *ipatch_sf2_mod_list_duplicate(const GSList *list);
+GSList *ipatch_sf2_mod_list_override(const GSList *alist,
+                                     const GSList *blist, gboolean copy);
+GSList *ipatch_sf2_mod_list_override_copy(const GSList *alist, const GSList *blist);
+void ipatch_sf2_mod_list_free(GSList *list, gboolean free_mods);
+void ipatch_sf2_mod_list_boxed_free(GSList *list);
+GSList *ipatch_sf2_mod_list_insert(GSList *mods, const IpatchSF2Mod *modvals, int pos);
+GSList *ipatch_sf2_mod_list_remove(GSList *mods, const IpatchSF2Mod *modvals,
+                                   gboolean *changed);
+gboolean ipatch_sf2_mod_list_change(GSList *mods, const IpatchSF2Mod *oldvals,
+                                    const IpatchSF2Mod *newvals);
+GSList *ipatch_sf2_mod_list_offset(const GSList *alist, const GSList *blist);
+G_CONST_RETURN GSList *ipatch_sf2_mod_list_get_default(void);
 
 #endif

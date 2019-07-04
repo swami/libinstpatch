@@ -46,35 +46,35 @@ typedef struct _IpatchSF2WriterClass IpatchSF2WriterClass;
 /* SF2 writer object */
 struct _IpatchSF2Writer
 {
-  IpatchRiff parent_instance; /* derived from IpatchRiff */
-  IpatchSF2 *orig_sf;		/* original SF2 object */
-  IpatchSF2 *sf;		/* duplicated SF2 object to save */
-  gboolean migrate_samples; /* set to TRUE to migrate samples to new file */
-  GHashTable *inst_hash;	/* instrument => index hash */
-  GHashTable *sample_hash;	/* sample => SampleHashValue hash */
-  IpatchList *store_list;       /* list of stores, only set if ipatch_sf2_writer_create_stores() was called */
+    IpatchRiff parent_instance; /* derived from IpatchRiff */
+    IpatchSF2 *orig_sf;		/* original SF2 object */
+    IpatchSF2 *sf;		/* duplicated SF2 object to save */
+    gboolean migrate_samples; /* set to TRUE to migrate samples to new file */
+    GHashTable *inst_hash;	/* instrument => index hash */
+    GHashTable *sample_hash;	/* sample => SampleHashValue hash */
+    IpatchList *store_list;       /* list of stores, only set if ipatch_sf2_writer_create_stores() was called */
 };
 
 /* SF2 writer class */
 struct _IpatchSF2WriterClass
 {
-  IpatchRiffClass parent_class;
+    IpatchRiffClass parent_class;
 };
 
-GType ipatch_sf2_writer_get_type (void);
-IpatchSF2Writer *ipatch_sf2_writer_new (IpatchFileHandle *handle, IpatchSF2 *sfont);
-void ipatch_sf2_writer_set_patch (IpatchSF2Writer *writer, IpatchSF2 *sfont);
-void ipatch_sf2_writer_set_file_handle (IpatchSF2Writer *writer,
-                                        IpatchFileHandle *handle);
-gboolean ipatch_sf2_writer_save (IpatchSF2Writer *writer, GError **err);
-IpatchList *ipatch_sf2_writer_create_stores (IpatchSF2Writer *writer);
+GType ipatch_sf2_writer_get_type(void);
+IpatchSF2Writer *ipatch_sf2_writer_new(IpatchFileHandle *handle, IpatchSF2 *sfont);
+void ipatch_sf2_writer_set_patch(IpatchSF2Writer *writer, IpatchSF2 *sfont);
+void ipatch_sf2_writer_set_file_handle(IpatchSF2Writer *writer,
+                                       IpatchFileHandle *handle);
+gboolean ipatch_sf2_writer_save(IpatchSF2Writer *writer, GError **err);
+IpatchList *ipatch_sf2_writer_create_stores(IpatchSF2Writer *writer);
 
-void ipatch_sf2_write_phdr (IpatchFileHandle *handle, const IpatchSF2Phdr *phdr);
-void ipatch_sf2_write_ihdr (IpatchFileHandle *handle, const IpatchSF2Ihdr *ihdr);
-void ipatch_sf2_write_shdr (IpatchFileHandle *handle, const IpatchSF2Shdr *shdr);
-void ipatch_sf2_write_bag (IpatchFileHandle *handle, const IpatchSF2Bag *bag);
-void ipatch_sf2_write_mod (IpatchFileHandle *handle, const IpatchSF2Mod *mod);
-void ipatch_sf2_write_gen (IpatchFileHandle *handle, int genid,
-			   const IpatchSF2GenAmount *amount);
+void ipatch_sf2_write_phdr(IpatchFileHandle *handle, const IpatchSF2Phdr *phdr);
+void ipatch_sf2_write_ihdr(IpatchFileHandle *handle, const IpatchSF2Ihdr *ihdr);
+void ipatch_sf2_write_shdr(IpatchFileHandle *handle, const IpatchSF2Shdr *shdr);
+void ipatch_sf2_write_bag(IpatchFileHandle *handle, const IpatchSF2Bag *bag);
+void ipatch_sf2_write_mod(IpatchFileHandle *handle, const IpatchSF2Mod *mod);
+void ipatch_sf2_write_gen(IpatchFileHandle *handle, int genid,
+                          const IpatchSF2GenAmount *amount);
 
 #endif

@@ -25,50 +25,61 @@
 
 #include "IpatchStateItem.h"
 
-static void ipatch_state_item_class_init (IpatchStateItemClass *klass);
-static void ipatch_state_item_finalize (GObject *gobject);
+static void ipatch_state_item_class_init(IpatchStateItemClass *klass);
+static void ipatch_state_item_finalize(GObject *gobject);
 
 gpointer item_parent_class = NULL;
 
 GType
-ipatch_state_item_get_type (void)
+ipatch_state_item_get_type(void)
 {
-  static GType item_type = 0;
+    static GType item_type = 0;
 
-  if (!item_type) {
-    static const GTypeInfo item_info = {
-      sizeof (IpatchStateItemClass), NULL, NULL,
-      (GClassInitFunc) ipatch_state_item_class_init, NULL, NULL,
-      sizeof (IpatchStateItem), 0,
-      (GInstanceInitFunc) NULL,
-    };
+    if(!item_type)
+    {
+        static const GTypeInfo item_info =
+        {
+            sizeof(IpatchStateItemClass), NULL, NULL,
+            (GClassInitFunc) ipatch_state_item_class_init, NULL, NULL,
+            sizeof(IpatchStateItem), 0,
+            (GInstanceInitFunc) NULL,
+        };
 
-    item_type = g_type_register_static (G_TYPE_OBJECT, "IpatchStateItem",
-					&item_info, G_TYPE_FLAG_ABSTRACT);
-  }
+        item_type = g_type_register_static(G_TYPE_OBJECT, "IpatchStateItem",
+                                           &item_info, G_TYPE_FLAG_ABSTRACT);
+    }
 
-  return (item_type);
+    return (item_type);
 }
 
 static void
-ipatch_state_item_class_init (IpatchStateItemClass *klass)
+ipatch_state_item_class_init(IpatchStateItemClass *klass)
 {
-  GObjectClass *gobj_class = G_OBJECT_CLASS (klass);
+    GObjectClass *gobj_class = G_OBJECT_CLASS(klass);
 
-  item_parent_class = g_type_class_peek_parent (klass);
-  gobj_class->finalize = ipatch_state_item_finalize;
+    item_parent_class = g_type_class_peek_parent(klass);
+    gobj_class->finalize = ipatch_state_item_finalize;
 }
 
 static void
-ipatch_state_item_finalize (GObject *gobject)
+ipatch_state_item_finalize(GObject *gobject)
 {
-  IpatchStateItem *item = IPATCH_STATE_ITEM (gobject);
+    IpatchStateItem *item = IPATCH_STATE_ITEM(gobject);
 
-  if (item->node) g_node_destroy (item->node); /* destroy item's tree node */
-  if (item->group) g_object_unref (item->group); /* -- unref item's group */
+    if(item->node)
+    {
+        g_node_destroy(item->node);    /* destroy item's tree node */
+    }
 
-  if (G_OBJECT_CLASS (item_parent_class)->finalize)
-    G_OBJECT_CLASS (item_parent_class)->finalize (gobject);
+    if(item->group)
+    {
+        g_object_unref(item->group);    /* -- unref item's group */
+    }
+
+    if(G_OBJECT_CLASS(item_parent_class)->finalize)
+    {
+        G_OBJECT_CLASS(item_parent_class)->finalize(gobject);
+    }
 }
 
 /**
@@ -78,14 +89,14 @@ ipatch_state_item_finalize (GObject *gobject)
  * Restore the state saved by @item.
  */
 void
-ipatch_state_item_restore (const IpatchStateItem *item)
+ipatch_state_item_restore(const IpatchStateItem *item)
 {
-  IpatchStateItemClass *klass;
-  g_return_if_fail (IPATCH_IS_STATE_ITEM (item));
+    IpatchStateItemClass *klass;
+    g_return_if_fail(IPATCH_IS_STATE_ITEM(item));
 
-  klass = IPATCH_STATE_ITEM_GET_CLASS (item);
-  g_return_if_fail (klass->restore != NULL);
-  (*klass->restore)(item);
+    klass = IPATCH_STATE_ITEM_GET_CLASS(item);
+    g_return_if_fail(klass->restore != NULL);
+    (*klass->restore)(item);
 }
 
 /**
@@ -98,15 +109,15 @@ ipatch_state_item_restore (const IpatchStateItem *item)
  * Returns: %TRUE if @item1 is dependent on @item2, %FALSE otherwise.
  */
 gboolean
-ipatch_state_item_depend (const IpatchStateItem *item1,
-			 const IpatchStateItem *item2)
+ipatch_state_item_depend(const IpatchStateItem *item1,
+                         const IpatchStateItem *item2)
 {
-  IpatchStateItemClass *klass;
-  g_return_val_if_fail (IPATCH_IS_STATE_ITEM (item1), FALSE);
-  g_return_val_if_fail (IPATCH_IS_STATE_ITEM (item2), FALSE);
+    IpatchStateItemClass *klass;
+    g_return_val_if_fail(IPATCH_IS_STATE_ITEM(item1), FALSE);
+    g_return_val_if_fail(IPATCH_IS_STATE_ITEM(item2), FALSE);
 
-  klass = IPATCH_STATE_ITEM_GET_CLASS (item1);
-  return (!klass->depend || (*klass->depend)(item1, item2));
+    klass = IPATCH_STATE_ITEM_GET_CLASS(item1);
+    return (!klass->depend || (*klass->depend)(item1, item2));
 }
 
 /**
@@ -119,15 +130,15 @@ ipatch_state_item_depend (const IpatchStateItem *item1,
  * Returns: %TRUE if @item1 conflicts with @item2, %FALSE otherwise.
  */
 gboolean
-ipatch_state_item_conflict (const IpatchStateItem *item1,
-			   const IpatchStateItem *item2)
+ipatch_state_item_conflict(const IpatchStateItem *item1,
+                           const IpatchStateItem *item2)
 {
-  IpatchStateItemClass *klass;
-  g_return_val_if_fail (IPATCH_IS_STATE_ITEM (item1), FALSE);
-  g_return_val_if_fail (IPATCH_IS_STATE_ITEM (item2), FALSE);
+    IpatchStateItemClass *klass;
+    g_return_val_if_fail(IPATCH_IS_STATE_ITEM(item1), FALSE);
+    g_return_val_if_fail(IPATCH_IS_STATE_ITEM(item2), FALSE);
 
-  klass = IPATCH_STATE_ITEM_GET_CLASS (item1);
-  return (!klass->conflict || (*klass->conflict)(item1, item2));
+    klass = IPATCH_STATE_ITEM_GET_CLASS(item1);
+    return (!klass->conflict || (*klass->conflict)(item1, item2));
 }
 
 /**
@@ -140,12 +151,19 @@ ipatch_state_item_conflict (const IpatchStateItem *item1,
  * no description available. String should be freed when no longer needed.
  */
 char *
-ipatch_state_item_describe (const IpatchStateItem *item)
+ipatch_state_item_describe(const IpatchStateItem *item)
 {
-  IpatchStateItemClass *klass;
-  g_return_val_if_fail (IPATCH_IS_STATE_ITEM (item), NULL);
+    IpatchStateItemClass *klass;
+    g_return_val_if_fail(IPATCH_IS_STATE_ITEM(item), NULL);
 
-  klass = IPATCH_STATE_ITEM_GET_CLASS (item);
-  if (klass->describe) return ((*klass->describe)(item));
-  else return (NULL);
+    klass = IPATCH_STATE_ITEM_GET_CLASS(item);
+
+    if(klass->describe)
+    {
+        return ((*klass->describe)(item));
+    }
+    else
+    {
+        return (NULL);
+    }
 }

@@ -20,7 +20,7 @@
 /**
  * SECTION: IpatchDLSFile
  * @short_description: DLS file object and functions
- * @see_also: 
+ * @see_also:
  * @stability: Stable
  *
  * Object type for DLS files and other constants and functions dealing with
@@ -37,62 +37,67 @@
 #include "i18n.h"
 #include "misc.h"
 
-static gboolean ipatch_dls_file_identify (IpatchFile *file, IpatchFileHandle *handle,
-                                          GError **err);
+static gboolean ipatch_dls_file_identify(IpatchFile *file, IpatchFileHandle *handle,
+        GError **err);
 
-G_DEFINE_TYPE (IpatchDLSFile, ipatch_dls_file, IPATCH_TYPE_FILE);
+G_DEFINE_TYPE(IpatchDLSFile, ipatch_dls_file, IPATCH_TYPE_FILE);
 
 
 static void
-ipatch_dls_file_class_init (IpatchDLSFileClass *klass)
+ipatch_dls_file_class_init(IpatchDLSFileClass *klass)
 {
-  IpatchFileClass *file_class = IPATCH_FILE_CLASS (klass);
-  file_class->identify = ipatch_dls_file_identify;
+    IpatchFileClass *file_class = IPATCH_FILE_CLASS(klass);
+    file_class->identify = ipatch_dls_file_identify;
 }
 
 static void
-ipatch_dls_file_init (IpatchDLSFile *file)
+ipatch_dls_file_init(IpatchDLSFile *file)
 {
 }
 
 /* DLS/gig file identification function */
 static gboolean
-ipatch_dls_file_identify (IpatchFile *file, IpatchFileHandle *handle, GError **err)
+ipatch_dls_file_identify(IpatchFile *file, IpatchFileHandle *handle, GError **err)
 {
-  guint32 buf[3];
-  char *filename;
-  gboolean retval = FALSE;
-  int len = 0;  /* Silence gcc */
+    guint32 buf[3];
+    char *filename;
+    gboolean retval = FALSE;
+    int len = 0;  /* Silence gcc */
 
-  filename = ipatch_file_get_name (file);       /* ++ alloc file name */
+    filename = ipatch_file_get_name(file);        /* ++ alloc file name */
 
-  /* Check if file ends with .gig extension first, since we can't easily
-   * check by content.  Defer to gig identify method. */
-  if (filename)
-  {
-    len = strlen (filename);
-    if (len >= 4 && g_ascii_strcasecmp (filename + len - 4, ".gig") == 0)
+    /* Check if file ends with .gig extension first, since we can't easily
+     * check by content.  Defer to gig identify method. */
+    if(filename)
     {
-      g_free (filename);        /* -- free file name */
-      return (FALSE);
+        len = strlen(filename);
+
+        if(len >= 4 && g_ascii_strcasecmp(filename + len - 4, ".gig") == 0)
+        {
+            g_free(filename);         /* -- free file name */
+            return (FALSE);
+        }
     }
-  }
 
-  if (handle)   /* Test content */
-  {
-    if (ipatch_file_read (handle, buf, 12, err)
-        && buf[0] == IPATCH_FOURCC_RIFF && buf[2] == IPATCH_DLS_FOURCC_DLS)
-      retval = TRUE;
-  }
-  else if (filename) /* Test file name extension */
-  {
-    if ((len >= 4 && g_ascii_strcasecmp (filename + len - 4, ".dls") == 0)
-        || (len >= 5 && g_ascii_strcasecmp (filename + len - 5, ".dls2") == 0))
-      retval = TRUE;
-  }
+    if(handle)    /* Test content */
+    {
+        if(ipatch_file_read(handle, buf, 12, err)
+                && buf[0] == IPATCH_FOURCC_RIFF && buf[2] == IPATCH_DLS_FOURCC_DLS)
+        {
+            retval = TRUE;
+        }
+    }
+    else if(filename)  /* Test file name extension */
+    {
+        if((len >= 4 && g_ascii_strcasecmp(filename + len - 4, ".dls") == 0)
+                || (len >= 5 && g_ascii_strcasecmp(filename + len - 5, ".dls2") == 0))
+        {
+            retval = TRUE;
+        }
+    }
 
-  g_free (filename);        /* -- free filename */
-  return (retval);
+    g_free(filename);         /* -- free filename */
+    return (retval);
 }
 
 /**
@@ -105,7 +110,7 @@ ipatch_dls_file_identify (IpatchFile *file, IpatchFileHandle *handle, GError **e
  * destroy the item.
  */
 IpatchDLSFile *
-ipatch_dls_file_new (void)
+ipatch_dls_file_new(void)
 {
-  return (IPATCH_DLS_FILE (g_object_new (IPATCH_TYPE_DLS_FILE, NULL)));
+    return (IPATCH_DLS_FILE(g_object_new(IPATCH_TYPE_DLS_FILE, NULL)));
 }

@@ -26,19 +26,19 @@
 /* Value for 0 seconds in DLS absolute time (a degenerate case) */
 #define IPATCH_UNIT_DLS_ABS_TIME_0SECS ((gint32)0x80000000L)
 
-int ipatch_unit_dls_class_convert (guint16 src_units, const GValue *src_val);
+int ipatch_unit_dls_class_convert(guint16 src_units, const GValue *src_val);
 
-double ipatch_unit_dls_percent_to_percent (int dls_percent);
-int ipatch_unit_percent_to_dls_percent (double percent);
-double ipatch_unit_dls_gain_to_decibels (int dls_gain);
-int ipatch_unit_decibels_to_dls_gain (double db);
-double ipatch_unit_dls_abs_time_to_seconds (int dls_abs_time);
-int ipatch_unit_seconds_to_dls_abs_time (double seconds);
-double ipatch_unit_dls_rel_time_to_time_cents (int dls_rel_time);
-int ipatch_unit_time_cents_to_dls_rel_time (double time_cents);
-double ipatch_unit_dls_abs_pitch_to_hertz (int dls_abs_pitch);
-int ipatch_unit_hertz_to_dls_abs_pitch (double hertz);
-double ipatch_unit_dls_rel_pitch_to_cents (int dls_rel_pitch);
-int ipatch_unit_cents_to_dls_rel_pitch (double cents);
+double ipatch_unit_dls_percent_to_percent(int dls_percent);
+int ipatch_unit_percent_to_dls_percent(double percent);
+double ipatch_unit_dls_gain_to_decibels(int dls_gain);
+int ipatch_unit_decibels_to_dls_gain(double db);
+double ipatch_unit_dls_abs_time_to_seconds(int dls_abs_time);
+int ipatch_unit_seconds_to_dls_abs_time(double seconds);
+double ipatch_unit_dls_rel_time_to_time_cents(int dls_rel_time);
+int ipatch_unit_time_cents_to_dls_rel_time(double time_cents);
+double ipatch_unit_dls_abs_pitch_to_hertz(int dls_abs_pitch);
+int ipatch_unit_hertz_to_dls_abs_pitch(double hertz);
+double ipatch_unit_dls_rel_pitch_to_cents(int dls_rel_pitch);
+int ipatch_unit_cents_to_dls_rel_pitch(double cents);
 
 #endif

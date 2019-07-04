@@ -31,20 +31,20 @@
 #include "IpatchXml.h"
 #include "misc.h"
 
-static gboolean xml_destroy_traverse_func (GNode *node, gpointer data);
-static GNode *ipatch_xml_find_by_path_recurse (GNode *node, const char *path);
-static void ipatch_xml_to_str_recurse (GString *str, GNode *node, guint indent,
-                                       guint inc);
+static gboolean xml_destroy_traverse_func(GNode *node, gpointer data);
+static GNode *ipatch_xml_find_by_path_recurse(GNode *node, const char *path);
+static void ipatch_xml_to_str_recurse(GString *str, GNode *node, guint indent,
+                                      guint inc);
 static void
-xml_start_element (GMarkupParseContext *context, const gchar *element_name,
-                   const gchar **attribute_names, const gchar **attribute_values,
-                   gpointer user_data, GError **error);
+xml_start_element(GMarkupParseContext *context, const gchar *element_name,
+                  const gchar **attribute_names, const gchar **attribute_values,
+                  gpointer user_data, GError **error);
 static void
-xml_end_element (GMarkupParseContext *context, const gchar *element_name,
-                 gpointer user_data, GError **error);
+xml_end_element(GMarkupParseContext *context, const gchar *element_name,
+                gpointer user_data, GError **error);
 static void
-xml_text (GMarkupParseContext *context, const gchar *text, gsize text_len,  
-          gpointer user_data, GError **error);
+xml_text(GMarkupParseContext *context, const gchar *text, gsize text_len,
+         gpointer user_data, GError **error);
 
 /**
  * ipatch_xml_new_node: (skip)
@@ -63,45 +63,49 @@ xml_text (GMarkupParseContext *context, const gchar *text, gsize text_len,
  * Returns: New XML tree node
  */
 GNode *
-ipatch_xml_new_node (GNode *parent, const char *name, const char *value,
-                     const char *attr_name, ...)
+ipatch_xml_new_node(GNode *parent, const char *name, const char *value,
+                    const char *attr_name, ...)
 {
-  IpatchXmlNode *xmlnode;
-  IpatchXmlAttr *attr;
-  va_list var_args;
-  char *vname, *vvalue;
+    IpatchXmlNode *xmlnode;
+    IpatchXmlAttr *attr;
+    va_list var_args;
+    char *vname, *vvalue;
 
-  g_return_val_if_fail (name != NULL, NULL);
+    g_return_val_if_fail(name != NULL, NULL);
 
-  xmlnode = ipatch_xml_node_new ();
-  xmlnode->name = g_strdup (name);
-  xmlnode->value = g_strdup (value);
-  xmlnode->attributes = NULL;
+    xmlnode = ipatch_xml_node_new();
+    xmlnode->name = g_strdup(name);
+    xmlnode->value = g_strdup(value);
+    xmlnode->attributes = NULL;
 
-  if (attr_name)
-  {
-    va_start (var_args, attr_name);
-
-    attr = ipatch_xml_attr_new ();
-    attr->name = g_strdup (attr_name);
-    attr->value = g_strdup (va_arg (var_args, char *));
-    xmlnode->attributes = g_list_append (xmlnode->attributes, attr);
-
-    while ((vname = va_arg (var_args, char *)))
+    if(attr_name)
     {
-      vvalue = va_arg (var_args, char *);
-      if (!vvalue) continue;
+        va_start(var_args, attr_name);
 
-      attr = ipatch_xml_attr_new ();
-      attr->name = g_strdup (vname);
-      attr->value = g_strdup (vvalue);
-      xmlnode->attributes = g_list_append (xmlnode->attributes, attr);
+        attr = ipatch_xml_attr_new();
+        attr->name = g_strdup(attr_name);
+        attr->value = g_strdup(va_arg(var_args, char *));
+        xmlnode->attributes = g_list_append(xmlnode->attributes, attr);
+
+        while((vname = va_arg(var_args, char *)))
+        {
+            vvalue = va_arg(var_args, char *);
+
+            if(!vvalue)
+            {
+                continue;
+            }
+
+            attr = ipatch_xml_attr_new();
+            attr->name = g_strdup(vname);
+            attr->value = g_strdup(vvalue);
+            xmlnode->attributes = g_list_append(xmlnode->attributes, attr);
+        }
+
+        va_end(var_args);
     }
 
-    va_end (var_args);
-  }
-
-  return (parent ? g_node_append_data (parent, xmlnode) : g_node_new (xmlnode));
+    return (parent ? g_node_append_data(parent, xmlnode) : g_node_new(xmlnode));
 }
 
 /**
@@ -121,35 +125,38 @@ ipatch_xml_new_node (GNode *parent, const char *name, const char *value,
  * Returns: New XML tree node
  */
 GNode *
-ipatch_xml_new_node_strv (GNode *parent, const char *name, const char *value,
-                          const char **attr_names, const char **attr_values)
+ipatch_xml_new_node_strv(GNode *parent, const char *name, const char *value,
+                         const char **attr_names, const char **attr_values)
 {
-  IpatchXmlNode *xmlnode;
-  IpatchXmlAttr *attr;
-  int i;
+    IpatchXmlNode *xmlnode;
+    IpatchXmlAttr *attr;
+    int i;
 
-  g_return_val_if_fail (name != NULL, NULL);
-  g_return_val_if_fail (!attr_names == !attr_values, NULL);
+    g_return_val_if_fail(name != NULL, NULL);
+    g_return_val_if_fail(!attr_names == !attr_values, NULL);
 
-  xmlnode = ipatch_xml_node_new ();
-  xmlnode->name = g_strdup (name);
-  xmlnode->value = g_strdup (value);
-  xmlnode->attributes = NULL;
+    xmlnode = ipatch_xml_node_new();
+    xmlnode->name = g_strdup(name);
+    xmlnode->value = g_strdup(value);
+    xmlnode->attributes = NULL;
 
-  if (attr_names)
-  {
-    for (i = 0; attr_names[i] && attr_values[i]; i++)
+    if(attr_names)
     {
-      if (!attr_values[i]) continue;
+        for(i = 0; attr_names[i] && attr_values[i]; i++)
+        {
+            if(!attr_values[i])
+            {
+                continue;
+            }
 
-      attr = ipatch_xml_attr_new ();
-      attr->name = g_strdup (attr_names[i]);
-      attr->value = g_strdup (attr_values[i]);
-      xmlnode->attributes = g_list_append (xmlnode->attributes, attr);
+            attr = ipatch_xml_attr_new();
+            attr->name = g_strdup(attr_names[i]);
+            attr->value = g_strdup(attr_values[i]);
+            xmlnode->attributes = g_list_append(xmlnode->attributes, attr);
+        }
     }
-  }
 
-  return (parent ? g_node_append_data (parent, xmlnode) : g_node_new (xmlnode));
+    return (parent ? g_node_append_data(parent, xmlnode) : g_node_new(xmlnode));
 }
 
 #define QDATA(node)	&(((IpatchXmlNode *)(node->data))->qdata)
@@ -164,10 +171,10 @@ ipatch_xml_new_node_strv (GNode *parent, const char *name, const char *value,
  * Returns: The data pointer or %NULL if not set
  */
 gpointer
-ipatch_xml_get_data (GNode *node, const char *key)
+ipatch_xml_get_data(GNode *node, const char *key)
 {
-  g_return_val_if_fail (node != NULL, NULL);
-  return (g_datalist_get_data (QDATA (node), key));
+    g_return_val_if_fail(node != NULL, NULL);
+    return (g_datalist_get_data(QDATA(node), key));
 }
 
 /**
@@ -179,10 +186,10 @@ ipatch_xml_get_data (GNode *node, const char *key)
  * Assigns arbitrary data to an XML node specified by a @key.
  */
 void
-ipatch_xml_set_data (GNode *node, const char *key, gpointer data)
+ipatch_xml_set_data(GNode *node, const char *key, gpointer data)
 {
-  g_return_if_fail (node != NULL);
-  g_datalist_set_data (QDATA (node), key, data);
+    g_return_if_fail(node != NULL);
+    g_datalist_set_data(QDATA(node), key, data);
 }
 
 /**
@@ -196,11 +203,11 @@ ipatch_xml_set_data (GNode *node, const char *key, gpointer data)
  * @destroy_func callback to destroy the data when it is removed.
  */
 void
-ipatch_xml_set_data_full (GNode *node, const char *key, gpointer data,
-                          GDestroyNotify destroy_func)
+ipatch_xml_set_data_full(GNode *node, const char *key, gpointer data,
+                         GDestroyNotify destroy_func)
 {
-  g_return_if_fail (node != NULL);
-  g_datalist_set_data_full (QDATA (node), key, data, destroy_func);
+    g_return_if_fail(node != NULL);
+    g_datalist_set_data_full(QDATA(node), key, data, destroy_func);
 }
 
 /**
@@ -214,20 +221,28 @@ ipatch_xml_set_data_full (GNode *node, const char *key, gpointer data,
  * Returns: (transfer none): The data pointer or %NULL if not set
  */
 gpointer
-ipatch_xml_steal_data (GNode *node, const char *key)
+ipatch_xml_steal_data(GNode *node, const char *key)
 {
-  gpointer data;
-  GQuark quark;
+    gpointer data;
+    GQuark quark;
 
-  g_return_val_if_fail (node != NULL, NULL);
+    g_return_val_if_fail(node != NULL, NULL);
 
-  quark = g_quark_try_string (key);
-  if (!quark) return (NULL);
+    quark = g_quark_try_string(key);
 
-  data = g_datalist_id_get_data (QDATA (node), quark);
-  if (data) g_datalist_id_remove_no_notify (QDATA (node), quark);
+    if(!quark)
+    {
+        return (NULL);
+    }
 
-  return (data);
+    data = g_datalist_id_get_data(QDATA(node), quark);
+
+    if(data)
+    {
+        g_datalist_id_remove_no_notify(QDATA(node), quark);
+    }
+
+    return (data);
 }
 
 /**
@@ -241,10 +256,10 @@ ipatch_xml_steal_data (GNode *node, const char *key)
  * Returns: (transfer none): The data pointer or %NULL if not set
  */
 gpointer
-ipatch_xml_get_qdata (GNode *node, GQuark quark)
+ipatch_xml_get_qdata(GNode *node, GQuark quark)
 {
-  g_return_val_if_fail (node != NULL, NULL);
-  return (g_datalist_id_get_data (QDATA (node), quark));
+    g_return_val_if_fail(node != NULL, NULL);
+    return (g_datalist_id_get_data(QDATA(node), quark));
 }
 
 /**
@@ -258,10 +273,10 @@ ipatch_xml_get_qdata (GNode *node, GQuark quark)
  * anyways.
  */
 void
-ipatch_xml_set_qdata (GNode *node, GQuark quark, gpointer data)
+ipatch_xml_set_qdata(GNode *node, GQuark quark, gpointer data)
 {
-  g_return_if_fail (node != NULL);
-  g_datalist_id_set_data (QDATA (node), quark, data);
+    g_return_if_fail(node != NULL);
+    g_datalist_id_set_data(QDATA(node), quark, data);
 }
 
 /**
@@ -277,11 +292,11 @@ ipatch_xml_set_qdata (GNode *node, GQuark quark, gpointer data)
  * anyways.
  */
 void
-ipatch_xml_set_qdata_full (GNode *node, GQuark quark, gpointer data,
-                           GDestroyNotify destroy_func)
+ipatch_xml_set_qdata_full(GNode *node, GQuark quark, gpointer data,
+                          GDestroyNotify destroy_func)
 {
-  g_return_if_fail (node != NULL);
-  g_datalist_id_set_data_full (QDATA (node), quark, data, destroy_func);
+    g_return_if_fail(node != NULL);
+    g_datalist_id_set_data_full(QDATA(node), quark, data, destroy_func);
 }
 
 /**
@@ -297,16 +312,20 @@ ipatch_xml_set_qdata_full (GNode *node, GQuark quark, gpointer data,
  * Returns: (transfer none): The data pointer or %NULL if not set
  */
 gpointer
-ipatch_xml_steal_qdata (GNode *node, GQuark quark)
+ipatch_xml_steal_qdata(GNode *node, GQuark quark)
 {
-  gpointer data;
+    gpointer data;
 
-  g_return_val_if_fail (node != NULL, NULL);
+    g_return_val_if_fail(node != NULL, NULL);
 
-  data = g_datalist_id_get_data (QDATA (node), quark);
-  if (data) g_datalist_id_remove_no_notify (QDATA (node), quark);
+    data = g_datalist_id_get_data(QDATA(node), quark);
 
-  return (data);
+    if(data)
+    {
+        g_datalist_id_remove_no_notify(QDATA(node), quark);
+    }
+
+    return (data);
 }
 
 /**
@@ -317,17 +336,17 @@ ipatch_xml_steal_qdata (GNode *node, GQuark quark)
  * the actual root of a tree, i.e., can remove a sub tree.
  */
 void
-ipatch_xml_destroy (GNode *node)
+ipatch_xml_destroy(GNode *node)
 {
-  g_node_traverse (node, G_PRE_ORDER, G_TRAVERSE_ALL, -1, xml_destroy_traverse_func, NULL);
-  g_node_destroy (node);
+    g_node_traverse(node, G_PRE_ORDER, G_TRAVERSE_ALL, -1, xml_destroy_traverse_func, NULL);
+    g_node_destroy(node);
 }
 
 static gboolean
-xml_destroy_traverse_func (GNode *node, gpointer data)
+xml_destroy_traverse_func(GNode *node, gpointer data)
 {
-  ipatch_xml_node_free (node->data);
-  return (FALSE);
+    ipatch_xml_node_free(node->data);
+    return (FALSE);
 }
 
 /**
@@ -339,11 +358,11 @@ xml_destroy_traverse_func (GNode *node, gpointer data)
  * Returns: New duplicate XML tree.
  */
 GNode *
-ipatch_xml_copy (GNode *node)
+ipatch_xml_copy(GNode *node)
 {
-  g_return_val_if_fail (node != NULL, NULL);
+    g_return_val_if_fail(node != NULL, NULL);
 
-  return (g_node_copy_deep (node, (GCopyFunc)ipatch_xml_node_duplicate, NULL));
+    return (g_node_copy_deep(node, (GCopyFunc)ipatch_xml_node_duplicate, NULL));
 }
 
 /**
@@ -354,16 +373,16 @@ ipatch_xml_copy (GNode *node)
  * Set the name of an XML node.
  */
 void
-ipatch_xml_set_name (GNode *node, const char *name)
+ipatch_xml_set_name(GNode *node, const char *name)
 {
-  IpatchXmlNode *xmlnode;
+    IpatchXmlNode *xmlnode;
 
-  g_return_if_fail (node != NULL);
-  g_return_if_fail (name != NULL);
+    g_return_if_fail(node != NULL);
+    g_return_if_fail(name != NULL);
 
-  xmlnode = node->data;
-  g_free (xmlnode->name);
-  xmlnode->name = g_strdup (name);
+    xmlnode = node->data;
+    g_free(xmlnode->name);
+    xmlnode->name = g_strdup(name);
 }
 
 /**
@@ -374,15 +393,15 @@ ipatch_xml_set_name (GNode *node, const char *name)
  * Set the text value of an XML node.
  */
 void
-ipatch_xml_set_value (GNode *node, const char *value)
+ipatch_xml_set_value(GNode *node, const char *value)
 {
-  IpatchXmlNode *xmlnode;
+    IpatchXmlNode *xmlnode;
 
-  g_return_if_fail (node != NULL);
+    g_return_if_fail(node != NULL);
 
-  xmlnode = node->data;
-  g_free (xmlnode->value);
-  xmlnode->value = g_strdup (value);
+    xmlnode = node->data;
+    g_free(xmlnode->value);
+    xmlnode->value = g_strdup(value);
 }
 
 /**
@@ -394,19 +413,19 @@ ipatch_xml_set_value (GNode *node, const char *value)
  * Assign a value to an XML node using a printf format and arguments.
  */
 void
-ipatch_xml_set_value_printf (GNode *node, const char *format, ...)
+ipatch_xml_set_value_printf(GNode *node, const char *format, ...)
 {
-  va_list var_args;
-  char *value;
+    va_list var_args;
+    char *value;
 
-  g_return_if_fail (node != NULL);
-  g_return_if_fail (format != NULL);
+    g_return_if_fail(node != NULL);
+    g_return_if_fail(format != NULL);
 
-  va_start (var_args, format);
-  value = g_strdup_vprintf (format, var_args);
-  va_end (var_args);
+    va_start(var_args, format);
+    value = g_strdup_vprintf(format, var_args);
+    va_end(var_args);
 
-  ipatch_xml_take_value (node, value);
+    ipatch_xml_take_value(node, value);
 }
 
 /**
@@ -418,16 +437,16 @@ ipatch_xml_set_value_printf (GNode *node, const char *format, ...)
  * duplicating it.
  */
 void
-ipatch_xml_take_name (GNode *node, char *name)
+ipatch_xml_take_name(GNode *node, char *name)
 {
-  IpatchXmlNode *xmlnode;
+    IpatchXmlNode *xmlnode;
 
-  g_return_if_fail (node != NULL);
-  g_return_if_fail (name != NULL);
+    g_return_if_fail(node != NULL);
+    g_return_if_fail(name != NULL);
 
-  xmlnode = node->data;
-  g_free (xmlnode->name);
-  xmlnode->name = name;
+    xmlnode = node->data;
+    g_free(xmlnode->name);
+    xmlnode->name = name;
 }
 
 /**
@@ -439,15 +458,15 @@ ipatch_xml_take_name (GNode *node, char *name)
  * duplicating it.
  */
 void
-ipatch_xml_take_value (GNode *node, char *value)
+ipatch_xml_take_value(GNode *node, char *value)
 {
-  IpatchXmlNode *xmlnode;
+    IpatchXmlNode *xmlnode;
 
-  g_return_if_fail (node != NULL);
+    g_return_if_fail(node != NULL);
 
-  xmlnode = node->data;
-  g_free (xmlnode->value);
-  xmlnode->value = value;
+    xmlnode = node->data;
+    g_free(xmlnode->value);
+    xmlnode->value = value;
 }
 
 /**
@@ -459,10 +478,10 @@ ipatch_xml_take_value (GNode *node, char *value)
  * Returns: Name of XML node which is internal and should not be modified or freed.
  */
 G_CONST_RETURN char *
-ipatch_xml_get_name (GNode *node)
+ipatch_xml_get_name(GNode *node)
 {
-  g_return_val_if_fail (node != NULL, NULL);
-  return (((IpatchXmlNode *)(node->data))->name);
+    g_return_val_if_fail(node != NULL, NULL);
+    return (((IpatchXmlNode *)(node->data))->name);
 }
 
 /**
@@ -475,16 +494,16 @@ ipatch_xml_get_name (GNode *node)
  * Returns: %TRUE if the node has the given name, %FALSE otherwise
  */
 gboolean
-ipatch_xml_test_name (GNode *node, const char *cmpname)
+ipatch_xml_test_name(GNode *node, const char *cmpname)
 {
-  const char *name;
+    const char *name;
 
-  g_return_val_if_fail (node != NULL, FALSE);
-  g_return_val_if_fail (cmpname != NULL, FALSE);
+    g_return_val_if_fail(node != NULL, FALSE);
+    g_return_val_if_fail(cmpname != NULL, FALSE);
 
-  name = ipatch_xml_get_name (node);
+    name = ipatch_xml_get_name(node);
 
-  return (name && strcmp (name, cmpname) == 0);
+    return (name && strcmp(name, cmpname) == 0);
 }
 
 /**
@@ -497,10 +516,10 @@ ipatch_xml_test_name (GNode *node, const char *cmpname)
  *   modified or freed.
  */
 G_CONST_RETURN char *
-ipatch_xml_get_value (GNode *node)
+ipatch_xml_get_value(GNode *node)
 {
-  g_return_val_if_fail (node != NULL, NULL);
-  return (((IpatchXmlNode *)(node->data))->value);
+    g_return_val_if_fail(node != NULL, NULL);
+    return (((IpatchXmlNode *)(node->data))->value);
 }
 
 /**
@@ -513,10 +532,10 @@ ipatch_xml_get_value (GNode *node)
  * Returns: Newly allocated duplicate value of XML node or %NULL.
  */
 char *
-ipatch_xml_dup_value (GNode *node)
+ipatch_xml_dup_value(GNode *node)
 {
-  g_return_val_if_fail (node != NULL, NULL);
-  return (g_strdup (((IpatchXmlNode *)(node->data))->value));
+    g_return_val_if_fail(node != NULL, NULL);
+    return (g_strdup(((IpatchXmlNode *)(node->data))->value));
 }
 
 /**
@@ -529,16 +548,16 @@ ipatch_xml_dup_value (GNode *node)
  * Returns: %TRUE if the node has the given value, %FALSE otherwise
  */
 gboolean
-ipatch_xml_test_value (GNode *node, const char *cmpvalue)
+ipatch_xml_test_value(GNode *node, const char *cmpvalue)
 {
-  const char *value;
+    const char *value;
 
-  g_return_val_if_fail (node != NULL, FALSE);
-  g_return_val_if_fail (cmpvalue != NULL, FALSE);
+    g_return_val_if_fail(node != NULL, FALSE);
+    g_return_val_if_fail(cmpvalue != NULL, FALSE);
 
-  value = ipatch_xml_get_value (node);
+    value = ipatch_xml_get_value(node);
 
-  return (value && strcmp (value, cmpvalue) == 0);
+    return (value && strcmp(value, cmpvalue) == 0);
 }
 
 /**
@@ -551,43 +570,43 @@ ipatch_xml_test_value (GNode *node, const char *cmpvalue)
  * attribute with the given @attr_name, its value will be replaced.
  */
 void
-ipatch_xml_set_attribute (GNode *node, const char *attr_name,
-                          const char *attr_value)
+ipatch_xml_set_attribute(GNode *node, const char *attr_name,
+                         const char *attr_value)
 {
-  IpatchXmlNode *xmlnode;
-  IpatchXmlAttr *attr;
-  GList *p;
+    IpatchXmlNode *xmlnode;
+    IpatchXmlAttr *attr;
+    GList *p;
 
-  g_return_if_fail (node != NULL);
-  g_return_if_fail (attr_name != NULL);
+    g_return_if_fail(node != NULL);
+    g_return_if_fail(attr_name != NULL);
 
-  xmlnode = (IpatchXmlNode *)(node->data);
+    xmlnode = (IpatchXmlNode *)(node->data);
 
-  for (p = xmlnode->attributes; p; p = p->next)
-  {
-    attr = (IpatchXmlAttr *)(p->data);
-
-    if (strcmp (attr->name, attr_name) == 0)
+    for(p = xmlnode->attributes; p; p = p->next)
     {
-      if (attr_value)
-      {
-        g_free (attr->value);
-        attr->value = g_strdup (attr_value);
-      }
-      else
-      {
-        ipatch_xml_attr_free (attr);
-        xmlnode->attributes = g_list_delete_link (xmlnode->attributes, p);
-      }
+        attr = (IpatchXmlAttr *)(p->data);
 
-      return;
+        if(strcmp(attr->name, attr_name) == 0)
+        {
+            if(attr_value)
+            {
+                g_free(attr->value);
+                attr->value = g_strdup(attr_value);
+            }
+            else
+            {
+                ipatch_xml_attr_free(attr);
+                xmlnode->attributes = g_list_delete_link(xmlnode->attributes, p);
+            }
+
+            return;
+        }
     }
-  }
 
-  attr = ipatch_xml_attr_new ();
-  attr->name = g_strdup (attr_name);
-  attr->value = g_strdup (attr_value);
-  xmlnode->attributes = g_list_append (xmlnode->attributes, attr);
+    attr = ipatch_xml_attr_new();
+    attr->name = g_strdup(attr_name);
+    attr->value = g_strdup(attr_value);
+    xmlnode->attributes = g_list_append(xmlnode->attributes, attr);
 }
 
 /**
@@ -600,26 +619,32 @@ ipatch_xml_set_attribute (GNode *node, const char *attr_name,
  * Set one or more attributes of an XML node.
  */
 void
-ipatch_xml_set_attributes (GNode *node, const char *attr_name,
-                           const char *attr_value, const char *attr2_name, ...)
+ipatch_xml_set_attributes(GNode *node, const char *attr_name,
+                          const char *attr_value, const char *attr2_name, ...)
 {
-  va_list var_args;
-  char *vname;
-  
-  g_return_if_fail (node != NULL);
-  g_return_if_fail (attr_name != NULL);
+    va_list var_args;
+    char *vname;
 
-  ipatch_xml_set_attribute (node, attr_name, attr_value);
-  if (!attr2_name) return;
+    g_return_if_fail(node != NULL);
+    g_return_if_fail(attr_name != NULL);
 
-  va_start (var_args, attr2_name);
+    ipatch_xml_set_attribute(node, attr_name, attr_value);
 
-  ipatch_xml_set_attribute (node, attr2_name, va_arg (var_args, char *));
+    if(!attr2_name)
+    {
+        return;
+    }
 
-  while ((vname = va_arg (var_args, char *)))
-    ipatch_xml_set_attribute (node, vname, va_arg (var_args, char *));
+    va_start(var_args, attr2_name);
 
-  va_end (var_args);
+    ipatch_xml_set_attribute(node, attr2_name, va_arg(var_args, char *));
+
+    while((vname = va_arg(var_args, char *)))
+    {
+        ipatch_xml_set_attribute(node, vname, va_arg(var_args, char *));
+    }
+
+    va_end(var_args);
 }
 
 /**
@@ -633,23 +658,25 @@ ipatch_xml_set_attributes (GNode *node, const char *attr_name,
  *   and should not be modified or freed.
  */
 G_CONST_RETURN char *
-ipatch_xml_get_attribute (GNode *node, const char *attr_name)
+ipatch_xml_get_attribute(GNode *node, const char *attr_name)
 {
-  IpatchXmlAttr *attr;
-  GList *p;
+    IpatchXmlAttr *attr;
+    GList *p;
 
-  g_return_val_if_fail (node != NULL, NULL);
-  g_return_val_if_fail (attr_name != NULL, NULL);
+    g_return_val_if_fail(node != NULL, NULL);
+    g_return_val_if_fail(attr_name != NULL, NULL);
 
-  for (p = ((IpatchXmlNode *)(node->data))->attributes; p; p = p->next)
-  {
-    attr = (IpatchXmlAttr *)(p->data);
+    for(p = ((IpatchXmlNode *)(node->data))->attributes; p; p = p->next)
+    {
+        attr = (IpatchXmlAttr *)(p->data);
 
-    if (strcmp (attr->name, attr_name) == 0)
-      return (attr->value);
-  }
+        if(strcmp(attr->name, attr_name) == 0)
+        {
+            return (attr->value);
+        }
+    }
 
-  return (NULL);
+    return (NULL);
 }
 
 /**
@@ -663,16 +690,16 @@ ipatch_xml_get_attribute (GNode *node, const char *attr_name)
  * Returns: %TRUE if attribute exists and matches @cmpval (if set).
  */
 gboolean
-ipatch_xml_test_attribute (GNode *node, const char *attr_name, const char *cmpval)
+ipatch_xml_test_attribute(GNode *node, const char *attr_name, const char *cmpval)
 {
-  const char *attr_val;
+    const char *attr_val;
 
-  g_return_val_if_fail (node != NULL, FALSE);
-  g_return_val_if_fail (attr_name != NULL, FALSE);
+    g_return_val_if_fail(node != NULL, FALSE);
+    g_return_val_if_fail(attr_name != NULL, FALSE);
 
-  attr_val = ipatch_xml_get_attribute (node, attr_name);
+    attr_val = ipatch_xml_get_attribute(node, attr_name);
 
-  return (attr_val && (!cmpval || strcmp (attr_val, cmpval) == 0));
+    return (attr_val && (!cmpval || strcmp(attr_val, cmpval) == 0));
 }
 
 /**
@@ -686,23 +713,25 @@ ipatch_xml_test_attribute (GNode *node, const char *attr_name, const char *cmpva
  * Returns: (transfer none): Matching node or %NULL if not found.
  */
 GNode *
-ipatch_xml_find_child (GNode *node, const char *name)
+ipatch_xml_find_child(GNode *node, const char *name)
 {
-  IpatchXmlNode *xmlnode;
-  GNode *n;
+    IpatchXmlNode *xmlnode;
+    GNode *n;
 
-  g_return_val_if_fail (node != NULL, NULL);
-  g_return_val_if_fail (name != NULL, NULL);
+    g_return_val_if_fail(node != NULL, NULL);
+    g_return_val_if_fail(name != NULL, NULL);
 
-  for (n = node->children; n; n = n->next)
-  {
-    xmlnode = (IpatchXmlNode *)(n->data);
+    for(n = node->children; n; n = n->next)
+    {
+        xmlnode = (IpatchXmlNode *)(n->data);
 
-    if (strcmp (xmlnode->name, name) == 0)
-      return (n);
-  }
+        if(strcmp(xmlnode->name, name) == 0)
+        {
+            return (n);
+        }
+    }
 
-  return (NULL);
+    return (NULL);
 }
 
 /**
@@ -716,37 +745,43 @@ ipatch_xml_find_child (GNode *node, const char *name)
  * Returns: (transfer none): Matching node or %NULL if not found.
  */
 GNode *
-ipatch_xml_find_by_path (GNode *node, const char *path)
+ipatch_xml_find_by_path(GNode *node, const char *path)
 {
-  g_return_val_if_fail (node != NULL, NULL);
-  g_return_val_if_fail (path != NULL, NULL);
+    g_return_val_if_fail(node != NULL, NULL);
+    g_return_val_if_fail(path != NULL, NULL);
 
-  return (ipatch_xml_find_by_path_recurse (node, path));
+    return (ipatch_xml_find_by_path_recurse(node, path));
 }
 
 static GNode *
-ipatch_xml_find_by_path_recurse (GNode *node, const char *path)
+ipatch_xml_find_by_path_recurse(GNode *node, const char *path)
 {
-  IpatchXmlNode *xmlnode;
-  char *dot;
-  int len;
-  GNode *n;
+    IpatchXmlNode *xmlnode;
+    char *dot;
+    int len;
+    GNode *n;
 
-  dot = strchr (path, '.');
-  len = dot ? dot - path : strlen (path);
+    dot = strchr(path, '.');
+    len = dot ? dot - path : strlen(path);
 
-  for (n = node->children; n; n = n->next)
-  {
-    xmlnode = (IpatchXmlNode *)(n->data);
-
-    if (strncmp (xmlnode->name, path, len) == 0)
+    for(n = node->children; n; n = n->next)
     {
-      if (!dot) return (n);
-      else return (ipatch_xml_find_by_path_recurse (n, dot + 1));
-    }
-  }
+        xmlnode = (IpatchXmlNode *)(n->data);
 
-  return (NULL);
+        if(strncmp(xmlnode->name, path, len) == 0)
+        {
+            if(!dot)
+            {
+                return (n);
+            }
+            else
+            {
+                return (ipatch_xml_find_by_path_recurse(n, dot + 1));
+            }
+        }
+    }
+
+    return (NULL);
 }
 
 /**
@@ -760,74 +795,83 @@ ipatch_xml_find_by_path_recurse (GNode *node, const char *path)
  *   g_free() when done using it.
  */
 char *
-ipatch_xml_to_str (GNode *node, guint indent)
+ipatch_xml_to_str(GNode *node, guint indent)
 {
-  GString *str;
+    GString *str;
 
-  g_return_val_if_fail (node != NULL, NULL);
+    g_return_val_if_fail(node != NULL, NULL);
 
-  str = g_string_new ("");
+    str = g_string_new("");
 
-  ipatch_xml_to_str_recurse (str, node, 0, indent);
+    ipatch_xml_to_str_recurse(str, node, 0, indent);
 
-  return (g_string_free (str, FALSE));
+    return (g_string_free(str, FALSE));
 }
 
 static void
-ipatch_xml_to_str_recurse (GString *str, GNode *node, guint indent, guint inc)
+ipatch_xml_to_str_recurse(GString *str, GNode *node, guint indent, guint inc)
 {
-  IpatchXmlNode *xmlnode;
-  char *esc;
-  GNode *n;
-  guint i;
+    IpatchXmlNode *xmlnode;
+    char *esc;
+    GNode *n;
+    guint i;
 
-  xmlnode = (IpatchXmlNode *)(node->data);
+    xmlnode = (IpatchXmlNode *)(node->data);
 
-  for (i = 0; i < indent; i++)
-    g_string_append_c (str, ' ');
-
-  g_string_append_printf (str, "<%s", xmlnode->name);
-
-  if (xmlnode->attributes)
-  {
-    IpatchXmlAttr *attr;
-    GList *p;
-
-    for (p = xmlnode->attributes; p; p = p->next)
+    for(i = 0; i < indent; i++)
     {
-      attr = (IpatchXmlAttr *)(p->data);
-      esc = g_markup_escape_text (attr->value, -1);	/* ++ alloc */
-      g_string_append_printf (str, " %s=\"%s\"", attr->name, esc);
-      g_free (esc);	/* -- free */
+        g_string_append_c(str, ' ');
     }
-  }
 
-  if (!xmlnode->value && !node->children)
-  {
-    g_string_append (str, "/>\n");
-    return;
-  }
-  else g_string_append (str, ">");
+    g_string_append_printf(str, "<%s", xmlnode->name);
 
-  if (xmlnode->value)
-  {
-    esc = g_markup_escape_text (xmlnode->value, -1);	/* ++ alloc */
-    g_string_append (str, esc);
-    g_free (esc);	/* -- free */
-  }
+    if(xmlnode->attributes)
+    {
+        IpatchXmlAttr *attr;
+        GList *p;
 
-  if (node->children)
-  {
-    g_string_append_c (str, '\n');
+        for(p = xmlnode->attributes; p; p = p->next)
+        {
+            attr = (IpatchXmlAttr *)(p->data);
+            esc = g_markup_escape_text(attr->value, -1);	/* ++ alloc */
+            g_string_append_printf(str, " %s=\"%s\"", attr->name, esc);
+            g_free(esc);	/* -- free */
+        }
+    }
 
-    for (n = node->children; n; n = n->next)
-      ipatch_xml_to_str_recurse (str, n, indent + inc, inc);
+    if(!xmlnode->value && !node->children)
+    {
+        g_string_append(str, "/>\n");
+        return;
+    }
+    else
+    {
+        g_string_append(str, ">");
+    }
 
-    for (i = 0; i < indent; i++)
-      g_string_append_c (str, ' ');
-  }
+    if(xmlnode->value)
+    {
+        esc = g_markup_escape_text(xmlnode->value, -1);	/* ++ alloc */
+        g_string_append(str, esc);
+        g_free(esc);	/* -- free */
+    }
 
-  g_string_append_printf (str, "</%s>\n", xmlnode->name);
+    if(node->children)
+    {
+        g_string_append_c(str, '\n');
+
+        for(n = node->children; n; n = n->next)
+        {
+            ipatch_xml_to_str_recurse(str, n, indent + inc, inc);
+        }
+
+        for(i = 0; i < indent; i++)
+        {
+            g_string_append_c(str, ' ');
+        }
+    }
+
+    g_string_append_printf(str, "</%s>\n", xmlnode->name);
 }
 
 /**
@@ -842,20 +886,24 @@ ipatch_xml_to_str_recurse (GString *str, GNode *node, guint indent, guint inc)
  * Returns: %TRUE on success, %FALSE otherwise (in which case @err may be set)
  */
 gboolean
-ipatch_xml_save_to_file (GNode *node, guint indent, const char *filename,
-                         GError **err)
+ipatch_xml_save_to_file(GNode *node, guint indent, const char *filename,
+                        GError **err)
 {
-  gboolean retval;
-  char *s;
+    gboolean retval;
+    char *s;
 
-  s = ipatch_xml_to_str (node, indent);		/* ++ alloc */
-  if (!s) return (FALSE);
+    s = ipatch_xml_to_str(node, indent);		/* ++ alloc */
 
-  retval = g_file_set_contents (filename, s, -1, err);
+    if(!s)
+    {
+        return (FALSE);
+    }
 
-  g_free (s);	/* -- free */
+    retval = g_file_set_contents(filename, s, -1, err);
 
-  return (retval);
+    g_free(s);	/* -- free */
+
+    return (retval);
 }
 
 /**
@@ -869,69 +917,72 @@ ipatch_xml_save_to_file (GNode *node, guint indent, const char *filename,
  *   %NULL on error (@err may be set), can be freed with ipatch_xml_destroy().
  */
 GNode *
-ipatch_xml_from_str (const char *str, GError **err)
+ipatch_xml_from_str(const char *str, GError **err)
 {
-  GMarkupParseContext *ctx;
+    GMarkupParseContext *ctx;
 
-    GMarkupParser parser = {
-    xml_start_element,
-    xml_end_element,
-    xml_text
-  };
-
-  GNode *root = NULL;
-
-  ctx = g_markup_parse_context_new (&parser, 0, &root, NULL);
-
-  if (!g_markup_parse_context_parse (ctx, str, -1, err)
-      || !g_markup_parse_context_end_parse (ctx, err))
-  {
-    g_markup_parse_context_free (ctx);
-
-    if (root)
+    GMarkupParser parser =
     {
-      root = g_node_get_root (root);
-      ipatch_xml_destroy (root);
+        xml_start_element,
+        xml_end_element,
+        xml_text
+    };
+
+    GNode *root = NULL;
+
+    ctx = g_markup_parse_context_new(&parser, 0, &root, NULL);
+
+    if(!g_markup_parse_context_parse(ctx, str, -1, err)
+            || !g_markup_parse_context_end_parse(ctx, err))
+    {
+        g_markup_parse_context_free(ctx);
+
+        if(root)
+        {
+            root = g_node_get_root(root);
+            ipatch_xml_destroy(root);
+        }
+
+        return (NULL);
     }
 
-    return (NULL);
-  }
+    g_markup_parse_context_free(ctx);
 
-  g_markup_parse_context_free (ctx);
-
-  return (root);
+    return (root);
 }
 
 static void
-xml_start_element (GMarkupParseContext *context, const gchar *element_name,
-                   const gchar **attribute_names, const gchar **attribute_values,
-                   gpointer user_data, GError **error)
+xml_start_element(GMarkupParseContext *context, const gchar *element_name,
+                  const gchar **attribute_names, const gchar **attribute_values,
+                  gpointer user_data, GError **error)
 {
-  GNode **node = (GNode **)user_data;
-  *node = ipatch_xml_new_node_strv (*node, element_name, NULL,
-                                    attribute_names, attribute_values);
+    GNode **node = (GNode **)user_data;
+    *node = ipatch_xml_new_node_strv(*node, element_name, NULL,
+                                     attribute_names, attribute_values);
 }
 
 static void
-xml_end_element (GMarkupParseContext *context, const gchar *element_name,
-                 gpointer user_data, GError **error)
+xml_end_element(GMarkupParseContext *context, const gchar *element_name,
+                gpointer user_data, GError **error)
 {
-  GNode **node = (GNode **)user_data;
+    GNode **node = (GNode **)user_data;
 
-  if ((*node)->parent)
-    *node = (*node)->parent;
+    if((*node)->parent)
+    {
+        *node = (*node)->parent;
+    }
 }
 
 static void
-xml_text (GMarkupParseContext *context, const gchar *text, gsize text_len,  
-          gpointer user_data, GError **error)
+xml_text(GMarkupParseContext *context, const gchar *text, gsize text_len,
+         gpointer user_data, GError **error)
 {
-  GNode **node = (GNode **)user_data;
-  IpatchXmlNode *xmlnode;
+    GNode **node = (GNode **)user_data;
+    IpatchXmlNode *xmlnode;
 
-  xmlnode = (IpatchXmlNode *)((*node)->data);
-  g_free (xmlnode->value);
-  xmlnode->value = g_strdup (text);
+    xmlnode = (IpatchXmlNode *)((*node)->data);
+    g_free(xmlnode->value);
+    xmlnode->value = g_strdup(text);
 }
 
 /**
@@ -945,22 +996,24 @@ xml_text (GMarkupParseContext *context, const gchar *text, gsize text_len,
  *   or %NULL on error (@err may be set), can be freed with ipatch_xml_destroy().
  */
 GNode *
-ipatch_xml_load_from_file (const char *filename, GError **err)
+ipatch_xml_load_from_file(const char *filename, GError **err)
 {
-  GNode *node;
-  char *str;
+    GNode *node;
+    char *str;
 
-  g_return_val_if_fail (filename != NULL, NULL);
-  g_return_val_if_fail (!err || !*err, NULL);
+    g_return_val_if_fail(filename != NULL, NULL);
+    g_return_val_if_fail(!err || !*err, NULL);
 
-  if (!g_file_get_contents (filename, &str, NULL, err))		/* ++ alloc */
-    return (NULL);
+    if(!g_file_get_contents(filename, &str, NULL, err))		/* ++ alloc */
+    {
+        return (NULL);
+    }
 
-  node = ipatch_xml_from_str (str, err);
+    node = ipatch_xml_from_str(str, err);
 
-  g_free (str);
+    g_free(str);
 
-  return (node);
+    return (node);
 }
 
 /**
@@ -971,14 +1024,14 @@ ipatch_xml_load_from_file (const char *filename, GError **err)
  * Returns: New XML node structure, which should be added to a GNode.
  */
 IpatchXmlNode *
-ipatch_xml_node_new (void)
+ipatch_xml_node_new(void)
 {
-  IpatchXmlNode *xmlnode;
+    IpatchXmlNode *xmlnode;
 
-  xmlnode = g_slice_new0 (IpatchXmlNode);
-  g_datalist_init (&xmlnode->qdata);
+    xmlnode = g_slice_new0(IpatchXmlNode);
+    g_datalist_init(&xmlnode->qdata);
 
-  return (xmlnode);
+    return (xmlnode);
 }
 
 /**
@@ -988,21 +1041,23 @@ ipatch_xml_node_new (void)
  * Free an XML node structure and its contents.  Not normally used.
  */
 void
-ipatch_xml_node_free (IpatchXmlNode *xmlnode)
+ipatch_xml_node_free(IpatchXmlNode *xmlnode)
 {
-  GList *p;
+    GList *p;
 
-  g_return_if_fail (xmlnode != NULL);
+    g_return_if_fail(xmlnode != NULL);
 
-  g_free (xmlnode->name);
-  g_free (xmlnode->value);
+    g_free(xmlnode->name);
+    g_free(xmlnode->value);
 
-  g_datalist_clear (&xmlnode->qdata);
+    g_datalist_clear(&xmlnode->qdata);
 
-  for (p = xmlnode->attributes; p; p = g_list_delete_link (p, p))
-    ipatch_xml_attr_free (p->data);
+    for(p = xmlnode->attributes; p; p = g_list_delete_link(p, p))
+    {
+        ipatch_xml_attr_free(p->data);
+    }
 
-  g_slice_free (IpatchXmlNode, xmlnode);
+    g_slice_free(IpatchXmlNode, xmlnode);
 }
 
 /**
@@ -1015,27 +1070,27 @@ ipatch_xml_node_free (IpatchXmlNode *xmlnode)
  * Returns: New duplicate of @xmlnode.
  */
 IpatchXmlNode *
-ipatch_xml_node_duplicate (const IpatchXmlNode *xmlnode)
+ipatch_xml_node_duplicate(const IpatchXmlNode *xmlnode)
 {
-  IpatchXmlNode *dupnode;
-  IpatchXmlAttr *dupattr;
-  GList *p;
+    IpatchXmlNode *dupnode;
+    IpatchXmlAttr *dupattr;
+    GList *p;
 
-  g_return_val_if_fail (xmlnode != NULL, NULL);
+    g_return_val_if_fail(xmlnode != NULL, NULL);
 
-  dupnode = ipatch_xml_node_new ();
-  dupnode->name = g_strdup (xmlnode->name);
-  dupnode->value = g_strdup (xmlnode->value);
+    dupnode = ipatch_xml_node_new();
+    dupnode->name = g_strdup(xmlnode->name);
+    dupnode->value = g_strdup(xmlnode->value);
 
-  for (p = xmlnode->attributes; p; p = p->next)
-  {
-    dupattr = ipatch_xml_attr_duplicate (p->data);
-    dupnode->attributes = g_list_prepend (dupnode->attributes, dupattr);
-  }
+    for(p = xmlnode->attributes; p; p = p->next)
+    {
+        dupattr = ipatch_xml_attr_duplicate(p->data);
+        dupnode->attributes = g_list_prepend(dupnode->attributes, dupattr);
+    }
 
-  dupnode->attributes = g_list_reverse (dupnode->attributes);
+    dupnode->attributes = g_list_reverse(dupnode->attributes);
 
-  return (dupnode);
+    return (dupnode);
 }
 
 /**
@@ -1047,9 +1102,9 @@ ipatch_xml_node_duplicate (const IpatchXmlNode *xmlnode)
  *   attributes list.
  */
 IpatchXmlAttr *
-ipatch_xml_attr_new (void)
+ipatch_xml_attr_new(void)
 {
-  return (g_slice_new0 (IpatchXmlAttr));
+    return (g_slice_new0(IpatchXmlAttr));
 }
 
 /**
@@ -1059,12 +1114,12 @@ ipatch_xml_attr_new (void)
  * Free an XML attribute structure.  Not normally used.
  */
 void
-ipatch_xml_attr_free (IpatchXmlAttr *attr)
+ipatch_xml_attr_free(IpatchXmlAttr *attr)
 {
-  g_return_if_fail (attr != NULL);
-  g_free (attr->name);
-  g_free (attr->value);
-  g_slice_free (IpatchXmlAttr, attr);
+    g_return_if_fail(attr != NULL);
+    g_free(attr->name);
+    g_free(attr->value);
+    g_slice_free(IpatchXmlAttr, attr);
 }
 
 /**
@@ -1076,15 +1131,15 @@ ipatch_xml_attr_free (IpatchXmlAttr *attr)
  * Returns: New duplicate attribute structure
  */
 IpatchXmlAttr *
-ipatch_xml_attr_duplicate (const IpatchXmlAttr *attr)
+ipatch_xml_attr_duplicate(const IpatchXmlAttr *attr)
 {
-  IpatchXmlAttr *dupattr;
-  
-  g_return_val_if_fail (attr != NULL, NULL);
+    IpatchXmlAttr *dupattr;
 
-  dupattr = ipatch_xml_attr_new ();
-  dupattr->name = g_strdup (attr->name);
-  dupattr->value = g_strdup (attr->value);
+    g_return_val_if_fail(attr != NULL, NULL);
 
-  return (dupattr);
+    dupattr = ipatch_xml_attr_new();
+    dupattr->name = g_strdup(attr->name);
+    dupattr->value = g_strdup(attr->value);
+
+    return (dupattr);
 }

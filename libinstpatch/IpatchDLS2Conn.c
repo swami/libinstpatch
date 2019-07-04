@@ -20,7 +20,7 @@
 /**
  * SECTION: IpatchDLS2Conn
  * @short_description: DLS version 2 connection structures and functions
- * @see_also: 
+ * @see_also:
  * @stability: Stable
  *
  * Defines structures and functions used for DLS version 2 instrument
@@ -40,16 +40,16 @@
  * Returns: Boxed GType of the #IpatchDLS2Conn structure
  */
 GType
-ipatch_dls2_conn_get_type (void)
+ipatch_dls2_conn_get_type(void)
 {
-  static GType type = 0;
+    static GType type = 0;
 
-  if (!type)
-    type = g_boxed_type_register_static ("IpatchDLS2Conn",
-				(GBoxedCopyFunc)ipatch_dls2_conn_duplicate,
-				(GBoxedFreeFunc)ipatch_dls2_conn_free);
+    if(!type)
+        type = g_boxed_type_register_static("IpatchDLS2Conn",
+                                            (GBoxedCopyFunc)ipatch_dls2_conn_duplicate,
+                                            (GBoxedFreeFunc)ipatch_dls2_conn_free);
 
-  return (type);
+    return (type);
 }
 
 /**
@@ -60,9 +60,9 @@ ipatch_dls2_conn_get_type (void)
  * Returns: New connection
  */
 IpatchDLS2Conn *
-ipatch_dls2_conn_new (void)
+ipatch_dls2_conn_new(void)
 {
-  return (g_slice_new0 (IpatchDLS2Conn));
+    return (g_slice_new0(IpatchDLS2Conn));
 }
 
 /**
@@ -72,9 +72,9 @@ ipatch_dls2_conn_new (void)
  * Free an #IpatchDLS2Conn structure
  */
 void
-ipatch_dls2_conn_free (IpatchDLS2Conn *conn)
+ipatch_dls2_conn_free(IpatchDLS2Conn *conn)
 {
-  g_slice_free (IpatchDLS2Conn, conn);
+    g_slice_free(IpatchDLS2Conn, conn);
 }
 
 /**
@@ -86,21 +86,21 @@ ipatch_dls2_conn_free (IpatchDLS2Conn *conn)
  * Returns: New duplicate connection
  */
 IpatchDLS2Conn *
-ipatch_dls2_conn_duplicate (const IpatchDLS2Conn *conn)
+ipatch_dls2_conn_duplicate(const IpatchDLS2Conn *conn)
 {
-  IpatchDLS2Conn *newconn;
+    IpatchDLS2Conn *newconn;
 
-  g_return_val_if_fail (conn != NULL, NULL);
+    g_return_val_if_fail(conn != NULL, NULL);
 
-  newconn = ipatch_dls2_conn_new ();
+    newconn = ipatch_dls2_conn_new();
 
-  newconn->src = conn->src;
-  newconn->ctrlsrc = conn->ctrlsrc;
-  newconn->dest = conn->dest;
-  newconn->trans = conn->trans;
-  newconn->scale = conn->scale;
+    newconn->src = conn->src;
+    newconn->ctrlsrc = conn->ctrlsrc;
+    newconn->dest = conn->dest;
+    newconn->trans = conn->trans;
+    newconn->scale = conn->scale;
 
-  return (newconn);
+    return (newconn);
 }
 
 /**
@@ -116,31 +116,46 @@ ipatch_dls2_conn_duplicate (const IpatchDLS2Conn *conn)
  * copied to it.
  */
 void
-ipatch_dls2_conn_list_set (GSList **list, const IpatchDLS2Conn *conn)
+ipatch_dls2_conn_list_set(GSList **list, const IpatchDLS2Conn *conn)
 {
-  GSList *p, *last = NULL;
-  IpatchDLS2Conn *c;
+    GSList *p, *last = NULL;
+    IpatchDLS2Conn *c;
 
-  g_return_if_fail (list != NULL);
-  g_return_if_fail (conn != NULL);
+    g_return_if_fail(list != NULL);
+    g_return_if_fail(conn != NULL);
 
-  p = *list;
-  while (p)
+    p = *list;
+
+    while(p)
     {
-      c = (IpatchDLS2Conn *)(p->data);
-      if (IPATCH_DLS2_CONN_ARE_IDENTICAL (c, conn)) break;
-      last = p;
-      p = g_slist_next (p);
+        c = (IpatchDLS2Conn *)(p->data);
+
+        if(IPATCH_DLS2_CONN_ARE_IDENTICAL(c, conn))
+        {
+            break;
+        }
+
+        last = p;
+        p = g_slist_next(p);
     }
 
-  if (!p)			/* duplicate not found? */
+    if(!p)			/* duplicate not found? */
     {
-      c = ipatch_dls2_conn_duplicate (conn);
+        c = ipatch_dls2_conn_duplicate(conn);
 
-      if (last) last = g_slist_append (last, c);  /* assign to supress gcc warning */
-      else *list = g_slist_append (NULL, c);
+        if(last)
+        {
+            last = g_slist_append(last, c);    /* assign to supress gcc warning */
+        }
+        else
+        {
+            *list = g_slist_append(NULL, c);
+        }
     }
-  else *c = *conn;		/* overwrite old connection values */
+    else
+    {
+        *c = *conn;    /* overwrite old connection values */
+    }
 }
 
 /**
@@ -156,28 +171,40 @@ ipatch_dls2_conn_list_set (GSList **list, const IpatchDLS2Conn *conn)
  * those connections which are defined.
  */
 void
-ipatch_dls2_conn_list_unset (GSList **list, const IpatchDLS2Conn *conn)
+ipatch_dls2_conn_list_unset(GSList **list, const IpatchDLS2Conn *conn)
 {
-  IpatchDLS2Conn *c;
-  GSList *p, *prev = NULL;
+    IpatchDLS2Conn *c;
+    GSList *p, *prev = NULL;
 
-  g_return_if_fail (list != NULL);
-  g_return_if_fail (conn != NULL);
+    g_return_if_fail(list != NULL);
+    g_return_if_fail(conn != NULL);
 
-  p = *list;
-  while (p)
+    p = *list;
+
+    while(p)
     {
-      c = (IpatchDLS2Conn *)(p->data);
-      if (IPATCH_DLS2_CONN_ARE_IDENTICAL (c, conn))
-	{			/* free and remove connection */
-	  ipatch_dls2_conn_free (c);
-	  if (!prev) *list = p->next;
-	  else prev->next = p->next;
-	  g_slist_free_1 (p);
-	  return;
-	}
-      prev = p;
-      p = g_slist_next (p);
+        c = (IpatchDLS2Conn *)(p->data);
+
+        if(IPATCH_DLS2_CONN_ARE_IDENTICAL(c, conn))
+        {
+            /* free and remove connection */
+            ipatch_dls2_conn_free(c);
+
+            if(!prev)
+            {
+                *list = p->next;
+            }
+            else
+            {
+                prev->next = p->next;
+            }
+
+            g_slist_free_1(p);
+            return;
+        }
+
+        prev = p;
+        p = g_slist_next(p);
     }
 }
 
@@ -192,18 +219,18 @@ ipatch_dls2_conn_list_unset (GSList **list, const IpatchDLS2Conn *conn)
  * should be freed with ipatch_dls2_conn_list_free() when finished with it.
  */
 GSList *
-ipatch_dls2_conn_list_duplicate (const GSList *list)
+ipatch_dls2_conn_list_duplicate(const GSList *list)
 {
-  GSList *newlist = NULL;
+    GSList *newlist = NULL;
 
-  while (list)
+    while(list)
     {
-      newlist = g_slist_prepend (newlist, ipatch_dls2_conn_duplicate
-				((IpatchDLS2Conn *)(list->data)));
-      list = list->next;
+        newlist = g_slist_prepend(newlist, ipatch_dls2_conn_duplicate
+                                  ((IpatchDLS2Conn *)(list->data)));
+        list = list->next;
     }
 
-  return (g_slist_reverse (newlist));
+    return (g_slist_reverse(newlist));
 }
 
 /**
@@ -218,18 +245,18 @@ ipatch_dls2_conn_list_duplicate (const GSList *list)
  *   should be freed with ipatch_dls2_conn_list_free() when finished with it.
  */
 GSList *
-ipatch_dls2_conn_list_duplicate_fast (const GSList *list)
+ipatch_dls2_conn_list_duplicate_fast(const GSList *list)
 {
-  GSList *newlist = NULL;
+    GSList *newlist = NULL;
 
-  while (list)
+    while(list)
     {
-      newlist = g_slist_prepend (newlist, ipatch_dls2_conn_duplicate
-				((IpatchDLS2Conn *)(list->data)));
-      list = list->next;
+        newlist = g_slist_prepend(newlist, ipatch_dls2_conn_duplicate
+                                  ((IpatchDLS2Conn *)(list->data)));
+        list = list->next;
     }
 
-  return (newlist);
+    return (newlist);
 }
 
 /**
@@ -243,18 +270,22 @@ ipatch_dls2_conn_list_duplicate_fast (const GSList *list)
  * Free a list of connections
  */
 void
-ipatch_dls2_conn_list_free (GSList *list, gboolean free_conns)
+ipatch_dls2_conn_list_free(GSList *list, gboolean free_conns)
 {
-  GSList *p;
+    GSList *p;
 
-  if (free_conns)
+    if(free_conns)
     {
-      p = list;
-      while (p)
-	{
-	  ipatch_dls2_conn_free ((IpatchDLS2Conn *)(p->data));
-	  p = g_slist_delete_link (p, p);
-	}
+        p = list;
+
+        while(p)
+        {
+            ipatch_dls2_conn_free((IpatchDLS2Conn *)(p->data));
+            p = g_slist_delete_link(p, p);
+        }
     }
-  else g_slist_free (list);
+    else
+    {
+        g_slist_free(list);
+    }
 }

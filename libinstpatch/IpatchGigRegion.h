@@ -52,43 +52,43 @@ typedef struct _IpatchGigRegionClass IpatchGigRegionClass;
 /* GigaSampler region object */
 struct _IpatchGigRegion
 {
-  IpatchContainer parent_instance;
+    IpatchContainer parent_instance;
 
-  /*< private >*/
+    /*< private >*/
 
-  guint8 note_range_low;	/* MIDI note range low value */
-  guint8 note_range_high;	/* MIDI note range high value */
-  guint8 velocity_range_low;	/* MIDI velocity range low value */
-  guint8 velocity_range_high;	/* MIDI velocity range high value */
+    guint8 note_range_low;	/* MIDI note range low value */
+    guint8 note_range_high;	/* MIDI note range high value */
+    guint8 velocity_range_low;	/* MIDI velocity range low value */
+    guint8 velocity_range_high;	/* MIDI velocity range high value */
 
-  guint16 key_group;		/* Exclusive key group number or 0 */
-  guint16 layer_group;		/* layer group (descriptive only) */
+    guint16 key_group;		/* Exclusive key group number or 0 */
+    guint16 layer_group;		/* layer group (descriptive only) */
 
-  guint16 phase_group;		/* Phase locked group number or 0 */
-  guint16 channel;	/* channel ID (IpatchDLS2RegionChannelType) */
+    guint16 phase_group;		/* Phase locked group number or 0 */
+    guint16 channel;	/* channel ID (IpatchDLS2RegionChannelType) */
 
-  IpatchDLS2Info *info;		/* info string values */
+    IpatchDLS2Info *info;		/* info string values */
 
-  guint8 dimension_count;	/* dimension count (0-5) */
-  guint8 sub_region_count;	/* 2 ^ sum (dimensions[].split_count) (1-32) */
-  IpatchGigDimension *dimensions[5];	/* [dimension_count] */
-  IpatchGigSubRegion *sub_regions[32];	/* [sub_region_count] */
-  guint8 chunk_3ddp[10];   /* FIXME - what is it? (16 bits / dimension?) */
+    guint8 dimension_count;	/* dimension count (0-5) */
+    guint8 sub_region_count;	/* 2 ^ sum (dimensions[].split_count) (1-32) */
+    IpatchGigDimension *dimensions[5];	/* [dimension_count] */
+    IpatchGigSubRegion *sub_regions[32];	/* [sub_region_count] */
+    guint8 chunk_3ddp[10];   /* FIXME - what is it? (16 bits / dimension?) */
 };
 
 /* GigaSampler region class */
 struct _IpatchGigRegionClass
 {
-  IpatchContainerClass parent_class;
+    IpatchContainerClass parent_class;
 };
 
 /* Flags crammed into IpatchItem flags (ditched 2 - 16 bit flag fields) */
 /* FIXME - Are these used in GigaSampler files? */
 typedef enum
 {
-  IPATCH_GIG_REGION_SELF_NON_EXCLUSIVE = 1 << IPATCH_CONTAINER_UNUSED_FLAG_SHIFT,
-  IPATCH_GIG_REGION_PHASE_MASTER = 1 << (IPATCH_CONTAINER_UNUSED_FLAG_SHIFT + 1),
-  IPATCH_GIG_REGION_MULTI_CHANNEL = 1 << (IPATCH_CONTAINER_UNUSED_FLAG_SHIFT + 2)
+    IPATCH_GIG_REGION_SELF_NON_EXCLUSIVE = 1 << IPATCH_CONTAINER_UNUSED_FLAG_SHIFT,
+    IPATCH_GIG_REGION_PHASE_MASTER = 1 << (IPATCH_CONTAINER_UNUSED_FLAG_SHIFT + 1),
+    IPATCH_GIG_REGION_MULTI_CHANNEL = 1 << (IPATCH_CONTAINER_UNUSED_FLAG_SHIFT + 2)
 } IpatchGigRegionFlags;
 
 /**
@@ -104,20 +104,20 @@ typedef enum
   (IPATCH_CONTAINER_UNUSED_FLAG_SHIFT + 4)
 
 
-GType ipatch_gig_region_get_type (void);
-IpatchGigRegion *ipatch_gig_region_new (void);
+GType ipatch_gig_region_get_type(void);
+IpatchGigRegion *ipatch_gig_region_new(void);
 
-IpatchGigRegion *ipatch_gig_region_first (IpatchIter *iter);
-IpatchGigRegion *ipatch_gig_region_next (IpatchIter *iter);
+IpatchGigRegion *ipatch_gig_region_first(IpatchIter *iter);
+IpatchGigRegion *ipatch_gig_region_next(IpatchIter *iter);
 
-void ipatch_gig_region_set_note_range (IpatchGigRegion *region,
-				       int low, int high);
-void ipatch_gig_region_set_velocity_range (IpatchGigRegion *region,
-					   int low, int high);
+void ipatch_gig_region_set_note_range(IpatchGigRegion *region,
+                                      int low, int high);
+void ipatch_gig_region_set_velocity_range(IpatchGigRegion *region,
+        int low, int high);
 
-void ipatch_gig_region_new_dimension (IpatchGigRegion *region,
-				      IpatchGigDimensionType type,
-				      int split_count);
-void ipatch_gig_region_remove_dimension (IpatchGigRegion *region,
-					 int dim_index, int split_index);
+void ipatch_gig_region_new_dimension(IpatchGigRegion *region,
+                                     IpatchGigDimensionType type,
+                                     int split_count);
+void ipatch_gig_region_remove_dimension(IpatchGigRegion *region,
+                                        int dim_index, int split_index);
 #endif

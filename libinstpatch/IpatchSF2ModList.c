@@ -20,7 +20,7 @@
 /**
  * SECTION: IpatchSF2ModList
  * @short_description: SoundFont modulator lists
- * @see_also: 
+ * @see_also:
  * @stability: Stable
  *
  * SoundFont modulators are used to define real time MIDI effect controls.
@@ -34,29 +34,29 @@
 /* default modulators */
 static IpatchSF2Mod default_mods[] =
 {
-  { 0x0502, IPATCH_SF2_GEN_ATTENUATION, 960, 0x0, 0 },
-  { 0x0102, IPATCH_SF2_GEN_FILTER_CUTOFF, -2400, 0xD02, 0 },
-  { 0x000D, IPATCH_SF2_GEN_VIB_LFO_TO_PITCH, 50, 0x0, 0 },
-  { 0x0081, IPATCH_SF2_GEN_VIB_LFO_TO_PITCH, 50, 0x0, 0 },
-  { 0x0587, IPATCH_SF2_GEN_ATTENUATION, 960, 0x0, 0 },
-  { 0x028A, IPATCH_SF2_GEN_PAN, 1000, 0x0, 0 },
-  { 0x058B, IPATCH_SF2_GEN_ATTENUATION, 960, 0x0, 0 },
-  { 0x00DB, IPATCH_SF2_GEN_REVERB, 200, 0x0, 0 },
-  { 0x00DD, IPATCH_SF2_GEN_CHORUS, 200, 0x0, 0 }
-  //    { 0x020E, InitialPitch WTF?, 12700, 0x0010, 0 },
+    { 0x0502, IPATCH_SF2_GEN_ATTENUATION, 960, 0x0, 0 },
+    { 0x0102, IPATCH_SF2_GEN_FILTER_CUTOFF, -2400, 0xD02, 0 },
+    { 0x000D, IPATCH_SF2_GEN_VIB_LFO_TO_PITCH, 50, 0x0, 0 },
+    { 0x0081, IPATCH_SF2_GEN_VIB_LFO_TO_PITCH, 50, 0x0, 0 },
+    { 0x0587, IPATCH_SF2_GEN_ATTENUATION, 960, 0x0, 0 },
+    { 0x028A, IPATCH_SF2_GEN_PAN, 1000, 0x0, 0 },
+    { 0x058B, IPATCH_SF2_GEN_ATTENUATION, 960, 0x0, 0 },
+    { 0x00DB, IPATCH_SF2_GEN_REVERB, 200, 0x0, 0 },
+    { 0x00DD, IPATCH_SF2_GEN_CHORUS, 200, 0x0, 0 }
+    //    { 0x020E, InitialPitch WTF?, 12700, 0x0010, 0 },
 };
 
-GType 
-ipatch_sf2_mod_list_get_type (void)
+GType
+ipatch_sf2_mod_list_get_type(void)
 {
-  static GType type = 0;
+    static GType type = 0;
 
-  if (!type)
-    type = g_boxed_type_register_static ("IpatchSF2ModList",
-				(GBoxedCopyFunc)ipatch_sf2_mod_list_duplicate,
-				(GBoxedFreeFunc)ipatch_sf2_mod_list_boxed_free);
+    if(!type)
+        type = g_boxed_type_register_static("IpatchSF2ModList",
+                                            (GBoxedCopyFunc)ipatch_sf2_mod_list_duplicate,
+                                            (GBoxedFreeFunc)ipatch_sf2_mod_list_boxed_free);
 
-  return (type);
+    return (type);
 }
 
 /**
@@ -70,20 +70,20 @@ ipatch_sf2_mod_list_get_type (void)
  *   %TRUE when finished with it.
  */
 GSList *
-ipatch_sf2_mod_list_duplicate (const GSList *list)
+ipatch_sf2_mod_list_duplicate(const GSList *list)
 {
-  GSList *newlist = NULL;
+    GSList *newlist = NULL;
 
-  while (list)
+    while(list)
     {
-      newlist = g_slist_prepend (newlist, ipatch_sf2_mod_duplicate
-				((IpatchSF2Mod *)(list->data)));
-      list = list->next;
+        newlist = g_slist_prepend(newlist, ipatch_sf2_mod_duplicate
+                                  ((IpatchSF2Mod *)(list->data)));
+        list = list->next;
     }
 
-  newlist = g_slist_reverse (newlist);
+    newlist = g_slist_reverse(newlist);
 
-  return (newlist);
+    return (newlist);
 }
 
 /**
@@ -101,41 +101,60 @@ ipatch_sf2_mod_list_duplicate (const GSList *list)
  * set to the value of @copy.
  */
 GSList *
-ipatch_sf2_mod_list_override (const GSList *alist, const GSList *blist,
-			      gboolean copy)
+ipatch_sf2_mod_list_override(const GSList *alist, const GSList *blist,
+                             gboolean copy)
 {
-  GSList *newlist, *bcopy, *p;
-  IpatchSF2Mod *amod, *bmod;
+    GSList *newlist, *bcopy, *p;
+    IpatchSF2Mod *amod, *bmod;
 
-  if (copy) newlist = ipatch_sf2_mod_list_duplicate (blist);
-  else newlist = g_slist_copy ((GSList *)blist);
-
-  if (!newlist)			/* optimize for empty blist */
+    if(copy)
     {
-      if (copy) return (ipatch_sf2_mod_list_duplicate (alist));
-      else return (g_slist_copy ((GSList *)alist));
+        newlist = ipatch_sf2_mod_list_duplicate(blist);
+    }
+    else
+    {
+        newlist = g_slist_copy((GSList *)blist);
     }
 
-  bcopy = newlist;
-  while (alist)			/* loop over alist */
+    if(!newlist)			/* optimize for empty blist */
     {
-      amod = (IpatchSF2Mod *)(alist->data);
-      p = bcopy;
-      while (p)
-	{
-	  bmod = (IpatchSF2Mod *)(p->data);
-
-	  if (IPATCH_SF2_MOD_ARE_IDENTICAL (amod, bmod)) break;
-	  p = p->next;
-	}
-
-      if (!p)			/* no duplicate found? */
-	newlist = g_slist_prepend (newlist, copy ? ipatch_sf2_mod_duplicate
-				   (amod) : amod);
-      alist = alist->next;
+        if(copy)
+        {
+            return (ipatch_sf2_mod_list_duplicate(alist));
+        }
+        else
+        {
+            return (g_slist_copy((GSList *)alist));
+        }
     }
 
-  return (newlist);
+    bcopy = newlist;
+
+    while(alist)			/* loop over alist */
+    {
+        amod = (IpatchSF2Mod *)(alist->data);
+        p = bcopy;
+
+        while(p)
+        {
+            bmod = (IpatchSF2Mod *)(p->data);
+
+            if(IPATCH_SF2_MOD_ARE_IDENTICAL(amod, bmod))
+            {
+                break;
+            }
+
+            p = p->next;
+        }
+
+        if(!p)			/* no duplicate found? */
+            newlist = g_slist_prepend(newlist, copy ? ipatch_sf2_mod_duplicate
+                                      (amod) : amod);
+
+        alist = alist->next;
+    }
+
+    return (newlist);
 }
 
 /**
@@ -153,9 +172,9 @@ ipatch_sf2_mod_list_override (const GSList *alist, const GSList *blist,
  * Since: 1.1.0
  */
 GSList *
-ipatch_sf2_mod_list_override_copy (const GSList *alist, const GSList *blist)
+ipatch_sf2_mod_list_override_copy(const GSList *alist, const GSList *blist)
 {
-  return (ipatch_sf2_mod_list_override (alist, blist, TRUE));
+    return (ipatch_sf2_mod_list_override(alist, blist, TRUE));
 }
 
 /**
@@ -175,43 +194,51 @@ ipatch_sf2_mod_list_override_copy (const GSList *alist, const GSList *blist)
  *   with @free_mods set to %TRUE when finished with it.
  */
 GSList *
-ipatch_sf2_mod_list_offset (const GSList *alist, const GSList *blist)
+ipatch_sf2_mod_list_offset(const GSList *alist, const GSList *blist)
 {
-  GSList *newlist, *acopy, *p;
-  IpatchSF2Mod *amod, *bmod;
-  int add;
+    GSList *newlist, *acopy, *p;
+    IpatchSF2Mod *amod, *bmod;
+    int add;
 
-  newlist = ipatch_sf2_mod_list_duplicate (alist);
-  if (!blist) return (newlist);	/* optimize for empty blist */
+    newlist = ipatch_sf2_mod_list_duplicate(alist);
 
-  acopy = newlist;
-  while (blist)			/* loop over alist */
+    if(!blist)
     {
-      bmod = (IpatchSF2Mod *)(blist->data);
-      p = acopy;
-      while (p)
-	{
-	  amod = (IpatchSF2Mod *)(p->data);
-
-	  if (IPATCH_SF2_MOD_ARE_IDENTICAL (amod, bmod))
-	    {
-	      /* offset (add) the modulator amount */
-	      add = amod->amount + bmod->amount;
-	      add = CLAMP (add, -32768, 32767);
-	      amod->amount = add;
-	      break;
-	    }
-	  p = p->next;
-	}
-
-      /* no duplicate found? */
-      if (!p) newlist = g_slist_prepend (newlist,
-					 ipatch_sf2_mod_duplicate (bmod));
-
-      blist = blist->next;
+        return (newlist);    /* optimize for empty blist */
     }
 
-  return (newlist);
+    acopy = newlist;
+
+    while(blist)			/* loop over alist */
+    {
+        bmod = (IpatchSF2Mod *)(blist->data);
+        p = acopy;
+
+        while(p)
+        {
+            amod = (IpatchSF2Mod *)(p->data);
+
+            if(IPATCH_SF2_MOD_ARE_IDENTICAL(amod, bmod))
+            {
+                /* offset (add) the modulator amount */
+                add = amod->amount + bmod->amount;
+                add = CLAMP(add, -32768, 32767);
+                amod->amount = add;
+                break;
+            }
+
+            p = p->next;
+        }
+
+        /* no duplicate found? */
+        if(!p)
+            newlist = g_slist_prepend(newlist,
+                                      ipatch_sf2_mod_duplicate(bmod));
+
+        blist = blist->next;
+    }
+
+    return (newlist);
 }
 
 /**
@@ -224,20 +251,24 @@ ipatch_sf2_mod_list_offset (const GSList *alist, const GSList *blist)
  * Free a list of modulators
  */
 void
-ipatch_sf2_mod_list_free (GSList *list, gboolean free_mods)
+ipatch_sf2_mod_list_free(GSList *list, gboolean free_mods)
 {
-  GSList *p;
+    GSList *p;
 
-  if (free_mods)
+    if(free_mods)
     {
-      p = list;
-      while (p)
-	{
-	  ipatch_sf2_mod_free ((IpatchSF2Mod *)(p->data));
-	  p = g_slist_delete_link (p, p);
-	}
+        p = list;
+
+        while(p)
+        {
+            ipatch_sf2_mod_free((IpatchSF2Mod *)(p->data));
+            p = g_slist_delete_link(p, p);
+        }
     }
-  else g_slist_free (list);
+    else
+    {
+        g_slist_free(list);
+    }
 }
 
 /**
@@ -248,9 +279,9 @@ ipatch_sf2_mod_list_free (GSList *list, gboolean free_mods)
  * therefore frees all modulators in the list.
  */
 void
-ipatch_sf2_mod_list_boxed_free (GSList *list)
+ipatch_sf2_mod_list_boxed_free(GSList *list)
 {
-  ipatch_sf2_mod_list_free (list, TRUE);
+    ipatch_sf2_mod_list_free(list, TRUE);
 }
 
 /**
@@ -267,14 +298,14 @@ ipatch_sf2_mod_list_boxed_free (GSList *list)
  * Returns: New start (root) of @mods list.
  */
 GSList *
-ipatch_sf2_mod_list_insert (GSList *mods, const IpatchSF2Mod *modvals, int pos)
+ipatch_sf2_mod_list_insert(GSList *mods, const IpatchSF2Mod *modvals, int pos)
 {
-  IpatchSF2Mod *newmod;
+    IpatchSF2Mod *newmod;
 
-  g_return_val_if_fail (modvals != NULL, mods);
+    g_return_val_if_fail(modvals != NULL, mods);
 
-  newmod = ipatch_sf2_mod_duplicate (modvals);
-  return (g_slist_insert (mods, newmod, pos));
+    newmod = ipatch_sf2_mod_duplicate(modvals);
+    return (g_slist_insert(mods, newmod, pos));
 }
 
 /**
@@ -291,29 +322,37 @@ ipatch_sf2_mod_list_insert (GSList *mods, const IpatchSF2Mod *modvals, int pos)
  * Returns: New start (root) of @mods list.
  */
 GSList *
-ipatch_sf2_mod_list_remove (GSList *mods, const IpatchSF2Mod *modvals,
-			    gboolean *changed)
+ipatch_sf2_mod_list_remove(GSList *mods, const IpatchSF2Mod *modvals,
+                           gboolean *changed)
 {
-  IpatchSF2Mod *mod;
-  GSList *p;
+    IpatchSF2Mod *mod;
+    GSList *p;
 
-  if (changed) *changed = FALSE;
-
-  g_return_val_if_fail (modvals != NULL, mods);
-
-  for (p = mods; p; p = g_slist_next (p))
+    if(changed)
     {
-      mod = (IpatchSF2Mod *)(p->data);
-
-      if (IPATCH_SF2_MOD_ARE_IDENTICAL_AMOUNT (mod, modvals))
-	{
-	  ipatch_sf2_mod_free (mod);
-	  if (changed) *changed = TRUE;
-	  return (g_slist_delete_link (mods, p));
-	}
+        *changed = FALSE;
     }
 
-  return (mods);
+    g_return_val_if_fail(modvals != NULL, mods);
+
+    for(p = mods; p; p = g_slist_next(p))
+    {
+        mod = (IpatchSF2Mod *)(p->data);
+
+        if(IPATCH_SF2_MOD_ARE_IDENTICAL_AMOUNT(mod, modvals))
+        {
+            ipatch_sf2_mod_free(mod);
+
+            if(changed)
+            {
+                *changed = TRUE;
+            }
+
+            return (g_slist_delete_link(mods, p));
+        }
+    }
+
+    return (mods);
 }
 
 /**
@@ -330,27 +369,27 @@ ipatch_sf2_mod_list_remove (GSList *mods, const IpatchSF2Mod *modvals,
  * Returns: %TRUE if changed, %FALSE otherwise (no match)
  */
 gboolean
-ipatch_sf2_mod_list_change (GSList *mods, const IpatchSF2Mod *oldvals,
-			    const IpatchSF2Mod *newvals)
+ipatch_sf2_mod_list_change(GSList *mods, const IpatchSF2Mod *oldvals,
+                           const IpatchSF2Mod *newvals)
 {
-  IpatchSF2Mod *mod;
-  GSList *p;
+    IpatchSF2Mod *mod;
+    GSList *p;
 
-  g_return_val_if_fail (oldvals != NULL, FALSE);
-  g_return_val_if_fail (newvals != NULL, FALSE);
+    g_return_val_if_fail(oldvals != NULL, FALSE);
+    g_return_val_if_fail(newvals != NULL, FALSE);
 
-  for (p = mods; p; p = p->next)
+    for(p = mods; p; p = p->next)
     {
-      mod = (IpatchSF2Mod *)(p->data);
+        mod = (IpatchSF2Mod *)(p->data);
 
-      if (IPATCH_SF2_MOD_ARE_IDENTICAL_AMOUNT (mod, oldvals))
-	{
-	  *mod = *newvals;	/* replace values in modulator */
-	  return (TRUE);
-	}
+        if(IPATCH_SF2_MOD_ARE_IDENTICAL_AMOUNT(mod, oldvals))
+        {
+            *mod = *newvals;	/* replace values in modulator */
+            return (TRUE);
+        }
     }
 
-  return (FALSE);
+    return (FALSE);
 }
 
 /**
@@ -363,14 +402,16 @@ ipatch_sf2_mod_list_change (GSList *mods, const IpatchSF2Mod *oldvals,
  *   should not be modified or freed.
  */
 G_CONST_RETURN GSList *
-ipatch_sf2_mod_list_get_default (void)
+ipatch_sf2_mod_list_get_default(void)
 {
-  static GSList *list = NULL;
-  int i;
+    static GSList *list = NULL;
+    int i;
 
-  if (!list)
-    for (i = sizeof (default_mods) / sizeof (IpatchSF2Mod) - 1; i >= 0 ; i--)
-      list = g_slist_prepend (list, &default_mods[i]);
+    if(!list)
+        for(i = sizeof(default_mods) / sizeof(IpatchSF2Mod) - 1; i >= 0 ; i--)
+        {
+            list = g_slist_prepend(list, &default_mods[i]);
+        }
 
-  return (list);
+    return (list);
 }

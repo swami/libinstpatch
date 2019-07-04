@@ -44,15 +44,15 @@ typedef struct _IpatchConverterSF2VoiceCacheClass IpatchConverterSF2VoiceCacheCl
 
 struct _IpatchConverterSF2VoiceCache
 {
-  IpatchConverter parent_instance;
-  IpatchItem *solo_item;
+    IpatchConverter parent_instance;
+    IpatchItem *solo_item;
 };
 
 struct _IpatchConverterSF2VoiceCacheClass
 {
-  IpatchConverterClass parent_class;
+    IpatchConverterClass parent_class;
 };
 
-GType ipatch_converter_sf2_voice_cache_get_type (void);
+GType ipatch_converter_sf2_voice_cache_get_type(void);
 
 #endif

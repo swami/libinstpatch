@@ -44,15 +44,15 @@ typedef struct _IpatchSampleStoreSwapClass IpatchSampleStoreSwapClass;
 /* Swap file sample store instance (derived from FILE sample store) */
 struct _IpatchSampleStoreSwap
 {
-  IpatchSampleStore parent_instance;
-  gpointer ram_location;        // Pointer to memory location or NULL if stored in file
-  guint location;               // Position in file of the sample data (if ram_location is NULL)
+    IpatchSampleStore parent_instance;
+    gpointer ram_location;        // Pointer to memory location or NULL if stored in file
+    guint location;               // Position in file of the sample data (if ram_location is NULL)
 };
 
 /* Swap file sample store class (derived from FILE sample store) */
 struct _IpatchSampleStoreSwapClass
 {
-  IpatchSampleStoreClass parent_class;
+    IpatchSampleStoreClass parent_class;
 };
 
 /**
@@ -62,15 +62,15 @@ struct _IpatchSampleStoreSwapClass
 #define IPATCH_SAMPLE_STORE_SWAP_UNUSED_FLAG_SHIFT \
   (IPATCH_SAMPLE_STORE_UNUSED_FLAG_SHIFT + 1)
 
-GType ipatch_sample_store_swap_get_type (void);
-void ipatch_set_sample_store_swap_file_name (const char *filename);
-char *ipatch_get_sample_store_swap_file_name (void);
-IpatchSample *ipatch_sample_store_swap_new (void);
-void ipatch_sample_store_swap_close (void);
-int ipatch_get_sample_store_swap_unused_size (void);
-void ipatch_set_sample_store_swap_max_memory (int size);
-int ipatch_get_sample_store_swap_max_memory (void);
-gboolean ipatch_compact_sample_store_swap (GError **err);
+GType ipatch_sample_store_swap_get_type(void);
+void ipatch_set_sample_store_swap_file_name(const char *filename);
+char *ipatch_get_sample_store_swap_file_name(void);
+IpatchSample *ipatch_sample_store_swap_new(void);
+void ipatch_sample_store_swap_close(void);
+int ipatch_get_sample_store_swap_unused_size(void);
+void ipatch_set_sample_store_swap_max_memory(int size);
+int ipatch_get_sample_store_swap_max_memory(void);
+gboolean ipatch_compact_sample_store_swap(GError **err);
 
 #endif
 

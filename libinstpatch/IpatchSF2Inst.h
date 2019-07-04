@@ -50,32 +50,32 @@ typedef struct _IpatchSF2InstClass IpatchSF2InstClass;
 /* SoundFont instrument item */
 struct _IpatchSF2Inst
 {
-  IpatchContainer parent_instance;
+    IpatchContainer parent_instance;
 
-  char *name;			/* name of inst */
-  GSList *zones;		/* list of inst zones */
-  GSList *mods;			/* modulators for global zone */
-  IpatchSF2GenArray genarray;	/* generator array for global zone */
+    char *name;			/* name of inst */
+    GSList *zones;		/* list of inst zones */
+    GSList *mods;			/* modulators for global zone */
+    IpatchSF2GenArray genarray;	/* generator array for global zone */
 };
 
 struct _IpatchSF2InstClass
 {
-  IpatchContainerClass parent_class;
+    IpatchContainerClass parent_class;
 };
 
-GType ipatch_sf2_inst_get_type (void);
-IpatchSF2Inst *ipatch_sf2_inst_new (void);
+GType ipatch_sf2_inst_get_type(void);
+IpatchSF2Inst *ipatch_sf2_inst_new(void);
 
 #define ipatch_sf2_inst_get_zones(inst) \
     ipatch_container_get_children (IPATCH_CONTAINER (inst), \
 				   IPATCH_TYPE_SF2_ZONE)
 
-IpatchSF2Inst *ipatch_sf2_inst_first (IpatchIter *iter);
-IpatchSF2Inst *ipatch_sf2_inst_next (IpatchIter *iter);
+IpatchSF2Inst *ipatch_sf2_inst_first(IpatchIter *iter);
+IpatchSF2Inst *ipatch_sf2_inst_next(IpatchIter *iter);
 
-void ipatch_sf2_inst_new_zone (IpatchSF2Inst *inst, IpatchSF2Sample *sample);
+void ipatch_sf2_inst_new_zone(IpatchSF2Inst *inst, IpatchSF2Sample *sample);
 
-void ipatch_sf2_inst_set_name (IpatchSF2Inst *inst, const char *name);
-char *ipatch_sf2_inst_get_name (IpatchSF2Inst *inst);
+void ipatch_sf2_inst_set_name(IpatchSF2Inst *inst, const char *name);
+char *ipatch_sf2_inst_get_name(IpatchSF2Inst *inst);
 
 #endif

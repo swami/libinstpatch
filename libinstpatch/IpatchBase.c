@@ -20,7 +20,7 @@
 /**
  * SECTION: IpatchBase
  * @short_description: Base instrument file object type
- * @see_also: 
+ * @see_also:
  * @stability: Stable
  *
  * Defines an abstract object type which is used as the basis of instrument
@@ -40,25 +40,26 @@
 #include "util.h"
 #include "ipatch_priv.h"
 
-enum {
-  PROP_0,
-  PROP_CHANGED,
-  PROP_SAVED,
-  PROP_FILENAME,
-  PROP_FILE
+enum
+{
+    PROP_0,
+    PROP_CHANGED,
+    PROP_SAVED,
+    PROP_FILENAME,
+    PROP_FILE
 };
 
 
-static void ipatch_base_finalize (GObject *gobject);
-static void ipatch_base_set_property (GObject *object, guint property_id,
-				      const GValue *value, GParamSpec *pspec);
-static void ipatch_base_get_property (GObject *object, guint property_id,
-				      GValue *value, GParamSpec *pspec);
-static void ipatch_base_real_set_file (IpatchBase *base, IpatchFile *file);
-static void ipatch_base_real_set_file_name (IpatchBase *base,
-					    const char *file_name);
-static gboolean ipatch_base_real_save (IpatchBase *base, const char *filename,
-                                       gboolean save_a_copy, GError **err);
+static void ipatch_base_finalize(GObject *gobject);
+static void ipatch_base_set_property(GObject *object, guint property_id,
+                                     const GValue *value, GParamSpec *pspec);
+static void ipatch_base_get_property(GObject *object, guint property_id,
+                                     GValue *value, GParamSpec *pspec);
+static void ipatch_base_real_set_file(IpatchBase *base, IpatchFile *file);
+static void ipatch_base_real_set_file_name(IpatchBase *base,
+        const char *file_name);
+static gboolean ipatch_base_real_save(IpatchBase *base, const char *filename,
+                                      gboolean save_a_copy, GError **err);
 
 /* private var used by IpatchItem, for fast "changed" property notifies */
 GParamSpec *ipatch_base_pspec_changed;
@@ -67,7 +68,7 @@ GParamSpec *ipatch_base_pspec_changed;
 static GParamSpec *file_pspec;
 static GParamSpec *file_name_pspec;
 
-G_DEFINE_ABSTRACT_TYPE (IpatchBase, ipatch_base, IPATCH_TYPE_CONTAINER);
+G_DEFINE_ABSTRACT_TYPE(IpatchBase, ipatch_base, IPATCH_TYPE_CONTAINER);
 
 
 /**
@@ -82,136 +83,167 @@ G_DEFINE_ABSTRACT_TYPE (IpatchBase, ipatch_base, IPATCH_TYPE_CONTAINER);
  * Since: 1.1.0
  */
 char *
-ipatch_base_type_get_mime_type (GType base_type)
+ipatch_base_type_get_mime_type(GType base_type)
 {
-  const IpatchConverterInfo *info;
-  char *mime_type;
+    const IpatchConverterInfo *info;
+    char *mime_type;
 
-  info = ipatch_lookup_converter_info (0, base_type, IPATCH_TYPE_FILE);
-  if (!info) return (NULL);
-  ipatch_type_get (info->dest_type, "mime-type", &mime_type, NULL);
+    info = ipatch_lookup_converter_info(0, base_type, IPATCH_TYPE_FILE);
 
-  return (mime_type);
+    if(!info)
+    {
+        return (NULL);
+    }
+
+    ipatch_type_get(info->dest_type, "mime-type", &mime_type, NULL);
+
+    return (mime_type);
 }
 
 static void
-ipatch_base_class_init (IpatchBaseClass *klass)
+ipatch_base_class_init(IpatchBaseClass *klass)
 {
-  GObjectClass *obj_class = G_OBJECT_CLASS (klass);
-  IpatchItemClass *item_class = IPATCH_ITEM_CLASS (klass);
+    GObjectClass *obj_class = G_OBJECT_CLASS(klass);
+    IpatchItemClass *item_class = IPATCH_ITEM_CLASS(klass);
 
-  item_class->item_set_property = ipatch_base_set_property;
-  obj_class->get_property = ipatch_base_get_property;
-  obj_class->finalize = ipatch_base_finalize;
+    item_class->item_set_property = ipatch_base_set_property;
+    obj_class->get_property = ipatch_base_get_property;
+    obj_class->finalize = ipatch_base_finalize;
 
-  ipatch_base_pspec_changed =
-    g_param_spec_boolean ("changed", "Changed", "Changed Flag",
-			  TRUE, G_PARAM_READWRITE | IPATCH_PARAM_NO_SAVE_CHANGE
-			  | IPATCH_PARAM_NO_SAVE);
-  g_object_class_install_property (obj_class, PROP_CHANGED,
-				   ipatch_base_pspec_changed);
+    ipatch_base_pspec_changed =
+        g_param_spec_boolean("changed", "Changed", "Changed Flag",
+                             TRUE, G_PARAM_READWRITE | IPATCH_PARAM_NO_SAVE_CHANGE
+                             | IPATCH_PARAM_NO_SAVE);
+    g_object_class_install_property(obj_class, PROP_CHANGED,
+                                    ipatch_base_pspec_changed);
 
-  g_object_class_install_property (obj_class, PROP_SAVED,
-		    g_param_spec_boolean ("saved", "Saved", "Been Saved Flag",
-					  FALSE, G_PARAM_READWRITE
-					  | IPATCH_PARAM_NO_SAVE_CHANGE
-					  | IPATCH_PARAM_NO_SAVE));
-  file_name_pspec = g_param_spec_string ("file-name", "File Name",
-					 "File Name", "untitled",
-					 G_PARAM_READWRITE
-                                         | IPATCH_PARAM_NO_SAVE_CHANGE);
-  g_object_class_install_property (obj_class, PROP_FILENAME, file_name_pspec);
+    g_object_class_install_property(obj_class, PROP_SAVED,
+                                    g_param_spec_boolean("saved", "Saved", "Been Saved Flag",
+                                            FALSE, G_PARAM_READWRITE
+                                            | IPATCH_PARAM_NO_SAVE_CHANGE
+                                            | IPATCH_PARAM_NO_SAVE));
+    file_name_pspec = g_param_spec_string("file-name", "File Name",
+                                          "File Name", "untitled",
+                                          G_PARAM_READWRITE
+                                          | IPATCH_PARAM_NO_SAVE_CHANGE);
+    g_object_class_install_property(obj_class, PROP_FILENAME, file_name_pspec);
 
-  file_pspec = g_param_spec_object ("file", "File", "File Object",
-				    IPATCH_TYPE_FILE,
-				    G_PARAM_READWRITE | IPATCH_PARAM_NO_SAVE
-				    | IPATCH_PARAM_HIDE
-                                    | IPATCH_PARAM_NO_SAVE_CHANGE);
-  g_object_class_install_property (obj_class, PROP_FILE, file_pspec);
+    file_pspec = g_param_spec_object("file", "File", "File Object",
+                                     IPATCH_TYPE_FILE,
+                                     G_PARAM_READWRITE | IPATCH_PARAM_NO_SAVE
+                                     | IPATCH_PARAM_HIDE
+                                     | IPATCH_PARAM_NO_SAVE_CHANGE);
+    g_object_class_install_property(obj_class, PROP_FILE, file_pspec);
 }
 
 static void
-ipatch_base_init (IpatchBase *base)
+ipatch_base_init(IpatchBase *base)
 {
 }
 
 /* function called when a patch is being destroyed */
 static void
-ipatch_base_finalize (GObject *gobject)
+ipatch_base_finalize(GObject *gobject)
 {
-  IpatchBase *base = IPATCH_BASE (gobject);
+    IpatchBase *base = IPATCH_BASE(gobject);
 
-  IPATCH_ITEM_WLOCK (base);
+    IPATCH_ITEM_WLOCK(base);
 
-  if (base->file) ipatch_file_unref_from_object (base->file, gobject);  // -- unref file from object
-  base->file = NULL;
-
-  IPATCH_ITEM_WUNLOCK (base);
-
-  if (G_OBJECT_CLASS (ipatch_base_parent_class)->finalize)
-    G_OBJECT_CLASS (ipatch_base_parent_class)->finalize (gobject);
-}
-
-static void
-ipatch_base_set_property (GObject *object, guint property_id,
-			  const GValue *value, GParamSpec *pspec)
-{
-  IpatchBase *base = IPATCH_BASE (object);
-
-  switch (property_id)
+    if(base->file)
     {
-    case PROP_CHANGED:
-      if (g_value_get_boolean (value))
-	ipatch_item_set_flags (IPATCH_ITEM (base), IPATCH_BASE_CHANGED);
-      else ipatch_item_clear_flags (IPATCH_ITEM (base), IPATCH_BASE_CHANGED);
-      break;
-    case PROP_SAVED:
-      if (g_value_get_boolean (value))
-	ipatch_item_set_flags (IPATCH_ITEM (base), IPATCH_BASE_SAVED);
-      else ipatch_item_clear_flags (IPATCH_ITEM (base), IPATCH_BASE_SAVED);
-      break;
-    case PROP_FILENAME:
-      ipatch_base_real_set_file_name (base, g_value_get_string (value));
-      break;
-    case PROP_FILE:
-      ipatch_base_real_set_file (base, g_value_get_object (value));
-      break;
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
-      break;
+        ipatch_file_unref_from_object(base->file, gobject);    // -- unref file from object
+    }
+
+    base->file = NULL;
+
+    IPATCH_ITEM_WUNLOCK(base);
+
+    if(G_OBJECT_CLASS(ipatch_base_parent_class)->finalize)
+    {
+        G_OBJECT_CLASS(ipatch_base_parent_class)->finalize(gobject);
     }
 }
 
 static void
-ipatch_base_get_property (GObject *object, guint property_id,
-			  GValue *value, GParamSpec *pspec)
+ipatch_base_set_property(GObject *object, guint property_id,
+                         const GValue *value, GParamSpec *pspec)
 {
-  IpatchBase *base;
+    IpatchBase *base = IPATCH_BASE(object);
 
-  g_return_if_fail (IPATCH_IS_BASE (object));
-  base = IPATCH_BASE (object);
-
-  switch (property_id)
+    switch(property_id)
     {
     case PROP_CHANGED:
-      g_value_set_boolean (value,
-			   ipatch_item_get_flags (IPATCH_ITEM (base))
-			   & IPATCH_BASE_CHANGED);
-      break;
+        if(g_value_get_boolean(value))
+        {
+            ipatch_item_set_flags(IPATCH_ITEM(base), IPATCH_BASE_CHANGED);
+        }
+        else
+        {
+            ipatch_item_clear_flags(IPATCH_ITEM(base), IPATCH_BASE_CHANGED);
+        }
+
+        break;
+
     case PROP_SAVED:
-      g_value_set_boolean (value,
-			   ipatch_item_get_flags (IPATCH_ITEM (base))
-			   & IPATCH_BASE_SAVED);
-      break;
+        if(g_value_get_boolean(value))
+        {
+            ipatch_item_set_flags(IPATCH_ITEM(base), IPATCH_BASE_SAVED);
+        }
+        else
+        {
+            ipatch_item_clear_flags(IPATCH_ITEM(base), IPATCH_BASE_SAVED);
+        }
+
+        break;
+
     case PROP_FILENAME:
-      g_value_take_string (value, ipatch_base_get_file_name (base));
-      break;
+        ipatch_base_real_set_file_name(base, g_value_get_string(value));
+        break;
+
     case PROP_FILE:
-      g_value_take_object (value, ipatch_base_get_file (base));
-      break;
+        ipatch_base_real_set_file(base, g_value_get_object(value));
+        break;
+
     default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
-      break;
+        G_OBJECT_WARN_INVALID_PROPERTY_ID(object, property_id, pspec);
+        break;
+    }
+}
+
+static void
+ipatch_base_get_property(GObject *object, guint property_id,
+                         GValue *value, GParamSpec *pspec)
+{
+    IpatchBase *base;
+
+    g_return_if_fail(IPATCH_IS_BASE(object));
+    base = IPATCH_BASE(object);
+
+    switch(property_id)
+    {
+    case PROP_CHANGED:
+        g_value_set_boolean(value,
+                            ipatch_item_get_flags(IPATCH_ITEM(base))
+                            & IPATCH_BASE_CHANGED);
+        break;
+
+    case PROP_SAVED:
+        g_value_set_boolean(value,
+                            ipatch_item_get_flags(IPATCH_ITEM(base))
+                            & IPATCH_BASE_SAVED);
+        break;
+
+    case PROP_FILENAME:
+        g_value_take_string(value, ipatch_base_get_file_name(base));
+        break;
+
+    case PROP_FILE:
+        g_value_take_object(value, ipatch_base_get_file(base));
+        break;
+
+    default:
+        G_OBJECT_WARN_INVALID_PROPERTY_ID(object, property_id, pspec);
+        break;
     }
 }
 
@@ -223,53 +255,53 @@ ipatch_base_get_property (GObject *object, guint property_id,
  * Sets the file object associated with a patch.
  */
 void
-ipatch_base_set_file (IpatchBase *base, IpatchFile *file)
+ipatch_base_set_file(IpatchBase *base, IpatchFile *file)
 {
-  GValue value = { 0 }, oldval = { 0 };
+    GValue value = { 0 }, oldval = { 0 };
 
-  g_return_if_fail (IPATCH_IS_BASE (base));
-  g_return_if_fail (IPATCH_IS_FILE (file));
+    g_return_if_fail(IPATCH_IS_BASE(base));
+    g_return_if_fail(IPATCH_IS_FILE(file));
 
-  g_value_init (&value, IPATCH_TYPE_FILE);
-  g_value_set_object (&value, file);
+    g_value_init(&value, IPATCH_TYPE_FILE);
+    g_value_set_object(&value, file);
 
-  ipatch_item_get_property_fast ((IpatchItem *)base, file_pspec, &oldval);
-  ipatch_base_real_set_file (base, file);
-  ipatch_item_prop_notify ((IpatchItem *)base, file_pspec, &value, &oldval);
+    ipatch_item_get_property_fast((IpatchItem *)base, file_pspec, &oldval);
+    ipatch_base_real_set_file(base, file);
+    ipatch_item_prop_notify((IpatchItem *)base, file_pspec, &value, &oldval);
 
-  g_value_unset (&value);
-  g_value_unset (&oldval);
+    g_value_unset(&value);
+    g_value_unset(&oldval);
 }
 
 static void
-ipatch_base_real_set_file (IpatchBase *base, IpatchFile *file)
+ipatch_base_real_set_file(IpatchBase *base, IpatchFile *file)
 {
-  GValue value = { 0 }, oldval = { 0 };
-  IpatchFile *oldfile;
+    GValue value = { 0 }, oldval = { 0 };
+    IpatchFile *oldfile;
 
-  ipatch_file_ref_from_object (file, (GObject *)base);                          // ++ ref new file from object
+    ipatch_file_ref_from_object(file, (GObject *)base);                           // ++ ref new file from object
 
-  IPATCH_ITEM_WLOCK (base);
-  oldfile = base->file;
-  base->file = file;
-  IPATCH_ITEM_WUNLOCK (base);
+    IPATCH_ITEM_WLOCK(base);
+    oldfile = base->file;
+    base->file = file;
+    IPATCH_ITEM_WUNLOCK(base);
 
-  g_value_init (&oldval, G_TYPE_STRING);
+    g_value_init(&oldval, G_TYPE_STRING);
 
-  if (oldfile)
-  {
-    g_value_take_string (&oldval, ipatch_file_get_name (oldfile));
-    ipatch_file_unref_from_object (oldfile, (GObject *)base);        // -- remove reference to old file
-  }
+    if(oldfile)
+    {
+        g_value_take_string(&oldval, ipatch_file_get_name(oldfile));
+        ipatch_file_unref_from_object(oldfile, (GObject *)base);         // -- remove reference to old file
+    }
 
-  g_value_init (&value, G_TYPE_STRING);
-  g_value_take_string (&value, ipatch_file_get_name (file));
+    g_value_init(&value, G_TYPE_STRING);
+    g_value_take_string(&value, ipatch_file_get_name(file));
 
-  // Notify file-name property change as well
-  ipatch_item_prop_notify ((IpatchItem *)base, file_name_pspec, &value, &oldval);
+    // Notify file-name property change as well
+    ipatch_item_prop_notify((IpatchItem *)base, file_name_pspec, &value, &oldval);
 
-  g_value_unset (&value);
-  g_value_unset (&oldval);
+    g_value_unset(&value);
+    g_value_unset(&oldval);
 }
 
 /**
@@ -284,18 +316,23 @@ ipatch_base_real_set_file (IpatchBase *base, IpatchFile *file)
  *   Remember to unref it when done with it.
  */
 IpatchFile *
-ipatch_base_get_file (IpatchBase *base)
+ipatch_base_get_file(IpatchBase *base)
 {
-  IpatchFile *file;
+    IpatchFile *file;
 
-  g_return_val_if_fail (IPATCH_IS_BASE (base), NULL);
+    g_return_val_if_fail(IPATCH_IS_BASE(base), NULL);
 
-  IPATCH_ITEM_RLOCK (base);
-  file = base->file;
-  if (file) g_object_ref (file);
-  IPATCH_ITEM_RUNLOCK (base);
+    IPATCH_ITEM_RLOCK(base);
+    file = base->file;
 
-  return (file);
+    if(file)
+    {
+        g_object_ref(file);
+    }
+
+    IPATCH_ITEM_RUNLOCK(base);
+
+    return (file);
 }
 
 /**
@@ -309,35 +346,37 @@ ipatch_base_get_file (IpatchBase *base)
  * and set it directly.
  */
 void
-ipatch_base_set_file_name (IpatchBase *base, const char *file_name)
+ipatch_base_set_file_name(IpatchBase *base, const char *file_name)
 {
-  GValue value = { 0 }, oldval = { 0 };
+    GValue value = { 0 }, oldval = { 0 };
 
-  g_return_if_fail (IPATCH_IS_BASE (base));
+    g_return_if_fail(IPATCH_IS_BASE(base));
 
-  g_value_init (&value, G_TYPE_STRING);
-  g_value_set_string (&value, file_name);
+    g_value_init(&value, G_TYPE_STRING);
+    g_value_set_string(&value, file_name);
 
-  ipatch_item_get_property_fast ((IpatchItem *)base, file_name_pspec, &oldval);
-  ipatch_base_real_set_file_name (base, file_name);
-  ipatch_item_prop_notify ((IpatchItem *)base, file_name_pspec, &value, &oldval);
+    ipatch_item_get_property_fast((IpatchItem *)base, file_name_pspec, &oldval);
+    ipatch_base_real_set_file_name(base, file_name);
+    ipatch_item_prop_notify((IpatchItem *)base, file_name_pspec, &value, &oldval);
 
-  g_value_unset (&value);
-  g_value_unset (&oldval);
+    g_value_unset(&value);
+    g_value_unset(&oldval);
 }
 
 /* the real set file name routine, user routine does a notify */
 static void
-ipatch_base_real_set_file_name (IpatchBase *base, const char *file_name)
+ipatch_base_real_set_file_name(IpatchBase *base, const char *file_name)
 {
-  IPATCH_ITEM_RLOCK (base);
-  if (!base->file)		/* silently fail */
+    IPATCH_ITEM_RLOCK(base);
+
+    if(!base->file)		/* silently fail */
     {
-      IPATCH_ITEM_RUNLOCK (base);
-      return;
+        IPATCH_ITEM_RUNLOCK(base);
+        return;
     }
-  ipatch_file_set_name (base->file, file_name);
-  IPATCH_ITEM_RUNLOCK (base);
+
+    ipatch_file_set_name(base->file, file_name);
+    IPATCH_ITEM_RUNLOCK(base);
 }
 
 /**
@@ -351,18 +390,22 @@ ipatch_base_real_set_file_name (IpatchBase *base, const char *file_name)
  *   not set. String should be freed when finished with it.
  */
 char *
-ipatch_base_get_file_name (IpatchBase *base)
+ipatch_base_get_file_name(IpatchBase *base)
 {
-  char *file_name = NULL;
+    char *file_name = NULL;
 
-  g_return_val_if_fail (IPATCH_IS_BASE (base), NULL);
+    g_return_val_if_fail(IPATCH_IS_BASE(base), NULL);
 
-  IPATCH_ITEM_RLOCK (base);
-  if (base->file)
-    file_name = ipatch_file_get_name (base->file);
-  IPATCH_ITEM_RUNLOCK (base);
+    IPATCH_ITEM_RLOCK(base);
 
-  return (file_name);
+    if(base->file)
+    {
+        file_name = ipatch_file_get_name(base->file);
+    }
+
+    IPATCH_ITEM_RUNLOCK(base);
+
+    return (file_name);
 }
 
 /**
@@ -388,22 +431,25 @@ ipatch_base_get_file_name (IpatchBase *base)
  * MIDI locale based on the input criteria.
  */
 void
-ipatch_base_find_unused_midi_locale (IpatchBase *base, int *bank,
-				     int *program, const IpatchItem *exclude,
-				     gboolean percussion)
+ipatch_base_find_unused_midi_locale(IpatchBase *base, int *bank,
+                                    int *program, const IpatchItem *exclude,
+                                    gboolean percussion)
 {
-  IpatchBaseClass *klass;
+    IpatchBaseClass *klass;
 
-  g_return_if_fail (IPATCH_IS_BASE (base));
-  g_return_if_fail (bank != NULL);
-  g_return_if_fail (program != NULL);
+    g_return_if_fail(IPATCH_IS_BASE(base));
+    g_return_if_fail(bank != NULL);
+    g_return_if_fail(program != NULL);
 
-  *bank = 0;
-  *program = 0;
+    *bank = 0;
+    *program = 0;
 
-  klass = IPATCH_BASE_GET_CLASS (base);
-  if (klass && klass->find_unused_locale)
-    klass->find_unused_locale (base, bank, program, exclude, percussion);
+    klass = IPATCH_BASE_GET_CLASS(base);
+
+    if(klass && klass->find_unused_locale)
+    {
+        klass->find_unused_locale(base, bank, program, exclude, percussion);
+    }
 }
 
 /**
@@ -419,28 +465,39 @@ ipatch_base_find_unused_midi_locale (IpatchBase *base, int *bank,
  *   returned object, and is responsible for unref'ing when finished.
  */
 IpatchItem *
-ipatch_base_find_item_by_midi_locale (IpatchBase *base, int bank, int program)
+ipatch_base_find_item_by_midi_locale(IpatchBase *base, int bank, int program)
 {
-  IpatchBaseClass *klass;
+    IpatchBaseClass *klass;
 
-  g_return_val_if_fail (IPATCH_IS_BASE (base), NULL);
+    g_return_val_if_fail(IPATCH_IS_BASE(base), NULL);
 
-  klass = IPATCH_BASE_GET_CLASS (base);
-  if (klass && klass->find_item_by_locale)
-    return (klass->find_item_by_locale (base, bank, program));
-  else return (NULL);
+    klass = IPATCH_BASE_GET_CLASS(base);
+
+    if(klass && klass->find_item_by_locale)
+    {
+        return (klass->find_item_by_locale(base, bank, program));
+    }
+    else
+    {
+        return (NULL);
+    }
 }
 
 /* GFunc used by g_list_foreach() to remove created sample stores */
 static void
-remove_created_stores (gpointer data, gpointer user_data)
+remove_created_stores(gpointer data, gpointer user_data)
 {
-  IpatchSampleStore *store = data;
-  IpatchSampleData *sampledata;
+    IpatchSampleStore *store = data;
+    IpatchSampleData *sampledata;
 
-  sampledata = (IpatchSampleData *)ipatch_item_get_parent ((IpatchItem *)store);        // ++ ref parent sampledata
-  if (sampledata) ipatch_sample_data_remove (sampledata, store);
-  g_object_unref (sampledata);          // -- unref sampledata
+    sampledata = (IpatchSampleData *)ipatch_item_get_parent((IpatchItem *)store);         // ++ ref parent sampledata
+
+    if(sampledata)
+    {
+        ipatch_sample_data_remove(sampledata, store);
+    }
+
+    g_object_unref(sampledata);           // -- unref sampledata
 }
 
 /**
@@ -456,9 +513,9 @@ remove_created_stores (gpointer data, gpointer user_data)
  * Since: 1.1.0
  */
 gboolean
-ipatch_base_save (IpatchBase *base, GError **err)
+ipatch_base_save(IpatchBase *base, GError **err)
 {
-  return ipatch_base_real_save (base, NULL, FALSE, err);
+    return ipatch_base_real_save(base, NULL, FALSE, err);
 }
 
 /**
@@ -476,9 +533,9 @@ ipatch_base_save (IpatchBase *base, GError **err)
  * Since: 1.1.0
  */
 gboolean
-ipatch_base_save_to_filename (IpatchBase *base, const char *filename, GError **err)
+ipatch_base_save_to_filename(IpatchBase *base, const char *filename, GError **err)
 {
-  return ipatch_base_real_save (base, filename, FALSE, err);
+    return ipatch_base_real_save(base, filename, FALSE, err);
 }
 
 /**
@@ -494,9 +551,9 @@ ipatch_base_save_to_filename (IpatchBase *base, const char *filename, GError **e
  * Since: 1.1.0
  */
 gboolean
-ipatch_base_save_a_copy (IpatchBase *base, const char *filename, GError **err)
+ipatch_base_save_a_copy(IpatchBase *base, const char *filename, GError **err)
 {
-  return ipatch_base_real_save (base, filename, TRUE, err);
+    return ipatch_base_real_save(base, filename, TRUE, err);
 }
 
 /*
@@ -513,160 +570,195 @@ ipatch_base_save_a_copy (IpatchBase *base, const char *filename, GError **err)
  * Returns: %TRUE on success, %FALSE otherwise (in which case @err may be set)
  */
 static gboolean
-ipatch_base_real_save (IpatchBase *base, const char *filename, gboolean save_a_copy, GError **err)
+ipatch_base_real_save(IpatchBase *base, const char *filename, gboolean save_a_copy, GError **err)
 {
-  const IpatchConverterInfo *info;
-  IpatchFile *lookup_file, *newfile = NULL, *oldfile = NULL;
-  char *tmp_fname = NULL, *abs_fname = NULL, *base_fname = NULL;
-  IpatchConverter *converter;
-  gboolean tempsave = FALSE;    // Set to TRUE if writing to a temp file first, before replacing a file
-  GError *local_err = NULL;
-  IpatchList *created_stores = NULL;
-  int tmpfd;
+    const IpatchConverterInfo *info;
+    IpatchFile *lookup_file, *newfile = NULL, *oldfile = NULL;
+    char *tmp_fname = NULL, *abs_fname = NULL, *base_fname = NULL;
+    IpatchConverter *converter;
+    gboolean tempsave = FALSE;    // Set to TRUE if writing to a temp file first, before replacing a file
+    GError *local_err = NULL;
+    IpatchList *created_stores = NULL;
+    int tmpfd;
 
-  g_return_val_if_fail (IPATCH_IS_BASE (base), FALSE);
-  g_return_val_if_fail (!err || !*err, FALSE);
+    g_return_val_if_fail(IPATCH_IS_BASE(base), FALSE);
+    g_return_val_if_fail(!err || !*err, FALSE);
 
-  g_object_get (base, "file", &oldfile, NULL);          // ++ ref old file (if any)
+    g_object_get(base, "file", &oldfile, NULL);           // ++ ref old file (if any)
 
-  /* Check if file name specified would overwrite another open file */
-  if (filename)
-  {
-    abs_fname = ipatch_util_abs_filename (filename);    // ++ allocate absolute filename
-    lookup_file = ipatch_file_pool_lookup (abs_fname);  // ++ ref file matching filename
-    if (lookup_file) g_object_unref (lookup_file);      // -- unref file (we only need the pointer value)
-
-    if (lookup_file && lookup_file != oldfile)
+    /* Check if file name specified would overwrite another open file */
+    if(filename)
     {
-      g_set_error (err, IPATCH_ERROR, IPATCH_ERROR_BUSY,
-                   _("Refusing to save over other open file '%s'"), abs_fname);
-      goto error;
-    }
-  }
+        abs_fname = ipatch_util_abs_filename(filename);     // ++ allocate absolute filename
+        lookup_file = ipatch_file_pool_lookup(abs_fname);   // ++ ref file matching filename
 
-  if (oldfile) g_object_get (base, "file-name", &base_fname, NULL);     // ++ allocate base file name
+        if(lookup_file)
+        {
+            g_object_unref(lookup_file);    // -- unref file (we only need the pointer value)
+        }
 
-  // Write to temporary file if saving over or new file name exists
-  tempsave = !abs_fname || (base_fname && strcmp (abs_fname, base_fname) == 0)
-    || g_file_test (abs_fname, G_FILE_TEST_EXISTS);
-
-  /* if no filename specified try to use current one */
-  if (!abs_fname)
-  {
-    if (!base_fname)
-    {
-      g_set_error (err, IPATCH_ERROR, IPATCH_ERROR_INVALID,
-                   _("File name not supplied and none assigned"));
-      goto error;
+        if(lookup_file && lookup_file != oldfile)
+        {
+            g_set_error(err, IPATCH_ERROR, IPATCH_ERROR_BUSY,
+                        _("Refusing to save over other open file '%s'"), abs_fname);
+            goto error;
+        }
     }
 
-    abs_fname = base_fname;     // !! abs_fname takes over base_fname
-    base_fname = NULL;
-  }
-  else g_free (base_fname);     // -- free base file name
-
-  /* Find a converter from base object to file */
-  info = ipatch_lookup_converter_info (0, G_OBJECT_TYPE (base), IPATCH_TYPE_FILE);
-
-  if (!info)
-  {
-    g_set_error (err, IPATCH_ERROR, IPATCH_ERROR_UNSUPPORTED,
-                 _("Saving object of type '%s' to file '%s' not supported"),
-                 g_type_name (G_OBJECT_TYPE (base)), abs_fname);
-    goto error;
-  }
-
-  if (tempsave) // Saving to a temporary file?
-  {
-    tmp_fname = g_strconcat (abs_fname, "_tmpXXXXXX", NULL);         // ++ alloc temporary file name
-
-    // open temporary file in same directory as destination
-    if ((tmpfd = g_mkstemp (tmp_fname)) == -1)
+    if(oldfile)
     {
-      g_set_error (err, G_FILE_ERROR, g_file_error_from_errno (errno),
-                   _("Unable to open temp file '%s' for writing: %s"),
-                   tmp_fname, g_strerror (errno));
-      goto error;
+        g_object_get(base, "file-name", &base_fname, NULL);    // ++ allocate base file name
     }
 
-    newfile = IPATCH_FILE (g_object_new (info->dest_type, "file-name", tmp_fname, NULL));       /* ++ ref new file */
-    ipatch_file_assign_fd (newfile, tmpfd, TRUE);         /* Assign file descriptor and set close on finalize */
-  }
-  else  // Not replacing a file, just save it directly without using a temporary file
-    newfile = IPATCH_FILE (g_object_new (info->dest_type, "file-name", abs_fname, NULL));       /* ++ ref new file */
+    // Write to temporary file if saving over or new file name exists
+    tempsave = !abs_fname || (base_fname && strcmp(abs_fname, base_fname) == 0)
+               || g_file_test(abs_fname, G_FILE_TEST_EXISTS);
 
-  // ++ Create new converter and set create-stores property if not "save a copy" mode
-  converter = IPATCH_CONVERTER (g_object_new (info->conv_type, "create-stores", !save_a_copy, NULL));
+    /* if no filename specified try to use current one */
+    if(!abs_fname)
+    {
+        if(!base_fname)
+        {
+            g_set_error(err, IPATCH_ERROR, IPATCH_ERROR_INVALID,
+                        _("File name not supplied and none assigned"));
+            goto error;
+        }
 
-  ipatch_converter_add_input (converter, G_OBJECT (base));
-  ipatch_converter_add_output (converter, G_OBJECT (newfile));
+        abs_fname = base_fname;     // !! abs_fname takes over base_fname
+        base_fname = NULL;
+    }
+    else
+    {
+        g_free(base_fname);    // -- free base file name
+    }
 
-  /* attempt to save patch file */
-  if (!ipatch_converter_convert (converter, err))
-  {
-    g_object_unref (converter);                 // -- unref converter
-    goto error;
-  }
+    /* Find a converter from base object to file */
+    info = ipatch_lookup_converter_info(0, G_OBJECT_TYPE(base), IPATCH_TYPE_FILE);
 
-  // If "create-stores" was set, then we get the list of stores in case of error, so new stores can be removed
-  if (!save_a_copy)
-  {
-    IpatchList *out_list = ipatch_converter_get_outputs (converter);    // ++ ref output object list
-    created_stores = (IpatchList *)g_list_nth_data (out_list->items, 1);
-    if (created_stores) g_object_ref (created_stores);          // ++ ref created stores list
-    g_object_unref (out_list);          // -- unref output object list
-  }
+    if(!info)
+    {
+        g_set_error(err, IPATCH_ERROR, IPATCH_ERROR_UNSUPPORTED,
+                    _("Saving object of type '%s' to file '%s' not supported"),
+                    g_type_name(G_OBJECT_TYPE(base)), abs_fname);
+        goto error;
+    }
 
-  g_object_unref (converter);                   // -- unref converter
+    if(tempsave)  // Saving to a temporary file?
+    {
+        tmp_fname = g_strconcat(abs_fname, "_tmpXXXXXX", NULL);          // ++ alloc temporary file name
 
-  if (tempsave)
-    ipatch_file_assign_fd (newfile, -1, FALSE); // Unset file descriptor of file (now using file name), closes file descriptor
+        // open temporary file in same directory as destination
+        if((tmpfd = g_mkstemp(tmp_fname)) == -1)
+        {
+            g_set_error(err, G_FILE_ERROR, g_file_error_from_errno(errno),
+                        _("Unable to open temp file '%s' for writing: %s"),
+                        tmp_fname, g_strerror(errno));
+            goto error;
+        }
 
-  // Migrate samples
-  if (!save_a_copy)
-  {
-    if (!ipatch_migrate_file_sample_data (oldfile, newfile, abs_fname, IPATCH_SAMPLE_DATA_MIGRATE_REMOVE_NEW_IF_UNUSED
-                                          | IPATCH_SAMPLE_DATA_MIGRATE_TO_NEWFILE | (tempsave ? IPATCH_SAMPLE_DATA_MIGRATE_REPLACE : 0), err))
-      goto error;
+        newfile = IPATCH_FILE(g_object_new(info->dest_type, "file-name", tmp_fname, NULL));         /* ++ ref new file */
+        ipatch_file_assign_fd(newfile, tmpfd, TRUE);          /* Assign file descriptor and set close on finalize */
+    }
+    else  // Not replacing a file, just save it directly without using a temporary file
+    {
+        newfile = IPATCH_FILE(g_object_new(info->dest_type, "file-name", abs_fname, NULL));    /* ++ ref new file */
+    }
 
-    ipatch_base_set_file (IPATCH_BASE (base), newfile); // Assign new file to base object
-  }
-  else if (tempsave && !ipatch_file_rename (newfile, abs_fname, err))   // If "save a copy" mode and saved to a temporary file, rename it here
-    goto error;
+    // ++ Create new converter and set create-stores property if not "save a copy" mode
+    converter = IPATCH_CONVERTER(g_object_new(info->conv_type, "create-stores", !save_a_copy, NULL));
 
-  if (created_stores) g_object_unref (created_stores);  // -- unref created stores
-  g_object_unref (newfile);	                        // -- unref creators reference
-  g_free (tmp_fname);                                   // -- free temp file name
-  g_free (abs_fname);                                   // -- free file name
-  if (oldfile) g_object_unref (oldfile);                // -- unref old file
+    ipatch_converter_add_input(converter, G_OBJECT(base));
+    ipatch_converter_add_output(converter, G_OBJECT(newfile));
 
-  return (TRUE);
+    /* attempt to save patch file */
+    if(!ipatch_converter_convert(converter, err))
+    {
+        g_object_unref(converter);                  // -- unref converter
+        goto error;
+    }
+
+    // If "create-stores" was set, then we get the list of stores in case of error, so new stores can be removed
+    if(!save_a_copy)
+    {
+        IpatchList *out_list = ipatch_converter_get_outputs(converter);     // ++ ref output object list
+        created_stores = (IpatchList *)g_list_nth_data(out_list->items, 1);
+
+        if(created_stores)
+        {
+            g_object_ref(created_stores);    // ++ ref created stores list
+        }
+
+        g_object_unref(out_list);           // -- unref output object list
+    }
+
+    g_object_unref(converter);                    // -- unref converter
+
+    if(tempsave)
+    {
+        ipatch_file_assign_fd(newfile, -1, FALSE);    // Unset file descriptor of file (now using file name), closes file descriptor
+    }
+
+    // Migrate samples
+    if(!save_a_copy)
+    {
+        if(!ipatch_migrate_file_sample_data(oldfile, newfile, abs_fname, IPATCH_SAMPLE_DATA_MIGRATE_REMOVE_NEW_IF_UNUSED
+                                            | IPATCH_SAMPLE_DATA_MIGRATE_TO_NEWFILE | (tempsave ? IPATCH_SAMPLE_DATA_MIGRATE_REPLACE : 0), err))
+        {
+            goto error;
+        }
+
+        ipatch_base_set_file(IPATCH_BASE(base), newfile);   // Assign new file to base object
+    }
+    else if(tempsave && !ipatch_file_rename(newfile, abs_fname, err))     // If "save a copy" mode and saved to a temporary file, rename it here
+    {
+        goto error;
+    }
+
+    if(created_stores)
+    {
+        g_object_unref(created_stores);    // -- unref created stores
+    }
+
+    g_object_unref(newfile);	                         // -- unref creators reference
+    g_free(tmp_fname);                                    // -- free temp file name
+    g_free(abs_fname);                                    // -- free file name
+
+    if(oldfile)
+    {
+        g_object_unref(oldfile);    // -- unref old file
+    }
+
+    return (TRUE);
 
 error:
 
-  if (created_stores)   // Remove new created stores
-  {
-    g_list_foreach (created_stores->items, remove_created_stores, NULL);
-    g_object_unref (created_stores);  // -- unref created stores
-  }
-
-  if (newfile)
-  {
-    if (!ipatch_file_unlink (newfile, &local_err))   // -- Delete new file
+    if(created_stores)    // Remove new created stores
     {
-      g_warning (_("Failed to remove file after save failure: %s"),
-                 ipatch_gerror_message (local_err));
-      g_clear_error (&local_err);
+        g_list_foreach(created_stores->items, remove_created_stores, NULL);
+        g_object_unref(created_stores);   // -- unref created stores
     }
 
-    g_object_unref (newfile);   // -- unref creators reference
-  }
+    if(newfile)
+    {
+        if(!ipatch_file_unlink(newfile, &local_err))     // -- Delete new file
+        {
+            g_warning(_("Failed to remove file after save failure: %s"),
+                      ipatch_gerror_message(local_err));
+            g_clear_error(&local_err);
+        }
 
-  g_free (tmp_fname);           // -- free temp file name
-  g_free (abs_fname);           // -- free file name
-  if (oldfile) g_object_unref (oldfile);        // -- unref old file
+        g_object_unref(newfile);    // -- unref creators reference
+    }
 
-  return (FALSE);
+    g_free(tmp_fname);            // -- free temp file name
+    g_free(abs_fname);            // -- free file name
+
+    if(oldfile)
+    {
+        g_object_unref(oldfile);    // -- unref old file
+    }
+
+    return (FALSE);
 }
 
 /**
@@ -681,26 +773,26 @@ error:
  * Since: 1.1.0
  */
 gboolean
-ipatch_base_close (IpatchBase *base, GError **err)
+ipatch_base_close(IpatchBase *base, GError **err)
 {
-  IpatchFile *file;
+    IpatchFile *file;
 
-  g_return_val_if_fail (IPATCH_IS_BASE (base), FALSE);
-  g_return_val_if_fail (!err || !*err, FALSE);
+    g_return_val_if_fail(IPATCH_IS_BASE(base), FALSE);
+    g_return_val_if_fail(!err || !*err, FALSE);
 
-  g_object_get (base, "file", &file, NULL);     // ++ ref file (if any)
+    g_object_get(base, "file", &file, NULL);      // ++ ref file (if any)
 
-  ipatch_item_remove (IPATCH_ITEM (base));
+    ipatch_item_remove(IPATCH_ITEM(base));
 
-  if (file && !ipatch_migrate_file_sample_data (file, NULL, NULL, 0, err))
-  {
-    g_object_unref (file);                      // -- unref file
-    return (FALSE);
-  }
+    if(file && !ipatch_migrate_file_sample_data(file, NULL, NULL, 0, err))
+    {
+        g_object_unref(file);                       // -- unref file
+        return (FALSE);
+    }
 
-  g_object_unref (file);                        // -- unref file
+    g_object_unref(file);                         // -- unref file
 
-  return (TRUE);
+    return (TRUE);
 }
 
 /**
@@ -718,51 +810,61 @@ ipatch_base_close (IpatchBase *base, GError **err)
  * Since: 1.1.0
  */
 gboolean
-ipatch_close_base_list (IpatchList *list, GError **err)
+ipatch_close_base_list(IpatchList *list, GError **err)
 {
-  GList *p, *file_list = NULL;
-  IpatchFile *file;
-  gboolean retval = TRUE;
-  GError *local_err = NULL;
-  char *filename;
+    GList *p, *file_list = NULL;
+    IpatchFile *file;
+    gboolean retval = TRUE;
+    GError *local_err = NULL;
+    char *filename;
 
-  g_return_val_if_fail (IPATCH_IS_LIST (list), FALSE);
-  g_return_val_if_fail (!err || !*err, FALSE);
+    g_return_val_if_fail(IPATCH_IS_LIST(list), FALSE);
+    g_return_val_if_fail(!err || !*err, FALSE);
 
-  for (p = list->items; p; p = p->next)
-  {
-    if (!IPATCH_IS_BASE (p->data)) continue;            // Just skip if its not a base object
-
-    g_object_get (p->data, "file", &file, NULL);        // ++ ref file (if any)
-    ipatch_item_remove_recursive (IPATCH_ITEM (p->data), TRUE);         // Recursively remove to release IpatchSampleData resources
-
-    if (file) file_list = g_list_prepend (file_list, file);
-  }
-
-  file_list = g_list_reverse (file_list);               // Reverse list to migrate samples in same order
-
-  for (p = file_list; p; p = g_list_delete_link (p, p))
-  {
-    file = p->data;
-
-    if (!ipatch_migrate_file_sample_data (file, NULL, NULL, 0, &local_err))
+    for(p = list->items; p; p = p->next)
     {
-      if (!retval || !err)
-      { // Log additional errors
-        g_object_get (file, "file-name", &filename, NULL);      // ++ alloc filename
-        g_critical (_("Error migrating samples from closed file '%s': %s"), filename,
-                    ipatch_gerror_message (local_err));
-        g_free (filename);                                      // -- free filename
-        g_clear_error (&local_err);
-      }
-      else g_propagate_error (err, local_err);          // Propagate first error
+        if(!IPATCH_IS_BASE(p->data))
+        {
+            continue;    // Just skip if its not a base object
+        }
 
-      retval = FALSE;
+        g_object_get(p->data, "file", &file, NULL);         // ++ ref file (if any)
+        ipatch_item_remove_recursive(IPATCH_ITEM(p->data), TRUE);           // Recursively remove to release IpatchSampleData resources
+
+        if(file)
+        {
+            file_list = g_list_prepend(file_list, file);
+        }
     }
 
-    g_object_unref (file);                              // -- unref file
-  }
+    file_list = g_list_reverse(file_list);                // Reverse list to migrate samples in same order
 
-  return (retval);
+    for(p = file_list; p; p = g_list_delete_link(p, p))
+    {
+        file = p->data;
+
+        if(!ipatch_migrate_file_sample_data(file, NULL, NULL, 0, &local_err))
+        {
+            if(!retval || !err)
+            {
+                // Log additional errors
+                g_object_get(file, "file-name", &filename, NULL);       // ++ alloc filename
+                g_critical(_("Error migrating samples from closed file '%s': %s"), filename,
+                           ipatch_gerror_message(local_err));
+                g_free(filename);                                       // -- free filename
+                g_clear_error(&local_err);
+            }
+            else
+            {
+                g_propagate_error(err, local_err);    // Propagate first error
+            }
+
+            retval = FALSE;
+        }
+
+        g_object_unref(file);                               // -- unref file
+    }
+
+    return (retval);
 }
 

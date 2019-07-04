@@ -46,25 +46,25 @@ typedef struct _IpatchSF2ModItemIface IpatchSF2ModItemIface;
 /* modulator item interface */
 struct _IpatchSF2ModItemIface
 {
-  GTypeInterface parent_iface;
+    GTypeInterface parent_iface;
 
-  guint modlist_ofs;	/* offset in item instance to modulator list pointer */
-  GParamSpec *mod_pspec;  /* cached value of modulator pspec for fast notifies */
+    guint modlist_ofs;	/* offset in item instance to modulator list pointer */
+    GParamSpec *mod_pspec;  /* cached value of modulator pspec for fast notifies */
 };
 
-GType ipatch_sf2_mod_item_get_type (void);
-GSList *ipatch_sf2_mod_item_get_mods (IpatchSF2ModItem *item);
-void ipatch_sf2_mod_item_set_mods (IpatchSF2ModItem *item, GSList *mod_list,
-				   int flags);
-void ipatch_sf2_mod_item_set_mods_copy (IpatchSF2ModItem *item, GSList *mod_list);
-void ipatch_sf2_mod_item_add (IpatchSF2ModItem *item, const IpatchSF2Mod *mod);
-void ipatch_sf2_mod_item_insert (IpatchSF2ModItem *item,
-				 const IpatchSF2Mod *mod, int pos);
-void ipatch_sf2_mod_item_remove (IpatchSF2ModItem *item,
-				 const IpatchSF2Mod *mod);
-void ipatch_sf2_mod_item_change (IpatchSF2ModItem *item,
-				 const IpatchSF2Mod *oldmod,
-				 const IpatchSF2Mod *newmod);
-guint ipatch_sf2_mod_item_count (IpatchSF2ModItem *item);
+GType ipatch_sf2_mod_item_get_type(void);
+GSList *ipatch_sf2_mod_item_get_mods(IpatchSF2ModItem *item);
+void ipatch_sf2_mod_item_set_mods(IpatchSF2ModItem *item, GSList *mod_list,
+                                  int flags);
+void ipatch_sf2_mod_item_set_mods_copy(IpatchSF2ModItem *item, GSList *mod_list);
+void ipatch_sf2_mod_item_add(IpatchSF2ModItem *item, const IpatchSF2Mod *mod);
+void ipatch_sf2_mod_item_insert(IpatchSF2ModItem *item,
+                                const IpatchSF2Mod *mod, int pos);
+void ipatch_sf2_mod_item_remove(IpatchSF2ModItem *item,
+                                const IpatchSF2Mod *mod);
+void ipatch_sf2_mod_item_change(IpatchSF2ModItem *item,
+                                const IpatchSF2Mod *oldmod,
+                                const IpatchSF2Mod *newmod);
+guint ipatch_sf2_mod_item_count(IpatchSF2ModItem *item);
 
 #endif

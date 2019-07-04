@@ -47,37 +47,37 @@ typedef struct _IpatchStateClass IpatchStateClass;
 /* Ipatch State history object */
 struct _IpatchState
 {
-  IpatchLock parent_instance;	/* derived from IpatchLock */
+    IpatchLock parent_instance;	/* derived from IpatchLock */
 
-  GNode *root;			/* state tree (IpatchState) */
-  GNode *position;		/* current position in state tree */
+    GNode *root;			/* state tree (IpatchState) */
+    GNode *position;		/* current position in state tree */
 
-  GNode *group_root;		/* group tree (IpatchStateGroup) */
+    GNode *group_root;		/* group tree (IpatchStateGroup) */
 
-  GPrivate *active_group_key; /* per thread active group (IpatchStateGroup)*/
+    GPrivate *active_group_key; /* per thread active group (IpatchStateGroup)*/
 
-  IpatchStateItem *current_undo;	/* current undo item or NULL */
-  GNode *redo_parent; /* current redo state parent (IpatchState GNode) */
+    IpatchStateItem *current_undo;	/* current undo item or NULL */
+    GNode *redo_parent; /* current redo state parent (IpatchState GNode) */
 };
 
 /* Ipatch State history class */
 struct _IpatchStateClass
 {
-  IpatchLockClass parent_class;
+    IpatchLockClass parent_class;
 };
 
-GType ipatch_state_get_type (void);
-IpatchState *ipatch_state_new (void);
-void ipatch_state_begin_group (IpatchState *state, const char *descr);
-void ipatch_state_end_group (IpatchState *state);
-void ipatch_state_set_active_group (IpatchState *state, IpatchStateGroup *group);
-IpatchStateGroup *ipatch_state_get_active_group (IpatchState *state);
-void ipatch_state_record_item (IpatchState *state, IpatchStateItem *item);
-void ipatch_state_record (IpatchState *state, const char *type_name,
-			  const char *first_property_name, ...);
-void ipatch_state_retract (IpatchState *state);
+GType ipatch_state_get_type(void);
+IpatchState *ipatch_state_new(void);
+void ipatch_state_begin_group(IpatchState *state, const char *descr);
+void ipatch_state_end_group(IpatchState *state);
+void ipatch_state_set_active_group(IpatchState *state, IpatchStateGroup *group);
+IpatchStateGroup *ipatch_state_get_active_group(IpatchState *state);
+void ipatch_state_record_item(IpatchState *state, IpatchStateItem *item);
+void ipatch_state_record(IpatchState *state, const char *type_name,
+                         const char *first_property_name, ...);
+void ipatch_state_retract(IpatchState *state);
 /* GList *ipatch_state_get_undo_depends (IpatchState *state, const GList *items); */
-void ipatch_state_undo (IpatchState *state, GList *items);
-void ipatch_state_redo (IpatchState *state, GList *items);
+void ipatch_state_undo(IpatchState *state, GList *items);
+void ipatch_state_redo(IpatchState *state, GList *items);
 
 #endif

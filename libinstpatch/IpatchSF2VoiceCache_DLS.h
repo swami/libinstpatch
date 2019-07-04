@@ -39,8 +39,8 @@ typedef IpatchConverterSF2VoiceCacheClass IpatchConverterDLS2SampleToSF2VoiceCac
 #define IPATCH_TYPE_CONVERTER_DLS2_SAMPLE_TO_SF2_VOICE_CACHE \
   (ipatch_converter_dls2_sample_to_sf2_voice_cache_get_type ())
 
-GType ipatch_converter_dls2_inst_to_sf2_voice_cache_get_type (void);
-GType ipatch_converter_dls2_region_to_sf2_voice_cache_get_type (void);
-GType ipatch_converter_dls2_sample_to_sf2_voice_cache_get_type (void);
+GType ipatch_converter_dls2_inst_to_sf2_voice_cache_get_type(void);
+GType ipatch_converter_dls2_region_to_sf2_voice_cache_get_type(void);
+GType ipatch_converter_dls2_sample_to_sf2_voice_cache_get_type(void);
 
 #endif

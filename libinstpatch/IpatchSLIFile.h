@@ -54,16 +54,16 @@ typedef struct _IpatchSLIFileClass IpatchSLIFileClass;
 /* Spectralis file object (derived from IpatchFile) */
 struct _IpatchSLIFile
 {
-  IpatchFile parent_instance;
+    IpatchFile parent_instance;
 };
 
 /* Spectralis file class (derived from IpatchFile) */
 struct _IpatchSLIFileClass
 {
-  IpatchFileClass parent_class;
+    IpatchFileClass parent_class;
 };
 
-GType ipatch_sli_file_get_type (void);
-IpatchSLIFile *ipatch_sli_file_new (void);
+GType ipatch_sli_file_get_type(void);
+IpatchSLIFile *ipatch_sli_file_new(void);
 
 #endif

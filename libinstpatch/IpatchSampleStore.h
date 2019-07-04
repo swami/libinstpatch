@@ -51,16 +51,16 @@ typedef struct _IpatchSampleStoreClass IpatchSampleStoreClass;
 /* sample store base instance */
 struct _IpatchSampleStore
 {
-  IpatchItem parent_instance;
+    IpatchItem parent_instance;
 
-  guint32 size;			/* size of sample data (in samples) */
-  guint32 rate;			/* sample rate in hz */
+    guint32 size;			/* size of sample data (in samples) */
+    guint32 rate;			/* sample rate in hz */
 };
 
 /* sample store base class */
 struct _IpatchSampleStoreClass
 {
-  IpatchItemClass parent_class;
+    IpatchItemClass parent_class;
 };
 
 
@@ -117,9 +117,9 @@ struct _IpatchSampleStoreClass
 #define IPATCH_SAMPLE_STORE_UNUSED_FLAG_SHIFT \
   (IPATCH_ITEM_UNUSED_FLAG_SHIFT + IPATCH_SAMPLE_FORMAT_BITCOUNT + 3)
 
-GType ipatch_sample_store_get_type (void);
+GType ipatch_sample_store_get_type(void);
 
-IpatchSampleStore *ipatch_sample_store_first (IpatchIter *iter);
-IpatchSampleStore *ipatch_sample_store_next (IpatchIter *iter);
+IpatchSampleStore *ipatch_sample_store_first(IpatchIter *iter);
+IpatchSampleStore *ipatch_sample_store_next(IpatchIter *iter);
 
 #endif

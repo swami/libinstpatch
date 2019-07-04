@@ -20,7 +20,7 @@
 /**
  * SECTION: IpatchSample
  * @short_description: Sample audio interface
- * @see_also: 
+ * @see_also:
  * @stability: Stable
  *
  * This interface provides a basic API for accessing audio of sample objects.
@@ -42,76 +42,78 @@
 
 
 /* some public loop type arrays for use with IpatchSample interfaces */
-int ipatch_sample_loop_types_standard[] = {
-  IPATCH_SAMPLE_LOOP_NONE,
-  IPATCH_SAMPLE_LOOP_STANDARD,
-  IPATCH_SAMPLE_LOOP_TYPE_TERM	/* terminator */
+int ipatch_sample_loop_types_standard[] =
+{
+    IPATCH_SAMPLE_LOOP_NONE,
+    IPATCH_SAMPLE_LOOP_STANDARD,
+    IPATCH_SAMPLE_LOOP_TYPE_TERM	/* terminator */
 };
 
-int ipatch_sample_loop_types_standard_release[] = {
-  IPATCH_SAMPLE_LOOP_NONE,
-  IPATCH_SAMPLE_LOOP_STANDARD,
-  IPATCH_SAMPLE_LOOP_RELEASE,
-  IPATCH_SAMPLE_LOOP_TYPE_TERM	/* terminator */
+int ipatch_sample_loop_types_standard_release[] =
+{
+    IPATCH_SAMPLE_LOOP_NONE,
+    IPATCH_SAMPLE_LOOP_STANDARD,
+    IPATCH_SAMPLE_LOOP_RELEASE,
+    IPATCH_SAMPLE_LOOP_TYPE_TERM	/* terminator */
 };
 
 
-static void ipatch_sample_interface_init (IpatchSampleIface *sample_iface);
+static void ipatch_sample_interface_init(IpatchSampleIface *sample_iface);
 
 
 GType
-ipatch_sample_get_type (void)
+ipatch_sample_get_type(void)
 {
-  static GType itype = 0;
+    static GType itype = 0;
 
-  if (!itype)
+    if(!itype)
     {
-      static const GTypeInfo info =
-	{
-	  sizeof (IpatchSampleIface),
-	  NULL,			/* base_init */
-	  NULL,			/* base_finalize */
-	  (GClassInitFunc) ipatch_sample_interface_init,
-	  (GClassFinalizeFunc) NULL
-	};
+        static const GTypeInfo info =
+        {
+            sizeof(IpatchSampleIface),
+            NULL,			/* base_init */
+            NULL,			/* base_finalize */
+            (GClassInitFunc) ipatch_sample_interface_init,
+            (GClassFinalizeFunc) NULL
+        };
 
-      itype = g_type_register_static (G_TYPE_INTERFACE, "IpatchSample", &info, 0);
-      g_type_interface_add_prerequisite (itype, IPATCH_TYPE_ITEM);
+        itype = g_type_register_static(G_TYPE_INTERFACE, "IpatchSample", &info, 0);
+        g_type_interface_add_prerequisite(itype, IPATCH_TYPE_ITEM);
     }
 
-  return (itype);
+    return (itype);
 }
 
 static void
-ipatch_sample_interface_init (IpatchSampleIface *sample_iface)
+ipatch_sample_interface_init(IpatchSampleIface *sample_iface)
 {
-  g_object_interface_install_property (sample_iface,
-	ipatch_sample_new_property_param_spec ("sample-data",
-					       G_PARAM_READABLE));
-  g_object_interface_install_property (sample_iface,
-	ipatch_sample_new_property_param_spec ("sample-size",
-					       G_PARAM_READABLE));
-  g_object_interface_install_property (sample_iface,
-	ipatch_sample_new_property_param_spec ("sample-format",
-					       G_PARAM_READABLE));
-  g_object_interface_install_property (sample_iface,
-	ipatch_sample_new_property_param_spec ("sample-rate",
-					       G_PARAM_READABLE));
-  g_object_interface_install_property (sample_iface,
-	ipatch_sample_new_property_param_spec ("loop-type",
-					       G_PARAM_READABLE));
-  g_object_interface_install_property (sample_iface,
-	ipatch_sample_new_property_param_spec ("loop-start",
-					       G_PARAM_READABLE));
-  g_object_interface_install_property (sample_iface,
-	ipatch_sample_new_property_param_spec ("loop-end",
-					       G_PARAM_READABLE));
-  g_object_interface_install_property (sample_iface,
-	ipatch_sample_new_property_param_spec ("root-note",
-					       G_PARAM_READABLE));
-  g_object_interface_install_property (sample_iface,
-	ipatch_sample_new_property_param_spec ("fine-tune",
-					       G_PARAM_READABLE));
+    g_object_interface_install_property(sample_iface,
+                                        ipatch_sample_new_property_param_spec("sample-data",
+                                                G_PARAM_READABLE));
+    g_object_interface_install_property(sample_iface,
+                                        ipatch_sample_new_property_param_spec("sample-size",
+                                                G_PARAM_READABLE));
+    g_object_interface_install_property(sample_iface,
+                                        ipatch_sample_new_property_param_spec("sample-format",
+                                                G_PARAM_READABLE));
+    g_object_interface_install_property(sample_iface,
+                                        ipatch_sample_new_property_param_spec("sample-rate",
+                                                G_PARAM_READABLE));
+    g_object_interface_install_property(sample_iface,
+                                        ipatch_sample_new_property_param_spec("loop-type",
+                                                G_PARAM_READABLE));
+    g_object_interface_install_property(sample_iface,
+                                        ipatch_sample_new_property_param_spec("loop-start",
+                                                G_PARAM_READABLE));
+    g_object_interface_install_property(sample_iface,
+                                        ipatch_sample_new_property_param_spec("loop-end",
+                                                G_PARAM_READABLE));
+    g_object_interface_install_property(sample_iface,
+                                        ipatch_sample_new_property_param_spec("root-note",
+                                                G_PARAM_READABLE));
+    g_object_interface_install_property(sample_iface,
+                                        ipatch_sample_new_property_param_spec("fine-tune",
+                                                G_PARAM_READABLE));
 }
 
 /**
@@ -125,13 +127,13 @@ ipatch_sample_interface_init (IpatchSampleIface *sample_iface)
  *   not be modified or freed.
  */
 int *
-ipatch_sample_get_loop_types (IpatchSample *sample)
+ipatch_sample_get_loop_types(IpatchSample *sample)
 {
-  GType type;
-  g_return_val_if_fail (IPATCH_IS_SAMPLE (sample), NULL);
+    GType type;
+    g_return_val_if_fail(IPATCH_IS_SAMPLE(sample), NULL);
 
-  type = G_OBJECT_TYPE (sample);
-  return (ipatch_sample_type_get_loop_types (type));
+    type = G_OBJECT_TYPE(sample);
+    return (ipatch_sample_type_get_loop_types(type));
 }
 
 /**
@@ -146,18 +148,18 @@ ipatch_sample_get_loop_types (IpatchSample *sample)
  *   not be modified or freed.
  */
 int *
-ipatch_sample_type_get_loop_types (GType type)
+ipatch_sample_type_get_loop_types(GType type)
 {
-  GObjectClass *obj_class;
-  IpatchSampleIface *iface;
+    GObjectClass *obj_class;
+    IpatchSampleIface *iface;
 
-  g_return_val_if_fail (g_type_is_a (type, IPATCH_TYPE_SAMPLE), NULL);
+    g_return_val_if_fail(g_type_is_a(type, IPATCH_TYPE_SAMPLE), NULL);
 
-  obj_class = g_type_class_ref (type);
-  iface = g_type_interface_peek (obj_class, IPATCH_TYPE_SAMPLE);
-  g_type_class_unref (obj_class);
+    obj_class = g_type_class_ref(type);
+    iface = g_type_interface_peek(obj_class, IPATCH_TYPE_SAMPLE);
+    g_type_class_unref(obj_class);
 
-  return (iface->loop_types);
+    return (iface->loop_types);
 }
 
 /**
@@ -175,14 +177,14 @@ ipatch_sample_type_get_loop_types (GType type)
  * Since: 1.1.0
  */
 int *
-ipatch_sample_get_loop_types_len (IpatchSample *sample, int *len)
+ipatch_sample_get_loop_types_len(IpatchSample *sample, int *len)
 {
-  GType type;
+    GType type;
 
-  g_return_val_if_fail (IPATCH_IS_SAMPLE (sample), NULL);
+    g_return_val_if_fail(IPATCH_IS_SAMPLE(sample), NULL);
 
-  type = G_OBJECT_TYPE (sample);
-  return (ipatch_sample_type_get_loop_types_len (type, len));
+    type = G_OBJECT_TYPE(sample);
+    return (ipatch_sample_type_get_loop_types_len(type, len));
 }
 
 /**
@@ -201,40 +203,42 @@ ipatch_sample_get_loop_types_len (IpatchSample *sample, int *len)
  * Since: 1.1.0
  */
 int *
-ipatch_sample_type_get_loop_types_len (GType type, int *len)
+ipatch_sample_type_get_loop_types_len(GType type, int *len)
 {
-  GObjectClass *obj_class;
-  IpatchSampleIface *iface;
-  int *tp;
+    GObjectClass *obj_class;
+    IpatchSampleIface *iface;
+    int *tp;
 
-  g_return_val_if_fail (g_type_is_a (type, IPATCH_TYPE_SAMPLE), NULL);
+    g_return_val_if_fail(g_type_is_a(type, IPATCH_TYPE_SAMPLE), NULL);
 
-  obj_class = g_type_class_ref (type);
-  iface = g_type_interface_peek (obj_class, IPATCH_TYPE_SAMPLE);
-  g_type_class_unref (obj_class);
+    obj_class = g_type_class_ref(type);
+    iface = g_type_interface_peek(obj_class, IPATCH_TYPE_SAMPLE);
+    g_type_class_unref(obj_class);
 
-  if (!iface->loop_types)
-    return (NULL);
+    if(!iface->loop_types)
+    {
+        return (NULL);
+    }
 
-  if (len)
-    for (*len = 0, tp = iface->loop_types; *tp != -1; *len = *len + 1);
+    if(len)
+        for(*len = 0, tp = iface->loop_types; *tp != -1; *len = *len + 1);
 
-  return (iface->loop_types);
+    return (iface->loop_types);
 }
 
 /**
  * ipatch_sample_set_format:
  * @sample: Sample to set format of
  * @format: Sample format to assign to sample (see #IpatchSampleWidth, etc)
- * 
+ *
  * Set sample format of a new sample.  Should only be assigned once.  Same as
  * assigning to a sample's "sample-format" property.
  */
 void
-ipatch_sample_set_format (IpatchSample *sample, int format)
+ipatch_sample_set_format(IpatchSample *sample, int format)
 {
-  g_return_if_fail (IPATCH_IS_SAMPLE (sample));
-  g_object_set (sample, "sample-format", format, NULL);
+    g_return_if_fail(IPATCH_IS_SAMPLE(sample));
+    g_object_set(sample, "sample-format", format, NULL);
 }
 
 /**
@@ -243,18 +247,18 @@ ipatch_sample_set_format (IpatchSample *sample, int format)
  *
  * Get the sample format of a sample.  Same as getting a sample's "sample-format"
  * property.
- * 
+ *
  * Returns: Sample format integer (see #IpatchSampleWidth, etc).
  */
 int
-ipatch_sample_get_format (IpatchSample *sample)
+ipatch_sample_get_format(IpatchSample *sample)
 {
-  int format;
+    int format;
 
-  g_return_val_if_fail (IPATCH_IS_SAMPLE (sample), 0);
-  g_object_get (sample, "sample-format", &format, NULL);
+    g_return_val_if_fail(IPATCH_IS_SAMPLE(sample), 0);
+    g_object_get(sample, "sample-format", &format, NULL);
 
-  return (format);
+    return (format);
 }
 
 /**
@@ -265,10 +269,10 @@ ipatch_sample_get_format (IpatchSample *sample)
  * Set the size of a sample.  Should be done once, and only once when created.
  */
 void
-ipatch_sample_set_size (IpatchSample *sample, guint size)
+ipatch_sample_set_size(IpatchSample *sample, guint size)
 {
-  g_return_if_fail (IPATCH_IS_SAMPLE (sample));
-  g_object_set (sample, "sample-size", size, NULL);
+    g_return_if_fail(IPATCH_IS_SAMPLE(sample));
+    g_object_set(sample, "sample-size", size, NULL);
 }
 
 /**
@@ -279,26 +283,29 @@ ipatch_sample_set_size (IpatchSample *sample, guint size)
  *
  * Get the size of a sample.  Same as getting a sample's "sample-size"
  * property.
- * 
+ *
  * Returns: Sample size (in frames)
  */
 guint
-ipatch_sample_get_size (IpatchSample *sample, guint *bytes)
+ipatch_sample_get_size(IpatchSample *sample, guint *bytes)
 {
-  guint size;
+    guint size;
 
-  g_return_val_if_fail (IPATCH_IS_SAMPLE (sample), 0);
-  g_object_get (sample, "sample-size", &size, NULL);
+    g_return_val_if_fail(IPATCH_IS_SAMPLE(sample), 0);
+    g_object_get(sample, "sample-size", &size, NULL);
 
-  if (bytes) *bytes = size * ipatch_sample_get_frame_size (sample);
+    if(bytes)
+    {
+        *bytes = size * ipatch_sample_get_frame_size(sample);
+    }
 
-  return (size);
+    return (size);
 }
 
 /**
  * ipatch_sample_get_frame_size:
  * @sample: Sample to get data frame size of
- * 
+ *
  * A convenience function to get size of a single sample frame for a given
  * @sample.  This is useful for determining buffer allocation sizes when
  * reading or writing data.
@@ -306,10 +313,10 @@ ipatch_sample_get_size (IpatchSample *sample, guint *bytes)
  * Returns: Size in bytes of a single sample frame
  */
 int
-ipatch_sample_get_frame_size (IpatchSample *sample)
+ipatch_sample_get_frame_size(IpatchSample *sample)
 {
-  g_return_val_if_fail (IPATCH_IS_SAMPLE (sample), 0);
-  return (ipatch_sample_format_size (ipatch_sample_get_format (sample)));
+    g_return_val_if_fail(IPATCH_IS_SAMPLE(sample), 0);
+    return (ipatch_sample_format_size(ipatch_sample_get_format(sample)));
 }
 
 /**
@@ -323,14 +330,14 @@ ipatch_sample_get_frame_size (IpatchSample *sample)
  *   by this sample type.  Caller owns a reference to the returned object.
  */
 IpatchSampleData *
-ipatch_sample_get_sample_data (IpatchSample *sample)
+ipatch_sample_get_sample_data(IpatchSample *sample)
 {
-  IpatchSampleData *sampledata;
+    IpatchSampleData *sampledata;
 
-  g_return_val_if_fail (IPATCH_IS_SAMPLE (sample), NULL);
-  g_object_get (sample, "sample-data", &sampledata, NULL);      /* ++ ref */
+    g_return_val_if_fail(IPATCH_IS_SAMPLE(sample), NULL);
+    g_object_get(sample, "sample-data", &sampledata, NULL);       /* ++ ref */
 
-  return (sampledata);  /* !! caller takes over ref */
+    return (sampledata);  /* !! caller takes over ref */
 }
 
 /**
@@ -344,18 +351,22 @@ ipatch_sample_get_sample_data (IpatchSample *sample)
  *   %FALSE otherwise.
  */
 gboolean
-ipatch_sample_set_sample_data (IpatchSample *sample, IpatchSampleData *sampledata)
+ipatch_sample_set_sample_data(IpatchSample *sample, IpatchSampleData *sampledata)
 {
-  GParamSpec *pspec;
+    GParamSpec *pspec;
 
-  g_return_val_if_fail (IPATCH_IS_SAMPLE (sample), FALSE);
-  g_return_val_if_fail (!sampledata || IPATCH_IS_SAMPLE_DATA (sampledata), FALSE);
+    g_return_val_if_fail(IPATCH_IS_SAMPLE(sample), FALSE);
+    g_return_val_if_fail(!sampledata || IPATCH_IS_SAMPLE_DATA(sampledata), FALSE);
 
-  pspec = g_object_class_find_property (G_OBJECT_GET_CLASS (sample), "sample-data");
-  if (!(pspec->flags & G_PARAM_WRITABLE)) return (FALSE);
+    pspec = g_object_class_find_property(G_OBJECT_GET_CLASS(sample), "sample-data");
 
-  g_object_set (sample, "sample-data", sampledata, NULL);
-  return (TRUE);
+    if(!(pspec->flags & G_PARAM_WRITABLE))
+    {
+        return (FALSE);
+    }
+
+    g_object_set(sample, "sample-data", sampledata, NULL);
+    return (TRUE);
 }
 
 /**
@@ -377,22 +388,24 @@ ipatch_sample_set_sample_data (IpatchSample *sample, IpatchSampleData *sampledat
  *   @err may be set).
  */
 gboolean
-ipatch_sample_read (IpatchSample *sample, guint offset, guint frames,
-                    gpointer buf, GError **err)
+ipatch_sample_read(IpatchSample *sample, guint offset, guint frames,
+                   gpointer buf, GError **err)
 {
-  IpatchSampleHandle handle;
-  gpointer retval;
+    IpatchSampleHandle handle;
+    gpointer retval;
 
-  g_return_val_if_fail (IPATCH_IS_SAMPLE (sample), FALSE);
+    g_return_val_if_fail(IPATCH_IS_SAMPLE(sample), FALSE);
 
-  if (!ipatch_sample_handle_open (sample, &handle, 'r', 0, 0, err))
-    return (FALSE);
+    if(!ipatch_sample_handle_open(sample, &handle, 'r', 0, 0, err))
+    {
+        return (FALSE);
+    }
 
-  retval = ipatch_sample_handle_read (&handle, offset, frames, buf, err);
+    retval = ipatch_sample_handle_read(&handle, offset, frames, buf, err);
 
-  ipatch_sample_handle_close (&handle);
+    ipatch_sample_handle_close(&handle);
 
-  return (retval != NULL);
+    return (retval != NULL);
 }
 
 /**
@@ -412,27 +425,27 @@ ipatch_sample_read (IpatchSample *sample, guint offset, guint frames,
  * Since: 1.1.0
  */
 gpointer
-ipatch_sample_read_size (IpatchSample *sample, guint offset, guint size, GError **err)
+ipatch_sample_read_size(IpatchSample *sample, guint offset, guint size, GError **err)
 {
-  int frame_size;
-  gpointer buf;
+    int frame_size;
+    gpointer buf;
 
-  g_return_val_if_fail (IPATCH_IS_SAMPLE (sample), NULL);
-  g_return_val_if_fail (size > 0, NULL);
+    g_return_val_if_fail(IPATCH_IS_SAMPLE(sample), NULL);
+    g_return_val_if_fail(size > 0, NULL);
 
-  frame_size = ipatch_sample_get_frame_size (sample);
-  g_return_val_if_fail (frame_size > 0, NULL);
-  g_return_val_if_fail (size % frame_size == 0, NULL);
+    frame_size = ipatch_sample_get_frame_size(sample);
+    g_return_val_if_fail(frame_size > 0, NULL);
+    g_return_val_if_fail(size % frame_size == 0, NULL);
 
-  buf = g_malloc (size);        // ++ alloc buf
+    buf = g_malloc(size);         // ++ alloc buf
 
-  if (!ipatch_sample_read (sample, offset, size / frame_size, buf, err))
-  {
-    g_free (buf);               // -- free buf on error
-    return (NULL);
-  }
+    if(!ipatch_sample_read(sample, offset, size / frame_size, buf, err))
+    {
+        g_free(buf);                // -- free buf on error
+        return (NULL);
+    }
 
-  return (buf);         // !! caller takes over
+    return (buf);         // !! caller takes over
 }
 
 /**
@@ -453,22 +466,24 @@ ipatch_sample_read_size (IpatchSample *sample, guint offset, guint size, GError 
  * Returns: %TRUE on success, %FALSE otherwise (in which case @err may be set).
  */
 gboolean
-ipatch_sample_write (IpatchSample *sample, guint offset, guint frames,
-                     gconstpointer buf, GError **err)
+ipatch_sample_write(IpatchSample *sample, guint offset, guint frames,
+                    gconstpointer buf, GError **err)
 {
-  IpatchSampleHandle handle;
-  gboolean retval;
+    IpatchSampleHandle handle;
+    gboolean retval;
 
-  g_return_val_if_fail (IPATCH_IS_SAMPLE (sample), FALSE);
+    g_return_val_if_fail(IPATCH_IS_SAMPLE(sample), FALSE);
 
-  if (!ipatch_sample_handle_open (sample, &handle, 'w', 0, 0, err))
-    return (FALSE);
+    if(!ipatch_sample_handle_open(sample, &handle, 'w', 0, 0, err))
+    {
+        return (FALSE);
+    }
 
-  retval = ipatch_sample_handle_write (&handle, offset, frames, buf, err);
+    retval = ipatch_sample_handle_write(&handle, offset, frames, buf, err);
 
-  ipatch_sample_handle_close (&handle);
+    ipatch_sample_handle_close(&handle);
 
-  return (retval);
+    return (retval);
 }
 
 /**
@@ -488,19 +503,19 @@ ipatch_sample_write (IpatchSample *sample, guint offset, guint frames,
  * Since: 1.1.0
  */
 gboolean
-ipatch_sample_write_size (IpatchSample *sample, guint offset,
-                          gconstpointer buf, guint size, GError **err)
+ipatch_sample_write_size(IpatchSample *sample, guint offset,
+                         gconstpointer buf, guint size, GError **err)
 {
-  int frame_size;
+    int frame_size;
 
-  g_return_val_if_fail (IPATCH_IS_SAMPLE (sample), FALSE);
-  g_return_val_if_fail (size > 0, FALSE);
+    g_return_val_if_fail(IPATCH_IS_SAMPLE(sample), FALSE);
+    g_return_val_if_fail(size > 0, FALSE);
 
-  frame_size = ipatch_sample_get_frame_size (sample);
-  g_return_val_if_fail (frame_size > 0, FALSE);
-  g_return_val_if_fail (size % frame_size == 0, FALSE);
+    frame_size = ipatch_sample_get_frame_size(sample);
+    g_return_val_if_fail(frame_size > 0, FALSE);
+    g_return_val_if_fail(size % frame_size == 0, FALSE);
 
-  return (ipatch_sample_write (sample, offset, size / frame_size, buf, err));
+    return (ipatch_sample_write(sample, offset, size / frame_size, buf, err));
 }
 
 /**
@@ -523,23 +538,25 @@ ipatch_sample_write_size (IpatchSample *sample, guint offset,
  *   @err may be set).
  */
 gboolean
-ipatch_sample_read_transform (IpatchSample *sample, guint offset, guint frames,
-                              gpointer buf, int format, guint32 channel_map,
-                              GError **err)
+ipatch_sample_read_transform(IpatchSample *sample, guint offset, guint frames,
+                             gpointer buf, int format, guint32 channel_map,
+                             GError **err)
 {
-  IpatchSampleHandle handle;
-  gpointer retval;
+    IpatchSampleHandle handle;
+    gpointer retval;
 
-  g_return_val_if_fail (IPATCH_IS_SAMPLE (sample), FALSE);
+    g_return_val_if_fail(IPATCH_IS_SAMPLE(sample), FALSE);
 
-  if (!ipatch_sample_handle_open (sample, &handle, 'r', format, channel_map, err))
-    return (FALSE);
+    if(!ipatch_sample_handle_open(sample, &handle, 'r', format, channel_map, err))
+    {
+        return (FALSE);
+    }
 
-  retval = ipatch_sample_handle_read (&handle, offset, frames, buf, err);
+    retval = ipatch_sample_handle_read(&handle, offset, frames, buf, err);
 
-  ipatch_sample_handle_close (&handle);
+    ipatch_sample_handle_close(&handle);
 
-  return (retval != NULL);
+    return (retval != NULL);
 }
 
 /**
@@ -564,29 +581,29 @@ ipatch_sample_read_transform (IpatchSample *sample, guint offset, guint frames,
  * Since: 1.1.0
  */
 gpointer
-ipatch_sample_read_transform_size (IpatchSample *sample, guint offset, guint size,
-                                   int format, guint32 channel_map, GError **err)
+ipatch_sample_read_transform_size(IpatchSample *sample, guint offset, guint size,
+                                  int format, guint32 channel_map, GError **err)
 {
-  int frame_size;
-  gpointer buf;
+    int frame_size;
+    gpointer buf;
 
-  g_return_val_if_fail (IPATCH_IS_SAMPLE (sample), NULL);
-  g_return_val_if_fail (size > 0, NULL);
+    g_return_val_if_fail(IPATCH_IS_SAMPLE(sample), NULL);
+    g_return_val_if_fail(size > 0, NULL);
 
-  frame_size = ipatch_sample_format_size (format);
-  g_return_val_if_fail (frame_size > 0, NULL);
-  g_return_val_if_fail (size % frame_size == 0, NULL);
+    frame_size = ipatch_sample_format_size(format);
+    g_return_val_if_fail(frame_size > 0, NULL);
+    g_return_val_if_fail(size % frame_size == 0, NULL);
 
-  buf = g_malloc (size);        // ++ alloc buf
+    buf = g_malloc(size);         // ++ alloc buf
 
-  if (!ipatch_sample_read_transform (sample, offset, size / frame_size,
+    if(!ipatch_sample_read_transform(sample, offset, size / frame_size,
                                      buf, format, channel_map, err))
-  {
-    g_free (buf);               // -- free buf on error
-    return (NULL);
-  }
+    {
+        g_free(buf);                // -- free buf on error
+        return (NULL);
+    }
 
-  return (buf);         // !! caller takes over
+    return (buf);         // !! caller takes over
 }
 
 /**
@@ -608,23 +625,25 @@ ipatch_sample_read_transform_size (IpatchSample *sample, guint offset, guint siz
  * Returns: %TRUE on success, %FALSE otherwise (in which case @err may be set).
  */
 gboolean
-ipatch_sample_write_transform (IpatchSample *sample, guint offset, guint frames,
-                               gconstpointer buf, int format, guint32 channel_map,
-                               GError **err)
+ipatch_sample_write_transform(IpatchSample *sample, guint offset, guint frames,
+                              gconstpointer buf, int format, guint32 channel_map,
+                              GError **err)
 {
-  IpatchSampleHandle handle;
-  gboolean retval;
+    IpatchSampleHandle handle;
+    gboolean retval;
 
-  g_return_val_if_fail (IPATCH_IS_SAMPLE (sample), FALSE);
+    g_return_val_if_fail(IPATCH_IS_SAMPLE(sample), FALSE);
 
-  if (!ipatch_sample_handle_open (sample, &handle, 'w', format, channel_map, err))
-    return (FALSE);
+    if(!ipatch_sample_handle_open(sample, &handle, 'w', format, channel_map, err))
+    {
+        return (FALSE);
+    }
 
-  retval = ipatch_sample_handle_write (&handle, offset, frames, buf, err);
+    retval = ipatch_sample_handle_write(&handle, offset, frames, buf, err);
 
-  ipatch_sample_handle_close (&handle);
+    ipatch_sample_handle_close(&handle);
 
-  return (retval);
+    return (retval);
 }
 
 /**
@@ -647,21 +666,21 @@ ipatch_sample_write_transform (IpatchSample *sample, guint offset, guint frames,
  * Since: 1.1.0
  */
 gboolean
-ipatch_sample_write_transform_size (IpatchSample *sample, guint offset,
-                                    gconstpointer buf, guint size, int format,
-                                    guint32 channel_map, GError **err)
+ipatch_sample_write_transform_size(IpatchSample *sample, guint offset,
+                                   gconstpointer buf, guint size, int format,
+                                   guint32 channel_map, GError **err)
 {
-  int frame_size;
+    int frame_size;
 
-  g_return_val_if_fail (IPATCH_IS_SAMPLE (sample), FALSE);
-  g_return_val_if_fail (size > 0, FALSE);
+    g_return_val_if_fail(IPATCH_IS_SAMPLE(sample), FALSE);
+    g_return_val_if_fail(size > 0, FALSE);
 
-  frame_size = ipatch_sample_format_size (format);
-  g_return_val_if_fail (frame_size != 0, FALSE);
-  g_return_val_if_fail (size % frame_size == 0, FALSE);
+    frame_size = ipatch_sample_format_size(format);
+    g_return_val_if_fail(frame_size != 0, FALSE);
+    g_return_val_if_fail(size % frame_size == 0, FALSE);
 
-  return (ipatch_sample_write_transform (sample, offset, size / frame_size,
-          buf, format, channel_map, err));
+    return (ipatch_sample_write_transform(sample, offset, size / frame_size,
+                                          buf, format, channel_map, err));
 }
 
 /**
@@ -680,78 +699,88 @@ ipatch_sample_write_transform_size (IpatchSample *sample, guint offset,
  * Returns: %TRUE on success, %FALSE otherwise (in which case @err may be set).
  */
 gboolean
-ipatch_sample_copy (IpatchSample *dest_sample, IpatchSample *src_sample,
-		    guint32 channel_map, GError **err)
+ipatch_sample_copy(IpatchSample *dest_sample, IpatchSample *src_sample,
+                   guint32 channel_map, GError **err)
 {
-  IpatchSampleHandle dest_handle, src_handle;
-  IpatchSampleTransform *transform;
-  int dest_size, src_size, thissize;
-  gpointer buf;
-  int src_format;
-  int sizeleft, ofs;
-  gboolean retval = FALSE;
+    IpatchSampleHandle dest_handle, src_handle;
+    IpatchSampleTransform *transform;
+    int dest_size, src_size, thissize;
+    gpointer buf;
+    int src_format;
+    int sizeleft, ofs;
+    gboolean retval = FALSE;
 
-  g_return_val_if_fail (IPATCH_IS_SAMPLE (dest_sample), FALSE);
-  g_return_val_if_fail (IPATCH_IS_SAMPLE (src_sample), FALSE);
-  g_return_val_if_fail (!err || !*err, FALSE);
+    g_return_val_if_fail(IPATCH_IS_SAMPLE(dest_sample), FALSE);
+    g_return_val_if_fail(IPATCH_IS_SAMPLE(src_sample), FALSE);
+    g_return_val_if_fail(!err || !*err, FALSE);
 
-  dest_size = ipatch_sample_get_size (dest_sample, NULL);
-  src_size = ipatch_sample_get_size (src_sample, NULL);
-  g_return_val_if_fail (src_size != 0, FALSE);
+    dest_size = ipatch_sample_get_size(dest_sample, NULL);
+    src_size = ipatch_sample_get_size(src_sample, NULL);
+    g_return_val_if_fail(src_size != 0, FALSE);
 
-  /* If destination size not yet set, assign it */
-  if (dest_size == 0)
-  {
-    dest_size = src_size;
-    ipatch_sample_set_size (dest_sample, dest_size);
-  }
+    /* If destination size not yet set, assign it */
+    if(dest_size == 0)
+    {
+        dest_size = src_size;
+        ipatch_sample_set_size(dest_sample, dest_size);
+    }
 
-  g_return_val_if_fail (dest_size == src_size, FALSE);
+    g_return_val_if_fail(dest_size == src_size, FALSE);
 
-  src_format = ipatch_sample_get_format (src_sample);
-  if (!ipatch_sample_handle_open (dest_sample, &dest_handle, 'w', src_format,
+    src_format = ipatch_sample_get_format(src_sample);
+
+    if(!ipatch_sample_handle_open(dest_sample, &dest_handle, 'w', src_format,
                                   channel_map, err))
-    return (FALSE);
+    {
+        return (FALSE);
+    }
 
-  if (!ipatch_sample_handle_open (src_sample, &src_handle, 'r', 0, 0, err))
-  {
-    ipatch_sample_handle_close (&dest_handle);
-    return (FALSE);
-  }
+    if(!ipatch_sample_handle_open(src_sample, &src_handle, 'r', 0, 0, err))
+    {
+        ipatch_sample_handle_close(&dest_handle);
+        return (FALSE);
+    }
 
-  transform = ipatch_sample_handle_get_transform (&dest_handle);  /* ++ ref */
+    transform = ipatch_sample_handle_get_transform(&dest_handle);   /* ++ ref */
 
-  /* Transform should always be set, since we passed a format to ipatch_sample_handle_open */
-  g_return_val_if_fail (transform != NULL, FALSE);
+    /* Transform should always be set, since we passed a format to ipatch_sample_handle_open */
+    g_return_val_if_fail(transform != NULL, FALSE);
 
-  thissize = ipatch_sample_transform_get_max_frames (transform);
-  ipatch_sample_transform_get_buffers (transform, &buf, NULL);
+    thissize = ipatch_sample_transform_get_max_frames(transform);
+    ipatch_sample_transform_get_buffers(transform, &buf, NULL);
 
-  sizeleft = src_size;
-  ofs = 0;
+    sizeleft = src_size;
+    ofs = 0;
 
-  while (sizeleft > 0)
-  {
-    if (thissize > sizeleft) thissize = sizeleft;
+    while(sizeleft > 0)
+    {
+        if(thissize > sizeleft)
+        {
+            thissize = sizeleft;
+        }
 
-    if (!ipatch_sample_handle_read (&src_handle, ofs, thissize, buf, err))
-      goto err;
+        if(!ipatch_sample_handle_read(&src_handle, ofs, thissize, buf, err))
+        {
+            goto err;
+        }
 
-    if (!ipatch_sample_handle_write (&dest_handle, ofs, thissize, buf, err))
-      goto err;
+        if(!ipatch_sample_handle_write(&dest_handle, ofs, thissize, buf, err))
+        {
+            goto err;
+        }
 
-    ofs += thissize;
-    sizeleft -= thissize;
-  }
+        ofs += thissize;
+        sizeleft -= thissize;
+    }
 
-  retval = TRUE;
+    retval = TRUE;
 
 err:
 
-  ipatch_sample_handle_close (&src_handle);     /* -- close source handle */
-  ipatch_sample_handle_close (&dest_handle);    /* -- close destination handle */
+    ipatch_sample_handle_close(&src_handle);      /* -- close source handle */
+    ipatch_sample_handle_close(&dest_handle);     /* -- close destination handle */
 
-  return (retval);
+    return (retval);
 }
 
 /* FIXME-GIR: @sub_format is a dynamic GEnum or -1 */
@@ -770,69 +799,70 @@ err:
  * Returns: %TRUE on success, %FALSE otherwise
  */
 gboolean
-ipatch_sample_save_to_file (IpatchSample *sample, const char *filename,
-                            int file_format, int sub_format, GError **err)
+ipatch_sample_save_to_file(IpatchSample *sample, const char *filename,
+                           int file_format, int sub_format, GError **err)
 {
-  IpatchSample *store;
-  int channels, samplerate, sample_format;
-  int loop_type, loop_start, loop_end, fine_tune, root_note;
+    IpatchSample *store;
+    int channels, samplerate, sample_format;
+    int loop_type, loop_start, loop_end, fine_tune, root_note;
 
-  g_return_val_if_fail (IPATCH_IS_SAMPLE (sample), FALSE);
-  g_return_val_if_fail (filename != NULL, FALSE);
-  g_return_val_if_fail (!err || !*err, FALSE);
+    g_return_val_if_fail(IPATCH_IS_SAMPLE(sample), FALSE);
+    g_return_val_if_fail(filename != NULL, FALSE);
+    g_return_val_if_fail(!err || !*err, FALSE);
 
-  g_object_get (sample,
-                "sample-format", &sample_format,
-                "sample-rate", &samplerate,
-                NULL);
+    g_object_get(sample,
+                 "sample-format", &sample_format,
+                 "sample-rate", &samplerate,
+                 NULL);
 
-  channels = IPATCH_SAMPLE_FORMAT_GET_CHANNEL_COUNT (sample_format);
-  sub_format = ipatch_snd_file_sample_format_to_sub_format (sample_format, file_format);
+    channels = IPATCH_SAMPLE_FORMAT_GET_CHANNEL_COUNT(sample_format);
+    sub_format = ipatch_snd_file_sample_format_to_sub_format(sample_format, file_format);
 
-  if (sub_format == -1)
-  {
-    g_set_error (err, IPATCH_ERROR, IPATCH_ERROR_PROGRAM,
-                 "Invalid libsndfile format parameters");
-    return (FALSE);
-  }
+    if(sub_format == -1)
+    {
+        g_set_error(err, IPATCH_ERROR, IPATCH_ERROR_PROGRAM,
+                    "Invalid libsndfile format parameters");
+        return (FALSE);
+    }
 
-  store = ipatch_sample_store_snd_file_new (filename); /* ++ ref new store */
-  if (!ipatch_sample_store_snd_file_init_write (IPATCH_SAMPLE_STORE_SND_FILE (store),
-                                                file_format, sub_format,
-                                                IPATCH_SND_FILE_ENDIAN_FILE,
-                                                channels, samplerate))
-  {
-    g_set_error (err, IPATCH_ERROR, IPATCH_ERROR_PROGRAM,
-                 "Invalid libsndfile format parameters");
-    g_object_unref (store);     /* -- unref store */
-    return (FALSE);
-  }
+    store = ipatch_sample_store_snd_file_new(filename);  /* ++ ref new store */
 
-  g_object_get (sample,
-                "loop-type", &loop_type,
-                "loop-start", &loop_start,
-                "loop-end", &loop_end,
-                "root-note", &root_note,
-                "fine-tune", &fine_tune,
-                NULL);
+    if(!ipatch_sample_store_snd_file_init_write(IPATCH_SAMPLE_STORE_SND_FILE(store),
+            file_format, sub_format,
+            IPATCH_SND_FILE_ENDIAN_FILE,
+            channels, samplerate))
+    {
+        g_set_error(err, IPATCH_ERROR, IPATCH_ERROR_PROGRAM,
+                    "Invalid libsndfile format parameters");
+        g_object_unref(store);      /* -- unref store */
+        return (FALSE);
+    }
 
-  g_object_set (store,
-                "loop-type", loop_type,
-                "loop-start", loop_start,
-                "loop-end", loop_end,
-                "root-note", root_note,
-                "fine-tune", fine_tune,
-                NULL);
+    g_object_get(sample,
+                 "loop-type", &loop_type,
+                 "loop-start", &loop_start,
+                 "loop-end", &loop_end,
+                 "root-note", &root_note,
+                 "fine-tune", &fine_tune,
+                 NULL);
 
-  if (!ipatch_sample_copy (store, sample, IPATCH_SAMPLE_UNITY_CHANNEL_MAP, err))
-  {
-    g_object_unref (store);     /* -- unref store */
-    return (FALSE);
-  }
+    g_object_set(store,
+                 "loop-type", loop_type,
+                 "loop-start", loop_start,
+                 "loop-end", loop_end,
+                 "root-note", root_note,
+                 "fine-tune", fine_tune,
+                 NULL);
 
-  g_object_unref (store);     /* -- unref store */
+    if(!ipatch_sample_copy(store, sample, IPATCH_SAMPLE_UNITY_CHANNEL_MAP, err))
+    {
+        g_object_unref(store);      /* -- unref store */
+        return (FALSE);
+    }
 
-  return (TRUE);
+    g_object_unref(store);      /* -- unref store */
+
+    return (TRUE);
 }
 
 /**
@@ -857,78 +887,92 @@ ipatch_sample_save_to_file (IpatchSample *sample, const char *filename,
  * Returns: %TRUE on success, %FALSE on failure (in which case @err may be set)
  */
 gboolean
-ipatch_sample_handle_open (IpatchSample *sample, IpatchSampleHandle *handle,
-			   char mode, int format, guint32 channel_map,
-			   GError **err)
+ipatch_sample_handle_open(IpatchSample *sample, IpatchSampleHandle *handle,
+                          char mode, int format, guint32 channel_map,
+                          GError **err)
 {
-  IpatchSampleIface *iface;
-  int sample_format;
-  guint size;
+    IpatchSampleIface *iface;
+    int sample_format;
+    guint size;
 
-  g_return_val_if_fail (IPATCH_IS_SAMPLE (sample), FALSE);
-  g_return_val_if_fail (handle != NULL, FALSE);
-  g_return_val_if_fail (mode == 'r' || mode == 'w', FALSE);
-  g_return_val_if_fail (!format || ipatch_sample_format_verify (format), FALSE);
+    g_return_val_if_fail(IPATCH_IS_SAMPLE(sample), FALSE);
+    g_return_val_if_fail(handle != NULL, FALSE);
+    g_return_val_if_fail(mode == 'r' || mode == 'w', FALSE);
+    g_return_val_if_fail(!format || ipatch_sample_format_verify(format), FALSE);
 
-  /* Verify sample format was set */
-  g_object_get (sample, "sample-format", &sample_format, NULL);
-  g_return_val_if_fail (ipatch_sample_format_verify (sample_format), FALSE);
+    /* Verify sample format was set */
+    g_object_get(sample, "sample-format", &sample_format, NULL);
+    g_return_val_if_fail(ipatch_sample_format_verify(sample_format), FALSE);
 
-  /* Verify transform formats and channel mapping, if format is set */
-  if (format)
-  {
-    if (mode == 'r')
-      g_return_val_if_fail (ipatch_sample_format_transform_verify (sample_format, format, channel_map), FALSE);
-    else g_return_val_if_fail (ipatch_sample_format_transform_verify (format, sample_format, channel_map), FALSE);
-  }
+    /* Verify transform formats and channel mapping, if format is set */
+    if(format)
+    {
+        if(mode == 'r')
+        {
+            g_return_val_if_fail(ipatch_sample_format_transform_verify(sample_format, format, channel_map), FALSE);
+        }
+        else
+        {
+            g_return_val_if_fail(ipatch_sample_format_transform_verify(format, sample_format, channel_map), FALSE);
+        }
+    }
 
-  /* Verify sample size is set */
-  g_object_get (sample, "sample-size", &size, NULL);
-  g_return_val_if_fail (size != 0, FALSE);
+    /* Verify sample size is set */
+    g_object_get(sample, "sample-size", &size, NULL);
+    g_return_val_if_fail(size != 0, FALSE);
 
-  memset (handle, 0, sizeof (IpatchSampleHandle));
-  handle->sample = g_object_ref (sample); /* ++ ref sample interface object */
-  handle->read_mode = mode == 'r';
-  handle->format = format ? format : sample_format;
-  handle->channel_map = format ? channel_map : IPATCH_SAMPLE_UNITY_CHANNEL_MAP;
+    memset(handle, 0, sizeof(IpatchSampleHandle));
+    handle->sample = g_object_ref(sample);  /* ++ ref sample interface object */
+    handle->read_mode = mode == 'r';
+    handle->format = format ? format : sample_format;
+    handle->channel_map = format ? channel_map : IPATCH_SAMPLE_UNITY_CHANNEL_MAP;
 
-  /* Was format specified? */
-  if (format != 0)
-  { /* Acquire sample data transform in the proper direction */
-    if (handle->read_mode)  /* ++ grab transform */
-      handle->transform = ipatch_sample_transform_pool_acquire (sample_format, format,
-                                                                channel_map);
-    else handle->transform = ipatch_sample_transform_pool_acquire (format, sample_format,
-                                                                   channel_map);
+    /* Was format specified? */
+    if(format != 0)
+    {
+        /* Acquire sample data transform in the proper direction */
+        if(handle->read_mode)   /* ++ grab transform */
+            handle->transform = ipatch_sample_transform_pool_acquire(sample_format, format,
+                                channel_map);
+        else
+            handle->transform = ipatch_sample_transform_pool_acquire(format, sample_format,
+                                channel_map);
 
-    handle->release_transform = TRUE;    /* Indicate that transform came from pool */
-  }
+        handle->release_transform = TRUE;    /* Indicate that transform came from pool */
+    }
 
-  iface = IPATCH_SAMPLE_GET_IFACE (sample);
+    iface = IPATCH_SAMPLE_GET_IFACE(sample);
 
-  handle->read = iface->read;
-  handle->write = iface->write;
-  handle->close = iface->close;
+    handle->read = iface->read;
+    handle->write = iface->write;
+    handle->close = iface->close;
 
-  /* call interface open method (if any) */
-  if (iface->open)
-  {
-    if (iface->open (handle, err))
-      return (TRUE);
+    /* call interface open method (if any) */
+    if(iface->open)
+    {
+        if(iface->open(handle, err))
+        {
+            return (TRUE);
+        }
 
-    /* Error occurred */
+        /* Error occurred */
 
-    if (handle->transform)  /* -- release transform */
-      ipatch_sample_transform_pool_release (handle->transform);
+        if(handle->transform)   /* -- release transform */
+        {
+            ipatch_sample_transform_pool_release(handle->transform);
+        }
 
-    g_object_unref (handle->sample);    /* -- unref sample */
+        g_object_unref(handle->sample);     /* -- unref sample */
 
-    handle->transform = NULL;
-    handle->sample = NULL;
+        handle->transform = NULL;
+        handle->sample = NULL;
 
-    return (FALSE);
-  }
-  else return (TRUE);   /* No open method, assume success */
+        return (FALSE);
+    }
+    else
+    {
+        return (TRUE);    /* No open method, assume success */
+    }
 }
 
 /**
@@ -938,29 +982,38 @@ ipatch_sample_handle_open (IpatchSample *sample, IpatchSampleHandle *handle,
  * Close a handle previously opened with ipatch_sample_handle_open().
  */
 void
-ipatch_sample_handle_close (IpatchSampleHandle *handle)
+ipatch_sample_handle_close(IpatchSampleHandle *handle)
 {
-  IpatchSampleIface *iface;
+    IpatchSampleIface *iface;
 
-  g_return_if_fail (handle != NULL);
-  g_return_if_fail (IPATCH_IS_SAMPLE (handle->sample));
+    g_return_if_fail(handle != NULL);
+    g_return_if_fail(IPATCH_IS_SAMPLE(handle->sample));
 
-  iface = IPATCH_SAMPLE_GET_IFACE (handle->sample);
+    iface = IPATCH_SAMPLE_GET_IFACE(handle->sample);
 
-  /* call interface close method (if any) */
-  if (iface->close) iface->close (handle);
+    /* call interface close method (if any) */
+    if(iface->close)
+    {
+        iface->close(handle);
+    }
 
-  if (handle->transform)
-  { /* If transform came from pool, release it, unref otherwise (user assigned) */
-    if (handle->release_transform)
-      ipatch_sample_transform_pool_release (handle->transform); /* -- release transform */
-    else ipatch_sample_transform_free (handle->transform);  /* -- free transform */
-  }
+    if(handle->transform)
+    {
+        /* If transform came from pool, release it, unref otherwise (user assigned) */
+        if(handle->release_transform)
+        {
+            ipatch_sample_transform_pool_release(handle->transform);    /* -- release transform */
+        }
+        else
+        {
+            ipatch_sample_transform_free(handle->transform);    /* -- free transform */
+        }
+    }
 
-  g_object_unref (handle->sample);    /* -- unref sample */
+    g_object_unref(handle->sample);     /* -- unref sample */
 
-  handle->transform = NULL;
-  handle->sample = NULL;
+    handle->transform = NULL;
+    handle->sample = NULL;
 }
 
 /**
@@ -975,12 +1028,12 @@ ipatch_sample_handle_close (IpatchSampleHandle *handle)
  * Returns: (transfer none): Sample transform or %NULL if none.
  */
 IpatchSampleTransform *
-ipatch_sample_handle_get_transform (IpatchSampleHandle *handle)
+ipatch_sample_handle_get_transform(IpatchSampleHandle *handle)
 {
-  g_return_val_if_fail (handle != NULL, NULL);
-  g_return_val_if_fail (IPATCH_IS_SAMPLE (handle->sample), NULL);
+    g_return_val_if_fail(handle != NULL, NULL);
+    g_return_val_if_fail(IPATCH_IS_SAMPLE(handle->sample), NULL);
 
-  return (handle->transform);
+    return (handle->transform);
 }
 
 /**
@@ -996,23 +1049,35 @@ ipatch_sample_handle_get_transform (IpatchSampleHandle *handle)
  * allocation is taken over by @handle.
  */
 void
-ipatch_sample_handle_set_transform (IpatchSampleHandle *handle,
-                                    IpatchSampleTransform *transform)
+ipatch_sample_handle_set_transform(IpatchSampleHandle *handle,
+                                   IpatchSampleTransform *transform)
 {
-  g_return_if_fail (handle != NULL);
-  g_return_if_fail (!transform || transform->buf1);
+    g_return_if_fail(handle != NULL);
+    g_return_if_fail(!transform || transform->buf1);
 
-  if (handle->transform)
-  { /* If transform came from pool, release it, free otherwise (user assigned) */
-    if (handle->release_transform)
-      ipatch_sample_transform_pool_release (handle->transform); /* -- release transform */
-    else ipatch_sample_transform_free (handle->transform);  /* -- free transform */
-  }
+    if(handle->transform)
+    {
+        /* If transform came from pool, release it, free otherwise (user assigned) */
+        if(handle->release_transform)
+        {
+            ipatch_sample_transform_pool_release(handle->transform);    /* -- release transform */
+        }
+        else
+        {
+            ipatch_sample_transform_free(handle->transform);    /* -- free transform */
+        }
+    }
 
-  if (transform) handle->transform = transform;
-  else handle->transform = NULL;
+    if(transform)
+    {
+        handle->transform = transform;
+    }
+    else
+    {
+        handle->transform = NULL;
+    }
 
-  handle->release_transform = FALSE;
+    handle->release_transform = FALSE;
 }
 
 /**
@@ -1022,34 +1087,37 @@ ipatch_sample_handle_set_transform (IpatchSampleHandle *handle,
  * Get the sample format of a sample handle.  May differ from the #IpatchSample
  * format of the handle, if it was opened with a different format and is
  * therefore being converted.
- * 
+ *
  * Returns: Sample format integer (see #IpatchSampleWidth, etc).
  */
 int
-ipatch_sample_handle_get_format (IpatchSampleHandle *handle)
+ipatch_sample_handle_get_format(IpatchSampleHandle *handle)
 {
-  g_return_val_if_fail (handle != NULL, 0);
-  g_return_val_if_fail (IPATCH_IS_SAMPLE (handle->sample), 0);
+    g_return_val_if_fail(handle != NULL, 0);
+    g_return_val_if_fail(IPATCH_IS_SAMPLE(handle->sample), 0);
 
-  if (handle->transform)
-    return (handle->read_mode ? handle->transform->dest_format
-	    : handle->transform->src_format);
-  else return (ipatch_sample_get_format (handle->sample));
+    if(handle->transform)
+        return (handle->read_mode ? handle->transform->dest_format
+                : handle->transform->src_format);
+    else
+    {
+        return (ipatch_sample_get_format(handle->sample));
+    }
 }
 
 /**
  * ipatch_sample_handle_get_frame_size:
  * @handle: Sample handle to get data frame size of
- * 
+ *
  * A convenience function to get size of a single sample frame for a given
  * sample @handle.  This is useful for determining buffer allocation sizes when
  * reading or writing data.
  *
  * Returns: Size in bytes of a single sample frame
  */
-int ipatch_sample_handle_get_frame_size (IpatchSampleHandle *handle)
+int ipatch_sample_handle_get_frame_size(IpatchSampleHandle *handle)
 {
-  return (ipatch_sample_format_size (ipatch_sample_handle_get_format (handle)));
+    return (ipatch_sample_format_size(ipatch_sample_handle_get_format(handle)));
 }
 
 /**
@@ -1063,14 +1131,17 @@ int ipatch_sample_handle_get_frame_size (IpatchSampleHandle *handle)
  *   transform buffers.  0 if no sample transform is assigned.
  */
 guint
-ipatch_sample_handle_get_max_frames (IpatchSampleHandle *handle)
+ipatch_sample_handle_get_max_frames(IpatchSampleHandle *handle)
 {
-  g_return_val_if_fail (handle != NULL, 0);
-  g_return_val_if_fail (IPATCH_IS_SAMPLE (handle->sample), 0);
+    g_return_val_if_fail(handle != NULL, 0);
+    g_return_val_if_fail(IPATCH_IS_SAMPLE(handle->sample), 0);
 
-  if (!handle->transform) return 0;
+    if(!handle->transform)
+    {
+        return 0;
+    }
 
-  return (ipatch_sample_transform_get_max_frames (handle->transform));
+    return (ipatch_sample_transform_get_max_frames(handle->transform));
 }
 
 /**
@@ -1085,89 +1156,98 @@ ipatch_sample_handle_get_max_frames (IpatchSampleHandle *handle)
  *   at a time, in which case the internal transform buffer pointer will be
  *   returned.
  * @err: Location to store error info or %NULL
- * 
+ *
  * Read sample data from a sample handle.  If the number of
  * frames read is within the sample transform buffer size and @buf is %NULL
  * then the transform buffer will be returned (extra copy not needed).
- * 
+ *
  * Returns: Pointer to sample data on success, %NULL on error (in which case
  *   @err may be set).  The internal transform buffer will only be returned
  *   if the @buf parameter is %NULL.
  */
 gpointer
-ipatch_sample_handle_read (IpatchSampleHandle *handle, guint offset,
-			   guint frames, gpointer buf, GError **err)
+ipatch_sample_handle_read(IpatchSampleHandle *handle, guint offset,
+                          guint frames, gpointer buf, GError **err)
 {
-  IpatchSampleTransform *trans;
-  guint readframes, framesize, readbytes;
-  gpointer transbuf, outbuf, bufptr;
-  guint size;
+    IpatchSampleTransform *trans;
+    guint readframes, framesize, readbytes;
+    gpointer transbuf, outbuf, bufptr;
+    guint size;
 
-  g_return_val_if_fail (handle != NULL, NULL);
-  g_return_val_if_fail (IPATCH_IS_SAMPLE (handle->sample), NULL);
-  g_return_val_if_fail (handle->read_mode, NULL);
-  g_return_val_if_fail (!err || !*err, NULL);
+    g_return_val_if_fail(handle != NULL, NULL);
+    g_return_val_if_fail(IPATCH_IS_SAMPLE(handle->sample), NULL);
+    g_return_val_if_fail(handle->read_mode, NULL);
+    g_return_val_if_fail(!err || !*err, NULL);
 
-  g_return_val_if_fail (handle->read != NULL, NULL);
+    g_return_val_if_fail(handle->read != NULL, NULL);
 
-  /* Make sure read does not exceed the sample size */
-  size = ipatch_sample_get_size (handle->sample, NULL);
-  g_return_val_if_fail (offset + frames <= size, FALSE);
+    /* Make sure read does not exceed the sample size */
+    size = ipatch_sample_get_size(handle->sample, NULL);
+    g_return_val_if_fail(offset + frames <= size, FALSE);
 
-  trans = handle->transform;
+    trans = handle->transform;
 
-  if (trans && !handle->manual_transform)	/* transforming audio data? */
-  {
-    readframes = trans->max_frames;
-    transbuf = trans->buf1;
-
-    /* buffer pointer not supplied? */
-    if (!buf)
+    if(trans && !handle->manual_transform)	/* transforming audio data? */
     {
-      /* extra descriptive for debugging purposes */
-      g_return_val_if_fail (buf || frames <= readframes, NULL);
+        readframes = trans->max_frames;
+        transbuf = trans->buf1;
 
-      /* read the sample data */
-      if (!handle->read (handle, offset, frames, transbuf, err)) return (NULL);
+        /* buffer pointer not supplied? */
+        if(!buf)
+        {
+            /* extra descriptive for debugging purposes */
+            g_return_val_if_fail(buf || frames <= readframes, NULL);
 
-      /* transform the sample data and return - we done! */
-      return (ipatch_sample_transform_convert_single (trans, frames));
+            /* read the sample data */
+            if(!handle->read(handle, offset, frames, transbuf, err))
+            {
+                return (NULL);
+            }
+
+            /* transform the sample data and return - we done! */
+            return (ipatch_sample_transform_convert_single(trans, frames));
+        }
+
+        bufptr = buf;
+        framesize = ipatch_sample_format_size(trans->dest_format);
+        readbytes = readframes * framesize;
+
+        while(frames > 0)	/* must be transformed in blocks */
+        {
+            if(readframes > frames)
+            {
+                readframes = frames;
+                readbytes = readframes * framesize;
+            }
+
+            /* read the sample data */
+            if(!handle->read(handle, offset, readframes, transbuf, err))
+            {
+                return (NULL);
+            }
+
+            /* transform the sample data */
+            outbuf = ipatch_sample_transform_convert_single(trans, readframes);
+
+            /* copy to caller's buffer */
+            memcpy(bufptr, outbuf, readbytes);
+
+            frames -= readframes;
+            offset += readframes;
+            bufptr = (guint8 *)bufptr + readbytes;
+        }
+    }
+    else   /* not transforming, do it all in one go */
+    {
+        g_return_val_if_fail(buf != NULL, NULL);
+
+        if(!handle->read(handle, offset, frames, buf, err))
+        {
+            return (NULL);
+        }
     }
 
-    bufptr = buf;
-    framesize = ipatch_sample_format_size (trans->dest_format);
-    readbytes = readframes * framesize;
-
-    while (frames > 0)	/* must be transformed in blocks */
-    {
-      if (readframes > frames)
-      {
-	readframes = frames;
-	readbytes = readframes * framesize;
-      }
-
-      /* read the sample data */
-      if (!handle->read (handle, offset, readframes, transbuf, err)) return (NULL);
-
-      /* transform the sample data */
-      outbuf = ipatch_sample_transform_convert_single (trans, readframes);
-
-      /* copy to caller's buffer */
-      memcpy (bufptr, outbuf, readbytes);
-
-      frames -= readframes;
-      offset += readframes;
-      bufptr = (guint8 *)bufptr + readbytes;
-    }
-  }
-  else   /* not transforming, do it all in one go */
-  {
-    g_return_val_if_fail (buf != NULL, NULL);
-
-    if (!handle->read (handle, offset, frames, buf, err)) return (NULL);
-  }
-
-  return (buf);
+    return (buf);
 }
 
 /**
@@ -1176,7 +1256,7 @@ ipatch_sample_handle_read (IpatchSampleHandle *handle, guint offset,
  * @offset: Offset in frames to read from
  * @size: Size of data to read (in bytes), must be a multiple of sample frame size
  * @err: Location to store error info or %NULL
- * 
+ *
  * Read sample data from a sample handle.  Like ipatch_sample_handle_read() but
  * is GObject Introspection friendly and allocates returned buffer.
  *
@@ -1186,29 +1266,29 @@ ipatch_sample_handle_read (IpatchSampleHandle *handle, guint offset,
  * Since: 1.1.0
  */
 gpointer
-ipatch_sample_handle_read_size (IpatchSampleHandle *handle, guint offset,
-                                guint size, GError **err)
+ipatch_sample_handle_read_size(IpatchSampleHandle *handle, guint offset,
+                               guint size, GError **err)
 {
-  gpointer buf;
-  int frame_size;
+    gpointer buf;
+    int frame_size;
 
-  g_return_val_if_fail (handle != NULL, NULL);
-  g_return_val_if_fail (IPATCH_IS_SAMPLE (handle->sample), NULL);
-  g_return_val_if_fail (size > 0, NULL);
+    g_return_val_if_fail(handle != NULL, NULL);
+    g_return_val_if_fail(IPATCH_IS_SAMPLE(handle->sample), NULL);
+    g_return_val_if_fail(size > 0, NULL);
 
-  frame_size = ipatch_sample_handle_get_frame_size (handle);
-  g_return_val_if_fail (frame_size > 0, NULL);
-  g_return_val_if_fail (size % frame_size == 0, NULL);
+    frame_size = ipatch_sample_handle_get_frame_size(handle);
+    g_return_val_if_fail(frame_size > 0, NULL);
+    g_return_val_if_fail(size % frame_size == 0, NULL);
 
-  buf = g_malloc (size);        // ++ alloc buf
+    buf = g_malloc(size);         // ++ alloc buf
 
-  if (!ipatch_sample_handle_read (handle, offset, size / frame_size, buf, err))
-  {
-    g_free (buf);               // -- free buf on error
-    return (NULL);
-  }
+    if(!ipatch_sample_handle_read(handle, offset, size / frame_size, buf, err))
+    {
+        g_free(buf);                // -- free buf on error
+        return (NULL);
+    }
 
-  return (buf);         // !! caller takes over allocation
+    return (buf);         // !! caller takes over allocation
 }
 
 /**
@@ -1222,85 +1302,91 @@ ipatch_sample_handle_read_size (IpatchSampleHandle *handle, guint offset,
  *   assumed that the sample data has been loaded into the first buffer of the
  *   handle's sample transform.
  * @err: Location to store error info or %NULL
- * 
+ *
  * Write sample data to a sample handle.
- * 
+ *
  * Returns: %TRUE on success, %FALSE otherwise (in which case @err may be set).
  */
 gboolean
-ipatch_sample_handle_write (IpatchSampleHandle *handle, guint offset, guint frames,
-			    gconstpointer buf, GError **err)
+ipatch_sample_handle_write(IpatchSampleHandle *handle, guint offset, guint frames,
+                           gconstpointer buf, GError **err)
 {
-  IpatchSampleTransform *trans;
-  guint writeframes, framesize, writebytes;
-  gpointer transbuf, outbuf;
-  gconstpointer bufptr;
-  guint size;
+    IpatchSampleTransform *trans;
+    guint writeframes, framesize, writebytes;
+    gpointer transbuf, outbuf;
+    gconstpointer bufptr;
+    guint size;
 
-  g_return_val_if_fail (handle != NULL, FALSE);
-  g_return_val_if_fail (IPATCH_IS_SAMPLE (handle->sample), FALSE);
-  g_return_val_if_fail (!handle->read_mode, FALSE);
-  g_return_val_if_fail (!err || !*err, FALSE);
+    g_return_val_if_fail(handle != NULL, FALSE);
+    g_return_val_if_fail(IPATCH_IS_SAMPLE(handle->sample), FALSE);
+    g_return_val_if_fail(!handle->read_mode, FALSE);
+    g_return_val_if_fail(!err || !*err, FALSE);
 
-  g_return_val_if_fail (handle->write != NULL, FALSE);
+    g_return_val_if_fail(handle->write != NULL, FALSE);
 
-  /* Make sure write does not exceed the sample size */
-  size = ipatch_sample_get_size (handle->sample, NULL);
-  g_return_val_if_fail (offset + frames <= size, FALSE);
+    /* Make sure write does not exceed the sample size */
+    size = ipatch_sample_get_size(handle->sample, NULL);
+    g_return_val_if_fail(offset + frames <= size, FALSE);
 
-  trans = handle->transform;
+    trans = handle->transform;
 
-  if (trans && !handle->manual_transform)	/* transforming audio data? */
-  {
-    writeframes = trans->max_frames;
-    transbuf = trans->buf1;
-
-    /* buffer pointer not supplied or its the transform buffer? */
-    if (!buf || buf == transbuf)
+    if(trans && !handle->manual_transform)	/* transforming audio data? */
     {
-      /* extra descriptive for debugging purposes */
-      g_return_val_if_fail (buf || frames <= writeframes, FALSE);
+        writeframes = trans->max_frames;
+        transbuf = trans->buf1;
 
-      outbuf = ipatch_sample_transform_convert_single (trans, frames);
+        /* buffer pointer not supplied or its the transform buffer? */
+        if(!buf || buf == transbuf)
+        {
+            /* extra descriptive for debugging purposes */
+            g_return_val_if_fail(buf || frames <= writeframes, FALSE);
 
-      /* write the sample data and return - we's done! */
-      return (handle->write (handle, offset, frames, outbuf, err));
+            outbuf = ipatch_sample_transform_convert_single(trans, frames);
+
+            /* write the sample data and return - we's done! */
+            return (handle->write(handle, offset, frames, outbuf, err));
+        }
+
+        bufptr = buf;
+        framesize = ipatch_sample_format_size(trans->src_format);
+        writebytes = writeframes * framesize;
+
+        while(frames > 0)	/* must be transformed in blocks */
+        {
+            if(writeframes > frames)
+            {
+                writeframes = frames;
+                writebytes = writeframes * framesize;
+            }
+
+            /* copy the block of sample data to transform */
+            memcpy(transbuf, bufptr, writebytes);
+
+            /* transform the sample data */
+            outbuf = ipatch_sample_transform_convert_single(trans, writeframes);
+
+            /* write the transformed sample data */
+            if(!handle->write(handle, offset, writeframes, outbuf, err))
+            {
+                return (FALSE);
+            }
+
+            frames -= writeframes;
+            offset += writeframes;
+            bufptr = (guint8 *)bufptr + writebytes;
+        }
+    }
+    else   /* not transforming, do it all in one go */
+    {
+        g_return_val_if_fail(buf != NULL, FALSE);
+
+        if(!handle->write(handle, offset, frames, buf, err))
+        {
+            return (FALSE);
+        }
     }
 
-    bufptr = buf;
-    framesize = ipatch_sample_format_size (trans->src_format);
-    writebytes = writeframes * framesize;
-
-    while (frames > 0)	/* must be transformed in blocks */
-    {
-      if (writeframes > frames)
-      {
-	writeframes = frames;
-	writebytes = writeframes * framesize;
-      }
-
-      /* copy the block of sample data to transform */
-      memcpy (transbuf, bufptr, writebytes);
-
-      /* transform the sample data */
-      outbuf = ipatch_sample_transform_convert_single (trans, writeframes);
-
-      /* write the transformed sample data */
-      if (!handle->write (handle, offset, writeframes, outbuf, err)) return (FALSE);
-
-      frames -= writeframes;
-      offset += writeframes;
-	  bufptr = (guint8 *)bufptr + writebytes;
-    }
-  }
-  else   /* not transforming, do it all in one go */
-  {
-    g_return_val_if_fail (buf != NULL, FALSE);
-
-    if (!handle->write (handle, offset, frames, buf, err)) return (FALSE);
-  }
-
-  return (TRUE);
+    return (TRUE);
 }
 
 /**
@@ -1311,28 +1397,28 @@ ipatch_sample_handle_write (IpatchSampleHandle *handle, guint offset, guint fram
  *   sample data to write
  * @size: Size of @buf in bytes (must be a multiple of sample frame size)
  * @err: Location to store error info or %NULL
- * 
+ *
  * Write sample data to a sample handle.  Like ipatch_sample_handle_write() but
  * is GObject Introspection friendly.
- * 
+ *
  * Returns: %TRUE on success, %FALSE otherwise (in which case @err may be set).
  *
  * Since: 1.1.0
  */
 gboolean
-ipatch_sample_handle_write_size (IpatchSampleHandle *handle, guint offset,
-                                 gconstpointer buf, guint size, GError **err)
+ipatch_sample_handle_write_size(IpatchSampleHandle *handle, guint offset,
+                                gconstpointer buf, guint size, GError **err)
 {
-  int frame_size;
+    int frame_size;
 
-  g_return_val_if_fail (handle != NULL, FALSE);
-  g_return_val_if_fail (IPATCH_IS_SAMPLE (handle->sample), FALSE);
+    g_return_val_if_fail(handle != NULL, FALSE);
+    g_return_val_if_fail(IPATCH_IS_SAMPLE(handle->sample), FALSE);
 
-  frame_size = ipatch_sample_handle_get_frame_size (handle);
-  g_return_val_if_fail (frame_size != 0, FALSE);
-  g_return_val_if_fail (size % frame_size == 0, FALSE);
+    frame_size = ipatch_sample_handle_get_frame_size(handle);
+    g_return_val_if_fail(frame_size != 0, FALSE);
+    g_return_val_if_fail(size % frame_size == 0, FALSE);
 
-  return (ipatch_sample_handle_write (handle, offset, size / frame_size, buf, err));
+    return (ipatch_sample_handle_write(handle, offset, size / frame_size, buf, err));
 }
 
 /**
@@ -1348,27 +1434,32 @@ ipatch_sample_handle_write_size (IpatchSampleHandle *handle, guint offset,
  * Returns: %TRUE on success, %FALSE on failure (in which case @err may be set)
  */
 gboolean
-ipatch_sample_handle_cascade_open (IpatchSampleHandle *handle,
-                                   IpatchSample *sample, GError **err)
+ipatch_sample_handle_cascade_open(IpatchSampleHandle *handle,
+                                  IpatchSample *sample, GError **err)
 {
-  IpatchSampleIface *iface;
+    IpatchSampleIface *iface;
 
-  g_return_val_if_fail (handle != NULL, FALSE);
-  g_return_val_if_fail (IPATCH_IS_SAMPLE (sample), FALSE);
+    g_return_val_if_fail(handle != NULL, FALSE);
+    g_return_val_if_fail(IPATCH_IS_SAMPLE(sample), FALSE);
 
-  iface = IPATCH_SAMPLE_GET_IFACE (sample);
+    iface = IPATCH_SAMPLE_GET_IFACE(sample);
 
-  g_object_unref (handle->sample);              /* -- unref old sample */
-  handle->sample = g_object_ref (sample);       /* ++ ref cascaded sample for new handle */
+    g_object_unref(handle->sample);               /* -- unref old sample */
+    handle->sample = g_object_ref(sample);        /* ++ ref cascaded sample for new handle */
 
-  handle->read = iface->read;
-  handle->write = iface->write;
-  handle->close = iface->close;
+    handle->read = iface->read;
+    handle->write = iface->write;
+    handle->close = iface->close;
 
-  /* call interface open method (if any) */
-  if (iface->open)
-    return (iface->open (handle, err));
-  else return (TRUE);   /* No open method, assume success */
+    /* call interface open method (if any) */
+    if(iface->open)
+    {
+        return (iface->open(handle, err));
+    }
+    else
+    {
+        return (TRUE);    /* No open method, assume success */
+    }
 }
 
 /**
@@ -1376,7 +1467,7 @@ ipatch_sample_handle_cascade_open (IpatchSampleHandle *handle,
  * @oclass: Object class to install #IpatchSample property
  * @property_id: Property ID for set/get property class method
  * @property_name: #IpatchSample property name to install
- * 
+ *
  * A helper function for objects that have an #IpatchSample interface.
  * Installs a #IpatchSample interface property for the given object class.
  * The parameter will be #G_PARAM_READWRITE.
@@ -1384,21 +1475,21 @@ ipatch_sample_handle_cascade_open (IpatchSampleHandle *handle,
  * Returns: The newly created and installed parameter spec.
  */
 GParamSpec *
-ipatch_sample_install_property (GObjectClass *oclass, guint property_id,
-				const char *property_name)
+ipatch_sample_install_property(GObjectClass *oclass, guint property_id,
+                               const char *property_name)
 {
-  GParamSpec *pspec;
+    GParamSpec *pspec;
 
-  g_return_val_if_fail (G_IS_OBJECT_CLASS (oclass), NULL);
-  g_return_val_if_fail (property_id != 0, NULL);
+    g_return_val_if_fail(G_IS_OBJECT_CLASS(oclass), NULL);
+    g_return_val_if_fail(property_id != 0, NULL);
 
-  pspec = ipatch_sample_new_property_param_spec (property_name,
-						 G_PARAM_READWRITE);
-  g_return_val_if_fail (pspec != NULL, NULL);
+    pspec = ipatch_sample_new_property_param_spec(property_name,
+            G_PARAM_READWRITE);
+    g_return_val_if_fail(pspec != NULL, NULL);
 
-  g_object_class_install_property (oclass, property_id, pspec);
+    g_object_class_install_property(oclass, property_id, pspec);
 
-  return (pspec);
+    return (pspec);
 }
 
 /**
@@ -1406,7 +1497,7 @@ ipatch_sample_install_property (GObjectClass *oclass, guint property_id,
  * @oclass: Object class to install #IpatchSample property
  * @property_id: Property ID for set/get property class method
  * @property_name: #IpatchSample property name to install
- * 
+ *
  * A helper function for objects that have an #IpatchSample interface.
  * Identical to ipatch_sample_install_property() but installs the property
  * as readonly and uses g_object_class_override_property() instead of
@@ -1415,75 +1506,78 @@ ipatch_sample_install_property (GObjectClass *oclass, guint property_id,
  * Returns: The newly created and installed parameter spec (GParamSpecOverride).
  */
 GParamSpec *
-ipatch_sample_install_property_readonly (GObjectClass *oclass,
-					 guint property_id,
-					 const char *property_name)
+ipatch_sample_install_property_readonly(GObjectClass *oclass,
+                                        guint property_id,
+                                        const char *property_name)
 {
-  g_return_val_if_fail (G_IS_OBJECT_CLASS (oclass), NULL);
-  g_return_val_if_fail (property_id != 0, NULL);
+    g_return_val_if_fail(G_IS_OBJECT_CLASS(oclass), NULL);
+    g_return_val_if_fail(property_id != 0, NULL);
 
-  g_object_class_override_property (oclass, property_id, property_name);
-  return (g_object_class_find_property (oclass, property_name));
+    g_object_class_override_property(oclass, property_id, property_name);
+    return (g_object_class_find_property(oclass, property_name));
 }
 
 /**
  * ipatch_sample_new_property_param_spec: (skip)
  * @property_name: Name of a #IpatchSample property
  * @flags: Flags to use for the new #GParamSpec
- * 
+ *
  * Seldom used function that creates a new GParamSpec that is identical to
  * a #IpatchSample property by the name @property_name, except the flags
  * can differ.
- * 
+ *
  * Returns: New GParamSpec.
  */
 GParamSpec *
-ipatch_sample_new_property_param_spec (const char *property_name,
-				       GParamFlags flags)
+ipatch_sample_new_property_param_spec(const char *property_name,
+                                      GParamFlags flags)
 {
-  if (strcmp (property_name, "sample-data") == 0)
-    return g_param_spec_object ("sample-data", _("Sample data"), _("Sample data"),
-			        IPATCH_TYPE_SAMPLE_DATA, flags);
-  else if (strcmp (property_name, "sample-size") == 0)
-    return g_param_spec_uint ("sample-size", _("Size"),
-			      _("Size in frames"),
-			      0, G_MAXUINT, 0,
-			      flags);
-  else if (strcmp (property_name, "sample-format") == 0)
-    return g_param_spec_int ("sample-format", _("Sample format"),
-			     _("Sample format"),
-			     0, G_MAXINT, IPATCH_SAMPLE_FORMAT_DEFAULT,
-			     flags);
-  else if (strcmp (property_name, "sample-rate") == 0)
-    return g_param_spec_int ("sample-rate", _("Sample rate"),
-			     _("Sampling rate in Hertz"),
-			     IPATCH_SAMPLE_RATE_MIN, IPATCH_SAMPLE_RATE_MAX,
-			     IPATCH_SAMPLE_RATE_DEFAULT, flags);
-  else if (strcmp (property_name, "loop-type") == 0)
-    return g_param_spec_enum ("loop-type", _("Loop type"),
-			      _("Loop method type"),
-			      IPATCH_TYPE_SAMPLE_LOOP_TYPE,
-			      IPATCH_SAMPLE_LOOP_NONE,
-			      flags);
-  else if (strcmp (property_name, "loop-start") == 0)
-    return g_param_spec_uint ("loop-start", _("Loop start"),
-			      _("Start of loop in frames"),
-			      0, G_MAXUINT, 0,
-			      flags);
-  else if (strcmp (property_name, "loop-end") == 0)
-    return g_param_spec_uint ("loop-end", _("Loop end"),
-			      _("Loop end in frames (after loop)"),
-			      0, G_MAXUINT, 0,
-			      flags);
-  else if (strcmp (property_name, "root-note") == 0)
-    return g_param_spec_int ("root-note", _("Root note"),
-			     _("Root MIDI note"),
-			     0, 127, IPATCH_SAMPLE_ROOT_NOTE_DEFAULT,
-			     flags);
-  else if (strcmp (property_name, "fine-tune") == 0)
-    return g_param_spec_int ("fine-tune", _("Fine tuning"),
-			     _("Fine tuning in cents"),
-			     -99, 99, 0,
-			     flags);
-  else return (NULL);
+    if(strcmp(property_name, "sample-data") == 0)
+        return g_param_spec_object("sample-data", _("Sample data"), _("Sample data"),
+                                   IPATCH_TYPE_SAMPLE_DATA, flags);
+    else if(strcmp(property_name, "sample-size") == 0)
+        return g_param_spec_uint("sample-size", _("Size"),
+                                 _("Size in frames"),
+                                 0, G_MAXUINT, 0,
+                                 flags);
+    else if(strcmp(property_name, "sample-format") == 0)
+        return g_param_spec_int("sample-format", _("Sample format"),
+                                _("Sample format"),
+                                0, G_MAXINT, IPATCH_SAMPLE_FORMAT_DEFAULT,
+                                flags);
+    else if(strcmp(property_name, "sample-rate") == 0)
+        return g_param_spec_int("sample-rate", _("Sample rate"),
+                                _("Sampling rate in Hertz"),
+                                IPATCH_SAMPLE_RATE_MIN, IPATCH_SAMPLE_RATE_MAX,
+                                IPATCH_SAMPLE_RATE_DEFAULT, flags);
+    else if(strcmp(property_name, "loop-type") == 0)
+        return g_param_spec_enum("loop-type", _("Loop type"),
+                                 _("Loop method type"),
+                                 IPATCH_TYPE_SAMPLE_LOOP_TYPE,
+                                 IPATCH_SAMPLE_LOOP_NONE,
+                                 flags);
+    else if(strcmp(property_name, "loop-start") == 0)
+        return g_param_spec_uint("loop-start", _("Loop start"),
+                                 _("Start of loop in frames"),
+                                 0, G_MAXUINT, 0,
+                                 flags);
+    else if(strcmp(property_name, "loop-end") == 0)
+        return g_param_spec_uint("loop-end", _("Loop end"),
+                                 _("Loop end in frames (after loop)"),
+                                 0, G_MAXUINT, 0,
+                                 flags);
+    else if(strcmp(property_name, "root-note") == 0)
+        return g_param_spec_int("root-note", _("Root note"),
+                                _("Root MIDI note"),
+                                0, 127, IPATCH_SAMPLE_ROOT_NOTE_DEFAULT,
+                                flags);
+    else if(strcmp(property_name, "fine-tune") == 0)
+        return g_param_spec_int("fine-tune", _("Fine tuning"),
+                                _("Fine tuning in cents"),
+                                -99, 99, 0,
+                                flags);
+    else
+    {
+        return (NULL);
+    }
 }

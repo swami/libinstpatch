@@ -23,7 +23,7 @@
 #include <glib.h>
 #include <glib-object.h>
 
-double ipatch_unit_hertz_to_cents (double hz);
-double ipatch_unit_cents_to_hertz (double cents);
+double ipatch_unit_hertz_to_cents(double hz);
+double ipatch_unit_cents_to_hertz(double cents);
 
 #endif

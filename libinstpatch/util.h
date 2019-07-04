@@ -31,10 +31,10 @@ extern GValue *ipatch_util_value_bool_false;
 #define IPATCH_UTIL_VALUE_BOOL(b) \
   ((b) ? ipatch_util_value_bool_true : ipatch_util_value_bool_false)
 
-guint ipatch_util_value_hash (GValue *val);
-guint ipatch_util_value_array_hash (GValueArray *valarray);
-guint64 ipatch_util_file_size (const char *fname, GError **err);
-char *ipatch_util_abs_filename (const char *filename);
-void ipatch_util_weakref_destroy (gpointer value);
+guint ipatch_util_value_hash(GValue *val);
+guint ipatch_util_value_array_hash(GValueArray *valarray);
+guint64 ipatch_util_file_size(const char *fname, GError **err);
+char *ipatch_util_abs_filename(const char *filename);
+void ipatch_util_weakref_destroy(gpointer value);
 
 #endif

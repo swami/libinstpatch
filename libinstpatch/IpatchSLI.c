@@ -22,7 +22,7 @@
 /**
  * SECTION: IpatchSLI
  * @short_description: Spectralis instrument file object
- * @see_also: 
+ * @see_also:
  *
  * Object type for Spectralis format instruments.
  */
@@ -40,27 +40,28 @@
 #include "ipatch_priv.h"
 
 /* properties */
-enum {
-  PROP_0,
-  PROP_TITLE
+enum
+{
+    PROP_0,
+    PROP_TITLE
 };
 
-static void ipatch_sli_class_init (IpatchSLIClass *klass);
-static void ipatch_sli_init (IpatchSLI *sli);
-static void ipatch_sli_get_title (IpatchSLI *sli, GValue *value);
-static void ipatch_sli_get_property (GObject *object, guint property_id,
-                                     GValue *value, GParamSpec *pspec);
-static void ipatch_sli_item_copy (IpatchItem *dest, IpatchItem *src,
-				  IpatchItemCopyLinkFunc link_func,
-				  gpointer user_data);
+static void ipatch_sli_class_init(IpatchSLIClass *klass);
+static void ipatch_sli_init(IpatchSLI *sli);
+static void ipatch_sli_get_title(IpatchSLI *sli, GValue *value);
+static void ipatch_sli_get_property(GObject *object, guint property_id,
+                                    GValue *value, GParamSpec *pspec);
+static void ipatch_sli_item_copy(IpatchItem *dest, IpatchItem *src,
+                                 IpatchItemCopyLinkFunc link_func,
+                                 gpointer user_data);
 
-static const GType *ipatch_sli_container_child_types (void);
-static const GType *ipatch_sli_container_virtual_types (void);
-static gboolean ipatch_sli_container_init_iter (IpatchContainer *container,
-						IpatchIter *iter, GType type);
-static void ipatch_sli_container_make_unique (IpatchContainer *container,
-					      IpatchItem *item);
-static void ipatch_sli_parent_file_prop_notify (IpatchItemPropNotify *info);
+static const GType *ipatch_sli_container_child_types(void);
+static const GType *ipatch_sli_container_virtual_types(void);
+static gboolean ipatch_sli_container_init_iter(IpatchContainer *container,
+        IpatchIter *iter, GType type);
+static void ipatch_sli_container_make_unique(IpatchContainer *container,
+        IpatchItem *item);
+static void ipatch_sli_parent_file_prop_notify(IpatchItemPropNotify *info);
 
 static gpointer parent_class = NULL;
 static GType sli_child_types[3] = { 0 };
@@ -72,226 +73,243 @@ static IpatchItemClass *base_item_class;
 
 /* Spectralis item type creation function */
 GType
-ipatch_sli_get_type (void)
+ipatch_sli_get_type(void)
 {
-  static GType item_type = 0;
+    static GType item_type = 0;
 
-  if (!item_type) {
-    static const GTypeInfo item_info = {
-      sizeof (IpatchSLIClass), NULL, NULL,
-      (GClassInitFunc)ipatch_sli_class_init, NULL, NULL,
-      sizeof (IpatchSLI),
-      0,
-      (GInstanceInitFunc)ipatch_sli_init,
-    };
+    if(!item_type)
+    {
+        static const GTypeInfo item_info =
+        {
+            sizeof(IpatchSLIClass), NULL, NULL,
+            (GClassInitFunc)ipatch_sli_class_init, NULL, NULL,
+            sizeof(IpatchSLI),
+            0,
+            (GInstanceInitFunc)ipatch_sli_init,
+        };
 
-    item_type = g_type_register_static (IPATCH_TYPE_BASE, "IpatchSLI",
-					&item_info, 0);
-  }
+        item_type = g_type_register_static(IPATCH_TYPE_BASE, "IpatchSLI",
+                                           &item_info, 0);
+    }
 
-  return (item_type);
+    return (item_type);
 }
 
 static void
-ipatch_sli_class_init (IpatchSLIClass *klass)
+ipatch_sli_class_init(IpatchSLIClass *klass)
 {
-  GObjectClass *obj_class = G_OBJECT_CLASS (klass);
-  IpatchItemClass *item_class = IPATCH_ITEM_CLASS (klass);
-  IpatchContainerClass *container_class = IPATCH_CONTAINER_CLASS (klass);
+    GObjectClass *obj_class = G_OBJECT_CLASS(klass);
+    IpatchItemClass *item_class = IPATCH_ITEM_CLASS(klass);
+    IpatchContainerClass *container_class = IPATCH_CONTAINER_CLASS(klass);
 
-  /* save original base class for chaining file-name property */
-  base_item_class = IPATCH_ITEM_CLASS (g_type_class_ref (IPATCH_TYPE_BASE));
+    /* save original base class for chaining file-name property */
+    base_item_class = IPATCH_ITEM_CLASS(g_type_class_ref(IPATCH_TYPE_BASE));
 
-  parent_class = g_type_class_peek_parent (klass);
+    parent_class = g_type_class_peek_parent(klass);
 
-  obj_class->get_property = ipatch_sli_get_property;
+    obj_class->get_property = ipatch_sli_get_property;
 
-  item_class->copy = ipatch_sli_item_copy;
+    item_class->copy = ipatch_sli_item_copy;
 
-  container_class->child_types = ipatch_sli_container_child_types;
-  container_class->virtual_types = ipatch_sli_container_virtual_types;
-  container_class->init_iter = ipatch_sli_container_init_iter;
-  container_class->make_unique = ipatch_sli_container_make_unique;
+    container_class->child_types = ipatch_sli_container_child_types;
+    container_class->virtual_types = ipatch_sli_container_virtual_types;
+    container_class->init_iter = ipatch_sli_container_init_iter;
+    container_class->make_unique = ipatch_sli_container_make_unique;
 
-  g_object_class_override_property (obj_class, PROP_TITLE, "title");
+    g_object_class_override_property(obj_class, PROP_TITLE, "title");
 
-  sli_child_types[0] = IPATCH_TYPE_SLI_INST;
-  sli_child_types[1] = IPATCH_TYPE_SLI_SAMPLE;
+    sli_child_types[0] = IPATCH_TYPE_SLI_INST;
+    sli_child_types[1] = IPATCH_TYPE_SLI_SAMPLE;
 
-  sli_virt_types[0] = IPATCH_TYPE_VIRTUAL_SLI_INST;
-  sli_virt_types[1] = IPATCH_TYPE_VIRTUAL_SLI_SAMPLES;
+    sli_virt_types[0] = IPATCH_TYPE_VIRTUAL_SLI_INST;
+    sli_virt_types[1] = IPATCH_TYPE_VIRTUAL_SLI_SAMPLES;
 }
 
 static void
-ipatch_sli_init (IpatchSLI *sli)
+ipatch_sli_init(IpatchSLI *sli)
 {
-  ipatch_item_clear_flags (IPATCH_ITEM (sli), IPATCH_BASE_CHANGED);
-  /* add a prop notify on file-name so sli can notify it's title also */
-  ipatch_item_prop_connect_by_name (IPATCH_ITEM (sli), "file-name",
-                                    ipatch_sli_parent_file_prop_notify, NULL,
-                                    sli);
+    ipatch_item_clear_flags(IPATCH_ITEM(sli), IPATCH_BASE_CHANGED);
+    /* add a prop notify on file-name so sli can notify it's title also */
+    ipatch_item_prop_connect_by_name(IPATCH_ITEM(sli), "file-name",
+                                     ipatch_sli_parent_file_prop_notify, NULL,
+                                     sli);
 }
 
 static void
-ipatch_sli_get_title (IpatchSLI *sli, GValue *value)
+ipatch_sli_get_title(IpatchSLI *sli, GValue *value)
 {
-  char *filename;
-  gchar *s;
+    char *filename;
+    gchar *s;
 
-  filename = ipatch_base_get_file_name (IPATCH_BASE (sli));
-  s = (filename ? g_path_get_basename (filename) : NULL);
-  free (filename);
-  
-  if (!s || *s == G_DIR_SEPARATOR || *s == '.')
-  {
-    g_free (s);
-    s = g_strdup(_(IPATCH_BASE_DEFAULT_NAME));
-  }
-  g_value_take_string (value, s);
+    filename = ipatch_base_get_file_name(IPATCH_BASE(sli));
+    s = (filename ? g_path_get_basename(filename) : NULL);
+    free(filename);
+
+    if(!s || *s == G_DIR_SEPARATOR || *s == '.')
+    {
+        g_free(s);
+        s = g_strdup(_(IPATCH_BASE_DEFAULT_NAME));
+    }
+
+    g_value_take_string(value, s);
 }
 
 static void
-ipatch_sli_get_property (GObject *object, guint property_id,
-                         GValue *value, GParamSpec *pspec)
+ipatch_sli_get_property(GObject *object, guint property_id,
+                        GValue *value, GParamSpec *pspec)
 {
-  IpatchSLI *sli;
+    IpatchSLI *sli;
 
-  g_return_if_fail (IPATCH_IS_SLI (object));
-  sli = IPATCH_SLI (object);
+    g_return_if_fail(IPATCH_IS_SLI(object));
+    sli = IPATCH_SLI(object);
 
-  switch (property_id)
+    switch(property_id)
     {
     case PROP_TITLE:
-      ipatch_sli_get_title (sli, value);
-      break;
+        ipatch_sli_get_title(sli, value);
+        break;
+
     default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
-      break;
+        G_OBJECT_WARN_INVALID_PROPERTY_ID(object, property_id, pspec);
+        break;
     }
 }
 
 static void
-ipatch_sli_item_copy (IpatchItem *dest, IpatchItem *src,
-		      IpatchItemCopyLinkFunc link_func, gpointer user_data)
+ipatch_sli_item_copy(IpatchItem *dest, IpatchItem *src,
+                     IpatchItemCopyLinkFunc link_func, gpointer user_data)
 {
-  IpatchSLI *src_sli, *dest_sli;
-  IpatchItem *newitem;
-  GHashTable *repl_samples;
-  GSList *p;
+    IpatchSLI *src_sli, *dest_sli;
+    IpatchItem *newitem;
+    GHashTable *repl_samples;
+    GSList *p;
 
-  src_sli = IPATCH_SLI (src);
-  dest_sli = IPATCH_SLI (dest);
+    src_sli = IPATCH_SLI(src);
+    dest_sli = IPATCH_SLI(dest);
 
-  /* create item replacement hash */
-  repl_samples = g_hash_table_new (NULL, NULL);
+    /* create item replacement hash */
+    repl_samples = g_hash_table_new(NULL, NULL);
 
-  IPATCH_ITEM_RLOCK (src_sli);
+    IPATCH_ITEM_RLOCK(src_sli);
 
-  if (IPATCH_BASE (src_sli)->file)
-    ipatch_base_set_file (IPATCH_BASE (dest_sli), IPATCH_BASE (src_sli)->file);
+    if(IPATCH_BASE(src_sli)->file)
+    {
+        ipatch_base_set_file(IPATCH_BASE(dest_sli), IPATCH_BASE(src_sli)->file);
+    }
 
-  p = src_sli->samples;
-  while (p)			/* duplicate samples */
-  { /* ++ ref new duplicate sample, !! sample list takes it over */
-    newitem = ipatch_item_duplicate ((IpatchItem *)(p->data));
-    dest_sli->samples = g_slist_prepend (dest_sli->samples, newitem);
-    ipatch_item_set_parent (newitem, IPATCH_ITEM (dest_sli));
+    p = src_sli->samples;
 
-    /* add to sample pointer replacement hash */
-    g_hash_table_insert (repl_samples, p->data, newitem);
+    while(p)			/* duplicate samples */
+    {
+        /* ++ ref new duplicate sample, !! sample list takes it over */
+        newitem = ipatch_item_duplicate((IpatchItem *)(p->data));
+        dest_sli->samples = g_slist_prepend(dest_sli->samples, newitem);
+        ipatch_item_set_parent(newitem, IPATCH_ITEM(dest_sli));
 
-    p = g_slist_next (p);
-  }
+        /* add to sample pointer replacement hash */
+        g_hash_table_insert(repl_samples, p->data, newitem);
 
-  p = src_sli->insts;
-  while (p)			/* duplicate instruments */
-  { /* ++ ref new duplicate instrument, !! instrument list takes it over
-    * duplicate instrument and replace referenced sample pointers. */
-    newitem = ipatch_item_duplicate_replace ((IpatchItem *)(p->data),
-                                             repl_samples);
-    dest_sli->insts = g_slist_prepend (dest_sli->insts, newitem);
-    ipatch_item_set_parent (newitem, IPATCH_ITEM (dest_sli));
+        p = g_slist_next(p);
+    }
 
-    p = g_slist_next (p);
-  }
+    p = src_sli->insts;
 
-  IPATCH_ITEM_RUNLOCK (src_sli);
+    while(p)			/* duplicate instruments */
+    {
+        /* ++ ref new duplicate instrument, !! instrument list takes it over
+        * duplicate instrument and replace referenced sample pointers. */
+        newitem = ipatch_item_duplicate_replace((IpatchItem *)(p->data),
+                                                repl_samples);
+        dest_sli->insts = g_slist_prepend(dest_sli->insts, newitem);
+        ipatch_item_set_parent(newitem, IPATCH_ITEM(dest_sli));
 
-  dest_sli->insts = g_slist_reverse (dest_sli->insts);
-  dest_sli->samples = g_slist_reverse (dest_sli->samples);
+        p = g_slist_next(p);
+    }
 
-  g_hash_table_destroy (repl_samples);
+    IPATCH_ITEM_RUNLOCK(src_sli);
+
+    dest_sli->insts = g_slist_reverse(dest_sli->insts);
+    dest_sli->samples = g_slist_reverse(dest_sli->samples);
+
+    g_hash_table_destroy(repl_samples);
 }
 
 static const GType *
-ipatch_sli_container_child_types (void)
+ipatch_sli_container_child_types(void)
 {
-  return (sli_child_types);
+    return (sli_child_types);
 }
 
 static const GType *
-ipatch_sli_container_virtual_types (void)
+ipatch_sli_container_virtual_types(void)
 {
-  return (sli_virt_types);
+    return (sli_virt_types);
 }
 
 /* container is locked by caller */
 static gboolean
-ipatch_sli_container_init_iter (IpatchContainer *container,
-				IpatchIter *iter, GType type)
+ipatch_sli_container_init_iter(IpatchContainer *container,
+                               IpatchIter *iter, GType type)
 {
-  IpatchSLI *sli = IPATCH_SLI (container);
+    IpatchSLI *sli = IPATCH_SLI(container);
 
-  if (g_type_is_a (type, IPATCH_TYPE_SLI_INST))
-    ipatch_iter_GSList_init (iter, &sli->insts);
-  else if (g_type_is_a (type, IPATCH_TYPE_SLI_SAMPLE))
-    ipatch_iter_GSList_init (iter, &sli->samples);
-  else
+    if(g_type_is_a(type, IPATCH_TYPE_SLI_INST))
     {
-      g_critical ("Invalid child type '%s' for parent of type '%s'",
-		  g_type_name (type), g_type_name (G_OBJECT_TYPE (container)));
-      return (FALSE);
+        ipatch_iter_GSList_init(iter, &sli->insts);
+    }
+    else if(g_type_is_a(type, IPATCH_TYPE_SLI_SAMPLE))
+    {
+        ipatch_iter_GSList_init(iter, &sli->samples);
+    }
+    else
+    {
+        g_critical("Invalid child type '%s' for parent of type '%s'",
+                   g_type_name(type), g_type_name(G_OBJECT_TYPE(container)));
+        return (FALSE);
     }
 
-  return (TRUE);
+    return (TRUE);
 }
 
 static void
-ipatch_sli_container_make_unique (IpatchContainer *container,
-				  IpatchItem *item)
+ipatch_sli_container_make_unique(IpatchContainer *container,
+                                 IpatchItem *item)
 {
-  IpatchSLI *sli = IPATCH_SLI (container);
-  char *name, *newname;
+    IpatchSLI *sli = IPATCH_SLI(container);
+    char *name, *newname;
 
-  if (!(IPATCH_IS_SLI_INST (item) || IPATCH_IS_SLI_SAMPLE (item)))
-  {
-    g_critical ("Invalid child type '%s' for IpatchSLI object",
-                g_type_name (G_TYPE_FROM_INSTANCE (item)));
-    return;
-  }
+    if(!(IPATCH_IS_SLI_INST(item) || IPATCH_IS_SLI_SAMPLE(item)))
+    {
+        g_critical("Invalid child type '%s' for IpatchSLI object",
+                   g_type_name(G_TYPE_FROM_INSTANCE(item)));
+        return;
+    }
 
-  IPATCH_ITEM_WLOCK (sli);
+    IPATCH_ITEM_WLOCK(sli);
 
-  g_object_get (item, "name", &name, NULL);
-  newname = ipatch_sli_make_unique_name (sli, G_TYPE_FROM_INSTANCE (item),
-					 name, NULL);
-  if (!name || strcmp (name, newname) != 0)
-    g_object_set (item, "name", newname, NULL);
+    g_object_get(item, "name", &name, NULL);
+    newname = ipatch_sli_make_unique_name(sli, G_TYPE_FROM_INSTANCE(item),
+                                          name, NULL);
 
-  IPATCH_ITEM_WUNLOCK (sli);
+    if(!name || strcmp(name, newname) != 0)
+    {
+        g_object_set(item, "name", newname, NULL);
+    }
 
-  g_free (name);
-  g_free (newname);
+    IPATCH_ITEM_WUNLOCK(sli);
+
+    g_free(name);
+    g_free(newname);
 }
 
 /* property notify for when parent's "file-name" property changes */
 static void
-ipatch_sli_parent_file_prop_notify (IpatchItemPropNotify *info)
+ipatch_sli_parent_file_prop_notify(IpatchItemPropNotify *info)
 {
-  IpatchItem *sli = (IpatchItem *)(info->user_data);
-  /* notify that SLI's title has changed */
-  ipatch_item_prop_notify (sli, ipatch_item_pspec_title,
-                           info->new_value, info->old_value);
+    IpatchItem *sli = (IpatchItem *)(info->user_data);
+    /* notify that SLI's title has changed */
+    ipatch_item_prop_notify(sli, ipatch_item_pspec_title,
+                            info->new_value, info->old_value);
 }
 
 /**
@@ -303,9 +321,9 @@ ipatch_sli_parent_file_prop_notify (IpatchItemPropNotify *info)
  * owns the reference and removing it will destroy the item.
  */
 IpatchSLI *
-ipatch_sli_new (void)
+ipatch_sli_new(void)
 {
-  return (IPATCH_SLI (g_object_new (IPATCH_TYPE_SLI, NULL)));
+    return (IPATCH_SLI(g_object_new(IPATCH_TYPE_SLI, NULL)));
 }
 
 /**
@@ -320,12 +338,12 @@ ipatch_sli_new (void)
  * type casting).
  */
 void
-ipatch_sli_set_file (IpatchSLI *sli, IpatchSLIFile *file)
+ipatch_sli_set_file(IpatchSLI *sli, IpatchSLIFile *file)
 {
-  g_return_if_fail (IPATCH_IS_SLI (sli));
-  g_return_if_fail (IPATCH_IS_SLI_FILE (file));
+    g_return_if_fail(IPATCH_IS_SLI(sli));
+    g_return_if_fail(IPATCH_IS_SLI_FILE(file));
 
-  ipatch_base_set_file (IPATCH_BASE (sli), IPATCH_FILE (file));
+    ipatch_base_set_file(IPATCH_BASE(sli), IPATCH_FILE(file));
 }
 
 /**
@@ -342,15 +360,22 @@ ipatch_sli_set_file (IpatchSLI *sli, IpatchSLIFile *file)
  * to unref the file object with g_object_unref() when done with it.
  */
 IpatchSLIFile *
-ipatch_sli_get_file (IpatchSLI *sli)
+ipatch_sli_get_file(IpatchSLI *sli)
 {
-  IpatchFile *file;
+    IpatchFile *file;
 
-  g_return_val_if_fail (IPATCH_IS_SLI (sli), NULL);
+    g_return_val_if_fail(IPATCH_IS_SLI(sli), NULL);
 
-  file = ipatch_base_get_file (IPATCH_BASE (sli));
-  if (file) return (IPATCH_SLI_FILE (file));
-  else return (NULL);
+    file = ipatch_base_get_file(IPATCH_BASE(sli));
+
+    if(file)
+    {
+        return (IPATCH_SLI_FILE(file));
+    }
+    else
+    {
+        return (NULL);
+    }
 }
 
 /**
@@ -372,62 +397,72 @@ ipatch_sli_get_file (IpatchSLI *sli)
  * Returns: A new unique name which should be freed when finished with it.
  */
 char *
-ipatch_sli_make_unique_name (IpatchSLI *sli, GType child_type,
-			     const char *name, const IpatchItem *exclude)
+ipatch_sli_make_unique_name(IpatchSLI *sli, GType child_type,
+                            const char *name, const IpatchItem *exclude)
 {
-  GSList **list, *p;
-  char curname[IPATCH_SLI_NAME_SIZE + 1];
-  guint name_ofs, count = 2;
+    GSList **list, *p;
+    char curname[IPATCH_SLI_NAME_SIZE + 1];
+    guint name_ofs, count = 2;
 
-  g_return_val_if_fail (IPATCH_IS_SLI (sli), NULL);
+    g_return_val_if_fail(IPATCH_IS_SLI(sli), NULL);
 
-  if (g_type_is_a (child_type, IPATCH_TYPE_SLI_INST))
+    if(g_type_is_a(child_type, IPATCH_TYPE_SLI_INST))
     {
-      list = &sli->insts;
-      name_ofs = G_STRUCT_OFFSET (IpatchSLIInst, name);
-      if (!name || !*name) name = _("New Instrument");
+        list = &sli->insts;
+        name_ofs = G_STRUCT_OFFSET(IpatchSLIInst, name);
+
+        if(!name || !*name)
+        {
+            name = _("New Instrument");
+        }
     }
-  else if (g_type_is_a (child_type, IPATCH_TYPE_SLI_SAMPLE))
+    else if(g_type_is_a(child_type, IPATCH_TYPE_SLI_SAMPLE))
     {
-      list = &sli->samples;
-      name_ofs = G_STRUCT_OFFSET (IpatchSLISample, name);
-      if (!name || !*name) name = _("New Sample");
+        list = &sli->samples;
+        name_ofs = G_STRUCT_OFFSET(IpatchSLISample, name);
+
+        if(!name || !*name)
+        {
+            name = _("New Sample");
+        }
     }
-  else
+    else
     {
-      g_critical ("Invalid child type '%s' of parent type '%s'",
-		  g_type_name (child_type), g_type_name (G_OBJECT_TYPE (sli)));
-      return (NULL);
-    }
-
-  g_strlcpy (curname, name, sizeof (curname));
-
-  IPATCH_ITEM_RLOCK (sli);
-
-  p = *list;
-  while (p)	/* check for duplicate */
-    {
-      IPATCH_ITEM_RLOCK (p->data); /* MT - Recursive LOCK */
-
-      if (p->data != exclude
-          && strcmp (G_STRUCT_MEMBER (char *, p->data, name_ofs),
-                     curname) == 0)
-      {			/* duplicate name */
-	      IPATCH_ITEM_RUNLOCK (p->data);
-
-	      ipatch_strconcat_num (name, count++, curname, sizeof (curname));
-
-	      p = *list;		/* start over */
-	      continue;
-      }
-
-      IPATCH_ITEM_RUNLOCK (p->data);
-      p = g_slist_next (p);
+        g_critical("Invalid child type '%s' of parent type '%s'",
+                   g_type_name(child_type), g_type_name(G_OBJECT_TYPE(sli)));
+        return (NULL);
     }
 
-  IPATCH_ITEM_RUNLOCK (sli);
+    g_strlcpy(curname, name, sizeof(curname));
 
-  return (g_strdup (curname));
+    IPATCH_ITEM_RLOCK(sli);
+
+    p = *list;
+
+    while(p)	/* check for duplicate */
+    {
+        IPATCH_ITEM_RLOCK(p->data);  /* MT - Recursive LOCK */
+
+        if(p->data != exclude
+                && strcmp(G_STRUCT_MEMBER(char *, p->data, name_ofs),
+                          curname) == 0)
+        {
+            /* duplicate name */
+            IPATCH_ITEM_RUNLOCK(p->data);
+
+            ipatch_strconcat_num(name, count++, curname, sizeof(curname));
+
+            p = *list;		/* start over */
+            continue;
+        }
+
+        IPATCH_ITEM_RUNLOCK(p->data);
+        p = g_slist_next(p);
+    }
+
+    IPATCH_ITEM_RUNLOCK(sli);
+
+    return (g_strdup(curname));
 }
 
 /**
@@ -445,35 +480,38 @@ ipatch_sli_make_unique_name (IpatchSLI *sli, GType child_type,
  * the item when finished with it.
  */
 IpatchSLIInst *
-ipatch_sli_find_inst (IpatchSLI *sli, const char *name,
-		      const IpatchSLIInst *exclude)
+ipatch_sli_find_inst(IpatchSLI *sli, const char *name,
+                     const IpatchSLIInst *exclude)
 {
-  IpatchSLIInst *inst;
-  GSList *p;
+    IpatchSLIInst *inst;
+    GSList *p;
 
-  g_return_val_if_fail (IPATCH_IS_SLI (sli), NULL);
-  g_return_val_if_fail (name != NULL, NULL);
+    g_return_val_if_fail(IPATCH_IS_SLI(sli), NULL);
+    g_return_val_if_fail(name != NULL, NULL);
 
-  IPATCH_ITEM_RLOCK (sli);
-  p = sli->insts;
-  while (p)
+    IPATCH_ITEM_RLOCK(sli);
+    p = sli->insts;
+
+    while(p)
     {
-      inst = (IpatchSLIInst *)(p->data);
-      IPATCH_ITEM_RLOCK (inst);	/* MT - Recursive LOCK */
+        inst = (IpatchSLIInst *)(p->data);
+        IPATCH_ITEM_RLOCK(inst);	/* MT - Recursive LOCK */
 
-      if (inst != exclude && strcmp (inst->name, name) == 0)
-	{
-	  g_object_ref (inst);
-	  IPATCH_ITEM_RUNLOCK (inst);
-	  IPATCH_ITEM_RUNLOCK (sli);
-	  return (inst);
-	}
-      IPATCH_ITEM_RUNLOCK (inst);
-      p = g_slist_next (p);
+        if(inst != exclude && strcmp(inst->name, name) == 0)
+        {
+            g_object_ref(inst);
+            IPATCH_ITEM_RUNLOCK(inst);
+            IPATCH_ITEM_RUNLOCK(sli);
+            return (inst);
+        }
+
+        IPATCH_ITEM_RUNLOCK(inst);
+        p = g_slist_next(p);
     }
-  IPATCH_ITEM_RUNLOCK (sli);
 
-  return (NULL);
+    IPATCH_ITEM_RUNLOCK(sli);
+
+    return (NULL);
 }
 
 /**
@@ -491,35 +529,38 @@ ipatch_sli_find_inst (IpatchSLI *sli, const char *name,
  * the item when finished with it.
  */
 IpatchSLISample *
-ipatch_sli_find_sample (IpatchSLI *sli, const char *name,
-			const IpatchSLISample *exclude)
+ipatch_sli_find_sample(IpatchSLI *sli, const char *name,
+                       const IpatchSLISample *exclude)
 {
-  IpatchSLISample *sample;
-  GSList *p;
+    IpatchSLISample *sample;
+    GSList *p;
 
-  g_return_val_if_fail (IPATCH_IS_SLI (sli), NULL);
-  g_return_val_if_fail (name != NULL, NULL);
+    g_return_val_if_fail(IPATCH_IS_SLI(sli), NULL);
+    g_return_val_if_fail(name != NULL, NULL);
 
-  IPATCH_ITEM_RLOCK (sli);
-  p = sli->samples;
-  while (p)
+    IPATCH_ITEM_RLOCK(sli);
+    p = sli->samples;
+
+    while(p)
     {
-      sample = (IpatchSLISample *)(p->data);
-      IPATCH_ITEM_RLOCK (sample); /* MT - Recursive LOCK */
+        sample = (IpatchSLISample *)(p->data);
+        IPATCH_ITEM_RLOCK(sample);  /* MT - Recursive LOCK */
 
-      if (p->data != exclude && strcmp (sample->name, name) == 0)
-	{
-	  g_object_ref (sample);
-	  IPATCH_ITEM_RUNLOCK (sample);
-	  IPATCH_ITEM_RUNLOCK (sli);
-	  return (p->data);
-	}
-      IPATCH_ITEM_RUNLOCK (sample);
-      p = g_slist_next (p);
+        if(p->data != exclude && strcmp(sample->name, name) == 0)
+        {
+            g_object_ref(sample);
+            IPATCH_ITEM_RUNLOCK(sample);
+            IPATCH_ITEM_RUNLOCK(sli);
+            return (p->data);
+        }
+
+        IPATCH_ITEM_RUNLOCK(sample);
+        p = g_slist_next(p);
     }
-  IPATCH_ITEM_RUNLOCK (sli);
 
-  return (NULL);
+    IPATCH_ITEM_RUNLOCK(sli);
+
+    return (NULL);
 }
 
 /**
@@ -533,46 +574,51 @@ ipatch_sli_find_sample (IpatchSLI *sli, const char *name,
  * the caller owns, unreference to free the list.
  */
 IpatchList *
-ipatch_sli_get_zone_references (IpatchSLISample *sample)
+ipatch_sli_get_zone_references(IpatchSLISample *sample)
 {
-  IpatchList *reflist, *instlist, *zonelist;
-  IpatchSLI *sli;
-  IpatchSLIZone *zone;
-  IpatchIter iter, zone_iter;
-  IpatchItem *pitem;
+    IpatchList *reflist, *instlist, *zonelist;
+    IpatchSLI *sli;
+    IpatchSLIZone *zone;
+    IpatchIter iter, zone_iter;
+    IpatchItem *pitem;
 
-  g_return_val_if_fail (IPATCH_IS_SLI_SAMPLE (sample), NULL);
-  pitem = ipatch_item_get_parent (IPATCH_ITEM (sample));
-  g_return_val_if_fail (IPATCH_IS_SLI (pitem), NULL);
-  sli = IPATCH_SLI (pitem);
-  
-  reflist = ipatch_list_new ();	/* ++ ref new list */
-  instlist = ipatch_sli_get_insts (sli); /* ++ ref instlist */
+    g_return_val_if_fail(IPATCH_IS_SLI_SAMPLE(sample), NULL);
+    pitem = ipatch_item_get_parent(IPATCH_ITEM(sample));
+    g_return_val_if_fail(IPATCH_IS_SLI(pitem), NULL);
+    sli = IPATCH_SLI(pitem);
 
-  ipatch_list_init_iter (instlist, &iter);
-  pitem = ipatch_item_first (&iter);
-  while (pitem) /* loop over instruments  */
-  {
-    zonelist = ipatch_sli_inst_get_zones (pitem); /* ++ ref new zone list */
-    ipatch_list_init_iter (zonelist, &zone_iter);
+    reflist = ipatch_list_new();	/* ++ ref new list */
+    instlist = ipatch_sli_get_insts(sli);  /* ++ ref instlist */
 
-    zone = ipatch_sli_zone_first (&zone_iter);
-    while (zone)
+    ipatch_list_init_iter(instlist, &iter);
+    pitem = ipatch_item_first(&iter);
+
+    while(pitem)  /* loop over instruments  */
     {
-      if (ipatch_sli_zone_peek_sample (zone) == sample)
-      {
-        g_object_ref (zone); /* ++ ref zone for new list */
-        reflist->items = g_list_prepend (reflist->items, zone);
-      }
-      zone = ipatch_sli_zone_next (&zone_iter);
+        zonelist = ipatch_sli_inst_get_zones(pitem);  /* ++ ref new zone list */
+        ipatch_list_init_iter(zonelist, &zone_iter);
+
+        zone = ipatch_sli_zone_first(&zone_iter);
+
+        while(zone)
+        {
+            if(ipatch_sli_zone_peek_sample(zone) == sample)
+            {
+                g_object_ref(zone);  /* ++ ref zone for new list */
+                reflist->items = g_list_prepend(reflist->items, zone);
+            }
+
+            zone = ipatch_sli_zone_next(&zone_iter);
+        }
+
+        g_object_unref(zonelist);  /* -- unref zone list */
+        pitem = ipatch_item_next(&iter);
     }
-    g_object_unref (zonelist); /* -- unref zone list */
-    pitem = ipatch_item_next (&iter);
-  }
-  g_object_unref (instlist); /* -- unref instlist */
 
-  /* reverse list to preserve order since we prepended */
-  reflist->items = g_list_reverse (reflist->items);
+    g_object_unref(instlist);  /* -- unref instlist */
 
-  return (reflist); /* !! caller takes over reference */
+    /* reverse list to preserve order since we prepended */
+    reflist->items = g_list_reverse(reflist->items);
+
+    return (reflist); /* !! caller takes over reference */
 }

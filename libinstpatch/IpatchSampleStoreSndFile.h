@@ -47,26 +47,26 @@ typedef struct _IpatchSampleStoreSndFileClass IpatchSampleStoreSndFileClass;
 /* libsndfile sample instance */
 struct _IpatchSampleStoreSndFile
 {
-  IpatchSampleStore parent_instance;
+    IpatchSampleStore parent_instance;
 
-  char *filename;               /* File name where sample data is */
-  gboolean identified;          /* TRUE if file has been identified (for reading) */
-  gboolean raw;                 /* TRUE if audio data is read raw from libsndfile */
-  int file_format;              /* File format enum (enum is dynamic) */
-  int sub_format;               /* File sub format enum (enum is dynamic) */
-  int endian;                   /* File endian byte order enum */
+    char *filename;               /* File name where sample data is */
+    gboolean identified;          /* TRUE if file has been identified (for reading) */
+    gboolean raw;                 /* TRUE if audio data is read raw from libsndfile */
+    int file_format;              /* File format enum (enum is dynamic) */
+    int sub_format;               /* File sub format enum (enum is dynamic) */
+    int endian;                   /* File endian byte order enum */
 
-  guint loop_start;             /* loop start */
-  guint loop_end;               /* loop end */
-  guint8 loop_type;             /* loop type */
-  guint8 root_note;             /* root note */
-  gint8 fine_tune;              /* fine tune */
+    guint loop_start;             /* loop start */
+    guint loop_end;               /* loop end */
+    guint8 loop_type;             /* loop type */
+    guint8 root_note;             /* root note */
+    gint8 fine_tune;              /* fine tune */
 };
 
 /* libsndfile sample class */
 struct _IpatchSampleStoreSndFileClass
 {
-  IpatchSampleStoreClass parent_class;
+    IpatchSampleStoreClass parent_class;
 };
 
 /**
@@ -76,11 +76,11 @@ struct _IpatchSampleStoreSndFileClass
 #define IPATCH_SAMPLE_STORE_SND_FILE_UNUSED_FLAG_SHIFT \
   (IPATCH_SAMPLE_STORE_UNUSED_FLAG_SHIFT + 3)
 
-GType ipatch_sample_store_snd_file_get_type (void);
-IpatchSample *ipatch_sample_store_snd_file_new (const char *filename);
-gboolean ipatch_sample_store_snd_file_init_read (IpatchSampleStoreSndFile *store);
-gboolean ipatch_sample_store_snd_file_init_write (IpatchSampleStoreSndFile *store,
-                                                  int file_format, int sub_format,
-                                                  int endian, int channels,
-                                                  int samplerate);
+GType ipatch_sample_store_snd_file_get_type(void);
+IpatchSample *ipatch_sample_store_snd_file_new(const char *filename);
+gboolean ipatch_sample_store_snd_file_init_read(IpatchSampleStoreSndFile *store);
+gboolean ipatch_sample_store_snd_file_init_write(IpatchSampleStoreSndFile *store,
+        int file_format, int sub_format,
+        int endian, int channels,
+        int samplerate);
 #endif

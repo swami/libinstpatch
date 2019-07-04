@@ -36,12 +36,12 @@ typedef struct _IpatchSampleListItem IpatchSampleListItem;
  * IpatchSampleList:
  *
  * A sample edit list.  Allows for non-destructive sample editing by defining
- * new audio samples from one or more audio sample segments.  
+ * new audio samples from one or more audio sample segments.
  */
 struct _IpatchSampleList
 {
-  GList *items;			/* list of IpatchSampleListItem structs */
-  guint total_size;		/* total size of audio data in frames */
+    GList *items;			/* list of IpatchSampleListItem structs */
+    guint total_size;		/* total size of audio data in frames */
 };
 
 /**
@@ -51,38 +51,38 @@ struct _IpatchSampleList
  */
 struct _IpatchSampleListItem
 {
-  IpatchSample *sample;	        /* Sample for this segment */
-  guint ofs;                    /* Offset in sample of segment start */
-  guint size;			/* Size in frames of audio segment */
-  guint32 channel : 3;          /* Channel to use in sample */
-  guint32 reserved : 29;
+    IpatchSample *sample;	        /* Sample for this segment */
+    guint ofs;                    /* Offset in sample of segment start */
+    guint size;			/* Size in frames of audio segment */
+    guint32 channel : 3;          /* Channel to use in sample */
+    guint32 reserved : 29;
 };
 
 
-GType ipatch_sample_list_get_type (void);
-GType ipatch_sample_list_item_get_type (void);
-IpatchSampleList *ipatch_sample_list_new (void);
-void ipatch_sample_list_free (IpatchSampleList *list);
-IpatchSampleList *ipatch_sample_list_duplicate (IpatchSampleList *list);
-IpatchSampleListItem *ipatch_sample_list_item_new (void);
-IpatchSampleListItem *ipatch_sample_list_item_new_init (IpatchSample *sample,
-                                                        guint ofs, guint size,
-				                        guint channel);
-void ipatch_sample_list_item_free (IpatchSampleListItem *item);
-IpatchSampleListItem *ipatch_sample_list_item_duplicate (IpatchSampleListItem *item);
-void ipatch_sample_list_append (IpatchSampleList *list, IpatchSample *sample,
+GType ipatch_sample_list_get_type(void);
+GType ipatch_sample_list_item_get_type(void);
+IpatchSampleList *ipatch_sample_list_new(void);
+void ipatch_sample_list_free(IpatchSampleList *list);
+IpatchSampleList *ipatch_sample_list_duplicate(IpatchSampleList *list);
+IpatchSampleListItem *ipatch_sample_list_item_new(void);
+IpatchSampleListItem *ipatch_sample_list_item_new_init(IpatchSample *sample,
+        guint ofs, guint size,
+        guint channel);
+void ipatch_sample_list_item_free(IpatchSampleListItem *item);
+IpatchSampleListItem *ipatch_sample_list_item_duplicate(IpatchSampleListItem *item);
+void ipatch_sample_list_append(IpatchSampleList *list, IpatchSample *sample,
+                               guint ofs, guint size, guint channel);
+void ipatch_sample_list_prepend(IpatchSampleList *list, IpatchSample *sample,
                                 guint ofs, guint size, guint channel);
-void ipatch_sample_list_prepend (IpatchSampleList *list, IpatchSample *sample,
-                                 guint ofs, guint size, guint channel);
-void ipatch_sample_list_insert_index (IpatchSampleList *list, guint index,
-				      IpatchSample *sample, guint ofs,
-				      guint size, guint channel);
-void ipatch_sample_list_insert (IpatchSampleList *list, guint pos,
-			        IpatchSample *sample, guint ofs,
-			        guint size, guint channel);
-void ipatch_sample_list_cut (IpatchSampleList *list, guint pos, guint size);
-gboolean ipatch_sample_list_render (IpatchSampleList *list, gpointer buf,
-                                    guint pos, guint frames, int format, GError **err);
-gpointer ipatch_sample_list_render_alloc (IpatchSampleList *list, guint pos, guint size,
-                                          int format, GError **err);
+void ipatch_sample_list_insert_index(IpatchSampleList *list, guint index,
+                                     IpatchSample *sample, guint ofs,
+                                     guint size, guint channel);
+void ipatch_sample_list_insert(IpatchSampleList *list, guint pos,
+                               IpatchSample *sample, guint ofs,
+                               guint size, guint channel);
+void ipatch_sample_list_cut(IpatchSampleList *list, guint pos, guint size);
+gboolean ipatch_sample_list_render(IpatchSampleList *list, gpointer buf,
+                                   guint pos, guint frames, int format, GError **err);
+gpointer ipatch_sample_list_render_alloc(IpatchSampleList *list, guint pos, guint size,
+        int format, GError **err);
 #endif

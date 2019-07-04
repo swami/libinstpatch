@@ -42,8 +42,8 @@ typedef IpatchConverterClass IpatchConverterFileToGigSampleClass;
 #define IPATCH_TYPE_CONVERTER_FILE_TO_GIG_SAMPLE \
   (ipatch_converter_file_to_gig_sample_get_type ())
 
-GType ipatch_converter_gig_to_file_get_type (void);
-GType ipatch_converter_file_to_gig_get_type (void);
-GType ipatch_converter_file_to_gig_sample_get_type (void);
+GType ipatch_converter_gig_to_file_get_type(void);
+GType ipatch_converter_file_to_gig_get_type(void);
+GType ipatch_converter_file_to_gig_sample_get_type(void);
 
 #endif

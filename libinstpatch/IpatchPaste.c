@@ -20,7 +20,7 @@
 /**
  * SECTION: IpatchPaste
  * @short_description: Object paste instance
- * @see_also: 
+ * @see_also:
  * @stability: Stable
  *
  * This object provides a system and instance for doing cut/paste operations
@@ -44,44 +44,44 @@
 
 typedef struct
 {
-  IpatchPasteTestFunc test_func;
-  IpatchPasteExecFunc exec_func;
-  GDestroyNotify notify_func;
-  gpointer user_data;
-  int id;
-  int flags;
+    IpatchPasteTestFunc test_func;
+    IpatchPasteExecFunc exec_func;
+    GDestroyNotify notify_func;
+    gpointer user_data;
+    int id;
+    int flags;
 } PasteHandler;
 
 /* info for an item add operation */
 typedef struct
 {
-  IpatchItem *additem;		/* item to add */
-  IpatchContainer *parent;	/* parent to add additem to */
-  IpatchItem *conflict;		/* conflict item (if any) */
-  IpatchPasteChoice choice;	/* choice of how to handle conflict */
+    IpatchItem *additem;		/* item to add */
+    IpatchContainer *parent;	/* parent to add additem to */
+    IpatchItem *conflict;		/* conflict item (if any) */
+    IpatchPasteChoice choice;	/* choice of how to handle conflict */
 } AddItemBag;
 
 /* info for an item link operation */
 typedef struct
 {
-  IpatchItem *from;		/* object to link from (set property) */
-  IpatchItem *to;		/* object to link to */
+    IpatchItem *from;		/* object to link from (set property) */
+    IpatchItem *to;		/* object to link to */
 } LinkItemBag;
 
-static gint handler_priority_GCompareFunc (gconstpointer a, gconstpointer b);
-static void ipatch_paste_class_init (IpatchPasteClass *klass);
-static void ipatch_paste_init (IpatchPaste *paste);
-static void ipatch_paste_finalize (GObject *gobject);
-static guint resolve_hash_func (gconstpointer key);
-static gboolean resolve_equal_func (gconstpointer a, gconstpointer b);
-static void resolve_key_destroy_func (gpointer data);
-static guint check_hash_func (gconstpointer key);
-static gboolean check_equal_func (gconstpointer a, gconstpointer b);
-static void check_item_conflicts_GHFunc (gpointer key, gpointer value,
-					 gpointer user_data);
-static IpatchItem *paste_copy_link_func_deep (IpatchItem *item,
-					      IpatchItem *link,
-					      gpointer user_data);
+static gint handler_priority_GCompareFunc(gconstpointer a, gconstpointer b);
+static void ipatch_paste_class_init(IpatchPasteClass *klass);
+static void ipatch_paste_init(IpatchPaste *paste);
+static void ipatch_paste_finalize(GObject *gobject);
+static guint resolve_hash_func(gconstpointer key);
+static gboolean resolve_equal_func(gconstpointer a, gconstpointer b);
+static void resolve_key_destroy_func(gpointer data);
+static guint check_hash_func(gconstpointer key);
+static gboolean check_equal_func(gconstpointer a, gconstpointer b);
+static void check_item_conflicts_GHFunc(gpointer key, gpointer value,
+                                        gpointer user_data);
+static IpatchItem *paste_copy_link_func_deep(IpatchItem *item,
+        IpatchItem *link,
+        gpointer user_data);
 
 static GStaticRecMutex paste_handlers_m = G_STATIC_REC_MUTEX_INIT;
 static GSList *paste_handlers = NULL;	/* list of PasteHandler structs */
@@ -101,11 +101,11 @@ static gpointer parent_class = NULL;
  * which @test_func returns %TRUE.
  */
 void
-ipatch_register_paste_handler (IpatchPasteTestFunc test_func,
-			       IpatchPasteExecFunc exec_func,
-			       int flags)
+ipatch_register_paste_handler(IpatchPasteTestFunc test_func,
+                              IpatchPasteExecFunc exec_func,
+                              int flags)
 {
-  ipatch_register_paste_handler_full (test_func, exec_func, NULL, NULL, flags);
+    ipatch_register_paste_handler_full(test_func, exec_func, NULL, NULL, flags);
 }
 
 /**
@@ -127,44 +127,47 @@ ipatch_register_paste_handler (IpatchPasteTestFunc test_func,
  * Since: 1.1.0
  */
 int
-ipatch_register_paste_handler_full (IpatchPasteTestFunc test_func,
-			            IpatchPasteExecFunc exec_func,
-			            GDestroyNotify notify_func,
-                                    gpointer user_data, int flags)
+ipatch_register_paste_handler_full(IpatchPasteTestFunc test_func,
+                                   IpatchPasteExecFunc exec_func,
+                                   GDestroyNotify notify_func,
+                                   gpointer user_data, int flags)
 {
-  PasteHandler *handler;
-  int id;
+    PasteHandler *handler;
+    int id;
 
-  g_return_val_if_fail (test_func != NULL, -1);
-  g_return_val_if_fail (exec_func != NULL, -1);
+    g_return_val_if_fail(test_func != NULL, -1);
+    g_return_val_if_fail(exec_func != NULL, -1);
 
-  if (flags == 0) flags = IPATCH_PASTE_PRIORITY_DEFAULT;
+    if(flags == 0)
+    {
+        flags = IPATCH_PASTE_PRIORITY_DEFAULT;
+    }
 
-  handler = g_slice_new (PasteHandler);         // ++ alloc handler structure
-  handler->test_func = test_func;
-  handler->exec_func = exec_func;
-  handler->notify_func = notify_func;
-  handler->user_data = user_data;
-  handler->flags = flags;
+    handler = g_slice_new(PasteHandler);          // ++ alloc handler structure
+    handler->test_func = test_func;
+    handler->exec_func = exec_func;
+    handler->notify_func = notify_func;
+    handler->user_data = user_data;
+    handler->flags = flags;
 
-  g_static_rec_mutex_lock (&paste_handlers_m);
-  id = ++ipatch_paste_handler_id;
-  handler->id = id;
-  paste_handlers = g_slist_insert_sorted (paste_handlers, handler,
-					  handler_priority_GCompareFunc);
-  g_static_rec_mutex_unlock (&paste_handlers_m);
+    g_static_rec_mutex_lock(&paste_handlers_m);
+    id = ++ipatch_paste_handler_id;
+    handler->id = id;
+    paste_handlers = g_slist_insert_sorted(paste_handlers, handler,
+                                           handler_priority_GCompareFunc);
+    g_static_rec_mutex_unlock(&paste_handlers_m);
 
-  return (id);
+    return (id);
 }
 
 static gint
-handler_priority_GCompareFunc (gconstpointer a, gconstpointer b)
+handler_priority_GCompareFunc(gconstpointer a, gconstpointer b)
 {
-  PasteHandler *ahandler = (PasteHandler *)a, *bhandler = (PasteHandler *)b;
+    PasteHandler *ahandler = (PasteHandler *)a, *bhandler = (PasteHandler *)b;
 
-  /* priority sorts from highest to lowest so subtract a from b */
-  return ((bhandler->flags & IPATCH_PASTE_FLAGS_PRIORITY_MASK)
-	  - (ahandler->flags & IPATCH_PASTE_FLAGS_PRIORITY_MASK));
+    /* priority sorts from highest to lowest so subtract a from b */
+    return ((bhandler->flags & IPATCH_PASTE_FLAGS_PRIORITY_MASK)
+            - (ahandler->flags & IPATCH_PASTE_FLAGS_PRIORITY_MASK));
 }
 
 /**
@@ -178,33 +181,36 @@ handler_priority_GCompareFunc (gconstpointer a, gconstpointer b)
  * Since: 1.1.0
  */
 gboolean
-ipatch_unregister_paste_handler (int id)
+ipatch_unregister_paste_handler(int id)
 {
-  PasteHandler *handler;
-  GDestroyNotify notify_func = NULL;
-  gpointer user_data;
-  GSList *p;
+    PasteHandler *handler;
+    GDestroyNotify notify_func = NULL;
+    gpointer user_data;
+    GSList *p;
 
-  g_static_rec_mutex_lock (&paste_handlers_m);
+    g_static_rec_mutex_lock(&paste_handlers_m);
 
-  for (p = paste_handlers; p; p = p->next)
-  {
-    handler = (PasteHandler *)(p->data);
-
-    if (handler->id == id)
+    for(p = paste_handlers; p; p = p->next)
     {
-      paste_handlers = g_slist_delete_link (paste_handlers, p);
-      notify_func = handler->notify_func;
-      user_data = handler->user_data;
-      g_slice_free (PasteHandler, handler);     // -- free handler structure
+        handler = (PasteHandler *)(p->data);
+
+        if(handler->id == id)
+        {
+            paste_handlers = g_slist_delete_link(paste_handlers, p);
+            notify_func = handler->notify_func;
+            user_data = handler->user_data;
+            g_slice_free(PasteHandler, handler);      // -- free handler structure
+        }
     }
-  }
 
-  g_static_rec_mutex_unlock (&paste_handlers_m);
+    g_static_rec_mutex_unlock(&paste_handlers_m);
 
-  if (notify_func) notify_func (user_data);
+    if(notify_func)
+    {
+        notify_func(user_data);
+    }
 
-  return (p != NULL);
+    return (p != NULL);
 }
 
 /**
@@ -219,33 +225,35 @@ ipatch_unregister_paste_handler (int id)
  * Returns: %TRUE on success, %FALSE otherwise in which case @err should be set.
  */
 gboolean
-ipatch_simple_paste (IpatchItem *dest, IpatchItem *src, GError **err)
+ipatch_simple_paste(IpatchItem *dest, IpatchItem *src, GError **err)
 {
-  IpatchPaste *paste;
+    IpatchPaste *paste;
 
-  g_return_val_if_fail (IPATCH_IS_ITEM (dest), FALSE);
-  g_return_val_if_fail (IPATCH_IS_ITEM (src), FALSE);
-  g_return_val_if_fail (!err || !*err, FALSE);
+    g_return_val_if_fail(IPATCH_IS_ITEM(dest), FALSE);
+    g_return_val_if_fail(IPATCH_IS_ITEM(src), FALSE);
+    g_return_val_if_fail(!err || !*err, FALSE);
 
-  paste = ipatch_paste_new ();	/* ++ ref new object */
+    paste = ipatch_paste_new();	/* ++ ref new object */
 
-  /* setup object paste */
-  if (!ipatch_paste_objects (paste, dest, src, err))
-    {	/* object paste failed */
-      g_object_unref (paste);	/* -- unref paste object */
-      return (FALSE);
+    /* setup object paste */
+    if(!ipatch_paste_objects(paste, dest, src, err))
+    {
+        /* object paste failed */
+        g_object_unref(paste);	/* -- unref paste object */
+        return (FALSE);
     }
 
-  /* finish paste operation */
-  if (!ipatch_paste_finish (paste, err))
-    {	/* finish paste failed */
-      g_object_unref (paste);	/* -- unref paste object */
-      return (FALSE);
+    /* finish paste operation */
+    if(!ipatch_paste_finish(paste, err))
+    {
+        /* finish paste failed */
+        g_object_unref(paste);	/* -- unref paste object */
+        return (FALSE);
     }
 
-  g_object_unref (paste);
+    g_object_unref(paste);
 
-  return (TRUE);
+    return (TRUE);
 }
 
 /**
@@ -258,95 +266,107 @@ ipatch_simple_paste (IpatchItem *dest, IpatchItem *src, GError **err)
  * Returns: %TRUE if paste is possible, %FALSE otherwise
  */
 gboolean
-ipatch_is_paste_possible (IpatchItem *dest, IpatchItem *src)
+ipatch_is_paste_possible(IpatchItem *dest, IpatchItem *src)
 {
-  PasteHandler *handler;
-  GSList *p;
+    PasteHandler *handler;
+    GSList *p;
 
-  g_return_val_if_fail (IPATCH_IS_ITEM (dest), FALSE);
-  g_return_val_if_fail (IPATCH_IS_ITEM (src), FALSE);
+    g_return_val_if_fail(IPATCH_IS_ITEM(dest), FALSE);
+    g_return_val_if_fail(IPATCH_IS_ITEM(src), FALSE);
 
-  g_static_rec_mutex_lock (&paste_handlers_m);
+    g_static_rec_mutex_lock(&paste_handlers_m);
 
-  for (p = paste_handlers; p; p = p->next)
+    for(p = paste_handlers; p; p = p->next)
     {
-      handler = (PasteHandler *)(p->data);
-      if (handler->test_func (dest, src)) break;
+        handler = (PasteHandler *)(p->data);
+
+        if(handler->test_func(dest, src))
+        {
+            break;
+        }
     }
 
-  g_static_rec_mutex_unlock (&paste_handlers_m);
+    g_static_rec_mutex_unlock(&paste_handlers_m);
 
-  return (p != NULL);
+    return (p != NULL);
 }
 
 GType
-ipatch_paste_get_type (void)
+ipatch_paste_get_type(void)
 {
-  static GType obj_type = 0;
+    static GType obj_type = 0;
 
-  if (!obj_type) {
-    static const GTypeInfo obj_info = {
-      sizeof (IpatchPasteClass), NULL, NULL,
-      (GClassInitFunc)ipatch_paste_class_init, NULL, NULL,
-      sizeof (IpatchPaste), 0,
-      (GInstanceInitFunc)ipatch_paste_init,
-    };
+    if(!obj_type)
+    {
+        static const GTypeInfo obj_info =
+        {
+            sizeof(IpatchPasteClass), NULL, NULL,
+            (GClassInitFunc)ipatch_paste_class_init, NULL, NULL,
+            sizeof(IpatchPaste), 0,
+            (GInstanceInitFunc)ipatch_paste_init,
+        };
 
-    obj_type = g_type_register_static (G_TYPE_OBJECT, "IpatchPaste",
-				       &obj_info, 0);
+        obj_type = g_type_register_static(G_TYPE_OBJECT, "IpatchPaste",
+                                          &obj_info, 0);
 
-    /* register the default handler */
-    ipatch_register_paste_handler (ipatch_paste_default_test_func,
-				   ipatch_paste_default_exec_func, 0);
-  }
+        /* register the default handler */
+        ipatch_register_paste_handler(ipatch_paste_default_test_func,
+                                      ipatch_paste_default_exec_func, 0);
+    }
 
-  return (obj_type);
+    return (obj_type);
 }
 
 static void
-ipatch_paste_class_init (IpatchPasteClass *klass)
+ipatch_paste_class_init(IpatchPasteClass *klass)
 {
-  GObjectClass *obj_class = G_OBJECT_CLASS (klass);
+    GObjectClass *obj_class = G_OBJECT_CLASS(klass);
 
-  parent_class = g_type_class_peek_parent (klass);
+    parent_class = g_type_class_peek_parent(klass);
 
-  obj_class->finalize = ipatch_paste_finalize;
+    obj_class->finalize = ipatch_paste_finalize;
 }
 
 static void
-ipatch_paste_init (IpatchPaste *paste)
+ipatch_paste_init(IpatchPaste *paste)
 {
-  paste->add_hash = g_hash_table_new (NULL, NULL);
+    paste->add_hash = g_hash_table_new(NULL, NULL);
 }
 
 /* function called when a patch is being destroyed */
 static void
-ipatch_paste_finalize (GObject *gobject)
+ipatch_paste_finalize(GObject *gobject)
 {
-  IpatchPaste *paste = IPATCH_PASTE (gobject);
-  AddItemBag *addbag;
-  LinkItemBag *linkbag;
-  GSList *p;
+    IpatchPaste *paste = IPATCH_PASTE(gobject);
+    AddItemBag *addbag;
+    LinkItemBag *linkbag;
+    GSList *p;
 
-  g_hash_table_destroy (paste->add_hash);
+    g_hash_table_destroy(paste->add_hash);
 
-  for (p = paste->add_list; p; p = p->next)
+    for(p = paste->add_list; p; p = p->next)
     {
-      addbag = (AddItemBag *)(p->data);
-      g_object_unref (addbag->additem);
-      g_object_unref (addbag->parent);
-      if (addbag->conflict) g_object_unref (addbag->conflict);
+        addbag = (AddItemBag *)(p->data);
+        g_object_unref(addbag->additem);
+        g_object_unref(addbag->parent);
+
+        if(addbag->conflict)
+        {
+            g_object_unref(addbag->conflict);
+        }
     }
 
-  for (p = paste->link_list; p; p = p->next)
+    for(p = paste->link_list; p; p = p->next)
     {
-      linkbag = (LinkItemBag *)(p->data);
-      g_object_unref (linkbag->from);
-      g_object_unref (linkbag->to);
+        linkbag = (LinkItemBag *)(p->data);
+        g_object_unref(linkbag->from);
+        g_object_unref(linkbag->to);
     }
 
-  if (G_OBJECT_CLASS (parent_class)->finalize)
-    G_OBJECT_CLASS (parent_class)->finalize (gobject);
+    if(G_OBJECT_CLASS(parent_class)->finalize)
+    {
+        G_OBJECT_CLASS(parent_class)->finalize(gobject);
+    }
 }
 
 /*
@@ -357,9 +377,9 @@ ipatch_paste_finalize (GObject *gobject)
  * Returns: New paste object with refcount of 1 which caller owns.
  */
 IpatchPaste *
-ipatch_paste_new (void)
+ipatch_paste_new(void)
 {
-  return (IPATCH_PASTE (g_object_new (IPATCH_TYPE_PASTE, NULL)));
+    return (IPATCH_PASTE(g_object_new(IPATCH_TYPE_PASTE, NULL)));
 }
 
 /**
@@ -378,58 +398,63 @@ ipatch_paste_new (void)
  * Returns: %TRUE on success, %FALSE otherwise (in which case @err may be set)
  */
 gboolean
-ipatch_paste_objects (IpatchPaste *paste, IpatchItem *dest, IpatchItem *src,
-		      GError **err)
+ipatch_paste_objects(IpatchPaste *paste, IpatchItem *dest, IpatchItem *src,
+                     GError **err)
 {
-  PasteHandler *handler = NULL;
-  GSList *p;
+    PasteHandler *handler = NULL;
+    GSList *p;
 
-  g_return_val_if_fail (IPATCH_IS_PASTE (paste), FALSE);
-  g_return_val_if_fail (IPATCH_IS_ITEM (dest), FALSE);
-  g_return_val_if_fail (IPATCH_IS_ITEM (src), FALSE);
-  g_return_val_if_fail (!err || !*err, FALSE);
+    g_return_val_if_fail(IPATCH_IS_PASTE(paste), FALSE);
+    g_return_val_if_fail(IPATCH_IS_ITEM(dest), FALSE);
+    g_return_val_if_fail(IPATCH_IS_ITEM(src), FALSE);
+    g_return_val_if_fail(!err || !*err, FALSE);
 
-  g_static_rec_mutex_lock (&paste_handlers_m);
+    g_static_rec_mutex_lock(&paste_handlers_m);
 
-  for (p = paste_handlers; p; p = p->next)
+    for(p = paste_handlers; p; p = p->next)
     {
-      handler = (PasteHandler *)(p->data);
-      if (handler->test_func (dest, src)) break;
+        handler = (PasteHandler *)(p->data);
+
+        if(handler->test_func(dest, src))
+        {
+            break;
+        }
     }
 
-  g_static_rec_mutex_unlock (&paste_handlers_m);
+    g_static_rec_mutex_unlock(&paste_handlers_m);
 
-  if (!p)
+    if(!p)
     {
-      g_set_error (err, IPATCH_ERROR, IPATCH_ERROR_UNHANDLED_CONVERSION,
-		   _("Pasting object of type %s to %s is unsupported"),
-		   G_OBJECT_TYPE_NAME (src),
-		   G_OBJECT_TYPE_NAME (dest));
-      return (FALSE);
+        g_set_error(err, IPATCH_ERROR, IPATCH_ERROR_UNHANDLED_CONVERSION,
+                    _("Pasting object of type %s to %s is unsupported"),
+                    G_OBJECT_TYPE_NAME(src),
+                    G_OBJECT_TYPE_NAME(dest));
+        return (FALSE);
     }
 
-  return (handler->exec_func (paste, dest, src, err));
+    return (handler->exec_func(paste, dest, src, err));
 }
 
 /* hash key used by ipatch_paste_resolve */
 typedef struct
-{ /* NOTE: item and parent are ref'd by paste->add_list, no need here */
-  IpatchItem *item;		/* item for these property values */
-  IpatchContainer *parent;	/* parent of item (or proposed parent) */
-  GValueArray *valarray;	/* array of all of item's unique prop. values */
-  GParamSpec **pspecs;	/* parameter specs for these properties (NULL term.) */
-  guint8 index;		/* index to first value/pspec of this unique group */
-  guint8 count;		/* # of values/pspecs in this unique prop group */
-  guint8 free_valarray;	/* boolean, TRUE if hash should free valarray */
+{
+    /* NOTE: item and parent are ref'd by paste->add_list, no need here */
+    IpatchItem *item;		/* item for these property values */
+    IpatchContainer *parent;	/* parent of item (or proposed parent) */
+    GValueArray *valarray;	/* array of all of item's unique prop. values */
+    GParamSpec **pspecs;	/* parameter specs for these properties (NULL term.) */
+    guint8 index;		/* index to first value/pspec of this unique group */
+    guint8 count;		/* # of values/pspecs in this unique prop group */
+    guint8 free_valarray;	/* boolean, TRUE if hash should free valarray */
 } ResolveHashKey;
 
 /* bag used for passing multiple vars to check_item_conflicts_GHFunc */
 typedef struct
 {
-  IpatchPaste *paste;
-  GHashTable *confl_hash;
-  IpatchPasteResolveFunc resolve_func;
-  gboolean cancel;
+    IpatchPaste *paste;
+    GHashTable *confl_hash;
+    IpatchPasteResolveFunc resolve_func;
+    gboolean cancel;
 } CheckBag;
 
 /**
@@ -451,303 +476,347 @@ typedef struct
  *   returned #IPATCH_PASTE_CHOICE_CANCEL).
  */
 gboolean
-ipatch_paste_resolve (IpatchPaste *paste, IpatchPasteResolveFunc resolve_func,
-		      gpointer user_data)
+ipatch_paste_resolve(IpatchPaste *paste, IpatchPasteResolveFunc resolve_func,
+                     gpointer user_data)
 {
-  GHashTable *confl_hash;	/* hash of add item unique property values */
-  GHashTable *check_hash;	/* hash of parent children to check */
-  GParamSpec **pspecs, **ps;
-  AddItemBag *addbag, *confl_addbag;
-  ResolveHashKey *key, skey;
-  CheckBag checkbag;
-  GValueArray *valarray;
-  gboolean free_valarray;
-  guint32 groups;
-  GSList *p;
-  int i, lastbit, count, index, choice;
+    GHashTable *confl_hash;	/* hash of add item unique property values */
+    GHashTable *check_hash;	/* hash of parent children to check */
+    GParamSpec **pspecs, **ps;
+    AddItemBag *addbag, *confl_addbag;
+    ResolveHashKey *key, skey;
+    CheckBag checkbag;
+    GValueArray *valarray;
+    gboolean free_valarray;
+    guint32 groups;
+    GSList *p;
+    int i, lastbit, count, index, choice;
 
-  g_return_val_if_fail (IPATCH_IS_PASTE (paste), FALSE);
-  g_return_val_if_fail (resolve_func != NULL, FALSE);
+    g_return_val_if_fail(IPATCH_IS_PASTE(paste), FALSE);
+    g_return_val_if_fail(resolve_func != NULL, FALSE);
 
-  /* create conflict hash, we try and increase performance by hashing items
-     and their unique property values (rather than having to compare every
-     item to every other possible conflicting item) */
-  confl_hash = g_hash_table_new_full (resolve_hash_func, resolve_equal_func,
-				      resolve_key_destroy_func, NULL);
+    /* create conflict hash, we try and increase performance by hashing items
+       and their unique property values (rather than having to compare every
+       item to every other possible conflicting item) */
+    confl_hash = g_hash_table_new_full(resolve_hash_func, resolve_equal_func,
+                                       resolve_key_destroy_func, NULL);
 
-  /* hash of Parent:ChildType to check for conflicts. Uses existing
-     ResolveHashKey structures. */
-  check_hash = g_hash_table_new (check_hash_func, check_equal_func);
+    /* hash of Parent:ChildType to check for conflicts. Uses existing
+       ResolveHashKey structures. */
+    check_hash = g_hash_table_new(check_hash_func, check_equal_func);
 
-  /* add paste items to hash and detect conflicts with other paste items */
-  for (p = paste->add_list; p; p = p->next)
+    /* add paste items to hash and detect conflicts with other paste items */
+    for(p = paste->add_list; p; p = p->next)
     {
-      addbag = (AddItemBag *)(p->data);
+        addbag = (AddItemBag *)(p->data);
 
-      /* get item's unique property values (if any) */
-      valarray = ipatch_item_get_unique_props (addbag->additem);
-      if (!valarray) continue;	/* no unique props? skip */
-      free_valarray = TRUE;
+        /* get item's unique property values (if any) */
+        valarray = ipatch_item_get_unique_props(addbag->additem);
 
-      /* get corresponding property param specs and group bits */
-      pspecs = ipatch_item_type_get_unique_specs (G_OBJECT_TYPE (addbag->additem),
-						   &groups);
-      if (!pspecs)	/* should never happen! */
-	{
-	  g_value_array_free (valarray);
-	  continue;
-	}
+        if(!valarray)
+        {
+            continue;    /* no unique props? skip */
+        }
 
-      lastbit = (groups & 1);
-      count = 0;
-      index = 0;
+        free_valarray = TRUE;
 
-      /* loop over unique property groups */
-      for (i = 0, ps = pspecs;   ;   i++, ps++, groups >>= 1)
-	{
-	  if (!*ps || lastbit != (groups & 1))	/* last val or end of group? */
-	    { /* initialize the static hash key */
-	      skey.valarray = valarray;
-	      skey.item = addbag->additem;
-	      skey.parent = addbag->parent;
-	      skey.pspecs = pspecs;
-	      skey.index = index;
-	      skey.count = count;
+        /* get corresponding property param specs and group bits */
+        pspecs = ipatch_item_type_get_unique_specs(G_OBJECT_TYPE(addbag->additem),
+                 &groups);
 
-	      /* check for conflict within paste items */
-	      confl_addbag = g_hash_table_lookup (confl_hash, &skey);
+        if(!pspecs)	/* should never happen! */
+        {
+            g_value_array_free(valarray);
+            continue;
+        }
 
-	      if (!confl_addbag)	/* no conflict? */
-		{ /* add to conflict detect hash */
-		  key = g_new (ResolveHashKey, 1);
-		  *key = skey;	/* copy static key to allocated key */
-		  key->free_valarray = free_valarray;	/* free once only */
-		  g_hash_table_insert (confl_hash, key, addbag);
+        lastbit = (groups & 1);
+        count = 0;
+        index = 0;
 
-		  free_valarray = FALSE;	/* hash will free it */
+        /* loop over unique property groups */
+        for(i = 0, ps = pspecs;   ;   i++, ps++, groups >>= 1)
+        {
+            if(!*ps || lastbit != (groups & 1))	/* last val or end of group? */
+            {
+                /* initialize the static hash key */
+                skey.valarray = valarray;
+                skey.item = addbag->additem;
+                skey.parent = addbag->parent;
+                skey.pspecs = pspecs;
+                skey.index = index;
+                skey.count = count;
 
-		  /* Parent:ItemType not yet added to check_hash? */
-		  if (!g_hash_table_lookup (check_hash, key))
-		    g_hash_table_insert (check_hash, key, addbag);
+                /* check for conflict within paste items */
+                confl_addbag = g_hash_table_lookup(confl_hash, &skey);
 
-		  if (!*ps) break;	/* NULL pspec terminator? */
-		}
-	      else	/* we have a conflict, tell caller about it */
-		{
-		  choice = resolve_func (paste, confl_addbag->additem,
-					 addbag->additem);
-		  /* cancel requested? */
-		  if (choice == IPATCH_PASTE_CHOICE_CANCEL)
-		    {
-		      g_hash_table_destroy (confl_hash);
-		      g_hash_table_destroy (check_hash);
-		      return (FALSE);
-		    }
+                if(!confl_addbag)	/* no conflict? */
+                {
+                    /* add to conflict detect hash */
+                    key = g_new(ResolveHashKey, 1);
+                    *key = skey;	/* copy static key to allocated key */
+                    key->free_valarray = free_valarray;	/* free once only */
+                    g_hash_table_insert(confl_hash, key, addbag);
 
-		  addbag->conflict = g_object_ref (confl_addbag->additem);
-		  addbag->choice = choice;
-		}
+                    free_valarray = FALSE;	/* hash will free it */
 
-	      index = i;	/* next group index */
-	      count = 1;	/* reset group count */
-	      lastbit = (groups & 1);
-	    }
-	  else count++;	/* not end of group, increment current val count */
-	}
+                    /* Parent:ItemType not yet added to check_hash? */
+                    if(!g_hash_table_lookup(check_hash, key))
+                    {
+                        g_hash_table_insert(check_hash, key, addbag);
+                    }
 
-      /* if valarray was not used in hash, then free it here */
-      if (free_valarray) g_value_array_free (valarray);
+                    if(!*ps)
+                    {
+                        break;    /* NULL pspec terminator? */
+                    }
+                }
+                else	/* we have a conflict, tell caller about it */
+                {
+                    choice = resolve_func(paste, confl_addbag->additem,
+                                          addbag->additem);
+
+                    /* cancel requested? */
+                    if(choice == IPATCH_PASTE_CHOICE_CANCEL)
+                    {
+                        g_hash_table_destroy(confl_hash);
+                        g_hash_table_destroy(check_hash);
+                        return (FALSE);
+                    }
+
+                    addbag->conflict = g_object_ref(confl_addbag->additem);
+                    addbag->choice = choice;
+                }
+
+                index = i;	/* next group index */
+                count = 1;	/* reset group count */
+                lastbit = (groups & 1);
+            }
+            else
+            {
+                count++;    /* not end of group, increment current val count */
+            }
+        }
+
+        /* if valarray was not used in hash, then free it here */
+        if(free_valarray)
+        {
+            g_value_array_free(valarray);
+        }
     }
 
-  /* bag for passing multilple variables to hash foreach function */
-  checkbag.paste = paste;
-  checkbag.confl_hash = confl_hash;
-  checkbag.resolve_func = resolve_func;
-  checkbag.cancel = FALSE;
+    /* bag for passing multilple variables to hash foreach function */
+    checkbag.paste = paste;
+    checkbag.confl_hash = confl_hash;
+    checkbag.resolve_func = resolve_func;
+    checkbag.cancel = FALSE;
 
-  g_hash_table_foreach (check_hash, check_item_conflicts_GHFunc, &checkbag);
+    g_hash_table_foreach(check_hash, check_item_conflicts_GHFunc, &checkbag);
 
-  g_hash_table_destroy (confl_hash);
-  g_hash_table_destroy (check_hash);
+    g_hash_table_destroy(confl_hash);
+    g_hash_table_destroy(check_hash);
 
-  if (checkbag.cancel) return (FALSE);
+    if(checkbag.cancel)
+    {
+        return (FALSE);
+    }
 
-  return (TRUE);
+    return (TRUE);
 }
 
 /* hash function used for detecting conflicting items quickly (in theory) */
 static guint
-resolve_hash_func (gconstpointer key)
+resolve_hash_func(gconstpointer key)
 {
-  ResolveHashKey *rkey = (ResolveHashKey *)key;
-  GValueArray *valarray;
-  GValue *value;
-  guint hashval;
-  int i, end;
+    ResolveHashKey *rkey = (ResolveHashKey *)key;
+    GValueArray *valarray;
+    GValue *value;
+    guint hashval;
+    int i, end;
 
-  /* hash the parent, item type and group value index */
-  hashval = GPOINTER_TO_UINT (rkey->parent);
-  hashval += G_OBJECT_TYPE (rkey->item);
+    /* hash the parent, item type and group value index */
+    hashval = GPOINTER_TO_UINT(rkey->parent);
+    hashval += G_OBJECT_TYPE(rkey->item);
 
-  i = rkey->index;
-  hashval += i;
+    i = rkey->index;
+    hashval += i;
 
-  valarray = rkey->valarray;
+    valarray = rkey->valarray;
 
-  end = i + rkey->count;	/* value end index */
+    end = i + rkey->count;	/* value end index */
 
-  for (; i < end; i++)	/* hash the property values for this group */
+    for(; i < end; i++)	/* hash the property values for this group */
     {
-      value = g_value_array_get_nth (valarray, i);
-      hashval += ipatch_util_value_hash (value);
+        value = g_value_array_get_nth(valarray, i);
+        hashval += ipatch_util_value_hash(value);
     }
 
-  return (hashval);
+    return (hashval);
 }
 
 /* hash key compare func for ResolveHashKeys */
 static gboolean
-resolve_equal_func (gconstpointer a, gconstpointer b)
+resolve_equal_func(gconstpointer a, gconstpointer b)
 {
-  ResolveHashKey *akey = (ResolveHashKey *)a, *bkey = (ResolveHashKey *)b;
-  GValue *aval, *bval;
-  int i, end;
+    ResolveHashKey *akey = (ResolveHashKey *)a, *bkey = (ResolveHashKey *)b;
+    GValue *aval, *bval;
+    int i, end;
 
-  /* value index, parent or item type not the same? */
-  if (akey->index != bkey->index
-      || akey->parent != bkey->parent
-      || G_OBJECT_TYPE (akey->item) != G_OBJECT_TYPE (bkey->item))
-    return (FALSE);
-
-  i = akey->index;
-  end = i + akey->count;
-
-  for (; i < end; i++)	/* see if the property values are the same */
+    /* value index, parent or item type not the same? */
+    if(akey->index != bkey->index
+            || akey->parent != bkey->parent
+            || G_OBJECT_TYPE(akey->item) != G_OBJECT_TYPE(bkey->item))
     {
-      aval = g_value_array_get_nth (akey->valarray, i);
-      bval = g_value_array_get_nth (bkey->valarray, i);
-
-      if (g_param_values_cmp (akey->pspecs[i], aval, bval) != 0)
-	return (FALSE);
+        return (FALSE);
     }
 
-  return (TRUE);	/* keys match (conflict) */
+    i = akey->index;
+    end = i + akey->count;
+
+    for(; i < end; i++)	/* see if the property values are the same */
+    {
+        aval = g_value_array_get_nth(akey->valarray, i);
+        bval = g_value_array_get_nth(bkey->valarray, i);
+
+        if(g_param_values_cmp(akey->pspecs[i], aval, bval) != 0)
+        {
+            return (FALSE);
+        }
+    }
+
+    return (TRUE);	/* keys match (conflict) */
 }
 
 static void
-resolve_key_destroy_func (gpointer data)
+resolve_key_destroy_func(gpointer data)
 {
-  ResolveHashKey *rkey = (ResolveHashKey *)data;
+    ResolveHashKey *rkey = (ResolveHashKey *)data;
 
-  if (rkey->free_valarray) g_value_array_free (rkey->valarray);
-  g_free (rkey);
+    if(rkey->free_valarray)
+    {
+        g_value_array_free(rkey->valarray);
+    }
+
+    g_free(rkey);
 }
 
 /* hash function used for hashing parent:ItemTypes to check later for
    duplicates.  They are hashed so that we only have to check the given
    children once. */
 static guint
-check_hash_func (gconstpointer key)
+check_hash_func(gconstpointer key)
 {
-  ResolveHashKey *rkey = (ResolveHashKey *)key;
+    ResolveHashKey *rkey = (ResolveHashKey *)key;
 
-  return (GPOINTER_TO_UINT (rkey->parent) + G_OBJECT_TYPE (rkey->item));
+    return (GPOINTER_TO_UINT(rkey->parent) + G_OBJECT_TYPE(rkey->item));
 }
 
 /* hash key compare func for Parent:ItemType check hash */
 static gboolean
-check_equal_func (gconstpointer a, gconstpointer b)
+check_equal_func(gconstpointer a, gconstpointer b)
 {
-  ResolveHashKey *akey = (ResolveHashKey *)a, *bkey = (ResolveHashKey *)b;
+    ResolveHashKey *akey = (ResolveHashKey *)a, *bkey = (ResolveHashKey *)b;
 
-  return (akey->parent == bkey->parent
-	  && G_OBJECT_TYPE (akey->item) == G_OBJECT_TYPE (bkey->item));
+    return (akey->parent == bkey->parent
+            && G_OBJECT_TYPE(akey->item) == G_OBJECT_TYPE(bkey->item));
 }
 
 /* check for conflicts in existing items using Parent:ItemType hash */
 static void
-check_item_conflicts_GHFunc (gpointer key, gpointer value,
-			     gpointer user_data)
+check_item_conflicts_GHFunc(gpointer key, gpointer value,
+                            gpointer user_data)
 {
-  CheckBag *checkbag = (CheckBag *)user_data;
-  ResolveHashKey *rkey = (ResolveHashKey *)key;
-  ResolveHashKey skey;	/* static key */
-  IpatchPasteResolveFunc resolve_func = (IpatchPasteResolveFunc)user_data;
-  AddItemBag *confl_addbag;
-  GParamSpec **pspecs, **ps;
-  GValueArray *valarray;
-  guint32 groups;
-  IpatchIter iter;
-  IpatchItem *item;
-  IpatchList *list;
-  int i, lastbit, count, index, choice;
+    CheckBag *checkbag = (CheckBag *)user_data;
+    ResolveHashKey *rkey = (ResolveHashKey *)key;
+    ResolveHashKey skey;	/* static key */
+    IpatchPasteResolveFunc resolve_func = (IpatchPasteResolveFunc)user_data;
+    AddItemBag *confl_addbag;
+    GParamSpec **pspecs, **ps;
+    GValueArray *valarray;
+    guint32 groups;
+    IpatchIter iter;
+    IpatchItem *item;
+    IpatchList *list;
+    int i, lastbit, count, index, choice;
 
-  if (checkbag->cancel) return;	/* operation cancelled? */
-
-  /* get children of specific type for parent */
-  list = ipatch_container_get_children (rkey->parent,
-					G_OBJECT_TYPE (rkey->item));
-  ipatch_list_init_iter (list, &iter);
-
-  /* get property param specs and group bits (all items are of same type) */
-  pspecs = ipatch_item_type_get_unique_specs (G_OBJECT_TYPE (rkey->item),
-					      &groups);
-  /* loop over container children */
-  for (item = ipatch_item_first (&iter); item; item = ipatch_item_next (&iter))
+    if(checkbag->cancel)
     {
-      /* get item's unique property values */
-      valarray = ipatch_item_get_unique_props (item);
-      if (!valarray) continue;	/* no unique props? skip (shouldn't happen) */
+        return;    /* operation cancelled? */
+    }
 
-      lastbit = (groups & 1);
-      count = 0;
-      index = 0;
+    /* get children of specific type for parent */
+    list = ipatch_container_get_children(rkey->parent,
+                                         G_OBJECT_TYPE(rkey->item));
+    ipatch_list_init_iter(list, &iter);
 
-      /* loop over unique property groups */
-      for (i = 0, ps = pspecs;   ;   i++, ps++, groups >>= 1)
-	{
-	  if (!*ps || lastbit != (groups & 1))	/* last val or end of group? */
-	    { /* initialize the static hash key */
-	      skey.valarray = valarray;
-	      skey.item = item;
-	      skey.parent = rkey->parent;
-	      skey.pspecs = pspecs;
-	      skey.index = index;
-	      skey.count = count;
+    /* get property param specs and group bits (all items are of same type) */
+    pspecs = ipatch_item_type_get_unique_specs(G_OBJECT_TYPE(rkey->item),
+             &groups);
 
-	      /* check for conflict within paste items */
-	      confl_addbag = g_hash_table_lookup (checkbag->confl_hash, &skey);
+    /* loop over container children */
+    for(item = ipatch_item_first(&iter); item; item = ipatch_item_next(&iter))
+    {
+        /* get item's unique property values */
+        valarray = ipatch_item_get_unique_props(item);
 
-	      if (confl_addbag)	/* conflict? */
-		{
-		  choice = resolve_func (checkbag->paste, item,
-					 confl_addbag->additem);
-		  /* cancel requested? */
-		  if (choice == IPATCH_PASTE_CHOICE_CANCEL)
-		    {
-		      checkbag->cancel = TRUE;
-		      g_value_array_free (valarray);
-		      g_object_unref (list);	/* -- unref list */
-		      return;
-		    }
+        if(!valarray)
+        {
+            continue;    /* no unique props? skip (shouldn't happen) */
+        }
 
-		  confl_addbag->conflict = g_object_ref (item);
-		  confl_addbag->choice = choice;
-		}
+        lastbit = (groups & 1);
+        count = 0;
+        index = 0;
 
-	      index = i;	/* next group index */
-	      count = 1;	/* reset group count */
-	      lastbit = (groups & 1);
-	    }
-	  else count++;	/* not end of group, increment current val count */
+        /* loop over unique property groups */
+        for(i = 0, ps = pspecs;   ;   i++, ps++, groups >>= 1)
+        {
+            if(!*ps || lastbit != (groups & 1))	/* last val or end of group? */
+            {
+                /* initialize the static hash key */
+                skey.valarray = valarray;
+                skey.item = item;
+                skey.parent = rkey->parent;
+                skey.pspecs = pspecs;
+                skey.index = index;
+                skey.count = count;
 
-	g_value_array_free (valarray);
+                /* check for conflict within paste items */
+                confl_addbag = g_hash_table_lookup(checkbag->confl_hash, &skey);
 
-      }	/* for each unique parameter group */
+                if(confl_addbag)	/* conflict? */
+                {
+                    choice = resolve_func(checkbag->paste, item,
+                                          confl_addbag->additem);
+
+                    /* cancel requested? */
+                    if(choice == IPATCH_PASTE_CHOICE_CANCEL)
+                    {
+                        checkbag->cancel = TRUE;
+                        g_value_array_free(valarray);
+                        g_object_unref(list);	/* -- unref list */
+                        return;
+                    }
+
+                    confl_addbag->conflict = g_object_ref(item);
+                    confl_addbag->choice = choice;
+                }
+
+                index = i;	/* next group index */
+                count = 1;	/* reset group count */
+                lastbit = (groups & 1);
+            }
+            else
+            {
+                count++;    /* not end of group, increment current val count */
+            }
+
+            g_value_array_free(valarray);
+
+        }	/* for each unique parameter group */
 
     }	/* for container items */
 
-  g_object_unref (list);	/* -- unref list */
+    g_object_unref(list);	/* -- unref list */
 }
 
 /**
@@ -762,34 +831,36 @@ check_item_conflicts_GHFunc (gpointer key, gpointer value,
  * Returns: %TRUE on success, %FALSE otherwise (in which case @err may be set).
  */
 gboolean
-ipatch_paste_finish (IpatchPaste *paste, GError **err)
+ipatch_paste_finish(IpatchPaste *paste, GError **err)
 {
-  AddItemBag *addbag;
-  LinkItemBag *linkbag;
-  GSList *p;
+    AddItemBag *addbag;
+    LinkItemBag *linkbag;
+    GSList *p;
 
-  g_return_val_if_fail (IPATCH_IS_PASTE (paste), FALSE);
-  g_return_val_if_fail (!err || !*err, FALSE);
+    g_return_val_if_fail(IPATCH_IS_PASTE(paste), FALSE);
+    g_return_val_if_fail(!err || !*err, FALSE);
 
-  /* add items in add list */
-  for (p = paste->add_list; p; p = p->next)
+    /* add items in add list */
+    for(p = paste->add_list; p; p = p->next)
     {
-      addbag = (AddItemBag *)(p->data);
+        addbag = (AddItemBag *)(p->data);
 
-      if (addbag->choice == IPATCH_PASTE_CHOICE_IGNORE)
-	ipatch_container_add (addbag->parent, addbag->additem);
+        if(addbag->choice == IPATCH_PASTE_CHOICE_IGNORE)
+        {
+            ipatch_container_add(addbag->parent, addbag->additem);
+        }
 
-      /* FIXME - Need to implement replace operation */
+        /* FIXME - Need to implement replace operation */
     }
 
-  /* link items in link list */
-  for (p = paste->link_list; p; p = p->next)
+    /* link items in link list */
+    for(p = paste->link_list; p; p = p->next)
     {
-      linkbag = (LinkItemBag *)(p->data);
-      g_object_set (linkbag->from, "link-item", linkbag->to, NULL);
+        linkbag = (LinkItemBag *)(p->data);
+        g_object_set(linkbag->from, "link-item", linkbag->to, NULL);
     }
 
-  return (TRUE);
+    return (TRUE);
 }
 
 /**
@@ -807,32 +878,34 @@ ipatch_paste_finish (IpatchPaste *paste, GError **err)
  *   Returned list has a refcount of 1 which the caller owns, unref when done.
  */
 IpatchList *
-ipatch_paste_get_add_list (IpatchPaste *paste)
+ipatch_paste_get_add_list(IpatchPaste *paste)
 {
-  IpatchList *retlist;
-  GList *newlist = NULL;
-  AddItemBag *bag;
-  GSList *p;
+    IpatchList *retlist;
+    GList *newlist = NULL;
+    AddItemBag *bag;
+    GSList *p;
 
-  g_return_val_if_fail (IPATCH_IS_PASTE (paste), NULL);
+    g_return_val_if_fail(IPATCH_IS_PASTE(paste), NULL);
 
-  for (p = paste->add_list; p; p = p->next)
-  {
-    bag = (AddItemBag *)(p->data);
+    for(p = paste->add_list; p; p = p->next)
+    {
+        bag = (AddItemBag *)(p->data);
 
-    if (bag->choice == IPATCH_PASTE_CHOICE_IGNORE
-	|| bag->choice == IPATCH_PASTE_CHOICE_REPLACE)
-      newlist = g_list_prepend (newlist, g_object_ref (bag->additem));
-  }
+        if(bag->choice == IPATCH_PASTE_CHOICE_IGNORE
+                || bag->choice == IPATCH_PASTE_CHOICE_REPLACE)
+        {
+            newlist = g_list_prepend(newlist, g_object_ref(bag->additem));
+        }
+    }
 
-  if (newlist)
-  {
-    retlist = ipatch_list_new ();	/* ++ ref list */
-    retlist->items = g_list_reverse (newlist);  /* reverse the list, since we prepended */
-    return (retlist);			/* !! caller takes over reference */
-  }
+    if(newlist)
+    {
+        retlist = ipatch_list_new();	/* ++ ref list */
+        retlist->items = g_list_reverse(newlist);   /* reverse the list, since we prepended */
+        return (retlist);			/* !! caller takes over reference */
+    }
 
-  return (NULL);
+    return (NULL);
 }
 
 /**
@@ -849,36 +922,39 @@ ipatch_paste_get_add_list (IpatchPaste *paste)
  * to a paste instance.
  */
 void
-ipatch_paste_object_add (IpatchPaste *paste, IpatchItem *additem, 
-			 IpatchContainer *parent, IpatchItem *orig)
+ipatch_paste_object_add(IpatchPaste *paste, IpatchItem *additem,
+                        IpatchContainer *parent, IpatchItem *orig)
 {
-  AddItemBag *addbag;
+    AddItemBag *addbag;
 
-  g_return_if_fail (IPATCH_IS_PASTE (paste));
-  g_return_if_fail (IPATCH_IS_ITEM (additem));
-  g_return_if_fail (IPATCH_IS_CONTAINER (parent));
-  g_return_if_fail (!orig || IPATCH_IS_ITEM (orig));
+    g_return_if_fail(IPATCH_IS_PASTE(paste));
+    g_return_if_fail(IPATCH_IS_ITEM(additem));
+    g_return_if_fail(IPATCH_IS_CONTAINER(parent));
+    g_return_if_fail(!orig || IPATCH_IS_ITEM(orig));
 
-  /* create a bag to hold the item add info and add to add_list */
-  addbag = g_new (AddItemBag, 1);
-  addbag->additem = g_object_ref (additem);
-  addbag->parent = g_object_ref (parent);
-  addbag->conflict = NULL;
-  addbag->choice = IPATCH_PASTE_CHOICE_IGNORE;
+    /* create a bag to hold the item add info and add to add_list */
+    addbag = g_new(AddItemBag, 1);
+    addbag->additem = g_object_ref(additem);
+    addbag->parent = g_object_ref(parent);
+    addbag->conflict = NULL;
+    addbag->choice = IPATCH_PASTE_CHOICE_IGNORE;
 
-  if (paste->add_list_last)
-  {
-    paste->add_list_last = g_slist_append (paste->add_list_last, addbag);
-    paste->add_list_last = paste->add_list_last->next;
-  }
-  else  /* Empty list */
-  {
-    paste->add_list = g_slist_append (paste->add_list, addbag);
-    paste->add_list_last = paste->add_list;
-  }
+    if(paste->add_list_last)
+    {
+        paste->add_list_last = g_slist_append(paste->add_list_last, addbag);
+        paste->add_list_last = paste->add_list_last->next;
+    }
+    else  /* Empty list */
+    {
+        paste->add_list = g_slist_append(paste->add_list, addbag);
+        paste->add_list_last = paste->add_list;
+    }
 
-  /* set up an association to the original item */
-  if (orig) g_hash_table_insert (paste->add_hash, orig, addbag);
+    /* set up an association to the original item */
+    if(orig)
+    {
+        g_hash_table_insert(paste->add_hash, orig, addbag);
+    }
 }
 
 /**
@@ -896,33 +972,33 @@ ipatch_paste_object_add (IpatchPaste *paste, IpatchItem *additem,
  * Returns: (transfer none): The new duplicate of @item (no reference added for caller).
  */
 IpatchItem *
-ipatch_paste_object_add_duplicate (IpatchPaste *paste, IpatchItem *item,
-				   IpatchContainer *parent)
+ipatch_paste_object_add_duplicate(IpatchPaste *paste, IpatchItem *item,
+                                  IpatchContainer *parent)
 {
-  IpatchItem *dup;
+    IpatchItem *dup;
 
-  g_return_val_if_fail (IPATCH_IS_PASTE (paste), NULL);
-  g_return_val_if_fail (IPATCH_IS_ITEM (item), NULL);
-  g_return_val_if_fail (IPATCH_IS_CONTAINER (parent), NULL);
+    g_return_val_if_fail(IPATCH_IS_PASTE(paste), NULL);
+    g_return_val_if_fail(IPATCH_IS_ITEM(item), NULL);
+    g_return_val_if_fail(IPATCH_IS_CONTAINER(parent), NULL);
 
-  dup = ipatch_item_duplicate (item);	/* ++ ref new dup */
+    dup = ipatch_item_duplicate(item);	/* ++ ref new dup */
 
-  /* make unique if requested */
-  ipatch_container_make_unique (IPATCH_CONTAINER (parent), dup);
+    /* make unique if requested */
+    ipatch_container_make_unique(IPATCH_CONTAINER(parent), dup);
 
-  /* add the object add operation of the duplicated item */
-  ipatch_paste_object_add (paste, dup, IPATCH_CONTAINER (parent), NULL);
+    /* add the object add operation of the duplicated item */
+    ipatch_paste_object_add(paste, dup, IPATCH_CONTAINER(parent), NULL);
 
-  g_object_unref (dup);	/* -- unref dup object */
+    g_object_unref(dup);	/* -- unref dup object */
 
-  return (dup);
+    return (dup);
 }
 
 /* bag used in ipatch_paste_object_add_duplicate_deep() */
 typedef struct
 {
-  IpatchPaste *paste;
-  IpatchContainer *dest_base;
+    IpatchPaste *paste;
+    IpatchContainer *dest_base;
 } DupDeepBag;
 
 /**
@@ -939,77 +1015,86 @@ typedef struct
  * Returns: (transfer none): The new duplicate of @item (no reference added for caller).
  */
 IpatchItem *
-ipatch_paste_object_add_duplicate_deep (IpatchPaste *paste, IpatchItem *item,
-					IpatchContainer *parent)
+ipatch_paste_object_add_duplicate_deep(IpatchPaste *paste, IpatchItem *item,
+                                       IpatchContainer *parent)
 {
-  DupDeepBag bag;
-  IpatchItem *dup;
+    DupDeepBag bag;
+    IpatchItem *dup;
 
-  g_return_val_if_fail (IPATCH_IS_PASTE (paste), NULL);
-  g_return_val_if_fail (IPATCH_IS_ITEM (item), NULL);
-  g_return_val_if_fail (IPATCH_IS_CONTAINER (parent), NULL);
+    g_return_val_if_fail(IPATCH_IS_PASTE(paste), NULL);
+    g_return_val_if_fail(IPATCH_IS_ITEM(item), NULL);
+    g_return_val_if_fail(IPATCH_IS_CONTAINER(parent), NULL);
 
-  bag.paste = paste;
-  bag.dest_base = IPATCH_CONTAINER
-    (ipatch_item_get_base (IPATCH_ITEM (parent))); /* ++ ref base */
+    bag.paste = paste;
+    bag.dest_base = IPATCH_CONTAINER
+                    (ipatch_item_get_base(IPATCH_ITEM(parent)));   /* ++ ref base */
 
-  /* deep duplicate the item (custom link function to use existing dups) */
-  dup = ipatch_item_duplicate_link_func (item, paste_copy_link_func_deep, &bag);
+    /* deep duplicate the item (custom link function to use existing dups) */
+    dup = ipatch_item_duplicate_link_func(item, paste_copy_link_func_deep, &bag);
 
-  /* add the duplicate object addition operation to paste instance */
-  ipatch_paste_object_add (paste, dup, parent, item);
+    /* add the duplicate object addition operation to paste instance */
+    ipatch_paste_object_add(paste, dup, parent, item);
 
-  g_object_unref (dup);		/* !! paste instance owns ref */
+    g_object_unref(dup);		/* !! paste instance owns ref */
 
-  g_object_unref (bag.dest_base);	/* -- unref base */
+    g_object_unref(bag.dest_base);	/* -- unref base */
 
-  return (dup);
+    return (dup);
 }
 
 /* IpatchItemCopyLinkFunc for deep duplicating an object and dependencies but
    using existing dups in paste instance, if any */
 static IpatchItem *
-paste_copy_link_func_deep (IpatchItem *item, IpatchItem *link,
-			   gpointer user_data)
+paste_copy_link_func_deep(IpatchItem *item, IpatchItem *link,
+                          gpointer user_data)
 {
-  DupDeepBag *dupbag = (DupDeepBag *)user_data;
-  AddItemBag *bag;
-  IpatchItem *dup;
+    DupDeepBag *dupbag = (DupDeepBag *)user_data;
+    AddItemBag *bag;
+    IpatchItem *dup;
 
-  if (!link) return (NULL);
-
-  /* look up link item in paste add hash */
-  bag = g_hash_table_lookup (dupbag->paste->add_hash, link);
-
-  /* FIXME - HACK until SoundFont stereo handling is improved.
-   * Reciprocal stereo linking cluster #&*!s things. */
-  if (IPATCH_IS_SF2_SAMPLE (item))
-  {
-    if (!bag) return (NULL);
-
-    /* Re-link the other sample */
-    ipatch_sf2_sample_set_linked (IPATCH_SF2_SAMPLE (bag->additem),
-                                  IPATCH_SF2_SAMPLE (item));
-
-    return (bag->additem);
-  }
-
-  if (!bag)	/* link not in hash? - Duplicate link and add it to paste. */
+    if(!link)
     {
-      dup = g_object_new (G_OBJECT_TYPE (link), NULL); /* ++ ref new item */
-      g_return_val_if_fail (dup != NULL, NULL);
-
-      ipatch_paste_object_add (dupbag->paste, dup, dupbag->dest_base, link);
-
-      /* recursively copy the link object to the duplicate (finish duping) */
-      ipatch_item_copy_link_func (dup, link, paste_copy_link_func_deep,
-				  user_data);
-
-      g_object_unref (dup);	/* !! paste instance holds a ref */
+        return (NULL);
     }
-  else dup = bag->additem;
 
-  return (dup);
+    /* look up link item in paste add hash */
+    bag = g_hash_table_lookup(dupbag->paste->add_hash, link);
+
+    /* FIXME - HACK until SoundFont stereo handling is improved.
+     * Reciprocal stereo linking cluster #&*!s things. */
+    if(IPATCH_IS_SF2_SAMPLE(item))
+    {
+        if(!bag)
+        {
+            return (NULL);
+        }
+
+        /* Re-link the other sample */
+        ipatch_sf2_sample_set_linked(IPATCH_SF2_SAMPLE(bag->additem),
+                                     IPATCH_SF2_SAMPLE(item));
+
+        return (bag->additem);
+    }
+
+    if(!bag)	/* link not in hash? - Duplicate link and add it to paste. */
+    {
+        dup = g_object_new(G_OBJECT_TYPE(link), NULL);   /* ++ ref new item */
+        g_return_val_if_fail(dup != NULL, NULL);
+
+        ipatch_paste_object_add(dupbag->paste, dup, dupbag->dest_base, link);
+
+        /* recursively copy the link object to the duplicate (finish duping) */
+        ipatch_item_copy_link_func(dup, link, paste_copy_link_func_deep,
+                                   user_data);
+
+        g_object_unref(dup);	/* !! paste instance holds a ref */
+    }
+    else
+    {
+        dup = bag->additem;
+    }
+
+    return (dup);
 }
 
 /**
@@ -1031,67 +1116,76 @@ paste_copy_link_func_deep (IpatchItem *item, IpatchItem *link,
  * Returns: %TRUE on success, %FALSE otherwise (in which case @err may be set).
  */
 gboolean
-ipatch_paste_object_add_convert (IpatchPaste *paste, GType conv_type,
-				 IpatchItem *item, IpatchContainer *parent,
-                                 IpatchList **item_list, GError **err)
+ipatch_paste_object_add_convert(IpatchPaste *paste, GType conv_type,
+                                IpatchItem *item, IpatchContainer *parent,
+                                IpatchList **item_list, GError **err)
 {
-  IpatchConverter *converter;
-  const IpatchConverterInfo *convinfo;
-  IpatchList *list;
-  GObject *dest;
-  GList *p;
+    IpatchConverter *converter;
+    const IpatchConverterInfo *convinfo;
+    IpatchList *list;
+    GObject *dest;
+    GList *p;
 
-  g_return_val_if_fail (IPATCH_IS_PASTE (paste), FALSE);
-  g_return_val_if_fail (g_type_is_a (conv_type, IPATCH_TYPE_CONVERTER), FALSE);
-  g_return_val_if_fail (IPATCH_IS_ITEM (item), FALSE);
-  g_return_val_if_fail (IPATCH_IS_CONTAINER (parent), FALSE);
-  g_return_val_if_fail (!err || !*err, FALSE);
+    g_return_val_if_fail(IPATCH_IS_PASTE(paste), FALSE);
+    g_return_val_if_fail(g_type_is_a(conv_type, IPATCH_TYPE_CONVERTER), FALSE);
+    g_return_val_if_fail(IPATCH_IS_ITEM(item), FALSE);
+    g_return_val_if_fail(IPATCH_IS_CONTAINER(parent), FALSE);
+    g_return_val_if_fail(!err || !*err, FALSE);
 
-  convinfo = ipatch_lookup_converter_info (conv_type, 0, 0);
-  g_return_val_if_fail (convinfo != NULL, FALSE);
+    convinfo = ipatch_lookup_converter_info(conv_type, 0, 0);
+    g_return_val_if_fail(convinfo != NULL, FALSE);
 
-  converter = IPATCH_CONVERTER (g_object_new (conv_type, NULL));  /* ++ ref */
-  g_return_val_if_fail (converter != NULL, FALSE);
+    converter = IPATCH_CONVERTER(g_object_new(conv_type, NULL));    /* ++ ref */
+    g_return_val_if_fail(converter != NULL, FALSE);
 
-  ipatch_converter_add_input (converter, G_OBJECT (item));
+    ipatch_converter_add_input(converter, G_OBJECT(item));
 
-  /* check if converter needs its destination item supplied */
-  if (convinfo->dest_count == IPATCH_CONVERTER_COUNT_ONE_OR_MORE
-      || convinfo->dest_count == 1)
+    /* check if converter needs its destination item supplied */
+    if(convinfo->dest_count == IPATCH_CONVERTER_COUNT_ONE_OR_MORE
+            || convinfo->dest_count == 1)
     {
-      dest = g_object_new (convinfo->dest_type, NULL);	/* ++ ref */
-      if (log_if_fail (dest != NULL))
-	{
-	  g_object_unref (converter);	/* -- unref converter */
-	  return (FALSE);
-	}
+        dest = g_object_new(convinfo->dest_type, NULL);	/* ++ ref */
 
-      ipatch_converter_add_output (converter, dest);
-      g_object_unref (dest);	/* -- unref */
+        if(log_if_fail(dest != NULL))
+        {
+            g_object_unref(converter);	/* -- unref converter */
+            return (FALSE);
+        }
+
+        ipatch_converter_add_output(converter, dest);
+        g_object_unref(dest);	/* -- unref */
     }
-  else if (log_if_fail (convinfo->dest_count == 0))
+    else if(log_if_fail(convinfo->dest_count == 0))
     {
-      g_object_unref (converter);	/* -- unref converter */
-      return (FALSE);
-    }
-
-  if (!ipatch_converter_convert (converter, err))
-    {
-      g_object_unref (converter);	/* -- unref converter */
-      return (FALSE);
+        g_object_unref(converter);	/* -- unref converter */
+        return (FALSE);
     }
 
-  list = ipatch_converter_get_outputs (converter);      /* ++ ref list */
-  g_object_unref (converter);	/* -- unref converter */
+    if(!ipatch_converter_convert(converter, err))
+    {
+        g_object_unref(converter);	/* -- unref converter */
+        return (FALSE);
+    }
 
-  /* add objects to paste operation */
-  for (p = list->items; p; p = p->next)
-    ipatch_paste_object_add (paste, IPATCH_ITEM (p->data), parent, item);
+    list = ipatch_converter_get_outputs(converter);       /* ++ ref list */
+    g_object_unref(converter);	/* -- unref converter */
 
-  if (item_list) *item_list = list;     /* !! caller takes over reference */
-  else g_object_unref (list);   /* -- unref list */
+    /* add objects to paste operation */
+    for(p = list->items; p; p = p->next)
+    {
+        ipatch_paste_object_add(paste, IPATCH_ITEM(p->data), parent, item);
+    }
 
-  return (TRUE);
+    if(item_list)
+    {
+        *item_list = list;    /* !! caller takes over reference */
+    }
+    else
+    {
+        g_object_unref(list);    /* -- unref list */
+    }
+
+    return (TRUE);
 }
 
 /**
@@ -1103,20 +1197,20 @@ ipatch_paste_object_add_convert (IpatchPaste *paste, GType conv_type,
  * Used by #IpatchPasteExecFunc handlers.  Registers a link operation.
  */
 void
-ipatch_paste_object_link (IpatchPaste *paste, IpatchItem *from, IpatchItem *to)
+ipatch_paste_object_link(IpatchPaste *paste, IpatchItem *from, IpatchItem *to)
 {
-  LinkItemBag *linkbag;
+    LinkItemBag *linkbag;
 
-  g_return_if_fail (IPATCH_IS_PASTE (paste));
-  g_return_if_fail (IPATCH_IS_ITEM (from));
-  g_return_if_fail (IPATCH_IS_ITEM (to));
+    g_return_if_fail(IPATCH_IS_PASTE(paste));
+    g_return_if_fail(IPATCH_IS_ITEM(from));
+    g_return_if_fail(IPATCH_IS_ITEM(to));
 
-  /* create a bag to hold the item link info and add to link_list */
-  linkbag = g_new (LinkItemBag, 1);
-  linkbag->from = g_object_ref (from);
-  linkbag->to = g_object_ref (to);
+    /* create a bag to hold the item link info and add to link_list */
+    linkbag = g_new(LinkItemBag, 1);
+    linkbag->from = g_object_ref(from);
+    linkbag->to = g_object_ref(to);
 
-  paste->link_list = g_slist_prepend (paste->link_list, linkbag);
+    paste->link_list = g_slist_prepend(paste->link_list, linkbag);
 }
 
 /**
@@ -1131,121 +1225,149 @@ ipatch_paste_object_link (IpatchPaste *paste, IpatchItem *from, IpatchItem *to)
  * Returns: %TRUE if paste supported by this handler, %FALSE otherwise
  */
 gboolean
-ipatch_paste_default_test_func (IpatchItem *dest, IpatchItem *src)
+ipatch_paste_default_test_func(IpatchItem *dest, IpatchItem *src)
 {
-  GType src_type, link_type, type;
-  const GType *child_types = NULL, *ptype;
-  GParamSpec *spec;
+    GType src_type, link_type, type;
+    const GType *child_types = NULL, *ptype;
+    GParamSpec *spec;
 
-  g_return_val_if_fail (IPATCH_IS_ITEM (dest), FALSE);
-  g_return_val_if_fail (IPATCH_IS_ITEM (src), FALSE);
+    g_return_val_if_fail(IPATCH_IS_ITEM(dest), FALSE);
+    g_return_val_if_fail(IPATCH_IS_ITEM(src), FALSE);
 
-  src_type = G_OBJECT_TYPE (src);
+    src_type = G_OBJECT_TYPE(src);
 
-  /* destination is a container? */
-  if (IPATCH_IS_CONTAINER (dest))
+    /* destination is a container? */
+    if(IPATCH_IS_CONTAINER(dest))
     {
-      /* get child types for destination container */
-      child_types = ipatch_container_get_child_types (IPATCH_CONTAINER (dest));
-      if (!child_types) return (FALSE);		/* no child types??!! */
+        /* get child types for destination container */
+        child_types = ipatch_container_get_child_types(IPATCH_CONTAINER(dest));
 
-      /* check if src type in child types */
-      for (ptype = child_types; *ptype; ptype++)
-	if (g_type_is_a (src_type, *ptype))
-	  return (TRUE);	/* if child type found, paste supported */
+        if(!child_types)
+        {
+            return (FALSE);    /* no child types??!! */
+        }
 
-      /* src is a link type of any of container's children types? */
-      for (ptype = child_types; *ptype; ptype++)
-	{
-	  ipatch_type_get (*ptype, "link-type", &link_type, NULL);
-	  if (g_type_is_a (src_type, link_type))
-	    return (TRUE);	/* link type found, paste supported */
-	}
+        /* check if src type in child types */
+        for(ptype = child_types; *ptype; ptype++)
+            if(g_type_is_a(src_type, *ptype))
+            {
+                return (TRUE);    /* if child type found, paste supported */
+            }
+
+        /* src is a link type of any of container's children types? */
+        for(ptype = child_types; *ptype; ptype++)
+        {
+            ipatch_type_get(*ptype, "link-type", &link_type, NULL);
+
+            if(g_type_is_a(src_type, link_type))
+            {
+                return (TRUE);    /* link type found, paste supported */
+            }
+        }
     }
-  else if (IPATCH_IS_VIRTUAL_CONTAINER (dest))	/* dest is a virtual container? */
+    else if(IPATCH_IS_VIRTUAL_CONTAINER(dest))	/* dest is a virtual container? */
     {
-      IpatchItem *child_obj;
+        IpatchItem *child_obj;
 
-      /* get the child type of the virtual container */
-      ipatch_type_get (G_OBJECT_TYPE (dest), "virtual-child-type", &type, NULL);
+        /* get the child type of the virtual container */
+        ipatch_type_get(G_OBJECT_TYPE(dest), "virtual-child-type", &type, NULL);
 
-      /* does source object conform to the virtual container child type? */
-      if (type && g_type_is_a (G_OBJECT_TYPE (src), type))
-	return (TRUE);
+        /* does source object conform to the virtual container child type? */
+        if(type && g_type_is_a(G_OBJECT_TYPE(src), type))
+        {
+            return (TRUE);
+        }
 
-      /* or can it be pasted to the child type recursively? */
-      child_obj = g_object_new (type, NULL); /* ++ ref child object */
-      if (child_obj)
-      {
-	if (ipatch_is_paste_possible(child_obj, src))
-	{
-	  g_object_unref (child_obj);	/* -- unref child_obj */
-	  return (TRUE); /* can be pasted recursively into the child type */
-	}
-	g_object_unref (child_obj);	/* -- unref child_obj */
-      }
+        /* or can it be pasted to the child type recursively? */
+        child_obj = g_object_new(type, NULL);  /* ++ ref child object */
+
+        if(child_obj)
+        {
+            if(ipatch_is_paste_possible(child_obj, src))
+            {
+                g_object_unref(child_obj);	/* -- unref child_obj */
+                return (TRUE); /* can be pasted recursively into the child type */
+            }
+
+            g_object_unref(child_obj);	/* -- unref child_obj */
+        }
     }
-  else	/* destination is not a container - src is link type of dest? */
+    else	/* destination is not a container - src is link type of dest? */
     {
-      /* dest has link item property (FIXME - Future proof?) */
-      spec = g_object_class_find_property (G_OBJECT_GET_CLASS (dest),
-					   "link-item");
-      /* link item property and src is of the required type? */
-      if (spec && g_type_is_a (src_type, spec->value_type))
-	return (TRUE);
-    }
+        /* dest has link item property (FIXME - Future proof?) */
+        spec = g_object_class_find_property(G_OBJECT_GET_CLASS(dest),
+                                            "link-item");
 
-
-  /* ## see if paste could occur if source object is converted ## */
-
-
-  /* destination is a container? */
-  if (IPATCH_IS_CONTAINER (dest))
-    {
-      /* child_types already retrieved above */
-
-      /* check if src type can be converted to any child types */
-      for (ptype = child_types; *ptype; ptype++)
-	{
-	  if (ipatch_lookup_converter_info (0, G_OBJECT_TYPE (src), *ptype))
-	    return (TRUE);
-	}
-
-      /* can src be converted to a container's child link type? */
-      for (ptype = child_types; *ptype; ptype++)
-	{
-	  ipatch_type_get (*ptype, "link-type", &link_type, NULL);
-
-	  if (ipatch_lookup_converter_info (0, G_OBJECT_TYPE (src), link_type))
-	    return (TRUE);
-	}
-    }
-  else if (IPATCH_IS_VIRTUAL_CONTAINER (dest))	/* dest is a virtual container? */
-    {
-      /* get the child type of the virtual container */
-      ipatch_type_get (G_OBJECT_TYPE (dest), "virtual-child-type", &type, NULL);
-
-      if (type)
-	{
-	  /* can object be converted to container child type? */
-	  if (ipatch_lookup_converter_info (0, G_OBJECT_TYPE (src), type))
-	    return (TRUE);
-	}
-    }
-  else	/* dest is not a container - can convert src to link type of dest? */
-    {
-      /* dest has link item property (FIXME - Future proof?) */
-      spec = g_object_class_find_property (G_OBJECT_GET_CLASS (dest),
-					   "link-item");
-      if (!spec) return (FALSE);
-
-      /* can src be converted to link type of dest? */
-      if (ipatch_lookup_converter_info (0, G_OBJECT_TYPE (src),
-					spec->value_type))
-	return (TRUE);
+        /* link item property and src is of the required type? */
+        if(spec && g_type_is_a(src_type, spec->value_type))
+        {
+            return (TRUE);
+        }
     }
 
-  return (FALSE);
+
+    /* ## see if paste could occur if source object is converted ## */
+
+
+    /* destination is a container? */
+    if(IPATCH_IS_CONTAINER(dest))
+    {
+        /* child_types already retrieved above */
+
+        /* check if src type can be converted to any child types */
+        for(ptype = child_types; *ptype; ptype++)
+        {
+            if(ipatch_lookup_converter_info(0, G_OBJECT_TYPE(src), *ptype))
+            {
+                return (TRUE);
+            }
+        }
+
+        /* can src be converted to a container's child link type? */
+        for(ptype = child_types; *ptype; ptype++)
+        {
+            ipatch_type_get(*ptype, "link-type", &link_type, NULL);
+
+            if(ipatch_lookup_converter_info(0, G_OBJECT_TYPE(src), link_type))
+            {
+                return (TRUE);
+            }
+        }
+    }
+    else if(IPATCH_IS_VIRTUAL_CONTAINER(dest))	/* dest is a virtual container? */
+    {
+        /* get the child type of the virtual container */
+        ipatch_type_get(G_OBJECT_TYPE(dest), "virtual-child-type", &type, NULL);
+
+        if(type)
+        {
+            /* can object be converted to container child type? */
+            if(ipatch_lookup_converter_info(0, G_OBJECT_TYPE(src), type))
+            {
+                return (TRUE);
+            }
+        }
+    }
+    else	/* dest is not a container - can convert src to link type of dest? */
+    {
+        /* dest has link item property (FIXME - Future proof?) */
+        spec = g_object_class_find_property(G_OBJECT_GET_CLASS(dest),
+                                            "link-item");
+
+        if(!spec)
+        {
+            return (FALSE);
+        }
+
+        /* can src be converted to link type of dest? */
+        if(ipatch_lookup_converter_info(0, G_OBJECT_TYPE(src),
+                                        spec->value_type))
+        {
+            return (TRUE);
+        }
+    }
+
+    return (FALSE);
 }
 
 /**
@@ -1262,300 +1384,390 @@ ipatch_paste_default_test_func (IpatchItem *dest, IpatchItem *src)
  * Returns: %TRUE on success, %FALSE otherwise (in which case @err may be set).
  */
 gboolean
-ipatch_paste_default_exec_func (IpatchPaste *paste, IpatchItem *dest,
-				IpatchItem *src, GError **err)
+ipatch_paste_default_exec_func(IpatchPaste *paste, IpatchItem *dest,
+                               IpatchItem *src, GError **err)
 {
-  IpatchItem *src_base, *dest_base;
-  IpatchItem *link, *dup;
-  GParamSpec *spec;
-  GType src_type, link_type, type;
-  const GType *child_types = NULL, *ptype;
-  const IpatchConverterInfo *convinfo, *matchinfo;
-  IpatchVirtualContainerConformFunc conform_func;
-  IpatchList *list;
+    IpatchItem *src_base, *dest_base;
+    IpatchItem *link, *dup;
+    GParamSpec *spec;
+    GType src_type, link_type, type;
+    const GType *child_types = NULL, *ptype;
+    const IpatchConverterInfo *convinfo, *matchinfo;
+    IpatchVirtualContainerConformFunc conform_func;
+    IpatchList *list;
 
-  g_return_val_if_fail (IPATCH_IS_PASTE (paste), FALSE);
-  g_return_val_if_fail (IPATCH_IS_ITEM (src), FALSE);
-  g_return_val_if_fail (IPATCH_IS_ITEM (dest), FALSE);
-  g_return_val_if_fail (!err || !*err, FALSE);
+    g_return_val_if_fail(IPATCH_IS_PASTE(paste), FALSE);
+    g_return_val_if_fail(IPATCH_IS_ITEM(src), FALSE);
+    g_return_val_if_fail(IPATCH_IS_ITEM(dest), FALSE);
+    g_return_val_if_fail(!err || !*err, FALSE);
 
-  src_base = ipatch_item_get_base (src);        // ++ ref
-  dest_base = ipatch_item_get_base (dest);      // ++ ref
-  src_type = G_OBJECT_TYPE (src);
+    src_base = ipatch_item_get_base(src);         // ++ ref
+    dest_base = ipatch_item_get_base(dest);       // ++ ref
+    src_type = G_OBJECT_TYPE(src);
 
-  /* destination is a container? */
-  if (IPATCH_IS_CONTAINER (dest))
+    /* destination is a container? */
+    if(IPATCH_IS_CONTAINER(dest))
     {
-      /* get child types for destination container */
-      child_types = ipatch_container_get_child_types (IPATCH_CONTAINER (dest));
-      if (!child_types) goto not_handled;
+        /* get child types for destination container */
+        child_types = ipatch_container_get_child_types(IPATCH_CONTAINER(dest));
 
-      /* check if src type in child types */
-      for (ptype = child_types; *ptype; ptype++)
-	if (g_type_is_a (src_type, *ptype)) break;
+        if(!child_types)
+        {
+            goto not_handled;
+        }
 
-      if (*ptype)	/* matching child type found? */
-	{
-	  /* paste is local (within the same IpatchBase?) */
-	  if (src_base == dest_base)
-	    ipatch_paste_object_add_duplicate (paste, src, IPATCH_CONTAINER (dest));
-	  else	/* deep duplicate the object and add to the paste instance */
-	    ipatch_paste_object_add_duplicate_deep (paste, src,
-						    IPATCH_CONTAINER (dest));
-	  goto ret_ok;
-	}
+        /* check if src type in child types */
+        for(ptype = child_types; *ptype; ptype++)
+            if(g_type_is_a(src_type, *ptype))
+            {
+                break;
+            }
 
-      /* src is a link type of any of container's children types? */
-      for (ptype = child_types; *ptype; ptype++)
-	{
-	  ipatch_type_get (*ptype, "link-type", &link_type, NULL);
-	  if (g_type_is_a (src_type, link_type)) break;
-	}
-    
-      /* matching link type found? */
-      if (*ptype)
-	{
-	  GObject *newchild;
-    
-	  newchild = g_object_new (*ptype, NULL);	/* ++ ref new child object */
-	  if (!newchild)
-	    {
-	      g_warning ("Failed to create linked child of type %s -> %s",
-			 g_type_name (*ptype), g_type_name (link_type));
-	      goto not_handled;
-	    }
-    
-	  /* add the object add operation of the new child */
-	  ipatch_paste_object_add (paste, IPATCH_ITEM (newchild),
-				   IPATCH_CONTAINER (dest), NULL);
-    
-	  /* link the new child item to the source object */
-	  g_object_set (newchild, "link-item", src, NULL);
-    
-	  g_object_unref (newchild);	/* -- unref creator's ref */
-    
-	  goto ret_ok;	/* paste was handled */
-	}    
+        if(*ptype)	/* matching child type found? */
+        {
+            /* paste is local (within the same IpatchBase?) */
+            if(src_base == dest_base)
+            {
+                ipatch_paste_object_add_duplicate(paste, src, IPATCH_CONTAINER(dest));
+            }
+            else	/* deep duplicate the object and add to the paste instance */
+                ipatch_paste_object_add_duplicate_deep(paste, src,
+                                                       IPATCH_CONTAINER(dest));
+
+            goto ret_ok;
+        }
+
+        /* src is a link type of any of container's children types? */
+        for(ptype = child_types; *ptype; ptype++)
+        {
+            ipatch_type_get(*ptype, "link-type", &link_type, NULL);
+
+            if(g_type_is_a(src_type, link_type))
+            {
+                break;
+            }
+        }
+
+        /* matching link type found? */
+        if(*ptype)
+        {
+            GObject *newchild;
+
+            newchild = g_object_new(*ptype, NULL);	/* ++ ref new child object */
+
+            if(!newchild)
+            {
+                g_warning("Failed to create linked child of type %s -> %s",
+                          g_type_name(*ptype), g_type_name(link_type));
+                goto not_handled;
+            }
+
+            /* add the object add operation of the new child */
+            ipatch_paste_object_add(paste, IPATCH_ITEM(newchild),
+                                    IPATCH_CONTAINER(dest), NULL);
+
+            /* link the new child item to the source object */
+            g_object_set(newchild, "link-item", src, NULL);
+
+            g_object_unref(newchild);	/* -- unref creator's ref */
+
+            goto ret_ok;	/* paste was handled */
+        }
     }
-  else if (IPATCH_IS_VIRTUAL_CONTAINER (dest))	/* dest is a virtual container? */
+    else if(IPATCH_IS_VIRTUAL_CONTAINER(dest))	/* dest is a virtual container? */
     {
-      IpatchItem *newchild;
-      GValue val = { 0 };
+        IpatchItem *newchild;
+        GValue val = { 0 };
 
-      /* get the child type of the virtual container */
-      ipatch_type_get (G_OBJECT_TYPE (dest),
-		       "virtual-child-type", &type,
-		       "virtual-child-conform-func", &conform_func,
-		       NULL);
-      if (!type) goto not_handled;
+        /* get the child type of the virtual container */
+        ipatch_type_get(G_OBJECT_TYPE(dest),
+                        "virtual-child-type", &type,
+                        "virtual-child-conform-func", &conform_func,
+                        NULL);
 
-      /* does source object conform to the virtual container type? */
-      if (g_type_is_a (G_OBJECT_TYPE (src), type))
-	{
-	  /* if src is foreign, deep duplicate it, otherwise local duplicate */
-	  if (src_base != dest_base)
-	    dup = ipatch_paste_object_add_duplicate_deep (paste, src,
-						IPATCH_CONTAINER (dest_base));
-	  else dup = ipatch_paste_object_add_duplicate (paste, src,
-						IPATCH_CONTAINER (dest_base));
+        if(!type)
+        {
+            goto not_handled;
+        }
 
-	  if (conform_func) conform_func (G_OBJECT (dup));
+        /* does source object conform to the virtual container type? */
+        if(g_type_is_a(G_OBJECT_TYPE(src), type))
+        {
+            /* if src is foreign, deep duplicate it, otherwise local duplicate */
+            if(src_base != dest_base)
+                dup = ipatch_paste_object_add_duplicate_deep(paste, src,
+                        IPATCH_CONTAINER(dest_base));
+            else
+                dup = ipatch_paste_object_add_duplicate(paste, src,
+                                                        IPATCH_CONTAINER(dest_base));
 
-	  goto ret_ok;	/* paste was handled */
-	}
+            if(conform_func)
+            {
+                conform_func(G_OBJECT(dup));
+            }
 
-      /* can it be pasted into the child type recursively? */
-      newchild = g_object_new (type, NULL);	/* ++ ref new child object */
-      if (!newchild)
-      {
-	g_warning ("Failed to create child of type %s", g_type_name (type));
-	goto not_handled;
-      }
+            goto ret_ok;	/* paste was handled */
+        }
 
-      if (conform_func) conform_func (G_OBJECT (newchild));
+        /* can it be pasted into the child type recursively? */
+        newchild = g_object_new(type, NULL);	/* ++ ref new child object */
 
-      if (ipatch_is_paste_possible(newchild, src))
-      {
-	if (!ipatch_simple_paste(newchild, src, err))
-	{
-	  g_object_unref (newchild);	/* -- unref creator's ref */
-	  goto ret_err;	/* paste not handled */
-	}
+        if(!newchild)
+        {
+            g_warning("Failed to create child of type %s", g_type_name(type));
+            goto not_handled;
+        }
 
-	/* Inherit title of the new item from the pasted one */
-	g_value_init (&val, G_TYPE_STRING);
-	g_object_get_property (G_OBJECT (src), "title", &val);
-	g_object_set_property (G_OBJECT (newchild), "name", &val);
-	g_value_unset (&val);
-	ipatch_container_make_unique (IPATCH_CONTAINER (dest_base), newchild);
+        if(conform_func)
+        {
+            conform_func(G_OBJECT(newchild));
+        }
 
-	/* add the object add operation of the new child */
-	ipatch_paste_object_add (paste, IPATCH_ITEM (newchild),
-				 IPATCH_CONTAINER (dest_base), NULL);
-	g_object_unref (newchild);	/* -- unref creator's ref */
-	goto ret_ok;	/* paste was handled */
-      }
-      g_object_unref (newchild);	/* -- unref creator's ref */
+        if(ipatch_is_paste_possible(newchild, src))
+        {
+            if(!ipatch_simple_paste(newchild, src, err))
+            {
+                g_object_unref(newchild);	/* -- unref creator's ref */
+                goto ret_err;	/* paste not handled */
+            }
+
+            /* Inherit title of the new item from the pasted one */
+            g_value_init(&val, G_TYPE_STRING);
+            g_object_get_property(G_OBJECT(src), "title", &val);
+            g_object_set_property(G_OBJECT(newchild), "name", &val);
+            g_value_unset(&val);
+            ipatch_container_make_unique(IPATCH_CONTAINER(dest_base), newchild);
+
+            /* add the object add operation of the new child */
+            ipatch_paste_object_add(paste, IPATCH_ITEM(newchild),
+                                    IPATCH_CONTAINER(dest_base), NULL);
+            g_object_unref(newchild);	/* -- unref creator's ref */
+            goto ret_ok;	/* paste was handled */
+        }
+
+        g_object_unref(newchild);	/* -- unref creator's ref */
     }
-  else	/* destination is not a container - src is link type of dest? */
+    else	/* destination is not a container - src is link type of dest? */
     {
-      /* dest has link item property (FIXME - Future proof?) */
-      spec = g_object_class_find_property (G_OBJECT_GET_CLASS (dest),
-					   "link-item");
-      /* if no link item property or src isn't of the required type - error */
-      if (!spec || !g_type_is_a (src_type, spec->value_type))
-	goto not_handled;
+        /* dest has link item property (FIXME - Future proof?) */
+        spec = g_object_class_find_property(G_OBJECT_GET_CLASS(dest),
+                                            "link-item");
 
-      /* if src is foreign, duplicate it */
-      if (src_base != dest_base)
-	link = ipatch_paste_object_add_duplicate_deep
-	  (paste, src, IPATCH_CONTAINER (dest_base));
-      else link = src;
+        /* if no link item property or src isn't of the required type - error */
+        if(!spec || !g_type_is_a(src_type, spec->value_type))
+        {
+            goto not_handled;
+        }
 
-      /* add the link operation */
-      ipatch_paste_object_link (paste, dest, link);
+        /* if src is foreign, duplicate it */
+        if(src_base != dest_base)
+            link = ipatch_paste_object_add_duplicate_deep
+                   (paste, src, IPATCH_CONTAINER(dest_base));
+        else
+        {
+            link = src;
+        }
 
-      goto ret_ok;	/* we done */
+        /* add the link operation */
+        ipatch_paste_object_link(paste, dest, link);
+
+        goto ret_ok;	/* we done */
     }
 
 
-  /* ## see if paste could occur if source object is converted ## */
+    /* ## see if paste could occur if source object is converted ## */
 
 
-  /* destination is a container? */
-  if (IPATCH_IS_CONTAINER (dest))
+    /* destination is a container? */
+    if(IPATCH_IS_CONTAINER(dest))
     {
-      /* child_types already retrieved above */
+        /* child_types already retrieved above */
 
-      /* check if src type can be converted to any child types, pick the highest
-         rated converter */
-      matchinfo = NULL;
-      for (ptype = child_types; *ptype; ptype++)
-	{
-	  convinfo = ipatch_lookup_converter_info (0, G_OBJECT_TYPE (src),
-						   *ptype);
-	  if (convinfo &&
-	      (!matchinfo || convinfo->priority > matchinfo->priority))
-	    matchinfo = convinfo;
-	}
+        /* check if src type can be converted to any child types, pick the highest
+           rated converter */
+        matchinfo = NULL;
 
-      if (matchinfo)	/* found a converter match? */
-      {
-        if (ipatch_paste_object_add_convert (paste, matchinfo->conv_type, src,
-                                             IPATCH_CONTAINER (dest), NULL, err))
-          goto ret_ok;
-        else goto ret_err;
-      }
+        for(ptype = child_types; *ptype; ptype++)
+        {
+            convinfo = ipatch_lookup_converter_info(0, G_OBJECT_TYPE(src),
+                                                    *ptype);
 
-      /* can src be converted to a container's child link type? */
-      for (ptype = child_types; *ptype; ptype++)
-	{
-	  ipatch_type_get (*ptype, "link-type", &link_type, NULL);
+            if(convinfo &&
+                    (!matchinfo || convinfo->priority > matchinfo->priority))
+            {
+                matchinfo = convinfo;
+            }
+        }
 
-	  convinfo = ipatch_lookup_converter_info (0, G_OBJECT_TYPE (src),
-						   link_type);
-	  if (convinfo &&
-	      (!matchinfo || convinfo->priority > matchinfo->priority))
-	    matchinfo = convinfo;
-	}
-    
-      /* matching converter found? */
-      if (matchinfo)
-	{
-	  GObject *newchild;
+        if(matchinfo)	/* found a converter match? */
+        {
+            if(ipatch_paste_object_add_convert(paste, matchinfo->conv_type, src,
+                                               IPATCH_CONTAINER(dest), NULL, err))
+            {
+                goto ret_ok;
+            }
+            else
+            {
+                goto ret_err;
+            }
+        }
 
-	  /* convert the source object to the matching link type */
-	  if (!ipatch_paste_object_add_convert (paste, matchinfo->conv_type,
-				                src, IPATCH_CONTAINER (dest_base),
+        /* can src be converted to a container's child link type? */
+        for(ptype = child_types; *ptype; ptype++)
+        {
+            ipatch_type_get(*ptype, "link-type", &link_type, NULL);
+
+            convinfo = ipatch_lookup_converter_info(0, G_OBJECT_TYPE(src),
+                                                    link_type);
+
+            if(convinfo &&
+                    (!matchinfo || convinfo->priority > matchinfo->priority))
+            {
+                matchinfo = convinfo;
+            }
+        }
+
+        /* matching converter found? */
+        if(matchinfo)
+        {
+            GObject *newchild;
+
+            /* convert the source object to the matching link type */
+            if(!ipatch_paste_object_add_convert(paste, matchinfo->conv_type,
+                                                src, IPATCH_CONTAINER(dest_base),
                                                 &list, err))    /* ++ ref list */
-            goto ret_err;
+            {
+                goto ret_err;
+            }
 
-	  newchild = g_object_new (*ptype, NULL);  /* ++ ref new child object */
-	  if (!newchild)
-	    {
-	      g_warning ("Failed to create linked child of type %s -> %s",
-			 g_type_name (*ptype), g_type_name (link_type));
-              g_object_unref (list);    /* -- unref list */
-	      goto not_handled;
-	    }
+            newchild = g_object_new(*ptype, NULL);   /* ++ ref new child object */
 
-	  /* add the object add operation of the new child */
-	  ipatch_paste_object_add (paste, IPATCH_ITEM (newchild),
-				   IPATCH_CONTAINER (dest), NULL);
+            if(!newchild)
+            {
+                g_warning("Failed to create linked child of type %s -> %s",
+                          g_type_name(*ptype), g_type_name(link_type));
+                g_object_unref(list);     /* -- unref list */
+                goto not_handled;
+            }
 
-	  /* link the new child item to the converted source object */
-	  g_object_set (newchild, "link-item", list->items->data, NULL);
+            /* add the object add operation of the new child */
+            ipatch_paste_object_add(paste, IPATCH_ITEM(newchild),
+                                    IPATCH_CONTAINER(dest), NULL);
 
-	  g_object_unref (newchild);	/* -- unref creator's ref */
-          g_object_unref (list);    /* -- unref list */
+            /* link the new child item to the converted source object */
+            g_object_set(newchild, "link-item", list->items->data, NULL);
 
-	  goto ret_ok;	/* paste was handled */
-	}    
+            g_object_unref(newchild);	/* -- unref creator's ref */
+            g_object_unref(list);     /* -- unref list */
+
+            goto ret_ok;	/* paste was handled */
+        }
     }
-  else if (IPATCH_IS_VIRTUAL_CONTAINER (dest))	/* dest is a virtual container? */
+    else if(IPATCH_IS_VIRTUAL_CONTAINER(dest))	/* dest is a virtual container? */
     {
-      /* get the child type of the virtual container */
-      ipatch_type_get (G_OBJECT_TYPE (dest),
-		       "virtual-child-type", &type,
-		       "virtual-child-conform-func", &conform_func,
-		       NULL);
-      if (!type) goto not_handled;
+        /* get the child type of the virtual container */
+        ipatch_type_get(G_OBJECT_TYPE(dest),
+                        "virtual-child-type", &type,
+                        "virtual-child-conform-func", &conform_func,
+                        NULL);
 
-      /* can object be converted to container child type? */
-      convinfo = ipatch_lookup_converter_info (0, G_OBJECT_TYPE (src), type);
-      if (!convinfo) goto not_handled;
+        if(!type)
+        {
+            goto not_handled;
+        }
 
-      /* add the conversion operation to the paste */
-      if (!ipatch_paste_object_add_convert (paste, convinfo->conv_type, src,
-				            IPATCH_CONTAINER (dest_base),
+        /* can object be converted to container child type? */
+        convinfo = ipatch_lookup_converter_info(0, G_OBJECT_TYPE(src), type);
+
+        if(!convinfo)
+        {
+            goto not_handled;
+        }
+
+        /* add the conversion operation to the paste */
+        if(!ipatch_paste_object_add_convert(paste, convinfo->conv_type, src,
+                                            IPATCH_CONTAINER(dest_base),
                                             &list, err))     /* ++ ref list */
-        goto ret_err;
+        {
+            goto ret_err;
+        }
 
-      if (conform_func) conform_func (G_OBJECT (list->items->data));
+        if(conform_func)
+        {
+            conform_func(G_OBJECT(list->items->data));
+        }
 
-      g_object_unref (list);          /* -- unref list */
+        g_object_unref(list);           /* -- unref list */
 
-      goto ret_ok;	/* paste was handled */
+        goto ret_ok;	/* paste was handled */
     }
-  else	/* dest is not a container - can convert src to link type of dest? */
+    else	/* dest is not a container - can convert src to link type of dest? */
     {
-      /* dest has link item property (FIXME - Future proof?) */
-      spec = g_object_class_find_property (G_OBJECT_GET_CLASS (dest), "link-item");
-      if (!spec) goto not_handled;
+        /* dest has link item property (FIXME - Future proof?) */
+        spec = g_object_class_find_property(G_OBJECT_GET_CLASS(dest), "link-item");
 
-      /* can src be converted to link type of dest? */
-      convinfo = ipatch_lookup_converter_info (0, G_OBJECT_TYPE (src),
-					       spec->value_type);
-      if (!convinfo) goto not_handled;
+        if(!spec)
+        {
+            goto not_handled;
+        }
 
-      /* convert the src object to the link type and add to paste operation */
-      if (!ipatch_paste_object_add_convert (paste, convinfo->conv_type,
-                                            src, IPATCH_CONTAINER (dest_base),
+        /* can src be converted to link type of dest? */
+        convinfo = ipatch_lookup_converter_info(0, G_OBJECT_TYPE(src),
+                                                spec->value_type);
+
+        if(!convinfo)
+        {
+            goto not_handled;
+        }
+
+        /* convert the src object to the link type and add to paste operation */
+        if(!ipatch_paste_object_add_convert(paste, convinfo->conv_type,
+                                            src, IPATCH_CONTAINER(dest_base),
                                             &list, err))      /* ++ ref list */
-        goto ret_err;
+        {
+            goto ret_err;
+        }
 
-      /* add the link operation */
-      ipatch_paste_object_link (paste, dest, IPATCH_ITEM (list->items->data));
+        /* add the link operation */
+        ipatch_paste_object_link(paste, dest, IPATCH_ITEM(list->items->data));
 
-      g_object_unref (list);          /* -- unref list */
+        g_object_unref(list);           /* -- unref list */
 
-      goto ret_ok;	/* we done */
+        goto ret_ok;	/* we done */
     }
 
- not_handled:
-  g_set_error (err, IPATCH_ERROR, IPATCH_ERROR_UNHANDLED_CONVERSION,
-	       _("Unhandled paste operation type '%s' => '%s'"),
-	       G_OBJECT_TYPE_NAME (src), G_OBJECT_TYPE_NAME (dest));
-  // Fall through
+not_handled:
+    g_set_error(err, IPATCH_ERROR, IPATCH_ERROR_UNHANDLED_CONVERSION,
+                _("Unhandled paste operation type '%s' => '%s'"),
+                G_OBJECT_TYPE_NAME(src), G_OBJECT_TYPE_NAME(dest));
+    // Fall through
 
- ret_err:
-  if (src_base) g_object_unref (src_base);      // -- unref
-  if (dest_base) g_object_unref (dest_base);    // -- unref
-  return (FALSE);
+ret_err:
 
- ret_ok:
-  if (src_base) g_object_unref (src_base);      // -- unref
-  if (dest_base) g_object_unref (dest_base);    // -- unref
-  return (TRUE);
+    if(src_base)
+    {
+        g_object_unref(src_base);    // -- unref
+    }
+
+    if(dest_base)
+    {
+        g_object_unref(dest_base);    // -- unref
+    }
+
+    return (FALSE);
+
+ret_ok:
+
+    if(src_base)
+    {
+        g_object_unref(src_base);    // -- unref
+    }
+
+    if(dest_base)
+    {
+        g_object_unref(dest_base);    // -- unref
+    }
+
+    return (TRUE);
 }
 

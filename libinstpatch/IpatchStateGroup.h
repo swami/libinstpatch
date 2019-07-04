@@ -47,26 +47,26 @@ typedef struct _IpatchStateGroupClass IpatchStateGroupClass;
 /* state group structure */
 struct _IpatchStateGroup
 {
-  IpatchLock parent_instance;	/* derived from IpatchLock */
+    IpatchLock parent_instance;	/* derived from IpatchLock */
 
-  guint flags;			/* group flags */
-  GNode *node;			/* node in the group tree or NULL */
-  char *descr;		     /* description of this action, or NULL */
-  GList *items;		/* list of IpatchStateItem objects (prepend) */
+    guint flags;			/* group flags */
+    GNode *node;			/* node in the group tree or NULL */
+    char *descr;		     /* description of this action, or NULL */
+    GList *items;		/* list of IpatchStateItem objects (prepend) */
 };
 
 typedef enum
 {
-  IPATCH_STATE_GROUP_RETRACTED = 1 << 0,	/* group has been retracted */
-  IPATCH_STATE_GROUP_PARTIAL   = 1 << 1 /* some item's missing from group */
+    IPATCH_STATE_GROUP_RETRACTED = 1 << 0,	/* group has been retracted */
+    IPATCH_STATE_GROUP_PARTIAL   = 1 << 1 /* some item's missing from group */
 } IpatchStateGroupFlags;
 
 /* state group class */
 struct _IpatchStateGroupClass
 {
-  IpatchLockClass parent_class;
+    IpatchLockClass parent_class;
 };
 
-GType ipatch_state_group_get_type (void);
+GType ipatch_state_group_get_type(void);
 
 #endif

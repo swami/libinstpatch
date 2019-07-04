@@ -84,21 +84,21 @@
   (G_TYPE_CHECK_INSTANCE_TYPE ((obj), IPATCH_TYPE_VIRTUAL_SLI_SAMPLES))
 
 
-GType ipatch_virtual_dls2_melodic_get_type (void);
-GType ipatch_virtual_dls2_percussion_get_type (void);
-GType ipatch_virtual_dls2_samples_get_type (void);
+GType ipatch_virtual_dls2_melodic_get_type(void);
+GType ipatch_virtual_dls2_percussion_get_type(void);
+GType ipatch_virtual_dls2_samples_get_type(void);
 
-GType ipatch_virtual_gig_melodic_get_type (void);
-GType ipatch_virtual_gig_percussion_get_type (void);
-GType ipatch_virtual_gig_samples_get_type (void);
+GType ipatch_virtual_gig_melodic_get_type(void);
+GType ipatch_virtual_gig_percussion_get_type(void);
+GType ipatch_virtual_gig_samples_get_type(void);
 
-GType ipatch_virtual_sf2_inst_get_type (void);
-GType ipatch_virtual_sf2_melodic_get_type (void);
-GType ipatch_virtual_sf2_percussion_get_type (void);
-GType ipatch_virtual_sf2_samples_get_type (void);
-GType ipatch_virtual_sf2_rom_get_type (void);
+GType ipatch_virtual_sf2_inst_get_type(void);
+GType ipatch_virtual_sf2_melodic_get_type(void);
+GType ipatch_virtual_sf2_percussion_get_type(void);
+GType ipatch_virtual_sf2_samples_get_type(void);
+GType ipatch_virtual_sf2_rom_get_type(void);
 
-GType ipatch_virtual_sli_inst_get_type (void);
-GType ipatch_virtual_sli_samples_get_type (void);
+GType ipatch_virtual_sli_inst_get_type(void);
+GType ipatch_virtual_sli_samples_get_type(void);
 
 #endif

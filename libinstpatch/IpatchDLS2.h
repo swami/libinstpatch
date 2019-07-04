@@ -49,24 +49,24 @@ typedef struct _IpatchDLS2Class IpatchDLS2Class;
 /* DLS level 2 object */
 struct _IpatchDLS2
 {
-  /*< public >*/
-  IpatchBase parent_instance;
+    /*< public >*/
+    IpatchBase parent_instance;
 
-  /* NOTE: This is not the DLS version! Optional descriptive stamp version */
-  guint32 ms_version; /* most significant 32 bits of 64 bit version */
-  guint32 ls_version; /* least significant 32 bits of 64 bit version */
+    /* NOTE: This is not the DLS version! Optional descriptive stamp version */
+    guint32 ms_version; /* most significant 32 bits of 64 bit version */
+    guint32 ls_version; /* least significant 32 bits of 64 bit version */
 
-  IpatchDLS2Info *info;		/* info strings */
-  GSList *insts;		/* list of #IpatchDLS2Inst objects */
-  GSList *samples;		/* list of #IpatchDLS2Sample objects */
+    IpatchDLS2Info *info;		/* info strings */
+    GSList *insts;		/* list of #IpatchDLS2Inst objects */
+    GSList *samples;		/* list of #IpatchDLS2Sample objects */
 
-  guint8 *dlid;	/* 16 bytes or NULL - globally unique ID (indicates changes) */
+    guint8 *dlid;	/* 16 bytes or NULL - globally unique ID (indicates changes) */
 };
 
 /* DLS level 2 class */
 struct _IpatchDLS2Class
 {
-  IpatchBaseClass parent_class;
+    IpatchBaseClass parent_class;
 };
 
 /**
@@ -75,7 +75,7 @@ struct _IpatchDLS2Class
  */
 typedef enum
 {
-  IPATCH_DLS2_VERSION_SET = 1 << IPATCH_BASE_UNUSED_FLAG_SHIFT
+    IPATCH_DLS2_VERSION_SET = 1 << IPATCH_BASE_UNUSED_FLAG_SHIFT
 } IpatchDLS2Flags;
 
 /* reserve a couple flags for expansion */
@@ -84,8 +84,8 @@ typedef enum
  */
 #define IPATCH_DLS2_UNUSED_FLAG_SHIFT (IPATCH_BASE_UNUSED_FLAG_SHIFT + 4)
 
-GType ipatch_dls2_get_type (void);
-IpatchDLS2 *ipatch_dls2_new (void);
+GType ipatch_dls2_get_type(void);
+IpatchDLS2 *ipatch_dls2_new(void);
 
 #define ipatch_dls2_get_insts(dls) \
     ipatch_container_get_children (IPATCH_CONTAINER (dls), \
@@ -94,18 +94,18 @@ IpatchDLS2 *ipatch_dls2_new (void);
     ipatch_container_get_children (IPATCH_CONTAINER (dls), \
 				   IPATCH_TYPE_DLS2_SAMPLE)
 
-void ipatch_dls2_set_file (IpatchDLS2 *dls, IpatchDLSFile *file);
-IpatchDLSFile *ipatch_dls2_get_file (IpatchDLS2 *dls);
-char *ipatch_dls2_get_info (IpatchDLS2 *dls, guint32 fourcc);
-void ipatch_dls2_set_info (IpatchDLS2 *dls, guint32 fourcc, const char *val);
-char *ipatch_dls2_make_unique_name (IpatchDLS2 *dls, GType child_type,
-				    const char *name,
-				    const IpatchItem *exclude);
-IpatchDLS2Inst *ipatch_dls2_find_inst (IpatchDLS2 *dls, const char *name,
-				       int bank, int program,
-				       const IpatchDLS2Inst *exclude);
-IpatchDLS2Sample *ipatch_dls2_find_sample (IpatchDLS2 *dls, const char *name,
-					   const IpatchDLS2Sample *exclude);
-IpatchList *ipatch_dls2_get_region_references (IpatchDLS2Sample *sample);
+void ipatch_dls2_set_file(IpatchDLS2 *dls, IpatchDLSFile *file);
+IpatchDLSFile *ipatch_dls2_get_file(IpatchDLS2 *dls);
+char *ipatch_dls2_get_info(IpatchDLS2 *dls, guint32 fourcc);
+void ipatch_dls2_set_info(IpatchDLS2 *dls, guint32 fourcc, const char *val);
+char *ipatch_dls2_make_unique_name(IpatchDLS2 *dls, GType child_type,
+                                   const char *name,
+                                   const IpatchItem *exclude);
+IpatchDLS2Inst *ipatch_dls2_find_inst(IpatchDLS2 *dls, const char *name,
+                                      int bank, int program,
+                                      const IpatchDLS2Inst *exclude);
+IpatchDLS2Sample *ipatch_dls2_find_sample(IpatchDLS2 *dls, const char *name,
+        const IpatchDLS2Sample *exclude);
+IpatchList *ipatch_dls2_get_region_references(IpatchDLS2Sample *sample);
 
 #endif

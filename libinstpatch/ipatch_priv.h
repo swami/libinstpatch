@@ -40,7 +40,7 @@
 /*
    In case of cross compiling from Linux to Win32, unistd.h and io.h
    may be both present.
-   So, we provide here exclusive macros definition for files i/o. 
+   So, we provide here exclusive macros definition for files i/o.
 */
 #ifdef _WIN32
 /* seek in file described by its file descriptor fd */
@@ -57,7 +57,7 @@
 #define IPATCH_FD_WRITE(fd, bufsrc, count) write(fd, bufsrc, count)
 #define IPATCH_FD_CLOSE(fd) close(fd)
 #endif
-   
+
 #define IPATCH_UNTITLED		_("Untitled")
 
 /* macro for getting a GParamSpec property ID (FIXME - its a private field!) */
@@ -104,7 +104,7 @@
 #endif
 
 
-int _ret_g_log (const gchar *log_domain, GLogLevelFlags log_level,
-		const gchar *format, ...);
+int _ret_g_log(const gchar *log_domain, GLogLevelFlags log_level,
+               const gchar *format, ...);
 
 #endif

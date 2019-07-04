@@ -20,7 +20,7 @@
 /**
  * SECTION: IpatchRiff
  * @short_description: RIFF file parser/composer object
- * @see_also: 
+ * @see_also:
  * @stability: Stable
  *
  * A RIFF file parser/composer.  Used for DLS, SoundFont and GigaSampler files.
@@ -32,63 +32,72 @@
 #include "ipatch_priv.h"
 #include "i18n.h"
 
-static void ipatch_riff_finalize (GObject *obj);
-static void ipatch_riff_update_positions (IpatchRiff *riff);
+static void ipatch_riff_finalize(GObject *obj);
+static void ipatch_riff_update_positions(IpatchRiff *riff);
 
-static gboolean verify_chunk_idstr (char idstr[4]);
+static gboolean verify_chunk_idstr(char idstr[4]);
 
 
-G_DEFINE_TYPE (IpatchRiff, ipatch_riff, G_TYPE_OBJECT);
+G_DEFINE_TYPE(IpatchRiff, ipatch_riff, G_TYPE_OBJECT);
 
 
 static void
-ipatch_riff_class_init (IpatchRiffClass *klass)
+ipatch_riff_class_init(IpatchRiffClass *klass)
 {
-  GObjectClass *obj_class = G_OBJECT_CLASS (klass);
+    GObjectClass *obj_class = G_OBJECT_CLASS(klass);
 
-  obj_class->finalize = ipatch_riff_finalize;
+    obj_class->finalize = ipatch_riff_finalize;
 }
 
 static void
-ipatch_riff_init (IpatchRiff *riff)
+ipatch_riff_init(IpatchRiff *riff)
 {
-  riff->status = IPATCH_RIFF_STATUS_BEGIN;
-  riff->mode = IPATCH_RIFF_READ;
-  riff->flags = 0;
-  riff->handle = NULL;
-  riff->chunks = g_array_new (FALSE, FALSE, sizeof (IpatchRiffChunk));
-  riff->state_stack = NULL;
+    riff->status = IPATCH_RIFF_STATUS_BEGIN;
+    riff->mode = IPATCH_RIFF_READ;
+    riff->flags = 0;
+    riff->handle = NULL;
+    riff->chunks = g_array_new(FALSE, FALSE, sizeof(IpatchRiffChunk));
+    riff->state_stack = NULL;
 }
 
 static void
-ipatch_riff_finalize (GObject *obj)
+ipatch_riff_finalize(GObject *obj)
 {
-  IpatchRiff *riff = IPATCH_RIFF (obj);
-  GList *p;
+    IpatchRiff *riff = IPATCH_RIFF(obj);
+    GList *p;
 
-  if (riff->handle) ipatch_file_close (riff->handle); /* -- unref file object */
+    if(riff->handle)
+    {
+        ipatch_file_close(riff->handle);    /* -- unref file object */
+    }
 
-  g_array_free (riff->chunks, TRUE);
+    g_array_free(riff->chunks, TRUE);
 
-  for (p = riff->state_stack; p; p = g_list_next (p))
-    g_array_free ((GArray *)(p->data), TRUE);
+    for(p = riff->state_stack; p; p = g_list_next(p))
+    {
+        g_array_free((GArray *)(p->data), TRUE);
+    }
 
-  if (G_OBJECT_CLASS (ipatch_riff_parent_class)->finalize)
-    G_OBJECT_CLASS (ipatch_riff_parent_class)->finalize (obj);
+    if(G_OBJECT_CLASS(ipatch_riff_parent_class)->finalize)
+    {
+        G_OBJECT_CLASS(ipatch_riff_parent_class)->finalize(obj);
+    }
 }
 
 /**
  * ipatch_riff_error_quark: (skip)
  */
 GQuark
-ipatch_riff_error_quark (void)
+ipatch_riff_error_quark(void)
 {
-  static GQuark q = 0;
+    static GQuark q = 0;
 
-  if (q == 0)
-    q = g_quark_from_static_string ("riff-error-quark");
+    if(q == 0)
+    {
+        q = g_quark_from_static_string("riff-error-quark");
+    }
 
-  return (q);
+    return (q);
 }
 
 /**
@@ -101,16 +110,20 @@ ipatch_riff_error_quark (void)
  * Returns: The RIFF object
  */
 IpatchRiff *
-ipatch_riff_new (IpatchFileHandle *handle)
+ipatch_riff_new(IpatchFileHandle *handle)
 {
-  IpatchRiff *riff;
+    IpatchRiff *riff;
 
-  g_return_val_if_fail (!handle || IPATCH_IS_FILE_HANDLE (handle), NULL);
+    g_return_val_if_fail(!handle || IPATCH_IS_FILE_HANDLE(handle), NULL);
 
-  riff = g_object_new (IPATCH_TYPE_RIFF, NULL);
-  if (handle) ipatch_riff_set_file_handle (riff, handle);
+    riff = g_object_new(IPATCH_TYPE_RIFF, NULL);
 
-  return (riff);
+    if(handle)
+    {
+        ipatch_riff_set_file_handle(riff, handle);
+    }
+
+    return (riff);
 }
 
 /**
@@ -122,17 +135,20 @@ ipatch_riff_new (IpatchFileHandle *handle)
  * by the riff object and will be closed when finalized.
  */
 void
-ipatch_riff_set_file_handle (IpatchRiff *riff, IpatchFileHandle *handle)
+ipatch_riff_set_file_handle(IpatchRiff *riff, IpatchFileHandle *handle)
 {
-  g_return_if_fail (IPATCH_IS_RIFF (riff));
-  g_return_if_fail (IPATCH_IS_FILE_HANDLE (handle));
+    g_return_if_fail(IPATCH_IS_RIFF(riff));
+    g_return_if_fail(IPATCH_IS_FILE_HANDLE(handle));
 
-  g_array_set_size (riff->chunks, 0);	/* reset chunk state */
+    g_array_set_size(riff->chunks, 0);	/* reset chunk state */
 
-  /* Close old handle, if any */
-  if (riff->handle) ipatch_file_close (riff->handle);
+    /* Close old handle, if any */
+    if(riff->handle)
+    {
+        ipatch_file_close(riff->handle);
+    }
 
-  riff->handle = handle;
+    riff->handle = handle;
 }
 
 /**
@@ -144,10 +160,10 @@ ipatch_riff_set_file_handle (IpatchRiff *riff, IpatchFileHandle *handle)
  * Returns: The file handle or %NULL if not assigned.
  */
 IpatchFileHandle *
-ipatch_riff_get_file_handle (IpatchRiff *riff)
+ipatch_riff_get_file_handle(IpatchRiff *riff)
 {
-  g_return_val_if_fail (IPATCH_IS_RIFF (riff), NULL);
-  return (riff->handle);
+    g_return_val_if_fail(IPATCH_IS_RIFF(riff), NULL);
+    return (riff->handle);
 }
 
 /**
@@ -160,10 +176,10 @@ ipatch_riff_get_file_handle (IpatchRiff *riff)
  * Returns: Chunk level count (0 = no open chunks)
  */
 int
-ipatch_riff_get_chunk_level (IpatchRiff *riff)
+ipatch_riff_get_chunk_level(IpatchRiff *riff)
 {
-  g_return_val_if_fail (IPATCH_IS_RIFF (riff), 0);
-  return (riff->chunks->len);
+    g_return_val_if_fail(IPATCH_IS_RIFF(riff), 0);
+    return (riff->chunks->len);
 }
 
 /**
@@ -180,20 +196,31 @@ ipatch_riff_get_chunk_level (IpatchRiff *riff)
  * operations). The number of elements in the array is stored in @count.
  */
 IpatchRiffChunk *
-ipatch_riff_get_chunk_array (IpatchRiff *riff, int *count)
+ipatch_riff_get_chunk_array(IpatchRiff *riff, int *count)
 {
-  if (count) *count = 0;	/* in case of error */
+    if(count)
+    {
+        *count = 0;    /* in case of error */
+    }
 
-  g_return_val_if_fail (IPATCH_IS_RIFF (riff), NULL);
+    g_return_val_if_fail(IPATCH_IS_RIFF(riff), NULL);
 
-  /* Update the chunk positions */
-  ipatch_riff_update_positions (riff);
+    /* Update the chunk positions */
+    ipatch_riff_update_positions(riff);
 
-  if (count) *count = riff->chunks->len;
+    if(count)
+    {
+        *count = riff->chunks->len;
+    }
 
-  if (riff->chunks->len > 0)
-    return (&g_array_index (riff->chunks, IpatchRiffChunk, 0));
-  else return (NULL);
+    if(riff->chunks->len > 0)
+    {
+        return (&g_array_index(riff->chunks, IpatchRiffChunk, 0));
+    }
+    else
+    {
+        return (NULL);
+    }
 }
 
 /**
@@ -210,20 +237,24 @@ ipatch_riff_get_chunk_array (IpatchRiff *riff, int *count)
  * operations).
  */
 IpatchRiffChunk *
-ipatch_riff_get_chunk (IpatchRiff *riff, int level)
+ipatch_riff_get_chunk(IpatchRiff *riff, int level)
 {
-  int chunks_len;
-  g_return_val_if_fail (IPATCH_IS_RIFF (riff), NULL);
-  g_return_val_if_fail (riff->chunks->len > 0, NULL);
-  
-  /* Update the chunk positions */
-  ipatch_riff_update_positions (riff);
-  chunks_len = (int)riff->chunks->len;
+    int chunks_len;
+    g_return_val_if_fail(IPATCH_IS_RIFF(riff), NULL);
+    g_return_val_if_fail(riff->chunks->len > 0, NULL);
 
-  if (level == -1) level = chunks_len - 1;
-  g_return_val_if_fail (level >= -1 && level < chunks_len, NULL);
+    /* Update the chunk positions */
+    ipatch_riff_update_positions(riff);
+    chunks_len = (int)riff->chunks->len;
 
-  return (&g_array_index (riff->chunks, IpatchRiffChunk, level));
+    if(level == -1)
+    {
+        level = chunks_len - 1;
+    }
+
+    g_return_val_if_fail(level >= -1 && level < chunks_len, NULL);
+
+    return (&g_array_index(riff->chunks, IpatchRiffChunk, level));
 }
 
 /**
@@ -238,18 +269,22 @@ ipatch_riff_get_chunk (IpatchRiff *riff, int level)
  *   is not checked.
  */
 guint32
-ipatch_riff_get_total_size (IpatchRiff *riff)
+ipatch_riff_get_total_size(IpatchRiff *riff)
 {
-  IpatchRiffChunk *chunk;
+    IpatchRiffChunk *chunk;
 
-  g_return_val_if_fail (IPATCH_IS_RIFF (riff), 0);
+    g_return_val_if_fail(IPATCH_IS_RIFF(riff), 0);
 
-  /* Update the chunk positions */
-  ipatch_riff_update_positions (riff);
+    /* Update the chunk positions */
+    ipatch_riff_update_positions(riff);
 
-  if (riff->chunks->len == 0) return (0);
-  chunk = &g_array_index (riff->chunks, IpatchRiffChunk, 0);
-  return (chunk->size + IPATCH_RIFF_HEADER_SIZE);
+    if(riff->chunks->len == 0)
+    {
+        return (0);
+    }
+
+    chunk = &g_array_index(riff->chunks, IpatchRiffChunk, 0);
+    return (chunk->size + IPATCH_RIFF_HEADER_SIZE);
 }
 
 /**
@@ -263,18 +298,22 @@ ipatch_riff_get_total_size (IpatchRiff *riff)
  * (including header).
  */
 guint32
-ipatch_riff_get_position (IpatchRiff *riff)
+ipatch_riff_get_position(IpatchRiff *riff)
 {
-  IpatchRiffChunk *chunk;
+    IpatchRiffChunk *chunk;
 
-  g_return_val_if_fail (IPATCH_IS_RIFF (riff), 0);
+    g_return_val_if_fail(IPATCH_IS_RIFF(riff), 0);
 
-  /* Update the chunk positions */
-  ipatch_riff_update_positions (riff);
+    /* Update the chunk positions */
+    ipatch_riff_update_positions(riff);
 
-  if (riff->chunks->len == 0) return (0);
-  chunk = &g_array_index (riff->chunks, IpatchRiffChunk, 0);
-  return (chunk->position + IPATCH_RIFF_HEADER_SIZE);
+    if(riff->chunks->len == 0)
+    {
+        return (0);
+    }
+
+    chunk = &g_array_index(riff->chunks, IpatchRiffChunk, 0);
+    return (chunk->position + IPATCH_RIFF_HEADER_SIZE);
 }
 
 /**
@@ -286,20 +325,23 @@ ipatch_riff_get_position (IpatchRiff *riff)
  * file.
  */
 void
-ipatch_riff_push_state (IpatchRiff *riff)
+ipatch_riff_push_state(IpatchRiff *riff)
 {
-  GArray *dup_array;
+    GArray *dup_array;
 
-  g_return_if_fail (IPATCH_IS_RIFF (riff));
+    g_return_if_fail(IPATCH_IS_RIFF(riff));
 
-  /* Update the chunk positions */
-  ipatch_riff_update_positions (riff);
+    /* Update the chunk positions */
+    ipatch_riff_update_positions(riff);
 
-  dup_array = g_array_new (FALSE, FALSE, sizeof (IpatchRiffChunk));
-  if (riff->chunks->len > 0)
-    g_array_append_vals (dup_array, riff->chunks->data, riff->chunks->len);
+    dup_array = g_array_new(FALSE, FALSE, sizeof(IpatchRiffChunk));
 
-  riff->state_stack = g_list_prepend (riff->state_stack, dup_array);
+    if(riff->chunks->len > 0)
+    {
+        g_array_append_vals(dup_array, riff->chunks->data, riff->chunks->len);
+    }
+
+    riff->state_stack = g_list_prepend(riff->state_stack, dup_array);
 }
 
 /**
@@ -313,43 +355,46 @@ ipatch_riff_push_state (IpatchRiff *riff)
  * Returns: %TRUE on success, %FALSE otherwise which is fatal
  */
 gboolean
-ipatch_riff_pop_state (IpatchRiff *riff, GError **err)
+ipatch_riff_pop_state(IpatchRiff *riff, GError **err)
 {
-  IpatchRiffChunk *chunk;
-  gboolean retval;
-  guint pos;
+    IpatchRiffChunk *chunk;
+    gboolean retval;
+    guint pos;
 
-  g_return_val_if_fail (IPATCH_IS_RIFF (riff), FALSE);
-  g_return_val_if_fail (riff->state_stack != NULL, FALSE);
+    g_return_val_if_fail(IPATCH_IS_RIFF(riff), FALSE);
+    g_return_val_if_fail(riff->state_stack != NULL, FALSE);
 
-  g_array_free (riff->chunks, TRUE);
+    g_array_free(riff->chunks, TRUE);
 
-  riff->chunks = riff->state_stack->data;
-  riff->state_stack = g_list_delete_link (riff->state_stack,
-					    riff->state_stack);
+    riff->chunks = riff->state_stack->data;
+    riff->state_stack = g_list_delete_link(riff->state_stack,
+                                           riff->state_stack);
 
-  /* We want the current chunk state position, not the current file position
-   * which we would get from ipatch_riff_get_position() */
-  if (riff->chunks->len > 0)
-  {
-    chunk = &g_array_index (riff->chunks, IpatchRiffChunk, 0);
-    pos = chunk->position + IPATCH_RIFF_HEADER_SIZE;
-  }
-  else pos = 0;
+    /* We want the current chunk state position, not the current file position
+     * which we would get from ipatch_riff_get_position() */
+    if(riff->chunks->len > 0)
+    {
+        chunk = &g_array_index(riff->chunks, IpatchRiffChunk, 0);
+        pos = chunk->position + IPATCH_RIFF_HEADER_SIZE;
+    }
+    else
+    {
+        pos = 0;
+    }
 
-  retval = ipatch_file_seek (riff->handle, pos, G_SEEK_SET, err);
+    retval = ipatch_file_seek(riff->handle, pos, G_SEEK_SET, err);
 
-  return (retval);
+    return (retval);
 }
 
 /* initializes riff object to default state */
 static void
-ipatch_riff_reset (IpatchRiff *riff)
+ipatch_riff_reset(IpatchRiff *riff)
 {
-  riff->status = IPATCH_RIFF_STATUS_BEGIN;
-  riff->mode = IPATCH_RIFF_READ;
-  riff->flags = 0;
-  g_array_set_size (riff->chunks, 0);
+    riff->status = IPATCH_RIFF_STATUS_BEGIN;
+    riff->mode = IPATCH_RIFF_READ;
+    riff->flags = 0;
+    g_array_set_size(riff->chunks, 0);
 }
 
 /**
@@ -372,31 +417,39 @@ ipatch_riff_reset (IpatchRiff *riff)
  * operations).
  */
 IpatchRiffChunk *
-ipatch_riff_start_read (IpatchRiff *riff, GError **err)
+ipatch_riff_start_read(IpatchRiff *riff, GError **err)
 {
-  IpatchRiffChunk *chunk;
+    IpatchRiffChunk *chunk;
 
-  g_return_val_if_fail (IPATCH_IS_RIFF (riff), NULL);
-  g_return_val_if_fail (riff->status != IPATCH_RIFF_STATUS_FAIL, NULL);
-  g_return_val_if_fail (!err || !*err, NULL);
+    g_return_val_if_fail(IPATCH_IS_RIFF(riff), NULL);
+    g_return_val_if_fail(riff->status != IPATCH_RIFF_STATUS_FAIL, NULL);
+    g_return_val_if_fail(!err || !*err, NULL);
 
-  ipatch_riff_reset (riff);
-  riff->mode = IPATCH_RIFF_READ;
+    ipatch_riff_reset(riff);
+    riff->mode = IPATCH_RIFF_READ;
 
-  if (!(chunk = ipatch_riff_read_chunk (riff, err))) return (NULL);
-
-  if (chunk->type != IPATCH_RIFF_CHUNK_RIFF)
+    if(!(chunk = ipatch_riff_read_chunk(riff, err)))
     {
-      g_array_set_size (riff->chunks, 0); /* clear non "RIFF" chunk */
-      riff->status = IPATCH_RIFF_STATUS_FAIL;
-      g_set_error (&riff->err, IPATCH_RIFF_ERROR,
-		   IPATCH_RIFF_ERROR_NOT_RIFF,
-		   _("Not a RIFF file"));
-      if (err) *err = g_error_copy (riff->err);
-      return (NULL);
+        return (NULL);
     }
 
-  return (chunk);
+    if(chunk->type != IPATCH_RIFF_CHUNK_RIFF)
+    {
+        g_array_set_size(riff->chunks, 0);  /* clear non "RIFF" chunk */
+        riff->status = IPATCH_RIFF_STATUS_FAIL;
+        g_set_error(&riff->err, IPATCH_RIFF_ERROR,
+                    IPATCH_RIFF_ERROR_NOT_RIFF,
+                    _("Not a RIFF file"));
+
+        if(err)
+        {
+            *err = g_error_copy(riff->err);
+        }
+
+        return (NULL);
+    }
+
+    return (chunk);
 }
 
 /**
@@ -418,19 +471,19 @@ ipatch_riff_start_read (IpatchRiff *riff, GError **err)
  * operations).
  */
 IpatchRiffChunk *
-ipatch_riff_start_read_chunk (IpatchRiff *riff, GError **err)
+ipatch_riff_start_read_chunk(IpatchRiff *riff, GError **err)
 {
-  IpatchRiffChunk *chunk;
+    IpatchRiffChunk *chunk;
 
-  g_return_val_if_fail (IPATCH_IS_RIFF (riff), NULL);
-  g_return_val_if_fail (riff->status != IPATCH_RIFF_STATUS_FAIL, NULL);
-  g_return_val_if_fail (!err || !*err, NULL);
+    g_return_val_if_fail(IPATCH_IS_RIFF(riff), NULL);
+    g_return_val_if_fail(riff->status != IPATCH_RIFF_STATUS_FAIL, NULL);
+    g_return_val_if_fail(!err || !*err, NULL);
 
-  ipatch_riff_reset (riff);
-  riff->mode = IPATCH_RIFF_READ;
+    ipatch_riff_reset(riff);
+    riff->mode = IPATCH_RIFF_READ;
 
-  chunk = ipatch_riff_read_chunk (riff, err);
-  return (chunk);
+    chunk = ipatch_riff_read_chunk(riff, err);
+    return (chunk);
 }
 
 /**
@@ -452,176 +505,217 @@ ipatch_riff_start_read_chunk (IpatchRiff *riff, GError **err)
  * unchanged (riff object or file operations).
  */
 IpatchRiffChunk *
-ipatch_riff_read_chunk (IpatchRiff *riff, GError **err)
+ipatch_riff_read_chunk(IpatchRiff *riff, GError **err)
 {
-  IpatchRiffChunk *chunk;
-  IpatchRiffChunk newchunk;
-  guint32 buf[IPATCH_RIFF_HEADER_SIZE / 4];
-  guint size;
-  guint32 id;
-  int i, c;
+    IpatchRiffChunk *chunk;
+    IpatchRiffChunk newchunk;
+    guint32 buf[IPATCH_RIFF_HEADER_SIZE / 4];
+    guint size;
+    guint32 id;
+    int i, c;
 
-  g_return_val_if_fail (IPATCH_IS_RIFF (riff), NULL);
-  g_return_val_if_fail (riff->status != IPATCH_RIFF_STATUS_FAIL, NULL);
-  g_return_val_if_fail (riff->mode == IPATCH_RIFF_READ, NULL);
-  g_return_val_if_fail (riff->handle != NULL, NULL);
-  g_return_val_if_fail (!err || !*err, NULL);
+    g_return_val_if_fail(IPATCH_IS_RIFF(riff), NULL);
+    g_return_val_if_fail(riff->status != IPATCH_RIFF_STATUS_FAIL, NULL);
+    g_return_val_if_fail(riff->mode == IPATCH_RIFF_READ, NULL);
+    g_return_val_if_fail(riff->handle != NULL, NULL);
+    g_return_val_if_fail(!err || !*err, NULL);
 
-  /* return finished if we already finished */
-  if (riff->status == IPATCH_RIFF_STATUS_FINISHED
-      || riff->status == IPATCH_RIFF_STATUS_CHUNK_END)
-    return (NULL);
-
-  if (riff->chunks->len > 0)
+    /* return finished if we already finished */
+    if(riff->status == IPATCH_RIFF_STATUS_FINISHED
+            || riff->status == IPATCH_RIFF_STATUS_CHUNK_END)
     {
-      guint32 chunk_position;
-	  /* Update the chunk positions */
-      ipatch_riff_update_positions (riff);
-
-      chunk = &g_array_index (riff->chunks, IpatchRiffChunk,
-			      riff->chunks->len - 1);
-	  chunk_position = (guint32)chunk->position;
-      
-	  /* current chunk is sub chunk, or pos past end? */
-      if (chunk->type == IPATCH_RIFF_CHUNK_SUB
-	  || chunk_position >= chunk->size)
-	{
-	  riff->status = IPATCH_RIFF_STATUS_CHUNK_END;
-	  return (NULL);
-	}
+        return (NULL);
     }
 
-  /* read FOURCC ID and chunk size */
-  if (!ipatch_file_read (riff->handle, buf, IPATCH_RIFF_HEADER_SIZE, &riff->err))
+    if(riff->chunks->len > 0)
     {
-      riff->status = IPATCH_RIFF_STATUS_FAIL;
-      if (err) *err = g_error_copy (riff->err);
-      return (NULL);
+        guint32 chunk_position;
+        /* Update the chunk positions */
+        ipatch_riff_update_positions(riff);
+
+        chunk = &g_array_index(riff->chunks, IpatchRiffChunk,
+                               riff->chunks->len - 1);
+        chunk_position = (guint32)chunk->position;
+
+        /* current chunk is sub chunk, or pos past end? */
+        if(chunk->type == IPATCH_RIFF_CHUNK_SUB
+                || chunk_position >= chunk->size)
+        {
+            riff->status = IPATCH_RIFF_STATUS_CHUNK_END;
+            return (NULL);
+        }
     }
 
-  id = buf[0];
-
-  /* unexpected "RIFF" chunk? */
-  if (id == IPATCH_FOURCC_RIFF && riff->chunks->len > 0)
+    /* read FOURCC ID and chunk size */
+    if(!ipatch_file_read(riff->handle, buf, IPATCH_RIFF_HEADER_SIZE, &riff->err))
     {
-      riff->status = IPATCH_RIFF_STATUS_FAIL;
-      g_set_error (&riff->err, IPATCH_RIFF_ERROR,
-		   IPATCH_RIFF_ERROR_UNEXPECTED_ID,
-		   _("Unexpected 'RIFF' chunk"));
-      if (err) *err = g_error_copy (riff->err);
-      return (NULL);
+        riff->status = IPATCH_RIFF_STATUS_FAIL;
+
+        if(err)
+        {
+            *err = g_error_copy(riff->err);
+        }
+
+        return (NULL);
     }
 
-  /* Position of chunk data (or LIST secondary chunk ID) */
-  newchunk.filepos = ipatch_file_get_position (riff->handle);
+    id = buf[0];
 
-  /* is a list chunk (LIST or RIFF)? */
-  if (id == IPATCH_FOURCC_LIST || id == IPATCH_FOURCC_RIFF
-      || id == IPATCH_FOURCC_RIFX)
+    /* unexpected "RIFF" chunk? */
+    if(id == IPATCH_FOURCC_RIFF && riff->chunks->len > 0)
     {
-      if (id == IPATCH_FOURCC_LIST)
-	newchunk.type = IPATCH_RIFF_CHUNK_LIST;
-      else if (id == IPATCH_FOURCC_RIFF)
-	{
-	  newchunk.type = IPATCH_RIFF_CHUNK_RIFF;
-	  ipatch_file_set_little_endian (riff->handle->file);
-	}
-      else			/* RIFX big endian chunk? */
-	{
-	  newchunk.type = IPATCH_RIFF_CHUNK_RIFF;
-	  ipatch_file_set_big_endian (riff->handle->file);
-	}
+        riff->status = IPATCH_RIFF_STATUS_FAIL;
+        g_set_error(&riff->err, IPATCH_RIFF_ERROR,
+                    IPATCH_RIFF_ERROR_UNEXPECTED_ID,
+                    _("Unexpected 'RIFF' chunk"));
 
-      /* read secondary chunk ID over old ID */
-      if (!ipatch_file_read (riff->handle, &buf, IPATCH_RIFF_FOURCC_SIZE, &riff->err))
-	{
-	  riff->status = IPATCH_RIFF_STATUS_FAIL;
-	  if (err) *err = g_error_copy (riff->err);
-	  return (NULL);
-	}
-      newchunk.position = 4;
-    }
-  else				/* sub chunk */
-    {
-      newchunk.type = IPATCH_RIFF_CHUNK_SUB;
-      newchunk.position = 0;
+        if(err)
+        {
+            *err = g_error_copy(riff->err);
+        }
+
+        return (NULL);
     }
 
-  newchunk.id = buf[0];
-  memcpy (&newchunk.idstr, &newchunk.id, 4);
+    /* Position of chunk data (or LIST secondary chunk ID) */
+    newchunk.filepos = ipatch_file_get_position(riff->handle);
 
-  if (!verify_chunk_idstr (newchunk.idstr))
+    /* is a list chunk (LIST or RIFF)? */
+    if(id == IPATCH_FOURCC_LIST || id == IPATCH_FOURCC_RIFF
+            || id == IPATCH_FOURCC_RIFX)
     {
-      riff->status = IPATCH_RIFF_STATUS_FAIL;
-      g_set_error (&riff->err, IPATCH_RIFF_ERROR,
-		   IPATCH_RIFF_ERROR_INVALID_ID,
-		   _("Invalid RIFF chunk id"));
-      if (err) *err = g_error_copy (riff->err);
-      return (NULL);
+        if(id == IPATCH_FOURCC_LIST)
+        {
+            newchunk.type = IPATCH_RIFF_CHUNK_LIST;
+        }
+        else if(id == IPATCH_FOURCC_RIFF)
+        {
+            newchunk.type = IPATCH_RIFF_CHUNK_RIFF;
+            ipatch_file_set_little_endian(riff->handle->file);
+        }
+        else			/* RIFX big endian chunk? */
+        {
+            newchunk.type = IPATCH_RIFF_CHUNK_RIFF;
+            ipatch_file_set_big_endian(riff->handle->file);
+        }
+
+        /* read secondary chunk ID over old ID */
+        if(!ipatch_file_read(riff->handle, &buf, IPATCH_RIFF_FOURCC_SIZE, &riff->err))
+        {
+            riff->status = IPATCH_RIFF_STATUS_FAIL;
+
+            if(err)
+            {
+                *err = g_error_copy(riff->err);
+            }
+
+            return (NULL);
+        }
+
+        newchunk.position = 4;
+    }
+    else				/* sub chunk */
+    {
+        newchunk.type = IPATCH_RIFF_CHUNK_SUB;
+        newchunk.position = 0;
     }
 
-  newchunk.size = IPATCH_FILE_SWAP32 (riff->handle->file, buf + 1);
+    newchunk.id = buf[0];
+    memcpy(&newchunk.idstr, &newchunk.id, 4);
 
-  /* list chunk size should be even (sub chunks can be odd) */
-  if (newchunk.type != IPATCH_RIFF_CHUNK_SUB && newchunk.size % 2)
+    if(!verify_chunk_idstr(newchunk.idstr))
     {
-      riff->status = IPATCH_RIFF_STATUS_FAIL;
-      g_set_error (&riff->err, IPATCH_RIFF_ERROR,
-		   IPATCH_RIFF_ERROR_ODD_SIZE,
-		   _("Invalid RIFF LIST chunk size (odd number)"));
-      if (err) *err = g_error_copy (riff->err);
-      return (NULL);
+        riff->status = IPATCH_RIFF_STATUS_FAIL;
+        g_set_error(&riff->err, IPATCH_RIFF_ERROR,
+                    IPATCH_RIFF_ERROR_INVALID_ID,
+                    _("Invalid RIFF chunk id"));
+
+        if(err)
+        {
+            *err = g_error_copy(riff->err);
+        }
+
+        return (NULL);
     }
 
-  size = (newchunk.size + 1) & ~1; /* round up to even if odd size */
+    newchunk.size = IPATCH_FILE_SWAP32(riff->handle->file, buf + 1);
 
-  /* Update the chunk positions */
-  ipatch_riff_update_positions (riff);
-
-  /* make sure chunk size does not exceed its parent sizes */
-  c = riff->chunks->len;
-  for (i=0; i < c; i++)
+    /* list chunk size should be even (sub chunks can be odd) */
+    if(newchunk.type != IPATCH_RIFF_CHUNK_SUB && newchunk.size % 2)
     {
-      chunk = &g_array_index (riff->chunks, IpatchRiffChunk, i);
-      if (chunk->position + size - newchunk.position > chunk->size)
-	{
-	  riff->status = IPATCH_RIFF_STATUS_FAIL;
-	  g_set_error (&riff->err, IPATCH_RIFF_ERROR,
-		       IPATCH_RIFF_ERROR_SIZE_EXCEEDED,
-		       _("Child chunk '%.4s' (size = %d, level = %d) exceeds"
-			 " parent chunk '%.4s' (size = %d, level = %d)"),
-		       newchunk.idstr, newchunk.size, c,
-		       chunk->idstr, chunk->size, i);
-	  if (err) *err = g_error_copy (riff->err);
-	  return (NULL);
-	}
+        riff->status = IPATCH_RIFF_STATUS_FAIL;
+        g_set_error(&riff->err, IPATCH_RIFF_ERROR,
+                    IPATCH_RIFF_ERROR_ODD_SIZE,
+                    _("Invalid RIFF LIST chunk size (odd number)"));
+
+        if(err)
+        {
+            *err = g_error_copy(riff->err);
+        }
+
+        return (NULL);
     }
 
-  g_array_append_val (riff->chunks, newchunk);
-  riff->status = IPATCH_RIFF_STATUS_NORMAL;
+    size = (newchunk.size + 1) & ~1; /* round up to even if odd size */
 
-  return ((IpatchRiffChunk *)&g_array_index (riff->chunks, IpatchRiffChunk,
-					     riff->chunks->len - 1));
+    /* Update the chunk positions */
+    ipatch_riff_update_positions(riff);
+
+    /* make sure chunk size does not exceed its parent sizes */
+    c = riff->chunks->len;
+
+    for(i = 0; i < c; i++)
+    {
+        chunk = &g_array_index(riff->chunks, IpatchRiffChunk, i);
+
+        if(chunk->position + size - newchunk.position > chunk->size)
+        {
+            riff->status = IPATCH_RIFF_STATUS_FAIL;
+            g_set_error(&riff->err, IPATCH_RIFF_ERROR,
+                        IPATCH_RIFF_ERROR_SIZE_EXCEEDED,
+                        _("Child chunk '%.4s' (size = %d, level = %d) exceeds"
+                          " parent chunk '%.4s' (size = %d, level = %d)"),
+                        newchunk.idstr, newchunk.size, c,
+                        chunk->idstr, chunk->size, i);
+
+            if(err)
+            {
+                *err = g_error_copy(riff->err);
+            }
+
+            return (NULL);
+        }
+    }
+
+    g_array_append_val(riff->chunks, newchunk);
+    riff->status = IPATCH_RIFF_STATUS_NORMAL;
+
+    return ((IpatchRiffChunk *)&g_array_index(riff->chunks, IpatchRiffChunk,
+            riff->chunks->len - 1));
 }
 
 /* Update all open chunk positions (called after file position changes) */
 static void
-ipatch_riff_update_positions (IpatchRiff *riff)
+ipatch_riff_update_positions(IpatchRiff *riff)
 {
-  IpatchRiffChunk *chunk;
-  gint32 filepos;
-  int size, i;
+    IpatchRiffChunk *chunk;
+    gint32 filepos;
+    int size, i;
 
-  size = riff->chunks->len;
-  if (size == 0) return;
+    size = riff->chunks->len;
 
-  filepos = ipatch_file_get_position (riff->handle);
+    if(size == 0)
+    {
+        return;
+    }
 
-  for (i = 0; i < size; i++)
-  {
-    chunk = &g_array_index (riff->chunks, IpatchRiffChunk, i);
-    chunk->position = filepos - chunk->filepos;
-  }
+    filepos = ipatch_file_get_position(riff->handle);
+
+    for(i = 0; i < size; i++)
+    {
+        chunk = &g_array_index(riff->chunks, IpatchRiffChunk, i);
+        chunk->position = filepos - chunk->filepos;
+    }
 }
 
 /**
@@ -643,63 +737,81 @@ ipatch_riff_update_positions (IpatchRiff *riff)
  * unchanged (riff object or file operations).
  */
 IpatchRiffChunk *
-ipatch_riff_read_chunk_verify (IpatchRiff *riff,
-			       IpatchRiffChunkType type, guint32 id,
-			       GError **err)
+ipatch_riff_read_chunk_verify(IpatchRiff *riff,
+                              IpatchRiffChunkType type, guint32 id,
+                              GError **err)
 {
-  IpatchRiffChunk *chunk;
-  char *idstr;
+    IpatchRiffChunk *chunk;
+    char *idstr;
 
-  g_return_val_if_fail (IPATCH_IS_RIFF (riff), NULL);
-  g_return_val_if_fail (riff->status != IPATCH_RIFF_STATUS_FAIL, NULL);
-  g_return_val_if_fail (type >= IPATCH_RIFF_CHUNK_RIFF && type <= IPATCH_RIFF_CHUNK_SUB, NULL);
-  idstr = (char *)(&id);
-  g_return_val_if_fail (verify_chunk_idstr (idstr), NULL);
-  g_return_val_if_fail (!err || !*err, NULL);
+    g_return_val_if_fail(IPATCH_IS_RIFF(riff), NULL);
+    g_return_val_if_fail(riff->status != IPATCH_RIFF_STATUS_FAIL, NULL);
+    g_return_val_if_fail(type >= IPATCH_RIFF_CHUNK_RIFF && type <= IPATCH_RIFF_CHUNK_SUB, NULL);
+    idstr = (char *)(&id);
+    g_return_val_if_fail(verify_chunk_idstr(idstr), NULL);
+    g_return_val_if_fail(!err || !*err, NULL);
 
-  if (!(chunk = ipatch_riff_read_chunk (riff, &riff->err)))
+    if(!(chunk = ipatch_riff_read_chunk(riff, &riff->err)))
     {
-      if (!riff->err)
-	g_set_error (&riff->err, IPATCH_RIFF_ERROR,
-		     IPATCH_RIFF_ERROR_UNEXPECTED_CHUNK_END,
-		     _("Unexpected end of LIST while looking for chunk '%.4s'"),
-		     idstr);
-      if (err) *err = g_error_copy (riff->err);
-      return (NULL);
+        if(!riff->err)
+            g_set_error(&riff->err, IPATCH_RIFF_ERROR,
+                        IPATCH_RIFF_ERROR_UNEXPECTED_CHUNK_END,
+                        _("Unexpected end of LIST while looking for chunk '%.4s'"),
+                        idstr);
+
+        if(err)
+        {
+            *err = g_error_copy(riff->err);
+        }
+
+        return (NULL);
     }
 
-  if (chunk->type != type || chunk->id != id)
+    if(chunk->type != type || chunk->id != id)
     {
-      riff->status = IPATCH_RIFF_STATUS_FAIL;
-      g_set_error (&riff->err, IPATCH_RIFF_ERROR,
-		   IPATCH_RIFF_ERROR_UNEXPECTED_ID,
-		   _("Unexpected RIFF chunk with ID '%.4s' (expected '%.4s')"),
-		   chunk->idstr, idstr);
-      if (err) *err = g_error_copy (riff->err);
-      return (NULL);
+        riff->status = IPATCH_RIFF_STATUS_FAIL;
+        g_set_error(&riff->err, IPATCH_RIFF_ERROR,
+                    IPATCH_RIFF_ERROR_UNEXPECTED_ID,
+                    _("Unexpected RIFF chunk with ID '%.4s' (expected '%.4s')"),
+                    chunk->idstr, idstr);
+
+        if(err)
+        {
+            *err = g_error_copy(riff->err);
+        }
+
+        return (NULL);
     }
-  return (chunk);
+
+    return (chunk);
 }
 
 /* verify the characters of a chunk ID string */
 static gboolean
-verify_chunk_idstr (char idstr[4])
+verify_chunk_idstr(char idstr[4])
 {
-  int i;
-  char c;
+    int i;
+    char c;
 
-  for (i=0; i < 4; i++)	  /* chars of FOURCC should be alphanumeric */
+    for(i = 0; i < 4; i++)	 /* chars of FOURCC should be alphanumeric */
     {
-      c = idstr[i];
-      if (!(c >= 'A' && c <= 'Z') && !(c >= 'a' && c <= 'z')
-	  && !(c >= '0' && c <= '9'))
-	break;
+        c = idstr[i];
+
+        if(!(c >= 'A' && c <= 'Z') && !(c >= 'a' && c <= 'z')
+                && !(c >= '0' && c <= '9'))
+        {
+            break;
+        }
     }
 
-  if (i < 4 && c == ' ' && i > 0) /* can pad with spaces (at least 1 char) */
-    do { i++; } while (i < 4 && idstr[i] == ' ');
+    if(i < 4 && c == ' ' && i > 0)  /* can pad with spaces (at least 1 char) */
+        do
+        {
+            i++;
+        }
+        while(i < 4 && idstr[i] == ' ');
 
-  return (i == 4);
+    return (i == 4);
 }
 
 /**
@@ -716,64 +828,71 @@ verify_chunk_idstr (char idstr[4])
  * Returns: %TRUE on success, %FALSE otherwise.
  */
 gboolean
-ipatch_riff_write_chunk (IpatchRiff *riff,
-			 IpatchRiffChunkType type, guint32 id, GError **err)
+ipatch_riff_write_chunk(IpatchRiff *riff,
+                        IpatchRiffChunkType type, guint32 id, GError **err)
 {
-  IpatchRiffChunk chunk;
-  guint32 buf[3];
-  char *idstr;
-  int size;
+    IpatchRiffChunk chunk;
+    guint32 buf[3];
+    char *idstr;
+    int size;
 
-  g_return_val_if_fail (IPATCH_IS_RIFF (riff), FALSE);
-  g_return_val_if_fail (riff->status != IPATCH_RIFF_STATUS_FAIL, FALSE);
-  g_return_val_if_fail (type >= IPATCH_RIFF_CHUNK_RIFF && type <= IPATCH_RIFF_CHUNK_SUB, FALSE);
-  idstr = (char *)(&id);
-  g_return_val_if_fail (verify_chunk_idstr (idstr), FALSE);
-  g_return_val_if_fail (!err || !*err, FALSE);
+    g_return_val_if_fail(IPATCH_IS_RIFF(riff), FALSE);
+    g_return_val_if_fail(riff->status != IPATCH_RIFF_STATUS_FAIL, FALSE);
+    g_return_val_if_fail(type >= IPATCH_RIFF_CHUNK_RIFF && type <= IPATCH_RIFF_CHUNK_SUB, FALSE);
+    idstr = (char *)(&id);
+    g_return_val_if_fail(verify_chunk_idstr(idstr), FALSE);
+    g_return_val_if_fail(!err || !*err, FALSE);
 
-  riff->mode = IPATCH_RIFF_WRITE;
+    riff->mode = IPATCH_RIFF_WRITE;
 
-  buf[1] = 0; /* set chunk size to 0 (will seek back later) */
+    buf[1] = 0; /* set chunk size to 0 (will seek back later) */
 
-  if (type == IPATCH_RIFF_CHUNK_LIST || type == IPATCH_RIFF_CHUNK_RIFF)
+    if(type == IPATCH_RIFF_CHUNK_LIST || type == IPATCH_RIFF_CHUNK_RIFF)
     {
-      if (type == IPATCH_RIFF_CHUNK_LIST)
-	buf[0] = IPATCH_FOURCC_LIST;
-      else
-	{
-	  buf[0] = IPATCH_RIFF_BIG_ENDIAN (riff)
-	    ? IPATCH_FOURCC_RIFX : IPATCH_FOURCC_RIFF;
-	}
+        if(type == IPATCH_RIFF_CHUNK_LIST)
+        {
+            buf[0] = IPATCH_FOURCC_LIST;
+        }
+        else
+        {
+            buf[0] = IPATCH_RIFF_BIG_ENDIAN(riff)
+                     ? IPATCH_FOURCC_RIFX : IPATCH_FOURCC_RIFF;
+        }
 
-      buf[2] = id;	/* set secondary list chunk ID */
-      chunk.position = chunk.size = 4;
-      size = 12;
+        buf[2] = id;	/* set secondary list chunk ID */
+        chunk.position = chunk.size = 4;
+        size = 12;
     }
-  else
+    else
     {
-      buf[0] = id; /* set sub chunk ID */
-      chunk.position = chunk.size = 0;
-      size = 8;
-    }
-
-  if (!ipatch_file_write (riff->handle, buf, size, &riff->err))
-    {
-      riff->status = IPATCH_RIFF_STATUS_FAIL;
-      if (err) *err = g_error_copy (riff->err);
-      return (FALSE);
+        buf[0] = id; /* set sub chunk ID */
+        chunk.position = chunk.size = 0;
+        size = 8;
     }
 
-  /* Update the chunk positions */
-  ipatch_riff_update_positions (riff);
+    if(!ipatch_file_write(riff->handle, buf, size, &riff->err))
+    {
+        riff->status = IPATCH_RIFF_STATUS_FAIL;
 
-  chunk.type = type;
-  chunk.id = id;
-  memcpy (&chunk.idstr, &id, 4);
-  chunk.filepos = ipatch_file_get_position (riff->handle) - chunk.position;
+        if(err)
+        {
+            *err = g_error_copy(riff->err);
+        }
 
-  g_array_append_val (riff->chunks, chunk);
+        return (FALSE);
+    }
 
-  return (TRUE);
+    /* Update the chunk positions */
+    ipatch_riff_update_positions(riff);
+
+    chunk.type = type;
+    chunk.id = id;
+    memcpy(&chunk.idstr, &id, 4);
+    chunk.filepos = ipatch_file_get_position(riff->handle) - chunk.position;
+
+    g_array_append_val(riff->chunks, chunk);
+
+    return (TRUE);
 }
 
 /**
@@ -800,117 +919,148 @@ ipatch_riff_write_chunk (IpatchRiff *riff,
  * Returns: %TRUE on success, %FALSE otherwise.
  */
 gboolean
-ipatch_riff_close_chunk (IpatchRiff *riff, int level, GError **err)
+ipatch_riff_close_chunk(IpatchRiff *riff, int level, GError **err)
 {
-  IpatchRiffChunk *chunk;
-  char nul = '\0';		/* null byte to pad odd sized chunks */
-  gint32 offset = 0;	   /* current offset from original position */
-  gint32 seek;
-  guint32 size;
-  int retval = TRUE;
-  int i,chunks_len;
+    IpatchRiffChunk *chunk;
+    char nul = '\0';		/* null byte to pad odd sized chunks */
+    gint32 offset = 0;	   /* current offset from original position */
+    gint32 seek;
+    guint32 size;
+    int retval = TRUE;
+    int i, chunks_len;
 
-  g_return_val_if_fail (IPATCH_IS_RIFF (riff), FALSE);
-  g_return_val_if_fail (riff->status != IPATCH_RIFF_STATUS_FAIL, FALSE);
-  g_return_val_if_fail (riff->chunks->len > 0, FALSE);
-  g_return_val_if_fail (!err || !*err, FALSE);
-  
-  chunks_len = (int)riff->chunks->len;
-  if (level == -1) level = chunks_len - 1;
-  g_return_val_if_fail (level >= -1 && level < chunks_len, FALSE);
+    g_return_val_if_fail(IPATCH_IS_RIFF(riff), FALSE);
+    g_return_val_if_fail(riff->status != IPATCH_RIFF_STATUS_FAIL, FALSE);
+    g_return_val_if_fail(riff->chunks->len > 0, FALSE);
+    g_return_val_if_fail(!err || !*err, FALSE);
 
-  /* Update the chunk positions */
-  ipatch_riff_update_positions (riff);
+    chunks_len = (int)riff->chunks->len;
 
-  if (riff->mode == IPATCH_RIFF_READ)	/* read mode? */
+    if(level == -1)
     {
-      chunk = &g_array_index (riff->chunks, IpatchRiffChunk, level);
+        level = chunks_len - 1;
+    }
 
-      /* round odd chunk sizes to even */
-      seek = ((chunk->size + 1) & ~1) - chunk->position;
+    g_return_val_if_fail(level >= -1 && level < chunks_len, FALSE);
 
-      /* close all chunks below and including level */
-      g_array_set_size (riff->chunks, level);
+    /* Update the chunk positions */
+    ipatch_riff_update_positions(riff);
 
-      if (seek != 0)
+    if(riff->mode == IPATCH_RIFF_READ)	/* read mode? */
+    {
+        chunk = &g_array_index(riff->chunks, IpatchRiffChunk, level);
+
+        /* round odd chunk sizes to even */
+        seek = ((chunk->size + 1) & ~1) - chunk->position;
+
+        /* close all chunks below and including level */
+        g_array_set_size(riff->chunks, level);
+
+        if(seek != 0)
         {
-          /* seek to the end of the specified chunk */
-          if (!ipatch_file_seek (riff->handle, seek, G_SEEK_CUR, &riff->err))
+            /* seek to the end of the specified chunk */
+            if(!ipatch_file_seek(riff->handle, seek, G_SEEK_CUR, &riff->err))
             {
-              riff->status = IPATCH_RIFF_STATUS_FAIL;
-              if (err) *err = g_error_copy (riff->err);
-              return (FALSE);
+                riff->status = IPATCH_RIFF_STATUS_FAIL;
+
+                if(err)
+                {
+                    *err = g_error_copy(riff->err);
+                }
+
+                return (FALSE);
             }
 
-          /* Update the chunk positions */
-          ipatch_riff_update_positions (riff);
+            /* Update the chunk positions */
+            ipatch_riff_update_positions(riff);
         }
 
-      if (level > 0) riff->status = IPATCH_RIFF_STATUS_NORMAL;
-      else riff->status = IPATCH_RIFF_STATUS_FINISHED;
+        if(level > 0)
+        {
+            riff->status = IPATCH_RIFF_STATUS_NORMAL;
+        }
+        else
+        {
+            riff->status = IPATCH_RIFF_STATUS_FINISHED;
+        }
 
-      return (TRUE);
+        return (TRUE);
     }
-  else				/* write mode */
+    else				/* write mode */
     {
-      for (i = riff->chunks->len - 1; i >= level; i--)
-	{
-	  chunk = &g_array_index (riff->chunks, IpatchRiffChunk, i);
+        for(i = riff->chunks->len - 1; i >= level; i--)
+        {
+            chunk = &g_array_index(riff->chunks, IpatchRiffChunk, i);
 
-	  /* make sure we don't have a negative chunk size! */
-	  if (log_if_fail (chunk->position >= 0))
-	    goto fail;
+            /* make sure we don't have a negative chunk size! */
+            if(log_if_fail(chunk->position >= 0))
+            {
+                goto fail;
+            }
 
-	  /* we don't include padding (if any) in the size */
-	  size = chunk->position;
+            /* we don't include padding (if any) in the size */
+            size = chunk->position;
 
-	  if (chunk->position % 2)	/* need pad to even chunk size? */
-	    {
-	      int i2;
+            if(chunk->position % 2)	/* need pad to even chunk size? */
+            {
+                int i2;
 
-	      if (!ipatch_file_write (riff->handle, &nul, 1, &riff->err))
-		goto fail;
+                if(!ipatch_file_write(riff->handle, &nul, 1, &riff->err))
+                {
+                    goto fail;
+                }
 
-	      /* add pad byte to chunk positions */
-	      for (i2 = i; i2 >= 0; i2--)
-		g_array_index (riff->chunks, IpatchRiffChunk, i2).position++;
-	    }
+                /* add pad byte to chunk positions */
+                for(i2 = i; i2 >= 0; i2--)
+                {
+                    g_array_index(riff->chunks, IpatchRiffChunk, i2).position++;
+                }
+            }
 
-	  /* seek to the chunk size field */
-	  seek = -chunk->position - 4 - offset;
-	  if (seek != 0)
-	    if (!ipatch_file_seek (riff->handle, seek, G_SEEK_CUR,
-				   &riff->err))
-	      goto fail;
+            /* seek to the chunk size field */
+            seek = -chunk->position - 4 - offset;
 
-	  offset += seek;
+            if(seek != 0)
+                if(!ipatch_file_seek(riff->handle, seek, G_SEEK_CUR,
+                                     &riff->err))
+                {
+                    goto fail;
+                }
 
-	  /* write the chunk size */
-	  if (!ipatch_file_write_u32 (riff->handle, size, &riff->err))
-	    goto fail;
+            offset += seek;
 
-	  offset += 4;
-	}
+            /* write the chunk size */
+            if(!ipatch_file_write_u32(riff->handle, size, &riff->err))
+            {
+                goto fail;
+            }
 
-      g_array_set_size (riff->chunks, level); /* close chunk(s) */
+            offset += 4;
+        }
 
-    ret:
-      /* return to the original position */
-      if (offset && !ipatch_file_seek (riff->handle, -offset, G_SEEK_CUR,
-				       retval ? err : NULL))
-	{
-	  riff->status = IPATCH_RIFF_STATUS_FAIL;
-	  retval = FALSE;
-	}
+        g_array_set_size(riff->chunks, level);  /* close chunk(s) */
 
-      if (!retval && riff->err && err) *err = g_error_copy (riff->err);
+ret:
 
-      return (retval);
+        /* return to the original position */
+        if(offset && !ipatch_file_seek(riff->handle, -offset, G_SEEK_CUR,
+                                       retval ? err : NULL))
+        {
+            riff->status = IPATCH_RIFF_STATUS_FAIL;
+            retval = FALSE;
+        }
 
-    fail:
-      riff->status = IPATCH_RIFF_STATUS_FAIL;
-      retval = FALSE;
-      goto ret;
+        if(!retval && riff->err && err)
+        {
+            *err = g_error_copy(riff->err);
+        }
+
+        return (retval);
+
+fail:
+        riff->status = IPATCH_RIFF_STATUS_FAIL;
+        retval = FALSE;
+        goto ret;
     } /* else - (write mode) */
 }
 
@@ -926,17 +1076,24 @@ ipatch_riff_close_chunk (IpatchRiff *riff, int level, GError **err)
  * Returns: %TRUE on success, %FALSE otherwise
  */
 gboolean
-ipatch_riff_skip_chunks (IpatchRiff *riff, guint count, GError **err)
+ipatch_riff_skip_chunks(IpatchRiff *riff, guint count, GError **err)
 {
-  guint i;
+    guint i;
 
-  for (i = 0; i < count; i++)
+    for(i = 0; i < count; i++)
     {
-      if (!ipatch_riff_read_chunk (riff, err)) return (FALSE);
-      if (!ipatch_riff_close_chunk (riff, -1, err)) return (FALSE);
+        if(!ipatch_riff_read_chunk(riff, err))
+        {
+            return (FALSE);
+        }
+
+        if(!ipatch_riff_close_chunk(riff, -1, err))
+        {
+            return (FALSE);
+        }
     }
 
-  return (TRUE);
+    return (TRUE);
 }
 
 /**
@@ -950,14 +1107,22 @@ ipatch_riff_skip_chunks (IpatchRiff *riff, guint count, GError **err)
  * can be found in @err, %TRUE if no error has occured.
  */
 gboolean
-ipatch_riff_get_error (IpatchRiff *riff, GError **err)
+ipatch_riff_get_error(IpatchRiff *riff, GError **err)
 {
-  g_return_val_if_fail (IPATCH_IS_RIFF (riff), FALSE);
-  g_return_val_if_fail (!err || !*err, FALSE);
+    g_return_val_if_fail(IPATCH_IS_RIFF(riff), FALSE);
+    g_return_val_if_fail(!err || !*err, FALSE);
 
-  if (riff->status != IPATCH_RIFF_STATUS_FAIL) return (TRUE);
-  if (err) *err = g_error_copy (riff->err);
-  return (FALSE);
+    if(riff->status != IPATCH_RIFF_STATUS_FAIL)
+    {
+        return (TRUE);
+    }
+
+    if(err)
+    {
+        *err = g_error_copy(riff->err);
+    }
+
+    return (FALSE);
 }
 
 /**
@@ -976,66 +1141,79 @@ ipatch_riff_get_error (IpatchRiff *riff, GError **err)
  * the next call to this function.
  */
 char *
-ipatch_riff_message_detail (IpatchRiff *riff, int level,
-			    const char *format, ...)
+ipatch_riff_message_detail(IpatchRiff *riff, int level,
+                           const char *format, ...)
 {
-  va_list args;
-  IpatchRiffChunk *chunk;
-  char *msg, *debug, *traceback = NULL, *s, *s2;
-  int i, riffchunkpos = 0;
-  int chunks_len;
+    va_list args;
+    IpatchRiffChunk *chunk;
+    char *msg, *debug, *traceback = NULL, *s, *s2;
+    int i, riffchunkpos = 0;
+    int chunks_len;
 
-  g_return_val_if_fail (IPATCH_IS_RIFF (riff), NULL);
+    g_return_val_if_fail(IPATCH_IS_RIFF(riff), NULL);
 
-  /* Update the chunk positions */
-  ipatch_riff_update_positions (riff);
+    /* Update the chunk positions */
+    ipatch_riff_update_positions(riff);
 
-  /* level will be -1 if already -1 and no chunks */
-  chunks_len = (int)riff->chunks->len;
-  if (level == -1) level = chunks_len - 1;
-  g_return_val_if_fail (level >= -1 && level < chunks_len, NULL);
+    /* level will be -1 if already -1 and no chunks */
+    chunks_len = (int)riff->chunks->len;
 
-  va_start (args, format);
-  msg = g_strdup_vprintf (format, args);
-  va_end (args);
-
-  if (riff->chunks->len > 0)
+    if(level == -1)
     {
-      chunk = &g_array_index (riff->chunks, IpatchRiffChunk, 0);
-      riffchunkpos = chunk->position;
+        level = chunks_len - 1;
     }
 
-  debug = g_strdup_printf (" (ofs=%x, traceback [", riffchunkpos);
+    g_return_val_if_fail(level >= -1 && level < chunks_len, NULL);
 
-  if (riff->chunks->len > 0)
+    va_start(args, format);
+    msg = g_strdup_vprintf(format, args);
+    va_end(args);
+
+    if(riff->chunks->len > 0)
     {
-      i = level;
-      while (i >= 0)
-	{
-	  chunk = &g_array_index (riff->chunks, IpatchRiffChunk, i);
-	  s = g_strdup_printf ("'%.4s' ofs=0x%X, size=%d%s", chunk->idstr,
-			       riffchunkpos - chunk->position, chunk->size,
-			       i != 0 ? " <= " : "");
-	  if (traceback)
-	    {
-	      s2 = g_strconcat (traceback, s, NULL);
-	      g_free (s);
-	      g_free (traceback);
-	      traceback = s2;
-	    }
-	  else traceback = s;
-
-	  i--;
-	}
+        chunk = &g_array_index(riff->chunks, IpatchRiffChunk, 0);
+        riffchunkpos = chunk->position;
     }
-  else traceback = g_strdup ("<none>");
 
-  s = g_strconcat (msg, debug, traceback, "])", NULL);
-  g_free (msg);
-  g_free (debug);
-  g_free (traceback);
+    debug = g_strdup_printf(" (ofs=%x, traceback [", riffchunkpos);
 
-  g_free (riff->msg_detail);
-  riff->msg_detail = s;
-  return (s);
+    if(riff->chunks->len > 0)
+    {
+        i = level;
+
+        while(i >= 0)
+        {
+            chunk = &g_array_index(riff->chunks, IpatchRiffChunk, i);
+            s = g_strdup_printf("'%.4s' ofs=0x%X, size=%d%s", chunk->idstr,
+                                riffchunkpos - chunk->position, chunk->size,
+                                i != 0 ? " <= " : "");
+
+            if(traceback)
+            {
+                s2 = g_strconcat(traceback, s, NULL);
+                g_free(s);
+                g_free(traceback);
+                traceback = s2;
+            }
+            else
+            {
+                traceback = s;
+            }
+
+            i--;
+        }
+    }
+    else
+    {
+        traceback = g_strdup("<none>");
+    }
+
+    s = g_strconcat(msg, debug, traceback, "])", NULL);
+    g_free(msg);
+    g_free(debug);
+    g_free(traceback);
+
+    g_free(riff->msg_detail);
+    riff->msg_detail = s;
+    return (s);
 }

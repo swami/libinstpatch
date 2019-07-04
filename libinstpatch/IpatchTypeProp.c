@@ -20,7 +20,7 @@
 /**
  * SECTION: IpatchTypeProp
  * @short_description: GObject style properties for GTypes
- * @see_also: 
+ * @see_also:
  * @stability: Stable
  *
  * Provides a registry system for adding GObject style properties to GTypes.
@@ -42,34 +42,34 @@
 /* key used for hash of GType property values */
 typedef struct
 {
-  GType type;		/* type this property is bound to */
-  GParamSpec *spec;	/* the parameter spec of the property */
+    GType type;		/* type this property is bound to */
+    GParamSpec *spec;	/* the parameter spec of the property */
 } TypePropValueKey;
 
 typedef struct
 {
-  GValue value;			/* a static assigned value (or NULL) */
-  IpatchTypePropGetFunc func;	/* a dynamic prop function (or NULL) */
-  GDestroyNotify notify_func;
-  gpointer user_data;
+    GValue value;			/* a static assigned value (or NULL) */
+    IpatchTypePropGetFunc func;	/* a dynamic prop function (or NULL) */
+    GDestroyNotify notify_func;
+    gpointer user_data;
 } TypePropValueVal;
 
-static guint type_prop_value_GHashFunc (gconstpointer key);
-static gboolean type_prop_value_GEqualFunc (gconstpointer a, gconstpointer b);
-static void type_prop_value_destroy (gpointer user_data);
+static guint type_prop_value_GHashFunc(gconstpointer key);
+static gboolean type_prop_value_GEqualFunc(gconstpointer a, gconstpointer b);
+static void type_prop_value_destroy(gpointer user_data);
 
-static void type_list_properties_GHFunc (gpointer key, gpointer value,
-					 gpointer user_data);
+static void type_list_properties_GHFunc(gpointer key, gpointer value,
+                                        gpointer user_data);
 static void
-type_set_property (GType type, GParamSpec *prop_spec, const GValue *value,
-		   IpatchTypePropGetFunc func, GDestroyNotify notify_func,
-                   gpointer user_data);
-static void type_get_property (GType type, GParamSpec *prop_spec,
-			       GValue *value, GObject *object);
+type_set_property(GType type, GParamSpec *prop_spec, const GValue *value,
+                  IpatchTypePropGetFunc func, GDestroyNotify notify_func,
+                  gpointer user_data);
+static void type_get_property(GType type, GParamSpec *prop_spec,
+                              GValue *value, GObject *object);
 
 
-G_LOCK_DEFINE_STATIC (type_prop_hash);
-G_LOCK_DEFINE_STATIC (type_prop_value_hash);
+G_LOCK_DEFINE_STATIC(type_prop_hash);
+G_LOCK_DEFINE_STATIC(type_prop_value_hash);
 
 /* GType GParamSpec property hash (PropNameQuark -> GParamSpec) */
 static GHashTable *type_prop_hash = NULL;
@@ -83,110 +83,113 @@ static GHashTable *type_prop_value_hash = NULL;
  * Initialize GType property system
  */
 void
-_ipatch_type_prop_init (void)
+_ipatch_type_prop_init(void)
 {
-  type_prop_hash = g_hash_table_new (NULL, NULL);
+    type_prop_hash = g_hash_table_new(NULL, NULL);
 
-  type_prop_value_hash =
-    g_hash_table_new_full (type_prop_value_GHashFunc,
-			   type_prop_value_GEqualFunc,
-			   (GDestroyNotify)g_free,
-			   (GDestroyNotify)type_prop_value_destroy);
+    type_prop_value_hash =
+        g_hash_table_new_full(type_prop_value_GHashFunc,
+                              type_prop_value_GEqualFunc,
+                              (GDestroyNotify)g_free,
+                              (GDestroyNotify)type_prop_value_destroy);
 
-  /* install some default type properties */
+    /* install some default type properties */
 
-  /* a user friendly type name */
-  ipatch_type_install_property
-    (g_param_spec_string ("name", "Name", "Name",
-			  NULL, G_PARAM_READWRITE));
+    /* a user friendly type name */
+    ipatch_type_install_property
+    (g_param_spec_string("name", "Name", "Name",
+                         NULL, G_PARAM_READWRITE));
 
-  /* title of the object (usually dynamically created from obj instance) */
-  ipatch_type_install_property
-    (g_param_spec_string ("title", "Title", "Title",
-			  NULL, G_PARAM_READWRITE));
+    /* title of the object (usually dynamically created from obj instance) */
+    ipatch_type_install_property
+    (g_param_spec_string("title", "Title", "Title",
+                         NULL, G_PARAM_READWRITE));
 
-  /* a user friendly type detail name */
-  ipatch_type_install_property
-    (g_param_spec_string ("blurb", "Blurb", "Blurb",
-			  NULL, G_PARAM_READWRITE));
+    /* a user friendly type detail name */
+    ipatch_type_install_property
+    (g_param_spec_string("blurb", "Blurb", "Blurb",
+                         NULL, G_PARAM_READWRITE));
 
-  /* type classes (see ipatch_type_prop_register_category) */
-  ipatch_type_install_property
-    (g_param_spec_int ("category", "Category", "Type category",
-		       G_MININT, G_MAXINT, IPATCH_CATEGORY_NONE,
-		       G_PARAM_READWRITE));
+    /* type classes (see ipatch_type_prop_register_category) */
+    ipatch_type_install_property
+    (g_param_spec_int("category", "Category", "Type category",
+                      G_MININT, G_MAXINT, IPATCH_CATEGORY_NONE,
+                      G_PARAM_READWRITE));
 
-  /* virtual parent container type (defined for children of
-   * IpatchVirtualContainer types) */
-  ipatch_type_install_property
-    (g_param_spec_gtype ("virtual-parent-type", "Virtual parent type",
-			 "Virtual parent type", G_TYPE_NONE,
-			 G_PARAM_READWRITE));
+    /* virtual parent container type (defined for children of
+     * IpatchVirtualContainer types) */
+    ipatch_type_install_property
+    (g_param_spec_gtype("virtual-parent-type", "Virtual parent type",
+                        "Virtual parent type", G_TYPE_NONE,
+                        G_PARAM_READWRITE));
 
-  /* virtual container child type (defined for IpatchVirtualContainer types) */
-  ipatch_type_install_property
-    (g_param_spec_gtype ("virtual-child-type", "Virtual child type",
-			 "Virtual child type", G_TYPE_NONE,
-			 G_PARAM_READWRITE));
+    /* virtual container child type (defined for IpatchVirtualContainer types) */
+    ipatch_type_install_property
+    (g_param_spec_gtype("virtual-child-type", "Virtual child type",
+                        "Virtual child type", G_TYPE_NONE,
+                        G_PARAM_READWRITE));
 
-  /* link item type (type of object referenced/linked by another) */
-  ipatch_type_install_property
-    (g_param_spec_gtype ("link-type", "Link type", "Link type", G_TYPE_NONE,
-			 G_PARAM_READWRITE));
+    /* link item type (type of object referenced/linked by another) */
+    ipatch_type_install_property
+    (g_param_spec_gtype("link-type", "Link type", "Link type", G_TYPE_NONE,
+                        G_PARAM_READWRITE));
 
-  /* virtual container conform function (function pointer used for making
-   * a child object conform to the virtual container's criteria, the "percussion"
-   * property for example) See IpatchVirtualContainerConformFunc. */
-  ipatch_type_install_property (g_param_spec_pointer
-    ("virtual-child-conform-func",
-     "IpatchVirtualContainerConformFunc",
-     "IpatchVirtualContainerConformFunc", G_PARAM_READWRITE));
+    /* virtual container conform function (function pointer used for making
+     * a child object conform to the virtual container's criteria, the "percussion"
+     * property for example) See IpatchVirtualContainerConformFunc. */
+    ipatch_type_install_property(g_param_spec_pointer
+                                 ("virtual-child-conform-func",
+                                  "IpatchVirtualContainerConformFunc",
+                                  "IpatchVirtualContainerConformFunc", G_PARAM_READWRITE));
 
-  /* sort a container's children in user interfaces? */
-  ipatch_type_install_property
-    (g_param_spec_boolean ("sort-children", "Sort children",
-			   "Sort children", FALSE, G_PARAM_READWRITE));
+    /* sort a container's children in user interfaces? */
+    ipatch_type_install_property
+    (g_param_spec_boolean("sort-children", "Sort children",
+                          "Sort children", FALSE, G_PARAM_READWRITE));
 
-  /* splits type property (for note and velocity splits) */
-  ipatch_type_install_property
-    (g_param_spec_enum ("splits-type", "Splits type",
-			"Splits type", IPATCH_TYPE_SPLITS_TYPE,
-			IPATCH_SPLITS_NONE, G_PARAM_READWRITE));
+    /* splits type property (for note and velocity splits) */
+    ipatch_type_install_property
+    (g_param_spec_enum("splits-type", "Splits type",
+                       "Splits type", IPATCH_TYPE_SPLITS_TYPE,
+                       IPATCH_SPLITS_NONE, G_PARAM_READWRITE));
 
-  /* mime type for IpatchFile derived types */
-  ipatch_type_install_property
-    (g_param_spec_string ("mime-type", "Mime type", "Mime type",
-			  NULL, G_PARAM_READWRITE));
+    /* mime type for IpatchFile derived types */
+    ipatch_type_install_property
+    (g_param_spec_string("mime-type", "Mime type", "Mime type",
+                         NULL, G_PARAM_READWRITE));
 }
 
 /* hash function for GType property value hash */
 static guint
-type_prop_value_GHashFunc (gconstpointer key)
+type_prop_value_GHashFunc(gconstpointer key)
 {
-  TypePropValueKey *valkey = (TypePropValueKey *)key;
-  return ((guint)(valkey->type) + G_PARAM_SPEC_TYPE (valkey->spec));
+    TypePropValueKey *valkey = (TypePropValueKey *)key;
+    return ((guint)(valkey->type) + G_PARAM_SPEC_TYPE(valkey->spec));
 }
 
 /* key equal function for GType property value hash */
 static gboolean
-type_prop_value_GEqualFunc (gconstpointer a, gconstpointer b)
+type_prop_value_GEqualFunc(gconstpointer a, gconstpointer b)
 {
-  TypePropValueKey *akey = (TypePropValueKey *)a;
-  TypePropValueKey *bkey = (TypePropValueKey *)b;
-  return (akey->type == bkey->type && akey->spec == bkey->spec);
+    TypePropValueKey *akey = (TypePropValueKey *)a;
+    TypePropValueKey *bkey = (TypePropValueKey *)b;
+    return (akey->type == bkey->type && akey->spec == bkey->spec);
 }
 
 /* destroy notify for GType property values */
 static void
-type_prop_value_destroy (gpointer user_data)
+type_prop_value_destroy(gpointer user_data)
 {
-  TypePropValueVal *val = (TypePropValueVal *)user_data;
+    TypePropValueVal *val = (TypePropValueVal *)user_data;
 
-  g_value_unset (&val->value);
+    g_value_unset(&val->value);
 
-  if (val->notify_func) val->notify_func (val->user_data);
+    if(val->notify_func)
+    {
+        val->notify_func(val->user_data);
+    }
 
-  g_slice_free (TypePropValueVal, val);
+    g_slice_free(TypePropValueVal, val);
 }
 
 /**
@@ -200,83 +203,87 @@ type_prop_value_destroy (gpointer user_data)
  * information to GTypes.
  */
 void
-ipatch_type_install_property (GParamSpec *prop_spec)
+ipatch_type_install_property(GParamSpec *prop_spec)
 {
-  GQuark quark;
+    GQuark quark;
 
-  g_return_if_fail (G_IS_PARAM_SPEC (prop_spec));
-  g_return_if_fail (prop_spec->name != NULL);
+    g_return_if_fail(G_IS_PARAM_SPEC(prop_spec));
+    g_return_if_fail(prop_spec->name != NULL);
 
-  /* take ownership of the parameter spec */
-  g_param_spec_ref (prop_spec);
-  g_param_spec_sink (prop_spec);
+    /* take ownership of the parameter spec */
+    g_param_spec_ref(prop_spec);
+    g_param_spec_sink(prop_spec);
 
-  quark = g_quark_from_static_string (prop_spec->name);
+    quark = g_quark_from_static_string(prop_spec->name);
 
-  G_LOCK (type_prop_hash);
-  g_hash_table_insert (type_prop_hash, GUINT_TO_POINTER (quark), prop_spec);
-  G_UNLOCK (type_prop_hash);
+    G_LOCK(type_prop_hash);
+    g_hash_table_insert(type_prop_hash, GUINT_TO_POINTER(quark), prop_spec);
+    G_UNLOCK(type_prop_hash);
 }
 
 /**
  * ipatch_type_find_property:
  * @name: Name of GType property
- * 
+ *
  * Lookup a GType property by name.
- * 
+ *
  * Returns: (transfer none): The matching GParamSpec or %NULL if not found.  The GParamSpec is
  *   internal and should NOT be modified or freed.
  */
 GParamSpec *
-ipatch_type_find_property (const char *name)
+ipatch_type_find_property(const char *name)
 {
-  GParamSpec *spec;
-  GQuark quark;
+    GParamSpec *spec;
+    GQuark quark;
 
-  g_return_val_if_fail (name != NULL, NULL);
+    g_return_val_if_fail(name != NULL, NULL);
 
-  quark = g_quark_try_string (name);
-  if (!quark) return (NULL);
+    quark = g_quark_try_string(name);
 
-  G_LOCK (type_prop_hash);
-  spec = g_hash_table_lookup (type_prop_hash, GUINT_TO_POINTER (quark));
-  G_UNLOCK (type_prop_hash);
+    if(!quark)
+    {
+        return (NULL);
+    }
 
-  return (spec);
+    G_LOCK(type_prop_hash);
+    spec = g_hash_table_lookup(type_prop_hash, GUINT_TO_POINTER(quark));
+    G_UNLOCK(type_prop_hash);
+
+    return (spec);
 }
 
 /**
  * ipatch_type_list_properties:
  * @n_properties: (out): Length of returned array
- * 
+ *
  * Get a list of all registered GType properties.
- * 
+ *
  * Returns: (array length=n_properties) (transfer container): An array of GParamSpecs
  *   which should be freed when finished (only the array, not the GParamSpecs themselves)
  */
 GParamSpec **
-ipatch_type_list_properties (guint *n_properties)
+ipatch_type_list_properties(guint *n_properties)
 {
-  GParamSpec **specs, **specp;
+    GParamSpec **specs, **specp;
 
-  g_return_val_if_fail (n_properties != NULL, NULL);
+    g_return_val_if_fail(n_properties != NULL, NULL);
 
-  G_LOCK (type_prop_hash);
-  specs = g_new (GParamSpec *, g_hash_table_size (type_prop_hash));
-  specp = specs;
-  g_hash_table_foreach (type_prop_hash, type_list_properties_GHFunc, &specp);
-  G_UNLOCK (type_prop_hash);
+    G_LOCK(type_prop_hash);
+    specs = g_new(GParamSpec *, g_hash_table_size(type_prop_hash));
+    specp = specs;
+    g_hash_table_foreach(type_prop_hash, type_list_properties_GHFunc, &specp);
+    G_UNLOCK(type_prop_hash);
 
-  return (specs);
+    return (specs);
 }
 
 /* fills an array with GParamSpecs in the type_prop_hash */
 static void
-type_list_properties_GHFunc (gpointer key, gpointer value, gpointer user_data)
+type_list_properties_GHFunc(gpointer key, gpointer value, gpointer user_data)
 {
-  GParamSpec ***specs = user_data;
-  **specs = (GParamSpec *)value;
-  *specs = *specs + 1;
+    GParamSpec ***specs = user_data;
+    **specs = (GParamSpec *)value;
+    *specs = *specs + 1;
 }
 
 /**
@@ -294,91 +301,118 @@ type_list_properties_GHFunc (gpointer key, gpointer value, gpointer user_data)
  *   which have the named property set or %NULL if type property not found.
  */
 GType *
-ipatch_type_find_types_with_property (const char *name, const GValue *value,
-                                      guint *n_types)
+ipatch_type_find_types_with_property(const char *name, const GValue *value,
+                                     guint *n_types)
 {
-  TypePropValueKey *key;
-  GParamSpec *pspec;
-  GList *keys, *p, *temp;
-  GType *types;
-  int count = 0;
-  int i;
+    TypePropValueKey *key;
+    GParamSpec *pspec;
+    GList *keys, *p, *temp;
+    GType *types;
+    int count = 0;
+    int i;
 
-  g_return_val_if_fail (name != NULL, NULL);
+    g_return_val_if_fail(name != NULL, NULL);
 
-  pspec = ipatch_type_find_property (name);
-  g_return_val_if_fail (pspec != NULL, NULL);
+    pspec = ipatch_type_find_property(name);
+    g_return_val_if_fail(pspec != NULL, NULL);
 
-  G_LOCK (type_prop_value_hash);
+    G_LOCK(type_prop_value_hash);
 
-  keys = g_hash_table_get_keys (type_prop_value_hash);  /* ++ alloc keys list */
+    keys = g_hash_table_get_keys(type_prop_value_hash);   /* ++ alloc keys list */
 
-  /* Convert keys list to list of matching GTypes */
-  for (p = keys; p; )
-  {
-    key = p->data;
-
-    if (key->spec == pspec)
-    { /* Replace list data TypePropValueKey pointer to GType */
-      p->data = GSIZE_TO_POINTER (key->type);
-      p = p->next;
-    }
-    else        /* Doesn't match GParamSpec - remove from list */
+    /* Convert keys list to list of matching GTypes */
+    for(p = keys; p;)
     {
-      if (p->prev) p->prev->next = p->next;
-      else keys = p->next;
+        key = p->data;
 
-      if (p->next) p->next->prev = p->prev;
+        if(key->spec == pspec)
+        {
+            /* Replace list data TypePropValueKey pointer to GType */
+            p->data = GSIZE_TO_POINTER(key->type);
+            p = p->next;
+        }
+        else        /* Doesn't match GParamSpec - remove from list */
+        {
+            if(p->prev)
+            {
+                p->prev->next = p->next;
+            }
+            else
+            {
+                keys = p->next;
+            }
 
-      temp = p;
-      p = p->next;
-      g_list_free1 (temp);
+            if(p->next)
+            {
+                p->next->prev = p->prev;
+            }
+
+            temp = p;
+            p = p->next;
+            g_list_free1(temp);
+        }
     }
-  }
 
-  G_UNLOCK (type_prop_value_hash);
+    G_UNLOCK(type_prop_value_hash);
 
-  /* Compare values if @value was supplied */
-  if (value)
-  {
-    GValue cmp_value = { 0 };
-    GType type;
-
-    for (p = keys; p; )
+    /* Compare values if @value was supplied */
+    if(value)
     {
-      type = GPOINTER_TO_SIZE (p->data);
-      g_value_init (&cmp_value, G_PARAM_SPEC_VALUE_TYPE (pspec));
-      ipatch_type_get_property (type, pspec->name, &cmp_value);
+        GValue cmp_value = { 0 };
+        GType type;
 
-      if (g_param_values_cmp (pspec, value, &cmp_value) != 0)
-      {
-        if (p->prev) p->prev->next = p->next;
-        else keys = p->next;
+        for(p = keys; p;)
+        {
+            type = GPOINTER_TO_SIZE(p->data);
+            g_value_init(&cmp_value, G_PARAM_SPEC_VALUE_TYPE(pspec));
+            ipatch_type_get_property(type, pspec->name, &cmp_value);
 
-        if (p->next) p->next->prev = p->prev;
+            if(g_param_values_cmp(pspec, value, &cmp_value) != 0)
+            {
+                if(p->prev)
+                {
+                    p->prev->next = p->next;
+                }
+                else
+                {
+                    keys = p->next;
+                }
 
-        temp = p;
-        p = p->next;
-        g_list_free1 (temp);
-      }
-      else p = p->next;
+                if(p->next)
+                {
+                    p->next->prev = p->prev;
+                }
 
-      g_value_unset (&cmp_value);
+                temp = p;
+                p = p->next;
+                g_list_free1(temp);
+            }
+            else
+            {
+                p = p->next;
+            }
+
+            g_value_unset(&cmp_value);
+        }
     }
-  }
 
-  count = g_list_length (keys);
-  types = g_new (GType, count + 1);     /* ++ alloc types */
+    count = g_list_length(keys);
+    types = g_new(GType, count + 1);      /* ++ alloc types */
 
-  /* Copy GType list to type array and delete the list */
-  for (p = keys, i = 0; p; p = g_list_delete_link (p, p), i++)  /* -- free keys list */
-    types[i] = GPOINTER_TO_SIZE (p->data);
+    /* Copy GType list to type array and delete the list */
+    for(p = keys, i = 0; p; p = g_list_delete_link(p, p), i++)    /* -- free keys list */
+    {
+        types[i] = GPOINTER_TO_SIZE(p->data);
+    }
 
-  types[i] = 0;
+    types[i] = 0;
 
-  if (n_types) *n_types = count;
+    if(n_types)
+    {
+        *n_types = count;
+    }
 
-  return (types);     /* !! caller takes over alloc */
+    return (types);     /* !! caller takes over alloc */
 }
 
 /**
@@ -387,18 +421,18 @@ ipatch_type_find_types_with_property (const char *name, const GValue *value,
  * @first_property_name: Name of first property to set
  * @...: Value of first property to set and optionally followed by more
  *   property name/value pairs, terminated with %NULL name.
- * 
+ *
  * Set GType properties.  GType properties are used to associate arbitrary
  * information with GTypes.
  */
 void
-ipatch_type_set (GType type, const char *first_property_name, ...)
+ipatch_type_set(GType type, const char *first_property_name, ...)
 {
-  va_list args;
+    va_list args;
 
-  va_start (args, first_property_name);
-  ipatch_type_set_valist (type, first_property_name, args);
-  va_end (args);
+    va_start(args, first_property_name);
+    ipatch_type_set_valist(type, first_property_name, args);
+    va_end(args);
 }
 
 /**
@@ -407,57 +441,58 @@ ipatch_type_set (GType type, const char *first_property_name, ...)
  * @first_property_name: Name of first property to set
  * @args: Value of first property to set and optionally followed by more
  *   property name/value pairs, terminated with %NULL name.
- * 
+ *
  * Like ipatch_type_set() but uses a va_list.
  */
 void
-ipatch_type_set_valist (GType type, const char *first_property_name,
-			va_list args)
+ipatch_type_set_valist(GType type, const char *first_property_name,
+                       va_list args)
 {
-  const char *name;
-  GValue value = { 0 };
-  gchar *error = NULL;
-  GParamSpec *prop_spec;
+    const char *name;
+    GValue value = { 0 };
+    gchar *error = NULL;
+    GParamSpec *prop_spec;
 
-  g_return_if_fail (type != 0);
-  g_return_if_fail (first_property_name != NULL);
+    g_return_if_fail(type != 0);
+    g_return_if_fail(first_property_name != NULL);
 
-  name = first_property_name;
-  while (name)
+    name = first_property_name;
+
+    while(name)
     {
-      prop_spec = ipatch_type_find_property (name);
+        prop_spec = ipatch_type_find_property(name);
 
-      if (!prop_spec)
-	{
-	  g_warning ("%s: no type property named `%s'",
-		     G_STRLOC, name);
-	  break;
-	}
+        if(!prop_spec)
+        {
+            g_warning("%s: no type property named `%s'",
+                      G_STRLOC, name);
+            break;
+        }
 
-      if (!(prop_spec->flags & G_PARAM_WRITABLE))
-	{
-	  g_warning ("%s: type property `%s' is not writable",
-		     G_STRLOC, prop_spec->name);
-	  break;
-	}
+        if(!(prop_spec->flags & G_PARAM_WRITABLE))
+        {
+            g_warning("%s: type property `%s' is not writable",
+                      G_STRLOC, prop_spec->name);
+            break;
+        }
 
-      g_value_init (&value, G_PARAM_SPEC_VALUE_TYPE (prop_spec));
-      G_VALUE_COLLECT (&value, args, 0, &error);
+        g_value_init(&value, G_PARAM_SPEC_VALUE_TYPE(prop_spec));
+        G_VALUE_COLLECT(&value, args, 0, &error);
 
-      if (error)
-	{
-	  g_warning ("%s: %s", G_STRLOC, error);
-	  g_free (error);
+        if(error)
+        {
+            g_warning("%s: %s", G_STRLOC, error);
+            g_free(error);
 
-	  /* we purposely leak the GValue contents here, it might not be
-	   * in a sane state if an error condition occured */
-	  break;
-	}
+            /* we purposely leak the GValue contents here, it might not be
+             * in a sane state if an error condition occured */
+            break;
+        }
 
-      type_set_property (type, prop_spec, &value, NULL, NULL, NULL);
+        type_set_property(type, prop_spec, &value, NULL, NULL, NULL);
 
-      g_value_unset (&value);
-      name = va_arg (args, char *);
+        g_value_unset(&value);
+        name = va_arg(args, char *);
     }
 }
 
@@ -471,72 +506,72 @@ ipatch_type_set_valist (GType type, const char *first_property_name,
  * Set a single property of a #GType.
  */
 void
-ipatch_type_set_property (GType type, const char *property_name,
-			  const GValue *value)
+ipatch_type_set_property(GType type, const char *property_name,
+                         const GValue *value)
 {
-  GParamSpec *prop_spec;
+    GParamSpec *prop_spec;
 
-  g_return_if_fail (type != 0);
-  g_return_if_fail (property_name != NULL);
-  g_return_if_fail (G_IS_VALUE (value));
+    g_return_if_fail(type != 0);
+    g_return_if_fail(property_name != NULL);
+    g_return_if_fail(G_IS_VALUE(value));
 
-  prop_spec = ipatch_type_find_property (property_name);
+    prop_spec = ipatch_type_find_property(property_name);
 
-  if (!prop_spec)
+    if(!prop_spec)
     {
-      g_warning ("%s: no type property named `%s'",
-		  G_STRLOC, property_name);
-      return;
+        g_warning("%s: no type property named `%s'",
+                  G_STRLOC, property_name);
+        return;
     }
 
-  if (!(prop_spec->flags & G_PARAM_WRITABLE))
+    if(!(prop_spec->flags & G_PARAM_WRITABLE))
     {
-      g_warning ("%s: type property `%s' is not writable",
-		 G_STRLOC, property_name);
-      return;
+        g_warning("%s: type property `%s' is not writable",
+                  G_STRLOC, property_name);
+        return;
     }
 
-  if (G_VALUE_TYPE (value) == G_PARAM_SPEC_VALUE_TYPE (prop_spec))
+    if(G_VALUE_TYPE(value) == G_PARAM_SPEC_VALUE_TYPE(prop_spec))
     {
-      g_warning ("%s: value type should be '%s' but is '%s'",
-		 G_STRLOC, g_type_name (G_PARAM_SPEC_VALUE_TYPE (prop_spec)),
-		 G_VALUE_TYPE_NAME (value));
-      return;
+        g_warning("%s: value type should be '%s' but is '%s'",
+                  G_STRLOC, g_type_name(G_PARAM_SPEC_VALUE_TYPE(prop_spec)),
+                  G_VALUE_TYPE_NAME(value));
+        return;
     }
 
-  type_set_property (type, prop_spec, value, NULL, NULL, NULL);
+    type_set_property(type, prop_spec, value, NULL, NULL, NULL);
 }
 
 /* does the actual setting of a GType property, note that the value is
    is copied and not used directly */
 static void
-type_set_property (GType type, GParamSpec *prop_spec, const GValue *value,
-		   IpatchTypePropGetFunc func, GDestroyNotify notify_func,
-                   gpointer user_data)
+type_set_property(GType type, GParamSpec *prop_spec, const GValue *value,
+                  IpatchTypePropGetFunc func, GDestroyNotify notify_func,
+                  gpointer user_data)
 {
-  TypePropValueKey *key;
-  TypePropValueVal *val;
+    TypePropValueKey *key;
+    TypePropValueVal *val;
 
-  key = g_new (TypePropValueKey, 1);
-  key->type = type;
-  key->spec = prop_spec;
+    key = g_new(TypePropValueKey, 1);
+    key->type = type;
+    key->spec = prop_spec;
 
-  val = g_slice_new0 (TypePropValueVal);
+    val = g_slice_new0(TypePropValueVal);
 
-  if (value)
+    if(value)
     {
-      g_value_init (&val->value, G_VALUE_TYPE (value));
-      g_value_copy (value, &val->value);
+        g_value_init(&val->value, G_VALUE_TYPE(value));
+        g_value_copy(value, &val->value);
     }
 
-  val->func = func;
-  val->notify_func = notify_func;
-  val->user_data = user_data;
+    val->func = func;
+    val->notify_func = notify_func;
+    val->user_data = user_data;
 
-  /* value is taken over by the hash table */
-  G_LOCK (type_prop_value_hash);
-  g_hash_table_insert (type_prop_value_hash, key, val);
-  G_UNLOCK (type_prop_value_hash);
+    /* value is taken over by the hash table */
+    G_LOCK(type_prop_value_hash);
+    g_hash_table_insert(type_prop_value_hash, key, val);
+    G_UNLOCK(type_prop_value_hash);
 }
 
 /**
@@ -549,36 +584,36 @@ type_set_property (GType type, GParamSpec *prop_spec, const GValue *value,
  * Since: 1.1.0
  */
 void
-ipatch_type_unset_property (GType type, const char *property_name)
+ipatch_type_unset_property(GType type, const char *property_name)
 {
-  GParamSpec *prop_spec;
-  TypePropValueKey key;
+    GParamSpec *prop_spec;
+    TypePropValueKey key;
 
-  g_return_if_fail (type != 0);
-  g_return_if_fail (property_name != NULL);
+    g_return_if_fail(type != 0);
+    g_return_if_fail(property_name != NULL);
 
-  prop_spec = ipatch_type_find_property (property_name);
+    prop_spec = ipatch_type_find_property(property_name);
 
-  if (!prop_spec)
-  {
-    g_warning ("%s: no type property named `%s'",
-               G_STRLOC, property_name);
-    return;
-  }
+    if(!prop_spec)
+    {
+        g_warning("%s: no type property named `%s'",
+                  G_STRLOC, property_name);
+        return;
+    }
 
-  if (!(prop_spec->flags & G_PARAM_WRITABLE))
-  {
-    g_warning ("%s: type property `%s' is not writable",
-               G_STRLOC, property_name);
-    return;
-  }
+    if(!(prop_spec->flags & G_PARAM_WRITABLE))
+    {
+        g_warning("%s: type property `%s' is not writable",
+                  G_STRLOC, property_name);
+        return;
+    }
 
-  key.type = type;
-  key.spec = prop_spec;
+    key.type = type;
+    key.spec = prop_spec;
 
-  G_LOCK (type_prop_value_hash);
-  g_hash_table_remove (type_prop_value_hash, &key);
-  G_UNLOCK (type_prop_value_hash);
+    G_LOCK(type_prop_value_hash);
+    g_hash_table_remove(type_prop_value_hash, &key);
+    G_UNLOCK(type_prop_value_hash);
 }
 
 /**
@@ -591,13 +626,13 @@ ipatch_type_unset_property (GType type, const char *property_name)
  * Get GType property values.
  */
 void
-ipatch_type_get (GType type, const char *first_property_name, ...)
+ipatch_type_get(GType type, const char *first_property_name, ...)
 {
-  va_list args;
-  
-  va_start (args, first_property_name);
-  ipatch_type_get_valist (type, first_property_name, args);
-  va_end (args);
+    va_list args;
+
+    va_start(args, first_property_name);
+    ipatch_type_get_valist(type, first_property_name, args);
+    va_end(args);
 }
 
 /**
@@ -610,51 +645,53 @@ ipatch_type_get (GType type, const char *first_property_name, ...)
  * Like ipatch_type_get() but uses a va_list.
  */
 void
-ipatch_type_get_valist (GType type, const char *first_property_name,
-			va_list args)
+ipatch_type_get_valist(GType type, const char *first_property_name,
+                       va_list args)
 {
-  const char *name;
+    const char *name;
 
-  g_return_if_fail (type != 0);
-  g_return_if_fail (first_property_name != NULL);
+    g_return_if_fail(type != 0);
+    g_return_if_fail(first_property_name != NULL);
 
-  name = first_property_name;
-  while (name)
+    name = first_property_name;
+
+    while(name)
     {
-      GValue value = { 0, };
-      GParamSpec *prop_spec;
-      char *error;
+        GValue value = { 0, };
+        GParamSpec *prop_spec;
+        char *error;
 
-      prop_spec = ipatch_type_find_property (name);
+        prop_spec = ipatch_type_find_property(name);
 
-      if (!prop_spec)
-	{
-	  g_warning ("%s: no type property named `%s'",
-		     G_STRLOC, name);
-	  break;
-	}
+        if(!prop_spec)
+        {
+            g_warning("%s: no type property named `%s'",
+                      G_STRLOC, name);
+            break;
+        }
 
-      if (!(prop_spec->flags & G_PARAM_READABLE))
-	{
-	  g_warning ("%s: type property `%s' is not readable",
-		     G_STRLOC, prop_spec->name);
-	  break;
-	}
+        if(!(prop_spec->flags & G_PARAM_READABLE))
+        {
+            g_warning("%s: type property `%s' is not readable",
+                      G_STRLOC, prop_spec->name);
+            break;
+        }
 
-      g_value_init (&value, G_PARAM_SPEC_VALUE_TYPE (prop_spec));
+        g_value_init(&value, G_PARAM_SPEC_VALUE_TYPE(prop_spec));
 
-      type_get_property (type, prop_spec, &value, NULL);
-      G_VALUE_LCOPY (&value, args, 0, &error);
+        type_get_property(type, prop_spec, &value, NULL);
+        G_VALUE_LCOPY(&value, args, 0, &error);
 
-      if (error)
-	{
-	  g_warning ("%s: %s", G_STRLOC, error);
-	  g_free (error);
-	  g_value_unset (&value);
-	  break;
-	}
-      g_value_unset (&value);
-      name = va_arg (args, char *);
+        if(error)
+        {
+            g_warning("%s: %s", G_STRLOC, error);
+            g_free(error);
+            g_value_unset(&value);
+            break;
+        }
+
+        g_value_unset(&value);
+        name = va_arg(args, char *);
     }
 }
 
@@ -668,78 +705,88 @@ ipatch_type_get_valist (GType type, const char *first_property_name,
  * Get a single property from a #GType.
  */
 void
-ipatch_type_get_property (GType type, const char *property_name,
-			  GValue *value)
+ipatch_type_get_property(GType type, const char *property_name,
+                         GValue *value)
 {
-  GParamSpec *prop_spec;
+    GParamSpec *prop_spec;
 
-  g_return_if_fail (type != 0);
-  g_return_if_fail (property_name != NULL);
-  g_return_if_fail (G_IS_VALUE (value));
+    g_return_if_fail(type != 0);
+    g_return_if_fail(property_name != NULL);
+    g_return_if_fail(G_IS_VALUE(value));
 
-  prop_spec = ipatch_type_find_property (property_name);
+    prop_spec = ipatch_type_find_property(property_name);
 
-  if (!prop_spec) g_warning ("%s: no type property named `%s'",
-			     G_STRLOC, property_name);
-  else if (!(prop_spec->flags & G_PARAM_READABLE))
-    g_warning ("%s: type property `%s' is not readable",
-	       G_STRLOC, prop_spec->name);
-  else
+    if(!prop_spec)
+        g_warning("%s: no type property named `%s'",
+                  G_STRLOC, property_name);
+    else if(!(prop_spec->flags & G_PARAM_READABLE))
+        g_warning("%s: type property `%s' is not readable",
+                  G_STRLOC, prop_spec->name);
+    else
     {
-      GValue *prop_value, tmp_value = { 0, };
+        GValue *prop_value, tmp_value = { 0, };
 
-      /* auto-conversion of the callers value type */
-      if (G_VALUE_TYPE (value) == G_PARAM_SPEC_VALUE_TYPE (prop_spec))
-	{
-	  g_value_reset (value);
-	  prop_value = value;
-	}
-      else if (!g_value_type_transformable (G_PARAM_SPEC_VALUE_TYPE (prop_spec),
-					    G_VALUE_TYPE (value)))
-	{
-	  g_warning ("can't retrieve type property `%s' of type"
-		     " `%s' as value of type `%s'", prop_spec->name,
-		     g_type_name (G_PARAM_SPEC_VALUE_TYPE (prop_spec)),
-		     G_VALUE_TYPE_NAME (value));
-	  return;
-	}
-      else
-	{
-	  g_value_init (&tmp_value, G_PARAM_SPEC_VALUE_TYPE (prop_spec));
-	  prop_value = &tmp_value;
-	}
+        /* auto-conversion of the callers value type */
+        if(G_VALUE_TYPE(value) == G_PARAM_SPEC_VALUE_TYPE(prop_spec))
+        {
+            g_value_reset(value);
+            prop_value = value;
+        }
+        else if(!g_value_type_transformable(G_PARAM_SPEC_VALUE_TYPE(prop_spec),
+                                            G_VALUE_TYPE(value)))
+        {
+            g_warning("can't retrieve type property `%s' of type"
+                      " `%s' as value of type `%s'", prop_spec->name,
+                      g_type_name(G_PARAM_SPEC_VALUE_TYPE(prop_spec)),
+                      G_VALUE_TYPE_NAME(value));
+            return;
+        }
+        else
+        {
+            g_value_init(&tmp_value, G_PARAM_SPEC_VALUE_TYPE(prop_spec));
+            prop_value = &tmp_value;
+        }
 
-      type_get_property (type, prop_spec, prop_value, NULL);
+        type_get_property(type, prop_spec, prop_value, NULL);
 
-      if (prop_value != value)
-	{
-	  g_value_transform (prop_value, value);
-	  g_value_unset (&tmp_value);
-	}
+        if(prop_value != value)
+        {
+            g_value_transform(prop_value, value);
+            g_value_unset(&tmp_value);
+        }
     }
 }
 
 /* does the actual getting of a GType property */
 static void
-type_get_property (GType type, GParamSpec *prop_spec, GValue *value,
-		   GObject *object)
+type_get_property(GType type, GParamSpec *prop_spec, GValue *value,
+                  GObject *object)
 {
-  TypePropValueKey key;
-  TypePropValueVal *val;
+    TypePropValueKey key;
+    TypePropValueVal *val;
 
-  key.type = type;
-  key.spec = prop_spec;
+    key.type = type;
+    key.spec = prop_spec;
 
-  G_LOCK (type_prop_value_hash);
-  val = g_hash_table_lookup (type_prop_value_hash, &key);
-  G_UNLOCK (type_prop_value_hash);
+    G_LOCK(type_prop_value_hash);
+    val = g_hash_table_lookup(type_prop_value_hash, &key);
+    G_UNLOCK(type_prop_value_hash);
 
-  if (val)
+    if(val)
     {
-      if (val->func) val->func (type, prop_spec, value, object);
-      else g_value_copy (&val->value, value);
+        if(val->func)
+        {
+            val->func(type, prop_spec, value, object);
+        }
+        else
+        {
+            g_value_copy(&val->value, value);
+        }
     }
-  else g_param_value_set_default (prop_spec, value);
+    else
+    {
+        g_param_value_set_default(prop_spec, value);
+    }
 }
 
 /**
@@ -754,13 +801,13 @@ type_get_property (GType type, GParamSpec *prop_spec, GValue *value,
  * functions.
  */
 void
-ipatch_type_object_get (GObject *object, const char *first_property_name, ...)
+ipatch_type_object_get(GObject *object, const char *first_property_name, ...)
 {
-  va_list args;
-  
-  va_start (args, first_property_name);
-  ipatch_type_object_get_valist (object, first_property_name, args);
-  va_end (args);
+    va_list args;
+
+    va_start(args, first_property_name);
+    ipatch_type_object_get_valist(object, first_property_name, args);
+    va_end(args);
 }
 
 /*
@@ -773,55 +820,57 @@ ipatch_type_object_get (GObject *object, const char *first_property_name, ...)
  * Like ipatch_type_object_get() but uses a va_list.
  */
 void
-ipatch_type_object_get_valist (GObject *object, const char *first_property_name,
-			       va_list args)
+ipatch_type_object_get_valist(GObject *object, const char *first_property_name,
+                              va_list args)
 {
-  GType type;
-  const char *name;
+    GType type;
+    const char *name;
 
-  g_return_if_fail (G_IS_OBJECT (object));
-  g_return_if_fail (first_property_name != NULL);
+    g_return_if_fail(G_IS_OBJECT(object));
+    g_return_if_fail(first_property_name != NULL);
 
-  type = G_OBJECT_TYPE (object);
-  g_return_if_fail (type != 0);
+    type = G_OBJECT_TYPE(object);
+    g_return_if_fail(type != 0);
 
-  name = first_property_name;
-  while (name)
+    name = first_property_name;
+
+    while(name)
     {
-      GValue value = { 0, };
-      GParamSpec *prop_spec;
-      char *error;
+        GValue value = { 0, };
+        GParamSpec *prop_spec;
+        char *error;
 
-      prop_spec = ipatch_type_find_property (name);
+        prop_spec = ipatch_type_find_property(name);
 
-      if (!prop_spec)
-	{
-	  g_warning ("%s: no type property named `%s'",
-		     G_STRLOC, name);
-	  break;
-	}
+        if(!prop_spec)
+        {
+            g_warning("%s: no type property named `%s'",
+                      G_STRLOC, name);
+            break;
+        }
 
-      if (!(prop_spec->flags & G_PARAM_READABLE))
-	{
-	  g_warning ("%s: type property `%s' is not readable",
-		     G_STRLOC, prop_spec->name);
-	  break;
-	}
+        if(!(prop_spec->flags & G_PARAM_READABLE))
+        {
+            g_warning("%s: type property `%s' is not readable",
+                      G_STRLOC, prop_spec->name);
+            break;
+        }
 
-      g_value_init (&value, G_PARAM_SPEC_VALUE_TYPE (prop_spec));
+        g_value_init(&value, G_PARAM_SPEC_VALUE_TYPE(prop_spec));
 
-      type_get_property (type, prop_spec, &value, object);
-      G_VALUE_LCOPY (&value, args, 0, &error);
+        type_get_property(type, prop_spec, &value, object);
+        G_VALUE_LCOPY(&value, args, 0, &error);
 
-      if (error)
-	{
-	  g_warning ("%s: %s", G_STRLOC, error);
-	  g_free (error);
-	  g_value_unset (&value);
-	  break;
-	}
-      g_value_unset (&value);
-      name = va_arg (args, char *);
+        if(error)
+        {
+            g_warning("%s: %s", G_STRLOC, error);
+            g_free(error);
+            g_value_unset(&value);
+            break;
+        }
+
+        g_value_unset(&value);
+        name = va_arg(args, char *);
     }
 }
 
@@ -835,58 +884,59 @@ ipatch_type_object_get_valist (GObject *object, const char *first_property_name,
  * Get a single type property from an @object instance.
  */
 void
-ipatch_type_object_get_property (GObject *object, const char *property_name,
-				 GValue *value)
+ipatch_type_object_get_property(GObject *object, const char *property_name,
+                                GValue *value)
 {
-  GParamSpec *prop_spec;
-  GType type;
+    GParamSpec *prop_spec;
+    GType type;
 
-  g_return_if_fail (G_IS_OBJECT (object));
-  g_return_if_fail (property_name != NULL);
-  g_return_if_fail (G_IS_VALUE (value));
+    g_return_if_fail(G_IS_OBJECT(object));
+    g_return_if_fail(property_name != NULL);
+    g_return_if_fail(G_IS_VALUE(value));
 
-  type = G_OBJECT_TYPE (object);
-  g_return_if_fail (type != 0);
+    type = G_OBJECT_TYPE(object);
+    g_return_if_fail(type != 0);
 
-  prop_spec = ipatch_type_find_property (property_name);
+    prop_spec = ipatch_type_find_property(property_name);
 
-  if (!prop_spec) g_warning ("%s: no type property named `%s'",
-			     G_STRLOC, property_name);
-  else if (!(prop_spec->flags & G_PARAM_READABLE))
-    g_warning ("%s: type property `%s' is not readable",
-	       G_STRLOC, prop_spec->name);
-  else
+    if(!prop_spec)
+        g_warning("%s: no type property named `%s'",
+                  G_STRLOC, property_name);
+    else if(!(prop_spec->flags & G_PARAM_READABLE))
+        g_warning("%s: type property `%s' is not readable",
+                  G_STRLOC, prop_spec->name);
+    else
     {
-      GValue *prop_value, tmp_value = { 0, };
+        GValue *prop_value, tmp_value = { 0, };
 
-      /* auto-conversion of the callers value type */
-      if (G_VALUE_TYPE (value) == G_PARAM_SPEC_VALUE_TYPE (prop_spec))
-	{
-	  g_value_reset (value);
-	  prop_value = value;
-	}
-      else if (!g_value_type_transformable (G_PARAM_SPEC_VALUE_TYPE (prop_spec),
-					    G_VALUE_TYPE (value)))
-	{
-	  g_warning ("can't retrieve type property `%s' of type"
-		     " `%s' as value of type `%s'", prop_spec->name,
-		     g_type_name (G_PARAM_SPEC_VALUE_TYPE (prop_spec)),
-		     G_VALUE_TYPE_NAME (value));
-	  return;
-	}
-      else
-	{
-	  g_value_init (&tmp_value, G_PARAM_SPEC_VALUE_TYPE (prop_spec));
-	  prop_value = &tmp_value;
-	}
+        /* auto-conversion of the callers value type */
+        if(G_VALUE_TYPE(value) == G_PARAM_SPEC_VALUE_TYPE(prop_spec))
+        {
+            g_value_reset(value);
+            prop_value = value;
+        }
+        else if(!g_value_type_transformable(G_PARAM_SPEC_VALUE_TYPE(prop_spec),
+                                            G_VALUE_TYPE(value)))
+        {
+            g_warning("can't retrieve type property `%s' of type"
+                      " `%s' as value of type `%s'", prop_spec->name,
+                      g_type_name(G_PARAM_SPEC_VALUE_TYPE(prop_spec)),
+                      G_VALUE_TYPE_NAME(value));
+            return;
+        }
+        else
+        {
+            g_value_init(&tmp_value, G_PARAM_SPEC_VALUE_TYPE(prop_spec));
+            prop_value = &tmp_value;
+        }
 
-      type_get_property (type, prop_spec, prop_value, object);
+        type_get_property(type, prop_spec, prop_value, object);
 
-      if (prop_value != value)
-	{
-	  g_value_transform (prop_value, value);
-	  g_value_unset (&tmp_value);
-	}
+        if(prop_value != value)
+        {
+            g_value_transform(prop_value, value);
+            g_value_unset(&tmp_value);
+        }
     }
 }
 
@@ -904,10 +954,10 @@ ipatch_type_object_get_property (GObject *object, const char *property_name,
  * melodic preset (determined from a preset's bank number).
  */
 void
-ipatch_type_set_dynamic_func (GType type, const char *property_name,
-			      IpatchTypePropGetFunc func)
+ipatch_type_set_dynamic_func(GType type, const char *property_name,
+                             IpatchTypePropGetFunc func)
 {
-  ipatch_type_set_dynamic_func_full (type, property_name, func, NULL, NULL);
+    ipatch_type_set_dynamic_func_full(type, property_name, func, NULL, NULL);
 }
 
 /**
@@ -930,25 +980,25 @@ ipatch_type_set_dynamic_func (GType type, const char *property_name,
  * Since: 1.1.0
  */
 void
-ipatch_type_set_dynamic_func_full (GType type, const char *property_name,
-			           IpatchTypePropGetFunc func,
-                                   GDestroyNotify notify_func, gpointer user_data)
+ipatch_type_set_dynamic_func_full(GType type, const char *property_name,
+                                  IpatchTypePropGetFunc func,
+                                  GDestroyNotify notify_func, gpointer user_data)
 {
-  GParamSpec *prop_spec;
+    GParamSpec *prop_spec;
 
-  g_return_if_fail (type != 0);
-  g_return_if_fail (property_name != NULL);
+    g_return_if_fail(type != 0);
+    g_return_if_fail(property_name != NULL);
 
-  prop_spec = ipatch_type_find_property (property_name);
+    prop_spec = ipatch_type_find_property(property_name);
 
-  if (!prop_spec)
+    if(!prop_spec)
     {
-      g_warning ("%s: no type property named `%s'",
-		  G_STRLOC, property_name);
-      return;
+        g_warning("%s: no type property named `%s'",
+                  G_STRLOC, property_name);
+        return;
     }
 
-  type_set_property (type, prop_spec, NULL, func, notify_func, user_data);
+    type_set_property(type, prop_spec, NULL, func, notify_func, user_data);
 }
 
 /**
@@ -964,21 +1014,21 @@ ipatch_type_set_dynamic_func_full (GType type, const char *property_name,
  *   registered (not a dynamic type property).
  */
 IpatchTypePropGetFunc
-ipatch_type_get_dynamic_func (GType type, const char *property_name)
+ipatch_type_get_dynamic_func(GType type, const char *property_name)
 {
-  GParamSpec *type_prop_pspec;
-  TypePropValueKey key;
-  TypePropValueVal *val;
+    GParamSpec *type_prop_pspec;
+    TypePropValueKey key;
+    TypePropValueVal *val;
 
-  type_prop_pspec = ipatch_type_find_property (property_name);
-  g_return_val_if_fail (type_prop_pspec != NULL, NULL);
+    type_prop_pspec = ipatch_type_find_property(property_name);
+    g_return_val_if_fail(type_prop_pspec != NULL, NULL);
 
-  key.type = type;
-  key.spec = type_prop_pspec;
+    key.type = type;
+    key.spec = type_prop_pspec;
 
-  G_LOCK (type_prop_value_hash);
-  val = g_hash_table_lookup (type_prop_value_hash, &key);
-  G_UNLOCK (type_prop_value_hash);
+    G_LOCK(type_prop_value_hash);
+    val = g_hash_table_lookup(type_prop_value_hash, &key);
+    G_UNLOCK(type_prop_value_hash);
 
-  return (val ? val->func : NULL);
+    return (val ? val->func : NULL);
 }

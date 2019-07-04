@@ -20,7 +20,7 @@
 /**
  * SECTION: IpatchList
  * @short_description: An object containing a list of object pointers
- * @see_also: 
+ * @see_also:
  * @stability: Stable
  *
  * An object which defines a list of object pointers.  A #GObject reference
@@ -30,56 +30,62 @@
 #include <glib-object.h>
 #include "IpatchList.h"
 
-static void ipatch_list_class_init (IpatchListClass *klass);
-static void ipatch_list_finalize (GObject *gobject);
+static void ipatch_list_class_init(IpatchListClass *klass);
+static void ipatch_list_finalize(GObject *gobject);
 
 static GObjectClass *parent_class = NULL;
 
 
 GType
-ipatch_list_get_type (void)
+ipatch_list_get_type(void)
 {
-  static GType item_type = 0;
+    static GType item_type = 0;
 
-  if (!item_type) {
-    static const GTypeInfo item_info = {
-      sizeof (IpatchListClass), NULL, NULL,
-      (GClassInitFunc) ipatch_list_class_init, NULL, NULL,
-      sizeof (IpatchList), 0,
-      (GInstanceInitFunc) NULL,
-    };
-
-    item_type = g_type_register_static (G_TYPE_OBJECT, "IpatchList",
-					&item_info, 0);
-  }
-
-  return (item_type);
-}
-
-static void
-ipatch_list_class_init (IpatchListClass *klass)
-{
-  GObjectClass *obj_class = G_OBJECT_CLASS (klass);
-  parent_class = g_type_class_peek_parent (klass);
-  obj_class->finalize = ipatch_list_finalize;
-}
-
-static void
-ipatch_list_finalize (GObject *gobject)
-{
-  IpatchList *list = IPATCH_LIST (gobject);
-  GList *p;
-
-  p = list->items;
-  while (p)	  /* unref all objects in list and destroy the list */
+    if(!item_type)
     {
-      g_object_unref (p->data);
-      p = g_list_delete_link (p, p);
-    }
-  list->items = NULL;
+        static const GTypeInfo item_info =
+        {
+            sizeof(IpatchListClass), NULL, NULL,
+            (GClassInitFunc) ipatch_list_class_init, NULL, NULL,
+            sizeof(IpatchList), 0,
+            (GInstanceInitFunc) NULL,
+        };
 
-  if (parent_class->finalize)
-    parent_class->finalize (gobject);
+        item_type = g_type_register_static(G_TYPE_OBJECT, "IpatchList",
+                                           &item_info, 0);
+    }
+
+    return (item_type);
+}
+
+static void
+ipatch_list_class_init(IpatchListClass *klass)
+{
+    GObjectClass *obj_class = G_OBJECT_CLASS(klass);
+    parent_class = g_type_class_peek_parent(klass);
+    obj_class->finalize = ipatch_list_finalize;
+}
+
+static void
+ipatch_list_finalize(GObject *gobject)
+{
+    IpatchList *list = IPATCH_LIST(gobject);
+    GList *p;
+
+    p = list->items;
+
+    while(p)	   /* unref all objects in list and destroy the list */
+    {
+        g_object_unref(p->data);
+        p = g_list_delete_link(p, p);
+    }
+
+    list->items = NULL;
+
+    if(parent_class->finalize)
+    {
+        parent_class->finalize(gobject);
+    }
 }
 
 /**
@@ -92,9 +98,9 @@ ipatch_list_finalize (GObject *gobject)
  * Returns: New object list container object.
  */
 IpatchList *
-ipatch_list_new (void)
+ipatch_list_new(void)
 {
-  return (IPATCH_LIST (g_object_new (IPATCH_TYPE_LIST, NULL)));
+    return (IPATCH_LIST(g_object_new(IPATCH_TYPE_LIST, NULL)));
 }
 
 /**
@@ -107,24 +113,30 @@ ipatch_list_new (void)
  *   caller owns.
  */
 IpatchList *
-ipatch_list_duplicate (IpatchList *list)
+ipatch_list_duplicate(IpatchList *list)
 {
-  IpatchList *newlist;
-  GList *p;
+    IpatchList *newlist;
+    GList *p;
 
-  g_return_val_if_fail (IPATCH_IS_LIST (list), NULL);
+    g_return_val_if_fail(IPATCH_IS_LIST(list), NULL);
 
-  newlist = ipatch_list_new ();	/* ++ ref new list */
-  p = list->items;
-  while (p)
+    newlist = ipatch_list_new();	/* ++ ref new list */
+    p = list->items;
+
+    while(p)
     {
-      if (p->data) g_object_ref (p->data); /* ++ ref object for new list */
-      newlist->items = g_list_prepend (newlist->items, p->data);
-      p = g_list_next (p);
-    }
-  newlist->items = g_list_reverse (newlist->items);
+        if(p->data)
+        {
+            g_object_ref(p->data);    /* ++ ref object for new list */
+        }
 
-  return (newlist);	   /* !! caller owns the new list reference */
+        newlist->items = g_list_prepend(newlist->items, p->data);
+        p = g_list_next(p);
+    }
+
+    newlist->items = g_list_reverse(newlist->items);
+
+    return (newlist);	   /* !! caller owns the new list reference */
 }
 
 /**
@@ -142,11 +154,11 @@ ipatch_list_duplicate (IpatchList *list)
  * Since: 1.1.0
  */
 GList *
-ipatch_list_get_items (IpatchList *list)
+ipatch_list_get_items(IpatchList *list)
 {
-  g_return_val_if_fail (IPATCH_IS_LIST (list), NULL);
+    g_return_val_if_fail(IPATCH_IS_LIST(list), NULL);
 
-  return list->items;
+    return list->items;
 }
 
 /**
@@ -163,16 +175,18 @@ ipatch_list_get_items (IpatchList *list)
  * Since: 1.1.0
  */
 void
-ipatch_list_set_items (IpatchList *list, GList *items)
+ipatch_list_set_items(IpatchList *list, GList *items)
 {
-  GList *p;
+    GList *p;
 
-  g_return_if_fail (IPATCH_IS_LIST (list));
+    g_return_if_fail(IPATCH_IS_LIST(list));
 
-  for (p = list->items; p; p = g_list_delete_link (p, p))
-    g_object_unref (p->data);
+    for(p = list->items; p; p = g_list_delete_link(p, p))
+    {
+        g_object_unref(p->data);
+    }
 
-  list->items = items;  // !! list takes over items
+    list->items = items;  // !! list takes over items
 }
 
 /**
@@ -185,13 +199,13 @@ ipatch_list_set_items (IpatchList *list, GList *items)
  * Since: 1.1.0
  */
 void
-ipatch_list_append (IpatchList *list, GObject *object)
+ipatch_list_append(IpatchList *list, GObject *object)
 {
-  g_return_if_fail (IPATCH_IS_LIST (list));
-  g_return_if_fail (G_IS_OBJECT (object));
+    g_return_if_fail(IPATCH_IS_LIST(list));
+    g_return_if_fail(G_IS_OBJECT(object));
 
-  g_object_ref (object);        // ++ ref for list
-  list->items = g_list_append (list->items, object);
+    g_object_ref(object);         // ++ ref for list
+    list->items = g_list_append(list->items, object);
 }
 
 /**
@@ -204,13 +218,13 @@ ipatch_list_append (IpatchList *list, GObject *object)
  * Since: 1.1.0
  */
 void
-ipatch_list_prepend (IpatchList *list, GObject *object)
+ipatch_list_prepend(IpatchList *list, GObject *object)
 {
-  g_return_if_fail (IPATCH_IS_LIST (list));
-  g_return_if_fail (G_IS_OBJECT (object));
+    g_return_if_fail(IPATCH_IS_LIST(list));
+    g_return_if_fail(G_IS_OBJECT(object));
 
-  g_object_ref (object);        // ++ ref for list
-  list->items = g_list_prepend (list->items, object);
+    g_object_ref(object);         // ++ ref for list
+    list->items = g_list_prepend(list->items, object);
 }
 
 /**
@@ -224,13 +238,13 @@ ipatch_list_prepend (IpatchList *list, GObject *object)
  * Since: 1.1.0
  */
 void
-ipatch_list_insert (IpatchList *list, GObject *object, int pos)
+ipatch_list_insert(IpatchList *list, GObject *object, int pos)
 {
-  g_return_if_fail (IPATCH_IS_LIST (list));
-  g_return_if_fail (G_IS_OBJECT (object));
+    g_return_if_fail(IPATCH_IS_LIST(list));
+    g_return_if_fail(G_IS_OBJECT(object));
 
-  g_object_ref (object);        // ++ ref for list
-  list->items = g_list_insert (list->items, object, pos);
+    g_object_ref(object);         // ++ ref for list
+    list->items = g_list_insert(list->items, object, pos);
 }
 
 /**
@@ -245,20 +259,24 @@ ipatch_list_insert (IpatchList *list, GObject *object, int pos)
  * Since: 1.1.0
  */
 gboolean
-ipatch_list_remove (IpatchList *list, GObject *object)
+ipatch_list_remove(IpatchList *list, GObject *object)
 {
-  GList *p;
+    GList *p;
 
-  g_return_val_if_fail (IPATCH_IS_LIST (list), FALSE);
-  g_return_val_if_fail (G_IS_OBJECT (object), FALSE);
+    g_return_val_if_fail(IPATCH_IS_LIST(list), FALSE);
+    g_return_val_if_fail(G_IS_OBJECT(object), FALSE);
 
-  p = g_list_find (list->items, object);
-  if (!p) return (FALSE);
+    p = g_list_find(list->items, object);
 
-  g_object_unref (p->data);     // -- unref object
-  list->items = g_list_delete_link (list->items, p);
+    if(!p)
+    {
+        return (FALSE);
+    }
 
-  return (TRUE);
+    g_object_unref(p->data);      // -- unref object
+    list->items = g_list_delete_link(list->items, p);
+
+    return (TRUE);
 }
 
 /**
@@ -270,10 +288,10 @@ ipatch_list_remove (IpatchList *list, GObject *object)
  * over the object @list. Further operations on @iter will use the @list.
  */
 void
-ipatch_list_init_iter (IpatchList *list, IpatchIter *iter)
+ipatch_list_init_iter(IpatchList *list, IpatchIter *iter)
 {
-  g_return_if_fail (IPATCH_IS_LIST (list));
-  g_return_if_fail (iter != NULL);
+    g_return_if_fail(IPATCH_IS_LIST(list));
+    g_return_if_fail(iter != NULL);
 
-  ipatch_iter_GList_init (iter, &list->items);
+    ipatch_iter_GList_init(iter, &list->items);
 }

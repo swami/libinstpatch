@@ -58,29 +58,29 @@ typedef struct _IpatchVBankClass IpatchVBankClass;
 /* Virtual bank */
 struct _IpatchVBank
 {
-  IpatchBase parent_instance;
+    IpatchBase parent_instance;
 
-  /*< private >*/
-  char *info[IPATCH_VBANK_INFO_COUNT];
-  GSList *insts;
+    /*< private >*/
+    char *info[IPATCH_VBANK_INFO_COUNT];
+    GSList *insts;
 };
 
 struct _IpatchVBankClass
 {
-  IpatchBaseClass parent_class;
+    IpatchBaseClass parent_class;
 };
 
-GType ipatch_vbank_get_type (void);
-IpatchVBank *ipatch_vbank_new (void);
+GType ipatch_vbank_get_type(void);
+IpatchVBank *ipatch_vbank_new(void);
 
 #define ipatch_vbank_get_insts(vbank) \
     ipatch_container_get_children (IPATCH_CONTAINER (vbank), \
 				   IPATCH_TYPE_VBANK_INST)
 IpatchVBankInst *
-ipatch_vbank_find_inst (IpatchVBank *vbank, const char *name, int bank,
-			int program, const IpatchVBankInst *exclude);
+ipatch_vbank_find_inst(IpatchVBank *vbank, const char *name, int bank,
+                       int program, const IpatchVBankInst *exclude);
 char *
-ipatch_vbank_make_unique_name (IpatchVBank *vbank, const char *name,
-			       const IpatchVBankInst *exclude);
+ipatch_vbank_make_unique_name(IpatchVBank *vbank, const char *name,
+                              const IpatchVBankInst *exclude);
 
 #endif

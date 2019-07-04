@@ -20,7 +20,7 @@
 /**
  * SECTION: IpatchConverter
  * @short_description: Base class for object conversion handlers
- * @see_also: 
+ * @see_also:
  * @stability: Stable
  *
  * A base abstract type for object conversion handlers.
@@ -32,38 +32,39 @@
 #include "IpatchConverter.h"
 #include "i18n.h"
 
-enum {
-  PROP_0,
-  PROP_PROGRESS
+enum
+{
+    PROP_0,
+    PROP_PROGRESS
 };
 
 /* structure used for log entries (the log is a prepend log, newest items
    at the head of the list) */
 typedef struct _LogEntry
 {
-  GObject *item;	   /* item this message applies to or %NULL */
-  guint8 type; /* type of message and flags (IpatchConverterLogType) */
-  union
-  {
-    char *msg;			/* LOG_INFO/WARN/CRITICAL/FATAL */
-    float rating;		/* LOG_RATING */
-  } data;
+    GObject *item;	   /* item this message applies to or %NULL */
+    guint8 type; /* type of message and flags (IpatchConverterLogType) */
+    union
+    {
+        char *msg;			/* LOG_INFO/WARN/CRITICAL/FATAL */
+        float rating;		/* LOG_RATING */
+    } data;
 } LogEntry;
 
 
-static gint priority_GCompareFunc (gconstpointer a, gconstpointer b);
-static const IpatchConverterInfo *convert_lookup_map_U (GType **array, GType conv_type,
-                                                        GType src_type, GType dest_type, guint flags);
-static void ipatch_converter_class_init (IpatchConverterClass *klass);
-static void ipatch_converter_finalize (GObject *gobject);
-static void ipatch_converter_set_property (GObject *object, guint property_id,
-					   const GValue *value,
-					   GParamSpec *pspec);
-static void ipatch_converter_get_property (GObject *object, guint property_id,
-					   GValue *value, GParamSpec *pspec);
+static gint priority_GCompareFunc(gconstpointer a, gconstpointer b);
+static const IpatchConverterInfo *convert_lookup_map_U(GType **array, GType conv_type,
+        GType src_type, GType dest_type, guint flags);
+static void ipatch_converter_class_init(IpatchConverterClass *klass);
+static void ipatch_converter_finalize(GObject *gobject);
+static void ipatch_converter_set_property(GObject *object, guint property_id,
+        const GValue *value,
+        GParamSpec *pspec);
+static void ipatch_converter_get_property(GObject *object, guint property_id,
+        GValue *value, GParamSpec *pspec);
 
 /* lock used for list and hash tables */
-G_LOCK_DEFINE_STATIC (conv_maps);
+G_LOCK_DEFINE_STATIC(conv_maps);
 static GList *conv_maps = NULL;	/* list of all registered IpatchConverterInfo */
 static gpointer parent_class = NULL;
 
@@ -81,22 +82,26 @@ static gpointer parent_class = NULL;
  * Returns: %TRUE on success, %FALSE otherwise (in which case @err may be set)
  */
 gboolean
-ipatch_convert_objects (GObject *input, GObject *output, GError **err)
+ipatch_convert_objects(GObject *input, GObject *output, GError **err)
 {
-  IpatchConverter *conv;
+    IpatchConverter *conv;
 
-  conv = ipatch_create_converter_for_objects (input, output, err);      // ++ ref converter
-  if (!conv) return FALSE;
+    conv = ipatch_create_converter_for_objects(input, output, err);       // ++ ref converter
 
-  if (!ipatch_converter_convert (conv, err))                            // -- unref converter
-  {
-    g_object_unref (conv);
-    return (FALSE);
-  }
+    if(!conv)
+    {
+        return FALSE;
+    }
 
-  g_object_unref (conv);                                                // -- unref converter
+    if(!ipatch_converter_convert(conv, err))                              // -- unref converter
+    {
+        g_object_unref(conv);
+        return (FALSE);
+    }
 
-  return (TRUE);
+    g_object_unref(conv);                                                 // -- unref converter
+
+    return (TRUE);
 }
 
 /**
@@ -114,56 +119,64 @@ ipatch_convert_objects (GObject *input, GObject *output, GError **err)
  * case @err may be set). The returned object has a refcount of 1 which the caller owns.
  */
 GObject *
-ipatch_convert_object_to_type (GObject *object, GType type, GError **err)
+ipatch_convert_object_to_type(GObject *object, GType type, GError **err)
 {
-  const IpatchConverterInfo *info;
-  IpatchConverter *conv;
-  GObject *output = NULL;
-  GType convtype;
+    const IpatchConverterInfo *info;
+    IpatchConverter *conv;
+    GObject *output = NULL;
+    GType convtype;
 
-  convtype = ipatch_find_converter (G_OBJECT_TYPE (object), type);
-  if (!convtype)
-  {
-    g_set_error (err, IPATCH_ERROR, IPATCH_ERROR_UNHANDLED_CONVERSION,
-                 _("Unsupported conversion of type %s to %s"),
-                 G_OBJECT_TYPE_NAME (object), g_type_name (type));
-    return (NULL);
-  }
+    convtype = ipatch_find_converter(G_OBJECT_TYPE(object), type);
 
-  info = ipatch_lookup_converter_info (convtype, G_OBJECT_TYPE (object), type);
-  g_return_val_if_fail (info != NULL, NULL);	/* shouldn't happen */
-
-  if (info->dest_count < 0 || info->dest_count > 1)
+    if(!convtype)
     {
-      g_set_error (err, IPATCH_ERROR, IPATCH_ERROR_UNSUPPORTED,
-		   _("Conversion from %s to %s requires %d outputs"),
-		   G_OBJECT_TYPE_NAME (object), g_type_name (type),
-		   info->dest_count);
-      return (NULL);
+        g_set_error(err, IPATCH_ERROR, IPATCH_ERROR_UNHANDLED_CONVERSION,
+                    _("Unsupported conversion of type %s to %s"),
+                    G_OBJECT_TYPE_NAME(object), g_type_name(type));
+        return (NULL);
     }
 
-  conv = IPATCH_CONVERTER (g_object_new (convtype, NULL));	/* ++ ref */
+    info = ipatch_lookup_converter_info(convtype, G_OBJECT_TYPE(object), type);
+    g_return_val_if_fail(info != NULL, NULL);	/* shouldn't happen */
 
-  ipatch_converter_add_input (conv, object);
+    if(info->dest_count < 0 || info->dest_count > 1)
+    {
+        g_set_error(err, IPATCH_ERROR, IPATCH_ERROR_UNSUPPORTED,
+                    _("Conversion from %s to %s requires %d outputs"),
+                    G_OBJECT_TYPE_NAME(object), g_type_name(type),
+                    info->dest_count);
+        return (NULL);
+    }
 
-  if (info->dest_count == 1)	/* if 1 output object expected, create it */
-  {
-      output = g_object_new (type, NULL);	/* ++ ref */
-    ipatch_converter_add_output (conv, output);
-  }
+    conv = IPATCH_CONVERTER(g_object_new(convtype, NULL));	/* ++ ref */
 
-  if (!ipatch_converter_convert (conv, err))	/* do the conversion */
-  {
-      if (output) g_object_unref (output);
-      g_object_unref (conv);
-    return (NULL);
-  }
+    ipatch_converter_add_input(conv, object);
 
-  if (!output) output = ipatch_converter_get_output (conv);	/* ++ ref */
+    if(info->dest_count == 1)	/* if 1 output object expected, create it */
+    {
+        output = g_object_new(type, NULL);	/* ++ ref */
+        ipatch_converter_add_output(conv, output);
+    }
 
-  g_object_unref (conv);
+    if(!ipatch_converter_convert(conv, err))	/* do the conversion */
+    {
+        if(output)
+        {
+            g_object_unref(output);
+        }
 
-  return (output);	/* !! caller takes over reference */
+        g_object_unref(conv);
+        return (NULL);
+    }
+
+    if(!output)
+    {
+        output = ipatch_converter_get_output(conv);    /* ++ ref */
+    }
+
+    g_object_unref(conv);
+
+    return (output);	/* !! caller takes over reference */
 }
 
 /**
@@ -180,9 +193,9 @@ ipatch_convert_object_to_type (GObject *object, GType type, GError **err)
  * case @err may be set). The returned object list has a refcount of 1 which the caller owns.
  */
 IpatchList *
-ipatch_convert_object_to_type_multi (GObject *object, GType type, GError **err)
+ipatch_convert_object_to_type_multi(GObject *object, GType type, GError **err)
 {
-  return (ipatch_convert_object_to_type_multi_set (object, type, err, NULL));
+    return (ipatch_convert_object_to_type_multi_set(object, type, err, NULL));
 }
 
 /**
@@ -201,9 +214,9 @@ ipatch_convert_object_to_type_multi (GObject *object, GType type, GError **err)
  * Since: 1.1.0
  */
 GList *
-ipatch_convert_object_to_type_multi_list (GObject *object, GType type, GError **err)
+ipatch_convert_object_to_type_multi_list(GObject *object, GType type, GError **err)
 {
-  return (ipatch_convert_object_to_type_multi_set_vlist (object, type, err, NULL, NULL));
+    return (ipatch_convert_object_to_type_multi_set_vlist(object, type, err, NULL, NULL));
 }
 
 /**
@@ -225,23 +238,26 @@ ipatch_convert_object_to_type_multi_list (GObject *object, GType type, GError **
  * case @err may be set). The returned object list has a refcount of 1 which the caller owns.
  */
 IpatchList *
-ipatch_convert_object_to_type_multi_set (GObject *object, GType type, GError **err,
-                                         const char *first_property_name, ...)
+ipatch_convert_object_to_type_multi_set(GObject *object, GType type, GError **err,
+                                        const char *first_property_name, ...)
 {
-  IpatchList *list;
-  GList *items;
-  va_list args;
+    IpatchList *list;
+    GList *items;
+    va_list args;
 
-  va_start (args, first_property_name);
-  items = ipatch_convert_object_to_type_multi_set_vlist (object, type,          // ++ alloc items list
-                                                         err, first_property_name, args);
-  va_end (args);
+    va_start(args, first_property_name);
+    items = ipatch_convert_object_to_type_multi_set_vlist(object, type,           // ++ alloc items list
+            err, first_property_name, args);
+    va_end(args);
 
-  if (!items) return NULL;
+    if(!items)
+    {
+        return NULL;
+    }
 
-  list = ipatch_list_new ();            // ++ ref new list
-  list->items = items;                  // !! Assign items to list
-  return list;                          // !! Caller takes over list
+    list = ipatch_list_new();             // ++ ref new list
+    list->items = items;                  // !! Assign items to list
+    return list;                          // !! Caller takes over list
 }
 
 /**
@@ -265,29 +281,35 @@ ipatch_convert_object_to_type_multi_set (GObject *object, GType type, GError **e
  * Since: 1.1.0
  */
 GList *
-ipatch_convert_object_to_type_multi_set_vlist (GObject *object, GType type, GError **err,
-                                               const char *first_property_name, va_list args)
+ipatch_convert_object_to_type_multi_set_vlist(GObject *object, GType type, GError **err,
+        const char *first_property_name, va_list args)
 {
-  IpatchConverter *conv;
-  GList *items;
+    IpatchConverter *conv;
+    GList *items;
 
-  conv = ipatch_create_converter_for_object_to_type (object, type, err);        // ++ ref converter
-  if (!conv) return NULL;
+    conv = ipatch_create_converter_for_object_to_type(object, type, err);         // ++ ref converter
 
-  if (first_property_name)
-    g_object_set_valist ((GObject *)conv, first_property_name, args);
+    if(!conv)
+    {
+        return NULL;
+    }
 
-  if (!ipatch_converter_convert (conv, err))	/* do the conversion */
-  {
-    g_object_unref (conv);                      // -- unref converter
-    return (NULL);
-  }
+    if(first_property_name)
+    {
+        g_object_set_valist((GObject *)conv, first_property_name, args);
+    }
 
-  items = ipatch_converter_get_outputs_list (conv);     /* ++ alloc object list */
+    if(!ipatch_converter_convert(conv, err))	/* do the conversion */
+    {
+        g_object_unref(conv);                       // -- unref converter
+        return (NULL);
+    }
 
-  g_object_unref (conv);        /* -- unref converter */
+    items = ipatch_converter_get_outputs_list(conv);      /* ++ alloc object list */
 
-  return (items);	/* !! caller takes over ownership */
+    g_object_unref(conv);         /* -- unref converter */
+
+    return (items);	/* !! caller takes over ownership */
 }
 
 /**
@@ -305,18 +327,22 @@ ipatch_convert_object_to_type_multi_set_vlist (GObject *object, GType type, GErr
  *   handler type.
  */
 IpatchConverter *
-ipatch_create_converter (GType src_type, GType dest_type)
+ipatch_create_converter(GType src_type, GType dest_type)
 {
-  GType conv_type;
+    GType conv_type;
 
-  g_return_val_if_fail (g_type_is_a (src_type, G_TYPE_OBJECT), NULL);
-  g_return_val_if_fail (g_type_is_a (dest_type, G_TYPE_OBJECT), NULL);
+    g_return_val_if_fail(g_type_is_a(src_type, G_TYPE_OBJECT), NULL);
+    g_return_val_if_fail(g_type_is_a(dest_type, G_TYPE_OBJECT), NULL);
 
-  conv_type = ipatch_find_converter (src_type, dest_type);
-  if (!conv_type) return (NULL);
+    conv_type = ipatch_find_converter(src_type, dest_type);
 
-  /* ++ ref new object and let the caller have it */
-  return (IPATCH_CONVERTER (g_object_new (conv_type, NULL)));
+    if(!conv_type)
+    {
+        return (NULL);
+    }
+
+    /* ++ ref new object and let the caller have it */
+    return (IPATCH_CONVERTER(g_object_new(conv_type, NULL)));
 }
 
 /**
@@ -334,29 +360,29 @@ ipatch_create_converter (GType src_type, GType dest_type)
  * Since: 1.1.0
  */
 IpatchConverter *
-ipatch_create_converter_for_objects (GObject *input, GObject *output, GError **err)
+ipatch_create_converter_for_objects(GObject *input, GObject *output, GError **err)
 {
-  IpatchConverter *conv;
+    IpatchConverter *conv;
 
-  g_return_val_if_fail (G_IS_OBJECT (input), FALSE);
-  g_return_val_if_fail (G_IS_OBJECT (output), FALSE);
-  g_return_val_if_fail (!err || !*err, FALSE);
+    g_return_val_if_fail(G_IS_OBJECT(input), FALSE);
+    g_return_val_if_fail(G_IS_OBJECT(output), FALSE);
+    g_return_val_if_fail(!err || !*err, FALSE);
 
-  /* ++ ref new converter */
-  conv = ipatch_create_converter (G_OBJECT_TYPE (input), G_OBJECT_TYPE (output));
+    /* ++ ref new converter */
+    conv = ipatch_create_converter(G_OBJECT_TYPE(input), G_OBJECT_TYPE(output));
 
-  if (!conv)
-  {
-    g_set_error (err, IPATCH_ERROR, IPATCH_ERROR_UNHANDLED_CONVERSION,
-                 _("Unsupported conversion of type %s to %s."),
-                 G_OBJECT_TYPE_NAME (input), G_OBJECT_TYPE_NAME (output));
-    return (FALSE);
-  }
+    if(!conv)
+    {
+        g_set_error(err, IPATCH_ERROR, IPATCH_ERROR_UNHANDLED_CONVERSION,
+                    _("Unsupported conversion of type %s to %s."),
+                    G_OBJECT_TYPE_NAME(input), G_OBJECT_TYPE_NAME(output));
+        return (FALSE);
+    }
 
-  ipatch_converter_add_input (conv, input);
-  ipatch_converter_add_output (conv, output);
+    ipatch_converter_add_input(conv, input);
+    ipatch_converter_add_output(conv, output);
 
-  return (conv);        // !! Caller takes over reference
+    return (conv);        // !! Caller takes over reference
 }
 
 /**
@@ -375,43 +401,43 @@ ipatch_create_converter_for_objects (GObject *input, GObject *output, GError **e
  * Since: 1.1.0
  */
 IpatchConverter *
-ipatch_create_converter_for_object_to_type (GObject *object, GType dest_type, GError **err)
+ipatch_create_converter_for_object_to_type(GObject *object, GType dest_type, GError **err)
 {
-  const IpatchConverterInfo *info;
-  IpatchConverter *conv;
-  GObject *output = NULL;
-  GType convtype;
-  int i;
+    const IpatchConverterInfo *info;
+    IpatchConverter *conv;
+    GObject *output = NULL;
+    GType convtype;
+    int i;
 
-  convtype = ipatch_find_converter (G_OBJECT_TYPE (object), dest_type);
+    convtype = ipatch_find_converter(G_OBJECT_TYPE(object), dest_type);
 
-  if (!convtype)
-  {
-    g_set_error (err, IPATCH_ERROR, IPATCH_ERROR_UNHANDLED_CONVERSION,
-                 _("Unsupported conversion of type %s to %s"),
-                 G_OBJECT_TYPE_NAME (object), g_type_name (dest_type));
-    return (NULL);
-  }
-
-  info = ipatch_lookup_converter_info (convtype, G_OBJECT_TYPE (object), dest_type);
-  g_return_val_if_fail (info != NULL, NULL);	/* shouldn't happen */
-
-  conv = IPATCH_CONVERTER (g_object_new (convtype, NULL));	/* ++ ref */
-
-  ipatch_converter_add_input (conv, object);
-
-
-  if (info->dest_count > 0)	/* if outputs are expected, create them */
-  {
-    for (i = 0; i < info->dest_count; i++)
+    if(!convtype)
     {
-      output = g_object_new (dest_type, NULL);	/* ++ ref output */
-      ipatch_converter_add_output (conv, output);
-      g_object_unref (output);  /* -- unref output */
+        g_set_error(err, IPATCH_ERROR, IPATCH_ERROR_UNHANDLED_CONVERSION,
+                    _("Unsupported conversion of type %s to %s"),
+                    G_OBJECT_TYPE_NAME(object), g_type_name(dest_type));
+        return (NULL);
     }
-  }
 
-  return (conv);                /* !! caller takes over reference */
+    info = ipatch_lookup_converter_info(convtype, G_OBJECT_TYPE(object), dest_type);
+    g_return_val_if_fail(info != NULL, NULL);	/* shouldn't happen */
+
+    conv = IPATCH_CONVERTER(g_object_new(convtype, NULL));	/* ++ ref */
+
+    ipatch_converter_add_input(conv, object);
+
+
+    if(info->dest_count > 0)	/* if outputs are expected, create them */
+    {
+        for(i = 0; i < info->dest_count; i++)
+        {
+            output = g_object_new(dest_type, NULL);	/* ++ ref output */
+            ipatch_converter_add_output(conv, output);
+            g_object_unref(output);   /* -- unref output */
+        }
+    }
+
+    return (conv);                /* !! caller takes over reference */
 }
 
 /**
@@ -441,58 +467,66 @@ ipatch_create_converter_for_object_to_type (GObject *object, GType dest_type, GE
  * Since: 1.1.0
  */
 void
-ipatch_register_converter_map (GType conv_type, guint8 flags, guint8 priority,
-			       GType src_type, GType src_match, gint8 src_count,
-			       GType dest_type, GType dest_match, gint8 dest_count)
+ipatch_register_converter_map(GType conv_type, guint8 flags, guint8 priority,
+                              GType src_type, GType src_match, gint8 src_count,
+                              GType dest_type, GType dest_match, gint8 dest_count)
 {
-  const IpatchConverterInfo *converter_exists;
-  IpatchConverterInfo *map;
+    const IpatchConverterInfo *converter_exists;
+    IpatchConverterInfo *map;
 
-  g_return_if_fail (g_type_is_a (conv_type, IPATCH_TYPE_CONVERTER));
-  g_return_if_fail (g_type_is_a (src_type, G_TYPE_OBJECT) || G_TYPE_IS_INTERFACE (src_type));
-  g_return_if_fail (g_type_is_a (dest_type, G_TYPE_OBJECT) || G_TYPE_IS_INTERFACE (dest_type));
+    g_return_if_fail(g_type_is_a(conv_type, IPATCH_TYPE_CONVERTER));
+    g_return_if_fail(g_type_is_a(src_type, G_TYPE_OBJECT) || G_TYPE_IS_INTERFACE(src_type));
+    g_return_if_fail(g_type_is_a(dest_type, G_TYPE_OBJECT) || G_TYPE_IS_INTERFACE(dest_type));
 
-  g_return_if_fail (!src_match || g_type_is_a (src_type, src_match));
-  g_return_if_fail (!dest_match || g_type_is_a (dest_type, dest_match));
+    g_return_if_fail(!src_match || g_type_is_a(src_type, src_match));
+    g_return_if_fail(!dest_match || g_type_is_a(dest_type, dest_match));
 
-  converter_exists = ipatch_lookup_converter_info (conv_type, 0, 0);
-  g_return_if_fail (!converter_exists);
+    converter_exists = ipatch_lookup_converter_info(conv_type, 0, 0);
+    g_return_if_fail(!converter_exists);
 
-  priority = flags & 0xFF;
-  if (priority == 0) priority = IPATCH_CONVERTER_PRIORITY_DEFAULT;
+    priority = flags & 0xFF;
 
-  // Enable derived flags for interface types
+    if(priority == 0)
+    {
+        priority = IPATCH_CONVERTER_PRIORITY_DEFAULT;
+    }
 
-  if (G_TYPE_IS_INTERFACE (src_type))
-    flags |= IPATCH_CONVERTER_SRC_DERIVED;
+    // Enable derived flags for interface types
 
-  if (G_TYPE_IS_INTERFACE (dest_type))
-    flags |= IPATCH_CONVERTER_DEST_DERIVED;
+    if(G_TYPE_IS_INTERFACE(src_type))
+    {
+        flags |= IPATCH_CONVERTER_SRC_DERIVED;
+    }
 
-  map = g_slice_new (IpatchConverterInfo);
-  map->conv_type = conv_type;
-  map->flags = flags;
-  map->priority = priority;
-  map->src_type = src_type;
-  map->src_match = src_match;
-  map->src_count = src_count;
-  map->dest_type = dest_type;
-  map->dest_match = dest_match;
-  map->dest_count = dest_count;
+    if(G_TYPE_IS_INTERFACE(dest_type))
+    {
+        flags |= IPATCH_CONVERTER_DEST_DERIVED;
+    }
 
-  G_LOCK (conv_maps);
-  conv_maps = g_list_insert_sorted (conv_maps, map, priority_GCompareFunc);
-  G_UNLOCK (conv_maps);
+    map = g_slice_new(IpatchConverterInfo);
+    map->conv_type = conv_type;
+    map->flags = flags;
+    map->priority = priority;
+    map->src_type = src_type;
+    map->src_match = src_match;
+    map->src_count = src_count;
+    map->dest_type = dest_type;
+    map->dest_match = dest_match;
+    map->dest_count = dest_count;
+
+    G_LOCK(conv_maps);
+    conv_maps = g_list_insert_sorted(conv_maps, map, priority_GCompareFunc);
+    G_UNLOCK(conv_maps);
 }
 
 /* GList GCompareFunc to sort list by mapping priority */
 static gint
-priority_GCompareFunc (gconstpointer a, gconstpointer b)
+priority_GCompareFunc(gconstpointer a, gconstpointer b)
 {
-  IpatchConverterInfo *mapa = (IpatchConverterInfo *)a, *mapb = (IpatchConverterInfo *)b;
+    IpatchConverterInfo *mapa = (IpatchConverterInfo *)a, *mapb = (IpatchConverterInfo *)b;
 
-  /* priority sorts from highest to lowest, so subtract a from b */
-  return (mapb->priority - mapa->priority);
+    /* priority sorts from highest to lowest, so subtract a from b */
+    return (mapb->priority - mapa->priority);
 }
 
 /**
@@ -509,18 +543,18 @@ priority_GCompareFunc (gconstpointer a, gconstpointer b)
  *   handler or 0 if no matches.
  */
 GType
-ipatch_find_converter (GType src_type, GType dest_type)
+ipatch_find_converter(GType src_type, GType dest_type)
 {
-  const IpatchConverterInfo *info;
+    const IpatchConverterInfo *info;
 
-  g_return_val_if_fail (g_type_is_a (src_type, G_TYPE_OBJECT) || G_TYPE_IS_INTERFACE (src_type), 0);
-  g_return_val_if_fail (g_type_is_a (dest_type, G_TYPE_OBJECT) || G_TYPE_IS_INTERFACE (dest_type), 0);
+    g_return_val_if_fail(g_type_is_a(src_type, G_TYPE_OBJECT) || G_TYPE_IS_INTERFACE(src_type), 0);
+    g_return_val_if_fail(g_type_is_a(dest_type, G_TYPE_OBJECT) || G_TYPE_IS_INTERFACE(dest_type), 0);
 
-  G_LOCK (conv_maps);
-  info = convert_lookup_map_U (NULL, 0, src_type, dest_type, 0);
-  G_UNLOCK (conv_maps);
+    G_LOCK(conv_maps);
+    info = convert_lookup_map_U(NULL, 0, src_type, dest_type, 0);
+    G_UNLOCK(conv_maps);
 
-  return (info ? info->conv_type : 0);
+    return (info ? info->conv_type : 0);
 }
 
 /**
@@ -537,15 +571,15 @@ ipatch_find_converter (GType src_type, GType dest_type)
  * Since: 1.1.0
  */
 GType *
-ipatch_find_converters (GType src_type, GType dest_type, guint flags)
+ipatch_find_converters(GType src_type, GType dest_type, guint flags)
 {
-  GType *types_array;
+    GType *types_array;
 
-  G_LOCK (conv_maps);
-  convert_lookup_map_U (&types_array, 0, src_type, dest_type, flags);
-  G_UNLOCK (conv_maps);
+    G_LOCK(conv_maps);
+    convert_lookup_map_U(&types_array, 0, src_type, dest_type, flags);
+    G_UNLOCK(conv_maps);
 
-  return types_array;
+    return types_array;
 }
 
 /* Lookup a IpatchConverterInfo in the conv_maps list (caller responsible for LOCK of conv_maps).
@@ -554,73 +588,110 @@ ipatch_find_converters (GType src_type, GType dest_type, guint flags)
  * IpatchConverterInfo structures are considered static (never unregistered and don't change).
  */
 static const IpatchConverterInfo *
-convert_lookup_map_U (GType **array, GType conv_type, GType src_type, GType dest_type, guint flags)
+convert_lookup_map_U(GType **array, GType conv_type, GType src_type, GType dest_type, guint flags)
 {
-  GArray *types_array = NULL;
-  IpatchConverterInfo *info;
-  GList *p;
+    GArray *types_array = NULL;
+    IpatchConverterInfo *info;
+    GList *p;
 
-  if (array) *array = NULL;
-  if (conv_type == G_TYPE_NONE) conv_type = 0;
-  if (src_type == G_TYPE_NONE) src_type = 0;
-  if (dest_type == G_TYPE_NONE) dest_type = 0;
-
-  for (p = conv_maps; p; p = p->next)
-  {
-    info = (IpatchConverterInfo *)(p->data);
-
-    if (conv_type && conv_type != info->conv_type)
-      continue;
-
-    if (src_type)
+    if(array)
     {
-      if ((flags | info->flags) & IPATCH_CONVERTER_SRC_DERIVED)         // If derived flag set (from map or caller) and source type is not a descendant of map type, skip
-      { // Derived will automatically be set for interface types as well
-        if (!g_type_is_a (info->src_type, src_type))
-          continue;
-      }
-      else if (info->src_match) // If parent source match set and type is outside of map type range of src_match <-> src_type, skip
-      {
-        if (!g_type_is_a (src_type, info->src_match)
-            || (src_type != info->src_type && g_type_is_a (src_type, info->src_type)))
-          continue;
-      }                 // Neither derived or src_map, just do a direct comparison
-      else if (src_type != info->src_type)
-        continue;
+        *array = NULL;
     }
 
-    if (dest_type)
+    if(conv_type == G_TYPE_NONE)
     {
-      if ((flags | info->flags) & IPATCH_CONVERTER_DEST_DERIVED)        // If derived flag set and destination type is not a descendant of map type, skip
-      { // Derived will automatically be set for interface types as well
-        if (!g_type_is_a (info->dest_type, dest_type))
-          continue;
-      }
-      else if (info->dest_match)        // If parent destination match set and type is outside of map type range of dest_match <-> dest_type, skip
-      {
-        if (!g_type_is_a (dest_type, info->dest_match)
-            || (dest_type != info->dest_type && g_type_is_a (dest_type, info->dest_type)))
-          continue;
-      }                 // Neither derived or dest_map, just do a direct comparison
-      else if (dest_type != info->dest_type)
-        continue;
+        conv_type = 0;
     }
 
-    if (!array)         // Not requesting array? Just return highest priority match
-      return info;
+    if(src_type == G_TYPE_NONE)
+    {
+        src_type = 0;
+    }
 
-    // Create types array if not already created
-    if (!types_array)
-      types_array = g_array_new (TRUE, FALSE, sizeof (GType));
+    if(dest_type == G_TYPE_NONE)
+    {
+        dest_type = 0;
+    }
 
-    g_array_append_val (types_array, info->conv_type);          // Append converter type to array
-  }
+    for(p = conv_maps; p; p = p->next)
+    {
+        info = (IpatchConverterInfo *)(p->data);
 
-  /* free type array but not the array itself */
-  if (types_array)
-    *array = (GType *)g_array_free (types_array, FALSE);
+        if(conv_type && conv_type != info->conv_type)
+        {
+            continue;
+        }
 
-  return NULL;
+        if(src_type)
+        {
+            if((flags | info->flags) & IPATCH_CONVERTER_SRC_DERIVED)          // If derived flag set (from map or caller) and source type is not a descendant of map type, skip
+            {
+                // Derived will automatically be set for interface types as well
+                if(!g_type_is_a(info->src_type, src_type))
+                {
+                    continue;
+                }
+            }
+            else if(info->src_match)  // If parent source match set and type is outside of map type range of src_match <-> src_type, skip
+            {
+                if(!g_type_is_a(src_type, info->src_match)
+                        || (src_type != info->src_type && g_type_is_a(src_type, info->src_type)))
+                {
+                    continue;
+                }
+            }                 // Neither derived or src_map, just do a direct comparison
+            else if(src_type != info->src_type)
+            {
+                continue;
+            }
+        }
+
+        if(dest_type)
+        {
+            if((flags | info->flags) & IPATCH_CONVERTER_DEST_DERIVED)         // If derived flag set and destination type is not a descendant of map type, skip
+            {
+                // Derived will automatically be set for interface types as well
+                if(!g_type_is_a(info->dest_type, dest_type))
+                {
+                    continue;
+                }
+            }
+            else if(info->dest_match)         // If parent destination match set and type is outside of map type range of dest_match <-> dest_type, skip
+            {
+                if(!g_type_is_a(dest_type, info->dest_match)
+                        || (dest_type != info->dest_type && g_type_is_a(dest_type, info->dest_type)))
+                {
+                    continue;
+                }
+            }                 // Neither derived or dest_map, just do a direct comparison
+            else if(dest_type != info->dest_type)
+            {
+                continue;
+            }
+        }
+
+        if(!array)          // Not requesting array? Just return highest priority match
+        {
+            return info;
+        }
+
+        // Create types array if not already created
+        if(!types_array)
+        {
+            types_array = g_array_new(TRUE, FALSE, sizeof(GType));
+        }
+
+        g_array_append_val(types_array, info->conv_type);           // Append converter type to array
+    }
+
+    /* free type array but not the array itself */
+    if(types_array)
+    {
+        *array = (GType *)g_array_free(types_array, FALSE);
+    }
+
+    return NULL;
 }
 
 /**
@@ -635,15 +706,15 @@ convert_lookup_map_U (GType **array, GType conv_type, GType src_type, GType dest
  * The returned pointer is internal and should not be modified or freed.
  */
 const IpatchConverterInfo *
-ipatch_lookup_converter_info (GType conv_type, GType src_type, GType dest_type)
+ipatch_lookup_converter_info(GType conv_type, GType src_type, GType dest_type)
 {
-  const IpatchConverterInfo *info;
+    const IpatchConverterInfo *info;
 
-  G_LOCK (conv_maps);
-  info = convert_lookup_map_U (NULL, conv_type, src_type, dest_type, 0);
-  G_UNLOCK (conv_maps);
+    G_LOCK(conv_maps);
+    info = convert_lookup_map_U(NULL, conv_type, src_type, dest_type, 0);
+    G_UNLOCK(conv_maps);
 
-  return (info);
+    return (info);
 }
 
 /**
@@ -658,116 +729,126 @@ ipatch_lookup_converter_info (GType conv_type, GType src_type, GType dest_type)
  * Since: 1.1.0
  */
 const IpatchConverterInfo *
-ipatch_get_converter_info (GType conv_type)
+ipatch_get_converter_info(GType conv_type)
 {
-  return ipatch_lookup_converter_info (conv_type, 0, 0);
+    return ipatch_lookup_converter_info(conv_type, 0, 0);
 }
 
 
 GType
-ipatch_converter_get_type (void)
+ipatch_converter_get_type(void)
 {
-  static GType obj_type = 0;
+    static GType obj_type = 0;
 
-  if (!obj_type) {
-    static const GTypeInfo obj_info = {
-      sizeof (IpatchConverterClass), NULL, NULL,
-      (GClassInitFunc)ipatch_converter_class_init, NULL, NULL,
-      sizeof (IpatchConverter), 0,
-      (GInstanceInitFunc) NULL,
-    };
+    if(!obj_type)
+    {
+        static const GTypeInfo obj_info =
+        {
+            sizeof(IpatchConverterClass), NULL, NULL,
+            (GClassInitFunc)ipatch_converter_class_init, NULL, NULL,
+            sizeof(IpatchConverter), 0,
+            (GInstanceInitFunc) NULL,
+        };
 
-    obj_type = g_type_register_static (G_TYPE_OBJECT, "IpatchConverter",
-				       &obj_info, G_TYPE_FLAG_ABSTRACT);
-  }
+        obj_type = g_type_register_static(G_TYPE_OBJECT, "IpatchConverter",
+                                          &obj_info, G_TYPE_FLAG_ABSTRACT);
+    }
 
-  return (obj_type);
+    return (obj_type);
 }
 
 static void
-ipatch_converter_class_init (IpatchConverterClass *klass)
+ipatch_converter_class_init(IpatchConverterClass *klass)
 {
-  GObjectClass *obj_class = G_OBJECT_CLASS (klass);
+    GObjectClass *obj_class = G_OBJECT_CLASS(klass);
 
-  parent_class = g_type_class_peek_parent (klass);
+    parent_class = g_type_class_peek_parent(klass);
 
-  obj_class->set_property = ipatch_converter_set_property;
-  obj_class->get_property = ipatch_converter_get_property;
-  obj_class->finalize = ipatch_converter_finalize;
+    obj_class->set_property = ipatch_converter_set_property;
+    obj_class->get_property = ipatch_converter_get_property;
+    obj_class->finalize = ipatch_converter_finalize;
 
-  g_object_class_install_property (obj_class, PROP_PROGRESS,
-				g_param_spec_float ("progress", _("Progress"),
-						    _("Conversion progress"),
-						    0.0, 1.0, 0.0,
-						    G_PARAM_READWRITE));
+    g_object_class_install_property(obj_class, PROP_PROGRESS,
+                                    g_param_spec_float("progress", _("Progress"),
+                                            _("Conversion progress"),
+                                            0.0, 1.0, 0.0,
+                                            G_PARAM_READWRITE));
 }
 
 /* function called when a patch is being destroyed */
 static void
-ipatch_converter_finalize (GObject *gobject)
+ipatch_converter_finalize(GObject *gobject)
 {
-  IpatchConverter *converter = IPATCH_CONVERTER (gobject);
-  GList *p;
+    IpatchConverter *converter = IPATCH_CONVERTER(gobject);
+    GList *p;
 
-  // Call destroy notify function for link function assignment (if set)
-  if (converter->notify_func)
-    converter->notify_func (converter->user_data);
-
-  p = converter->inputs;
-  while (p)
+    // Call destroy notify function for link function assignment (if set)
+    if(converter->notify_func)
     {
-      g_object_unref (p->data);
-      p = g_list_delete_link (p, p);
+        converter->notify_func(converter->user_data);
     }
 
-  p = converter->outputs;
-  while (p)
+    p = converter->inputs;
+
+    while(p)
     {
-      g_object_unref (p->data);
-      p = g_list_delete_link (p, p);
+        g_object_unref(p->data);
+        p = g_list_delete_link(p, p);
     }
 
-  if (G_OBJECT_CLASS (parent_class)->finalize)
-    G_OBJECT_CLASS (parent_class)->finalize (gobject);
-}
+    p = converter->outputs;
 
-static void
-ipatch_converter_set_property (GObject *object, guint property_id,
-			       const GValue *value, GParamSpec *pspec)
-{
-  IpatchConverter *converter;
-
-  g_return_if_fail (IPATCH_IS_CONVERTER (object));
-  converter = IPATCH_CONVERTER (object);
-
-  switch (property_id)
+    while(p)
     {
-    case PROP_PROGRESS:
-      converter->progress = g_value_get_float (value);
-      break;
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
-      break;
+        g_object_unref(p->data);
+        p = g_list_delete_link(p, p);
+    }
+
+    if(G_OBJECT_CLASS(parent_class)->finalize)
+    {
+        G_OBJECT_CLASS(parent_class)->finalize(gobject);
     }
 }
 
 static void
-ipatch_converter_get_property (GObject *object, guint property_id,
-			       GValue *value, GParamSpec *pspec)
+ipatch_converter_set_property(GObject *object, guint property_id,
+                              const GValue *value, GParamSpec *pspec)
 {
-  IpatchConverter *converter;
+    IpatchConverter *converter;
 
-  g_return_if_fail (IPATCH_IS_CONVERTER (object));
-  converter = IPATCH_CONVERTER (object);
+    g_return_if_fail(IPATCH_IS_CONVERTER(object));
+    converter = IPATCH_CONVERTER(object);
 
-  switch (property_id)
+    switch(property_id)
     {
     case PROP_PROGRESS:
-      g_value_set_float (value, converter->progress);
-      break;
+        converter->progress = g_value_get_float(value);
+        break;
+
     default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
-      break;
+        G_OBJECT_WARN_INVALID_PROPERTY_ID(object, property_id, pspec);
+        break;
+    }
+}
+
+static void
+ipatch_converter_get_property(GObject *object, guint property_id,
+                              GValue *value, GParamSpec *pspec)
+{
+    IpatchConverter *converter;
+
+    g_return_if_fail(IPATCH_IS_CONVERTER(object));
+    converter = IPATCH_CONVERTER(object);
+
+    switch(property_id)
+    {
+    case PROP_PROGRESS:
+        g_value_set_float(value, converter->progress);
+        break;
+
+    default:
+        G_OBJECT_WARN_INVALID_PROPERTY_ID(object, property_id, pspec);
+        break;
     }
 }
 
@@ -779,12 +860,12 @@ ipatch_converter_get_property (GObject *object, guint property_id,
  * Add an input object to a converter object.
  */
 void
-ipatch_converter_add_input (IpatchConverter *converter, GObject *object)
+ipatch_converter_add_input(IpatchConverter *converter, GObject *object)
 {
-  g_return_if_fail (IPATCH_IS_CONVERTER (converter));
-  g_return_if_fail (G_IS_OBJECT (object));
+    g_return_if_fail(IPATCH_IS_CONVERTER(converter));
+    g_return_if_fail(G_IS_OBJECT(object));
 
-  converter->inputs = g_list_append (converter->inputs, g_object_ref (object));
+    converter->inputs = g_list_append(converter->inputs, g_object_ref(object));
 }
 
 /**
@@ -795,13 +876,13 @@ ipatch_converter_add_input (IpatchConverter *converter, GObject *object)
  * Add an output object to a converter object.
  */
 void
-ipatch_converter_add_output (IpatchConverter *converter, GObject *object)
+ipatch_converter_add_output(IpatchConverter *converter, GObject *object)
 {
-  g_return_if_fail (IPATCH_IS_CONVERTER (converter));
-  g_return_if_fail (G_IS_OBJECT (object));
+    g_return_if_fail(IPATCH_IS_CONVERTER(converter));
+    g_return_if_fail(G_IS_OBJECT(object));
 
-  converter->outputs = g_list_append (converter->outputs,
-				      g_object_ref (object));
+    converter->outputs = g_list_append(converter->outputs,
+                                       g_object_ref(object));
 }
 
 /**
@@ -812,19 +893,20 @@ ipatch_converter_add_output (IpatchConverter *converter, GObject *object)
  * Add a list of input objects to a converter object.
  */
 void
-ipatch_converter_add_inputs (IpatchConverter *converter, GList *objects)
+ipatch_converter_add_inputs(IpatchConverter *converter, GList *objects)
 {
-  GList *p;
+    GList *p;
 
-  g_return_if_fail (IPATCH_IS_CONVERTER (converter));
-  g_return_if_fail (objects != NULL);
+    g_return_if_fail(IPATCH_IS_CONVERTER(converter));
+    g_return_if_fail(objects != NULL);
 
-  p = objects;
-  while (p)
+    p = objects;
+
+    while(p)
     {
-      converter->inputs = g_list_append (converter->inputs,
-					 g_object_ref (p->data));
-      p = g_list_next (p);
+        converter->inputs = g_list_append(converter->inputs,
+                                          g_object_ref(p->data));
+        p = g_list_next(p);
     }
 }
 
@@ -836,19 +918,20 @@ ipatch_converter_add_inputs (IpatchConverter *converter, GList *objects)
  * Add a list of output objects to a converter object.
  */
 void
-ipatch_converter_add_outputs (IpatchConverter *converter, GList *objects)
+ipatch_converter_add_outputs(IpatchConverter *converter, GList *objects)
 {
-  GList *p;
+    GList *p;
 
-  g_return_if_fail (IPATCH_IS_CONVERTER (converter));
-  g_return_if_fail (objects != NULL);
+    g_return_if_fail(IPATCH_IS_CONVERTER(converter));
+    g_return_if_fail(objects != NULL);
 
-  p = objects;
-  while (p)
+    p = objects;
+
+    while(p)
     {
-      converter->outputs = g_list_append (converter->outputs,
-					  g_object_ref (p->data));
-      p = g_list_next (p);
+        converter->outputs = g_list_append(converter->outputs,
+                                           g_object_ref(p->data));
+        p = g_list_next(p);
     }
 }
 
@@ -863,15 +946,23 @@ ipatch_converter_add_outputs (IpatchConverter *converter, GList *objects)
  *   object.
  */
 GObject *
-ipatch_converter_get_input (IpatchConverter *converter)
+ipatch_converter_get_input(IpatchConverter *converter)
 {
-  GObject *obj = NULL;
+    GObject *obj = NULL;
 
-  g_return_val_if_fail (IPATCH_IS_CONVERTER (converter), NULL);
+    g_return_val_if_fail(IPATCH_IS_CONVERTER(converter), NULL);
 
-  if (converter->inputs) obj = (GObject *)(converter->inputs->data);
-  if (obj) g_object_ref (obj);
-  return (obj);
+    if(converter->inputs)
+    {
+        obj = (GObject *)(converter->inputs->data);
+    }
+
+    if(obj)
+    {
+        g_object_ref(obj);
+    }
+
+    return (obj);
 }
 
 /**
@@ -885,15 +976,23 @@ ipatch_converter_get_input (IpatchConverter *converter)
  *   object.
  */
 GObject *
-ipatch_converter_get_output (IpatchConverter *converter)
+ipatch_converter_get_output(IpatchConverter *converter)
 {
-  GObject *obj = NULL;
+    GObject *obj = NULL;
 
-  g_return_val_if_fail (IPATCH_IS_CONVERTER (converter), NULL);
+    g_return_val_if_fail(IPATCH_IS_CONVERTER(converter), NULL);
 
-  if (converter->outputs) obj = (GObject *)(converter->outputs->data);
-  if (obj) g_object_ref (obj);
-  return (obj);
+    if(converter->outputs)
+    {
+        obj = (GObject *)(converter->outputs->data);
+    }
+
+    if(obj)
+    {
+        g_object_ref(obj);
+    }
+
+    return (obj);
 }
 
 /**
@@ -907,17 +1006,21 @@ ipatch_converter_get_output (IpatchConverter *converter)
  *   returned list.
  */
 IpatchList *
-ipatch_converter_get_inputs (IpatchConverter *converter)
+ipatch_converter_get_inputs(IpatchConverter *converter)
 {
-  IpatchList *list;
-  GList *items;
+    IpatchList *list;
+    GList *items;
 
-  items = ipatch_converter_get_inputs_list (converter);
-  if (!items) return NULL;
+    items = ipatch_converter_get_inputs_list(converter);
 
-  list = ipatch_list_new ();	/* ++ ref new */
-  list->items = items;          // !! list takes over items
-  return (list);		/* !! caller takes over list reference */
+    if(!items)
+    {
+        return NULL;
+    }
+
+    list = ipatch_list_new();	/* ++ ref new */
+    list->items = items;          // !! list takes over items
+    return (list);		/* !! caller takes over list reference */
 }
 
 /**
@@ -933,18 +1036,23 @@ ipatch_converter_get_inputs (IpatchConverter *converter)
  * Since: 1.1.0
  */
 GList *
-ipatch_converter_get_inputs_list (IpatchConverter *converter)
+ipatch_converter_get_inputs_list(IpatchConverter *converter)
 {
-  GList *items = NULL, *p;
+    GList *items = NULL, *p;
 
-  g_return_val_if_fail (IPATCH_IS_CONVERTER (converter), NULL);
+    g_return_val_if_fail(IPATCH_IS_CONVERTER(converter), NULL);
 
-  if (!converter->inputs) return (NULL);
+    if(!converter->inputs)
+    {
+        return (NULL);
+    }
 
-  for (p = converter->inputs; p; p = g_list_next (p))
-    items = g_list_prepend (items, g_object_ref (p->data));
+    for(p = converter->inputs; p; p = g_list_next(p))
+    {
+        items = g_list_prepend(items, g_object_ref(p->data));
+    }
 
-  return g_list_reverse (items);        // !! caller takes over list
+    return g_list_reverse(items);         // !! caller takes over list
 }
 
 /**
@@ -958,17 +1066,21 @@ ipatch_converter_get_inputs_list (IpatchConverter *converter)
  *   returned list.
  */
 IpatchList *
-ipatch_converter_get_outputs (IpatchConverter *converter)
+ipatch_converter_get_outputs(IpatchConverter *converter)
 {
-  IpatchList *list;
-  GList *items;
+    IpatchList *list;
+    GList *items;
 
-  items = ipatch_converter_get_outputs_list (converter);
-  if (!items) return NULL;
+    items = ipatch_converter_get_outputs_list(converter);
 
-  list = ipatch_list_new ();	/* ++ ref new */
-  list->items = items;          // !! list takes over items
-  return (list);		/* !! caller takes over list reference */
+    if(!items)
+    {
+        return NULL;
+    }
+
+    list = ipatch_list_new();	/* ++ ref new */
+    list->items = items;          // !! list takes over items
+    return (list);		/* !! caller takes over list reference */
 }
 
 /**
@@ -984,18 +1096,23 @@ ipatch_converter_get_outputs (IpatchConverter *converter)
  * Since: 1.1.0
  */
 GList *
-ipatch_converter_get_outputs_list (IpatchConverter *converter)
+ipatch_converter_get_outputs_list(IpatchConverter *converter)
 {
-  GList *items = NULL, *p;
+    GList *items = NULL, *p;
 
-  g_return_val_if_fail (IPATCH_IS_CONVERTER (converter), NULL);
+    g_return_val_if_fail(IPATCH_IS_CONVERTER(converter), NULL);
 
-  if (!converter->outputs) return (NULL);
+    if(!converter->outputs)
+    {
+        return (NULL);
+    }
 
-  for (p = converter->outputs; p; p = g_list_next (p))
-    items = g_list_prepend (items, g_object_ref (p->data));
+    for(p = converter->outputs; p; p = g_list_next(p))
+    {
+        items = g_list_prepend(items, g_object_ref(p->data));
+    }
 
-  return g_list_reverse (items);        // !! caller takes over list
+    return g_list_reverse(items);         // !! caller takes over list
 }
 
 /**
@@ -1013,101 +1130,139 @@ ipatch_converter_get_outputs_list (IpatchConverter *converter)
  *   message when finished with it.
  */
 gboolean
-ipatch_converter_verify (IpatchConverter *converter, char **failmsg)
+ipatch_converter_verify(IpatchConverter *converter, char **failmsg)
 {
-  IpatchConverterClass *klass;
-  const IpatchConverterInfo *info;
-  char *msg = NULL;
-  gboolean retval;
-  GType type;
-  int count;
-  GList *p;
+    IpatchConverterClass *klass;
+    const IpatchConverterInfo *info;
+    char *msg = NULL;
+    gboolean retval;
+    GType type;
+    int count;
+    GList *p;
 
-  g_return_val_if_fail (IPATCH_IS_CONVERTER (converter), FALSE);
+    g_return_val_if_fail(IPATCH_IS_CONVERTER(converter), FALSE);
 
-  klass = IPATCH_CONVERTER_GET_CLASS (converter);
+    klass = IPATCH_CONVERTER_GET_CLASS(converter);
 
-  // Verify method set? - use it
-  if (klass->verify)
-  {
-    retval = (klass->verify)(converter, &msg);
-
-    if (failmsg) *failmsg = msg;
-    else g_free (msg);
-
-    return (retval);
-  }
-
-  // No verify method, check input/output types and counts
-  info = ipatch_lookup_converter_info (G_OBJECT_TYPE (converter), 0, 0);
-
-  if (info->src_count == 0 && converter->inputs)
-    goto input_failed;
-
-  for (p = converter->inputs, count = 0; p; p = p->next, count++)
-  {
-    type = G_OBJECT_TYPE (p->data);
-
-    if (info->flags & IPATCH_CONVERTER_SRC_DERIVED)     // If derived flag set and source type is not a descendant of map type, fail
+    // Verify method set? - use it
+    if(klass->verify)
     {
-      if (!g_type_is_a (info->src_type, type))
+        retval = (klass->verify)(converter, &msg);
+
+        if(failmsg)
+        {
+            *failmsg = msg;
+        }
+        else
+        {
+            g_free(msg);
+        }
+
+        return (retval);
+    }
+
+    // No verify method, check input/output types and counts
+    info = ipatch_lookup_converter_info(G_OBJECT_TYPE(converter), 0, 0);
+
+    if(info->src_count == 0 && converter->inputs)
+    {
         goto input_failed;
     }
-    else if (info->src_match)   // If parent source match set and type is outside of map type range of src_match <-> src_type, fail
+
+    for(p = converter->inputs, count = 0; p; p = p->next, count++)
     {
-      if (!g_type_is_a (type, info->src_match)
-          || (type != info->src_type && g_type_is_a (type, info->src_type)))
-        goto input_failed;
-    }                           // Neither derived or src_map, just do a direct type comparison, if not equal, fail
-    else if (type != info->src_type)
-      goto input_failed;
-  }
+        type = G_OBJECT_TYPE(p->data);
 
-  if (info->src_count == IPATCH_CONVERTER_COUNT_ONE_OR_MORE)
-  {
-    if (count < 1)
-      goto input_failed;
-  }
-  else if (info->src_count != IPATCH_CONVERTER_COUNT_ZERO_OR_MORE && count != info->src_count)
-    goto input_failed;
+        if(info->flags & IPATCH_CONVERTER_SRC_DERIVED)      // If derived flag set and source type is not a descendant of map type, fail
+        {
+            if(!g_type_is_a(info->src_type, type))
+            {
+                goto input_failed;
+            }
+        }
+        else if(info->src_match)    // If parent source match set and type is outside of map type range of src_match <-> src_type, fail
+        {
+            if(!g_type_is_a(type, info->src_match)
+                    || (type != info->src_type && g_type_is_a(type, info->src_type)))
+            {
+                goto input_failed;
+            }
+        }                           // Neither derived or src_map, just do a direct type comparison, if not equal, fail
+        else if(type != info->src_type)
+        {
+            goto input_failed;
+        }
+    }
 
-
-  for (p = converter->outputs, count = 0; p; p = p->next, count++)
-  {
-    type = G_OBJECT_TYPE (p->data);
-
-    if (info->flags & IPATCH_CONVERTER_DEST_DERIVED)    // If derived flag set and dest type is not a descendant of map type, fail
+    if(info->src_count == IPATCH_CONVERTER_COUNT_ONE_OR_MORE)
     {
-      if (!g_type_is_a (info->dest_type, type))
+        if(count < 1)
+        {
+            goto input_failed;
+        }
+    }
+    else if(info->src_count != IPATCH_CONVERTER_COUNT_ZERO_OR_MORE && count != info->src_count)
+    {
         goto input_failed;
     }
-    else if (info->dest_match)          // If parent dest match set and type is outside of map type range of dest_match <-> dest_type, fail
+
+
+    for(p = converter->outputs, count = 0; p; p = p->next, count++)
     {
-      if (!g_type_is_a (type, info->dest_match)
-          || (type != info->dest_type && g_type_is_a (type, info->dest_type)))
-        goto input_failed;
-    }                                   // Neither derived or dest_map, just do a direct type comparison, if not equal, fail
-    else if (type != info->dest_type)
-      goto input_failed;
-  }
+        type = G_OBJECT_TYPE(p->data);
 
-  if (info->dest_count == IPATCH_CONVERTER_COUNT_ONE_OR_MORE)
-  {
-    if (count < 1)
-      goto output_failed;
-  }
-  else if (info->dest_count != IPATCH_CONVERTER_COUNT_ZERO_OR_MORE && count != info->dest_count)
-    goto output_failed;
+        if(info->flags & IPATCH_CONVERTER_DEST_DERIVED)     // If derived flag set and dest type is not a descendant of map type, fail
+        {
+            if(!g_type_is_a(info->dest_type, type))
+            {
+                goto input_failed;
+            }
+        }
+        else if(info->dest_match)           // If parent dest match set and type is outside of map type range of dest_match <-> dest_type, fail
+        {
+            if(!g_type_is_a(type, info->dest_match)
+                    || (type != info->dest_type && g_type_is_a(type, info->dest_type)))
+            {
+                goto input_failed;
+            }
+        }                                   // Neither derived or dest_map, just do a direct type comparison, if not equal, fail
+        else if(type != info->dest_type)
+        {
+            goto input_failed;
+        }
+    }
 
-  return TRUE;
+    if(info->dest_count == IPATCH_CONVERTER_COUNT_ONE_OR_MORE)
+    {
+        if(count < 1)
+        {
+            goto output_failed;
+        }
+    }
+    else if(info->dest_count != IPATCH_CONVERTER_COUNT_ZERO_OR_MORE && count != info->dest_count)
+    {
+        goto output_failed;
+    }
+
+    return TRUE;
 
 input_failed:
-  if (failmsg) *failmsg = g_strdup ("Converter inputs failed to verify");
-  return (FALSE);
+
+    if(failmsg)
+    {
+        *failmsg = g_strdup("Converter inputs failed to verify");
+    }
+
+    return (FALSE);
 
 output_failed:
-  if (failmsg) *failmsg = g_strdup ("Converter outputs failed to verify");
-  return (FALSE);
+
+    if(failmsg)
+    {
+        *failmsg = g_strdup("Converter outputs failed to verify");
+    }
+
+    return (FALSE);
 }
 
 /**
@@ -1127,16 +1282,20 @@ output_failed:
  * own verification.
  */
 void
-ipatch_converter_init (IpatchConverter *converter)
+ipatch_converter_init(IpatchConverter *converter)
 {
-  IpatchConverterClass *klass;
+    IpatchConverterClass *klass;
 
-  g_return_if_fail (IPATCH_IS_CONVERTER (converter));
+    g_return_if_fail(IPATCH_IS_CONVERTER(converter));
 
-  klass = IPATCH_CONVERTER_GET_CLASS (converter);
-  if (!klass->init) return;
+    klass = IPATCH_CONVERTER_GET_CLASS(converter);
 
-  (klass->init)(converter);
+    if(!klass->init)
+    {
+        return;
+    }
+
+    (klass->init)(converter);
 }
 
 /**
@@ -1150,70 +1309,76 @@ ipatch_converter_init (IpatchConverter *converter)
  * Returns: %TRUE on success, %FALSE otherwise
  */
 gboolean
-ipatch_converter_convert (IpatchConverter *converter, GError **err)
+ipatch_converter_convert(IpatchConverter *converter, GError **err)
 {
-  IpatchConverterClass *klass;
-  char *failmsg = NULL;
+    IpatchConverterClass *klass;
+    char *failmsg = NULL;
 
-  g_return_val_if_fail (IPATCH_IS_CONVERTER (converter), FALSE);
-  g_return_val_if_fail (!err || !*err, FALSE);
+    g_return_val_if_fail(IPATCH_IS_CONVERTER(converter), FALSE);
+    g_return_val_if_fail(!err || !*err, FALSE);
 
-  klass = IPATCH_CONVERTER_GET_CLASS (converter);
-  g_return_val_if_fail (klass->convert != NULL, FALSE);
+    klass = IPATCH_CONVERTER_GET_CLASS(converter);
+    g_return_val_if_fail(klass->convert != NULL, FALSE);
 
-  if (!ipatch_converter_verify (converter, &failmsg))
+    if(!ipatch_converter_verify(converter, &failmsg))
     {
-      g_set_error (err, IPATCH_ERROR, IPATCH_ERROR_INVALID,
-		   _("Verification of conversion parameters failed: %s"),
-		   failmsg ? failmsg : _("<No detailed error message>"));
-      return (FALSE);
+        g_set_error(err, IPATCH_ERROR, IPATCH_ERROR_INVALID,
+                    _("Verification of conversion parameters failed: %s"),
+                    failmsg ? failmsg : _("<No detailed error message>"));
+        return (FALSE);
     }
 
-  return ((klass->convert)(converter, err));
+    return ((klass->convert)(converter, err));
 }
 
 /**
  * ipatch_converter_reset:
  * @converter: Converter object
- * 
+ *
  * Reset a converter object so it can be re-used.
  */
 void
-ipatch_converter_reset (IpatchConverter *converter)
+ipatch_converter_reset(IpatchConverter *converter)
 {
-  GList *p;
+    GList *p;
 
-  g_return_if_fail (IPATCH_IS_CONVERTER (converter));
+    g_return_if_fail(IPATCH_IS_CONVERTER(converter));
 
-  p = converter->inputs;
-  while (p)
+    p = converter->inputs;
+
+    while(p)
     {
-      g_object_unref (p->data);
-      p = g_list_delete_link (p, p);
+        g_object_unref(p->data);
+        p = g_list_delete_link(p, p);
     }
-  converter->inputs = NULL;
 
-  p = converter->outputs;
-  while (p)
+    converter->inputs = NULL;
+
+    p = converter->outputs;
+
+    while(p)
     {
-      g_object_unref (p->data);
-      p = g_list_delete_link (p, p);
+        g_object_unref(p->data);
+        p = g_list_delete_link(p, p);
     }
-  converter->outputs = NULL;
 
-  p = converter->log;
-  while (p)
+    converter->outputs = NULL;
+
+    p = converter->log;
+
+    while(p)
     {
-      g_free (p->data);
-      p = g_list_delete_link (p, p);
+        g_free(p->data);
+        p = g_list_delete_link(p, p);
     }
-  converter->log = NULL;
 
-  converter->min_rate = 0.0;
-  converter->max_rate = 0.0;
-  converter->avg_rate = 0.0;
-  converter->sum_rate = 0.0;
-  converter->item_count = 0;
+    converter->log = NULL;
+
+    converter->min_rate = 0.0;
+    converter->max_rate = 0.0;
+    converter->avg_rate = 0.0;
+    converter->sum_rate = 0.0;
+    converter->item_count = 0;
 }
 
 /**
@@ -1229,16 +1394,20 @@ ipatch_converter_reset (IpatchConverter *converter)
  *   the user. This string should be freed when no longer needed.
  */
 char *
-ipatch_converter_get_notes (IpatchConverter *converter)
+ipatch_converter_get_notes(IpatchConverter *converter)
 {
-  IpatchConverterClass *klass;
+    IpatchConverterClass *klass;
 
-  g_return_val_if_fail (IPATCH_IS_CONVERTER (converter), NULL);
+    g_return_val_if_fail(IPATCH_IS_CONVERTER(converter), NULL);
 
-  klass = IPATCH_CONVERTER_GET_CLASS (converter);
-  if (!klass->notes) return (NULL);
+    klass = IPATCH_CONVERTER_GET_CLASS(converter);
 
-  return ((klass->notes)(converter));
+    if(!klass->notes)
+    {
+        return (NULL);
+    }
+
+    return ((klass->notes)(converter));
 }
 
 /* FIXME-GIR: @type consists of multiple flags types?  @msg can be static or dynamic. */
@@ -1255,21 +1424,26 @@ ipatch_converter_get_notes (IpatchConverter *converter)
  * object handlers.
  */
 void
-ipatch_converter_log (IpatchConverter *converter, GObject *item,
-		      int type, char *msg)
+ipatch_converter_log(IpatchConverter *converter, GObject *item,
+                     int type, char *msg)
 {
-  LogEntry *entry;
+    LogEntry *entry;
 
-  g_return_if_fail (IPATCH_IS_CONVERTER (converter));
-  g_return_if_fail (!item || G_IS_OBJECT (item));
-  g_return_if_fail (msg != NULL);
+    g_return_if_fail(IPATCH_IS_CONVERTER(converter));
+    g_return_if_fail(!item || G_IS_OBJECT(item));
+    g_return_if_fail(msg != NULL);
 
-  entry = g_new0 (LogEntry, 1);
-  if (item) entry->item = g_object_ref (item);
-  entry->type = type;
-  entry->data.msg = msg;
+    entry = g_new0(LogEntry, 1);
 
-  converter->log = g_list_prepend (converter->log, entry);
+    if(item)
+    {
+        entry->item = g_object_ref(item);
+    }
+
+    entry->type = type;
+    entry->data.msg = msg;
+
+    converter->log = g_list_prepend(converter->log, entry);
 }
 
 /* FIXME-GIR: @type consists of multiple flags types? */
@@ -1287,25 +1461,30 @@ ipatch_converter_log (IpatchConverter *converter, GObject *item,
  * set on the log entry, since it is dynamically allocated.
  */
 void
-ipatch_converter_log_printf (IpatchConverter *converter, GObject *item,
-			     int type, const char *fmt, ...)
+ipatch_converter_log_printf(IpatchConverter *converter, GObject *item,
+                            int type, const char *fmt, ...)
 {
-  LogEntry *entry;
-  va_list args;
+    LogEntry *entry;
+    va_list args;
 
-  g_return_if_fail (IPATCH_IS_CONVERTER (converter));
-  g_return_if_fail (!item || G_IS_OBJECT (item));
-  g_return_if_fail (fmt != NULL);
+    g_return_if_fail(IPATCH_IS_CONVERTER(converter));
+    g_return_if_fail(!item || G_IS_OBJECT(item));
+    g_return_if_fail(fmt != NULL);
 
-  entry = g_new0 (LogEntry, 1);
-  if (item) entry->item = g_object_ref (item);
-  entry->type = type | IPATCH_CONVERTER_LOG_MSG_ALLOC;
+    entry = g_new0(LogEntry, 1);
 
-  va_start (args, fmt);
-  entry->data.msg = g_strdup_vprintf (fmt, args);
-  va_end (args);
+    if(item)
+    {
+        entry->item = g_object_ref(item);
+    }
 
-  converter->log = g_list_prepend (converter->log, entry);
+    entry->type = type | IPATCH_CONVERTER_LOG_MSG_ALLOC;
+
+    va_start(args, fmt);
+    entry->data.msg = g_strdup_vprintf(fmt, args);
+    va_end(args);
+
+    converter->log = g_list_prepend(converter->log, entry);
 }
 
 /**
@@ -1327,26 +1506,47 @@ ipatch_converter_log_printf (IpatchConverter *converter, GObject *item,
  *   case item, type and msg are all undefined.
  */
 gboolean
-ipatch_converter_log_next (IpatchConverter *converter, gpointer *pos,
-			   GObject **item, int *type, char **msg)
+ipatch_converter_log_next(IpatchConverter *converter, gpointer *pos,
+                          GObject **item, int *type, char **msg)
 {
-  LogEntry *entry;
-  GList *p;
+    LogEntry *entry;
+    GList *p;
 
-  g_return_val_if_fail (IPATCH_IS_CONVERTER (converter), FALSE);
-  g_return_val_if_fail (pos != NULL, FALSE);
+    g_return_val_if_fail(IPATCH_IS_CONVERTER(converter), FALSE);
+    g_return_val_if_fail(pos != NULL, FALSE);
 
-  if (!*pos) p = g_list_last (converter->log);
-  else p = g_list_previous ((GList *)(*pos));
+    if(!*pos)
+    {
+        p = g_list_last(converter->log);
+    }
+    else
+    {
+        p = g_list_previous((GList *)(*pos));
+    }
 
-  if (!p) return (FALSE);
+    if(!p)
+    {
+        return (FALSE);
+    }
 
-  entry = (LogEntry *)(p->data);
-  if (item) *item = entry->item;
-  if (type) *type = entry->type;
-  if (msg) *msg = entry->data.msg;
+    entry = (LogEntry *)(p->data);
 
-  return (TRUE);
+    if(item)
+    {
+        *item = entry->item;
+    }
+
+    if(type)
+    {
+        *type = entry->type;
+    }
+
+    if(msg)
+    {
+        *msg = entry->data.msg;
+    }
+
+    return (TRUE);
 }
 
 /**
@@ -1367,12 +1567,12 @@ ipatch_converter_log_next (IpatchConverter *converter, gpointer *pos,
  * already converted objects (a conversion pool).
  */
 void
-ipatch_converter_set_link_funcs (IpatchConverter *converter,
-				 IpatchConverterLinkLookupFunc *link_lookup,
-				 IpatchConverterLinkNotifyFunc *link_notify)
+ipatch_converter_set_link_funcs(IpatchConverter *converter,
+                                IpatchConverterLinkLookupFunc *link_lookup,
+                                IpatchConverterLinkNotifyFunc *link_notify)
 {
-  g_return_if_fail (IPATCH_IS_CONVERTER (converter));
-  ipatch_converter_set_link_funcs_full (converter, link_lookup, link_notify, NULL, NULL);
+    g_return_if_fail(IPATCH_IS_CONVERTER(converter));
+    ipatch_converter_set_link_funcs_full(converter, link_lookup, link_notify, NULL, NULL);
 }
 
 /**
@@ -1398,18 +1598,20 @@ ipatch_converter_set_link_funcs (IpatchConverter *converter,
  * Since: 1.1.0
  */
 void
-ipatch_converter_set_link_funcs_full (IpatchConverter *converter,
-                                      IpatchConverterLinkLookupFunc *link_lookup,
-                                      IpatchConverterLinkNotifyFunc *link_notify,
-                                      GDestroyNotify notify_func, gpointer user_data)
+ipatch_converter_set_link_funcs_full(IpatchConverter *converter,
+                                     IpatchConverterLinkLookupFunc *link_lookup,
+                                     IpatchConverterLinkNotifyFunc *link_notify,
+                                     GDestroyNotify notify_func, gpointer user_data)
 {
-  g_return_if_fail (IPATCH_IS_CONVERTER (converter));
+    g_return_if_fail(IPATCH_IS_CONVERTER(converter));
 
-  if (converter->notify_func)
-    converter->notify_func (converter->user_data);
+    if(converter->notify_func)
+    {
+        converter->notify_func(converter->user_data);
+    }
 
-  converter->link_lookup = link_lookup;
-  converter->link_notify = link_notify;
-  converter->notify_func = notify_func;
-  converter->user_data = user_data;
+    converter->link_lookup = link_lookup;
+    converter->link_notify = link_notify;
+    converter->notify_func = notify_func;
+    converter->user_data = user_data;
 }
