@@ -17,9 +17,7 @@
  *   -r, --raw                  Do raw dump rather than formatted hex dump
  *
  */
-//#include <stdio.h>
-//#include <stdlib.h>
-//#include <string.h>
+#include <string.h>
 #include <libinstpatch/libinstpatch.h>
 
 static gboolean recurse_riff_chunks (IpatchRiff *riff, char *indent,
