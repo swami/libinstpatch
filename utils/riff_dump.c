@@ -22,8 +22,6 @@
 #include <string.h>
 #include <libinstpatch/libinstpatch.h>
 
-#define _GNU_SOURCE
-
 static gboolean recurse_riff_chunks (IpatchRiff *riff, char *indent,
 			      GError **err);
 static void display_chunk (IpatchRiff *riff, char *indent);
