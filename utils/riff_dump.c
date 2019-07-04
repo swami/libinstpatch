@@ -33,7 +33,6 @@ gboolean dump_chunk (IpatchRiff *riff, GError **err);
 gint dump_index = -1;      /* set to chunk index if chunk dump requested */
 gchar *dump_type = NULL;   /* set to 4 char string if dumping a chunk type */
 gboolean raw_dump = FALSE; /* set to TRUE for raw byte dumps */
-gchar **file_arg = NULL; /* file name argument */
 
 /* dislaying variables (global for convenience)*/
 int chunk_index = 0;       /* current index */
@@ -52,6 +51,7 @@ main (int argc, char *argv[])
     char indent_buf[256] = ""; /* indentation buffer */
 
     GError *err = NULL;
+    gchar **file_arg = NULL; /* file name argument */
 
 	/* parsing context variables */
     GOptionContext *context = NULL; /* parsing context */
@@ -91,145 +91,136 @@ main (int argc, char *argv[])
 	{
 	    file_name = *file_arg;
 	}
+    g_strfreev (file_arg); /* free file arguments array */
+    file_arg = NULL;
 
+  g_type_init ();
 	/* libinstpatch initialization */
-    ipatch_init ();
+  ipatch_init ();
 
-    /* try to open riff_file */
-	riff_file = ipatch_file_new ();
-	if(file_name) fhandle = ipatch_file_open (riff_file, file_name, "r", &err);
+  riff_file = ipatch_file_new ();
+  if(file_name) fhandle = ipatch_file_open (riff_file, file_name, "r", &err);
     if (!(fhandle))
     {
-        fprintf (stderr, "Failed to open file '%s': %s\n",
-	            file_name, err ? err->message : "<no details>");
-        g_free(dump_type);
-		g_strfreev (file_arg); /* free file arguments array */
-        return (1);
+      fprintf (stderr, "Failed to open file '%s': %s\n",
+	       file_name, err ? err->message : "<no details>");
+      g_free(dump_type);
+      return (1);
     }
-	g_strfreev (file_arg); /* free array */
 
-
-    riff = ipatch_riff_new (fhandle);
+  riff = ipatch_riff_new (fhandle);
 
 	/* start reading chunk */
-    if (!(chunk = ipatch_riff_start_read (riff, &err)))
+  if (!(chunk = ipatch_riff_start_read (riff, &err)))
     {
-        fprintf (stderr, "Failed to start RIFF parse of file '%s': %s\n",
-	             file_name, err ? err->message : "<no details>");
-        g_free(dump_type);
-        return (1);
+      fprintf (stderr, "Failed to start RIFF parse of file '%s': %s\n",
+	       file_name, err ? err->message : "<no details>");
+      g_free(dump_type);
+      return (1);
     }
 
-	/* if a dump of chunk 0 requested or type matches, display everything */
-    if ( (dump_index == 0)
+  /* if a dump of chunk 0 requested or type matches, display everything */
+  if (dump_index == 0
       || (dump_type && strncmp (dump_type, chunk->idstr, 4) == 0))
-    {
-      display = TRUE;
-    }
+    display = TRUE;
 
-	if (display)
-    {
-        display_chunk (riff, indent_buf);
-	}
-    chunk_index++;
-    strcat (indent_buf, "  ");
+  g_free(dump_type);
+  dump_type = NULL;
+
+  if (display) display_chunk (riff, indent_buf);
+  chunk_index++;
+  strcat (indent_buf, "  ");
 
 	/* continue to read by recursion */
-    if (!recurse_riff_chunks (riff, indent_buf, &err))
+  if (!recurse_riff_chunks (riff, indent_buf, &err))
     {
-        fprintf (stderr, "%s\n", ipatch_riff_message_detail
-	            (riff, -1, "Error while parsing RIFF file '%s': %s",
-		         file_name, err ? err->message : "<no details>"));
-        g_free(dump_type);
-        return (1);
+      fprintf (stderr, "%s\n", ipatch_riff_message_detail
+	       (riff, -1, "Error while parsing RIFF file '%s': %s",
+		file_name, err ? err->message : "<no details>"));
+      return (1);
     }
-	g_free(dump_type);
 
-    return (0);
+  return (0);
 }
 
 gboolean
 recurse_riff_chunks (IpatchRiff *riff, char *indent, GError **err)
 {
-    IpatchRiffChunk *chunk;
-    gboolean retval;
+  IpatchRiffChunk *chunk;
+  gboolean retval;
 
-    while (!stop && (chunk = ipatch_riff_read_chunk (riff, err)))
+  while (!stop && (chunk = ipatch_riff_read_chunk (riff, err)))
     {
-        if (dump_index == chunk_index) /* dump by chunk index match? */
-        {
-            if (chunk->type != IPATCH_RIFF_CHUNK_SUB) /* list chunk? */
-            {
-                display_chunk (riff, indent);
+      if (dump_index == chunk_index) /* dump by chunk index match? */
+	{
+	  if (chunk->type != IPATCH_RIFF_CHUNK_SUB) /* list chunk? */
+	    {
+	      display_chunk (riff, indent);
 
-                strcat (indent, "  ");
-                display = TRUE;
-                retval = recurse_riff_chunks (riff, indent, err);
+	      strcat (indent, "  ");
+	      display = TRUE;
+	      retval = recurse_riff_chunks (riff, indent, err);
 
-                stop = TRUE;
-                return (retval);
-            }
-            else
-            {
-                retval = dump_chunk (riff, err); /* hex dump of sub chunk */
-                stop = TRUE;
-                return (retval);
-            }
-        } /* dump by type match? */
-        else if (dump_type && strncmp (dump_type, chunk->idstr, 4) == 0)
-        {
-            if (chunk->type != IPATCH_RIFF_CHUNK_SUB) /* list chunk? */
-            {
-                display = TRUE;
-                strcat (indent, "  ");
-                recurse_riff_chunks (riff, indent, err);
-                indent[strlen (indent) - 2] = '\0';
-                display = FALSE;
-            }
-            else dump_chunk (riff, err); /* hex dump of sub chunk */
-        }
-        else /* no dump match, just do stuff */
-        {
-            if (display) display_chunk (riff, indent);
-            chunk_index++;		/* advance chunk index */
+	      stop = TRUE;
+	      return (retval);
+	    }
+	  else
+	    {
+	      retval = dump_chunk (riff, err); /* hex dump of sub chunk */
+	      stop = TRUE;
+	      return (retval);
+	    }
+	} /* dump by type match? */
+      else if (dump_type && strncmp (dump_type, chunk->idstr, 4) == 0)
+	{
+	  if (chunk->type != IPATCH_RIFF_CHUNK_SUB) /* list chunk? */
+	    {
+	      display = TRUE;
+	      strcat (indent, "  ");
+	      recurse_riff_chunks (riff, indent, err);
+	      indent[strlen (indent) - 2] = '\0';
+	      display = FALSE;
+	    }
+	  else dump_chunk (riff, err); /* hex dump of sub chunk */
+	}
+      else			/* no dump match, just do stuff */
+	{
+	  if (display) display_chunk (riff, indent);
+	  chunk_index++;		/* advance chunk index */
 
-            if (chunk->type != IPATCH_RIFF_CHUNK_SUB)	/* list chunk? */
-            {
-                strcat (indent, "  ");
-                if (!recurse_riff_chunks (riff, indent, err)) return (FALSE);
-                indent[strlen (indent) - 2] = '\0';
-            }
-        }
+	  if (chunk->type != IPATCH_RIFF_CHUNK_SUB)	/* list chunk? */
+	    {
+	      strcat (indent, "  ");
+	      if (!recurse_riff_chunks (riff, indent, err)) return (FALSE);
+	      indent[strlen (indent) - 2] = '\0';
+	    }
+	}
 
-        if (!ipatch_riff_close_chunk (riff, -1, err)) return (FALSE);
+      if (!ipatch_riff_close_chunk (riff, -1, err)) return (FALSE);
     }
 
-    return (ipatch_riff_get_error (riff, NULL));
+  return (ipatch_riff_get_error (riff, NULL));
 }
 
 void
 display_chunk (IpatchRiff *riff, char *indent)
 {
-    IpatchRiffChunk *chunk;
-    int filepos;
+  IpatchRiffChunk *chunk;
+  int filepos;
 
-    chunk = ipatch_riff_get_chunk (riff, -1);
-    filepos = ipatch_riff_get_position (riff);
+  chunk = ipatch_riff_get_chunk (riff, -1);
+  filepos = ipatch_riff_get_position (riff);
 
-    if (chunk->type == IPATCH_RIFF_CHUNK_SUB)
-	{
-        printf ("%s(%.4s)[%4d] (ofs = 0x%x, size = %d)\n", indent,
-                chunk->idstr, chunk_index,
-                filepos - (chunk->position + IPATCH_RIFF_HEADER_SIZE),
-                chunk->size);
-	}
-	else	/* list chunk */
-    {
-		printf ("%s<%.4s>[%4d] (ofs = 0x%x, size = %d)\n", indent,
-                chunk->idstr, chunk_index,
-                filepos - (chunk->position + IPATCH_RIFF_HEADER_SIZE),
-                chunk->size);
-	}
+  if (chunk->type == IPATCH_RIFF_CHUNK_SUB)
+    printf ("%s(%.4s)[%4d] (ofs = 0x%x, size = %d)\n", indent,
+	    chunk->idstr, chunk_index,
+	    filepos - (chunk->position + IPATCH_RIFF_HEADER_SIZE),
+	    chunk->size);
+  else	/* list chunk */
+    printf ("%s<%.4s>[%4d] (ofs = 0x%x, size = %d)\n", indent,
+	    chunk->idstr, chunk_index,
+	    filepos - (chunk->position + IPATCH_RIFF_HEADER_SIZE),
+	    chunk->size);
 }
 
 #define BUFFER_SIZE (16 * 1024)
@@ -238,54 +229,53 @@ display_chunk (IpatchRiff *riff, char *indent)
 gboolean
 dump_chunk (IpatchRiff *riff, GError **err)
 {
-    IpatchRiffChunk *chunk;
-    guint8 buf[BUFFER_SIZE];
-    int filepos, read_size, bytes_left, i;
+  IpatchRiffChunk *chunk;
+  guint8 buf[BUFFER_SIZE];
+  int filepos, read_size, bytes_left, i;
 
-    chunk = ipatch_riff_get_chunk (riff, -1);
-    filepos = ipatch_riff_get_position (riff);
+  chunk = ipatch_riff_get_chunk (riff, -1);
+  filepos = ipatch_riff_get_position (riff);
 
-    if (!raw_dump)
+  if (!raw_dump)
     {
-        printf ("Dump chunk: (%.4s)[%4d] (ofs = 0x%x, size = %d)",
-                chunk->idstr, chunk_index,
-                filepos - (chunk->position + IPATCH_RIFF_HEADER_SIZE),
-	            chunk->size);
+      printf ("Dump chunk: (%.4s)[%4d] (ofs = 0x%x, size = %d)",
+	      chunk->idstr, chunk_index,
+	      filepos - (chunk->position + IPATCH_RIFF_HEADER_SIZE),
+	      chunk->size);
 
-        i = filepos & ~0xF;   /* round down to nearest 16 byte offset */
-        while (i < filepos) /* advance to start point in 16 byte block */
-        {
-            if (!(i & 0xF)) printf ("\n%08u  ", i); /* print file position */
-            else if (!(i & 0x3)) printf (" |  "); /* print divider */
-            printf ("   ");		/* skip 1 byte character */
-            i++;
-        }
+      i = filepos & ~0xF;   /* round down to nearest 16 byte offset */
+      while (i < filepos) /* advance to start point in 16 byte block */
+	{
+	  if (!(i & 0xF)) printf ("\n%08u  ", i); /* print file position */
+	  else if (!(i & 0x3)) printf (" |  "); /* print divider */
+	  printf ("   ");		/* skip 1 byte character */
+	  i++;
+	}
     }
 
-    read_size = BUFFER_SIZE;
-    bytes_left = chunk->size;
-    while (bytes_left)		/* loop until chunk exhausted */
+  read_size = BUFFER_SIZE;
+  bytes_left = chunk->size;
+  while (bytes_left)		/* loop until chunk exhausted */
     {
-        if (bytes_left < BUFFER_SIZE) read_size = bytes_left;
-        if (!ipatch_file_read (riff->handle, &buf, read_size, err))
-        return (FALSE);
+      if (bytes_left < BUFFER_SIZE) read_size = bytes_left;
+      if (!ipatch_file_read (riff->handle, &buf, read_size, err))
+	return (FALSE);
 
-        for (i = 0; i < read_size; i++, filepos++)
-        {
-            if (!raw_dump)
-            {
-                if (!(filepos & 0xF))
-                    printf ("\n%08u  ", filepos); /* print file position */
-                else if (!(filepos & 0x3)) 
-                    printf (" |  "); /* print divider */
-            }
+      for (i = 0; i < read_size; i++, filepos++)
+	{
+	  if (!raw_dump)
+	    {
+	      if (!(filepos & 0xF))
+		printf ("\n%08u  ", filepos); /* print file position */
+	      else if (!(filepos & 0x3)) printf (" |  "); /* print divider */
+	    }
 
-            printf ("%02X ", buf[i]);
-        }
-        bytes_left -= read_size;
+	  printf ("%02X ", buf[i]);
+	}
+      bytes_left -= read_size;
     }
 
-    printf ("\n");
+  printf ("\n");
 
-    return (TRUE);
+  return (TRUE);
 }
