@@ -3,117 +3,117 @@
  *
  * riff_dump utility (licensed separately from libInstPatch)
  * Copyright (C) 1999-2014 Element Green <element@elementsofsound.org>
- *
  * Public Domain, use as you please.
+ *
+ * Usage:
+ *  riff_dump [OPTION] file.sf2
+ *
+ * Help options:
+ *   -h, --help                 Display help options
+ *
+ * Application options :
+ *   -d, --dump=CHUNK_INDEX     Dump a chunk by CHUNK_INDEX index
+ *   -t, --dump-type=CHNK       Dump a chunk by RIFF FOURCC CHNK
+ *   -r, --raw                  Do raw dump rather than formatted hex dump
+ *
  */
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <libinstpatch/libinstpatch.h>
 
-#define _GNU_SOURCE
-#include <getopt.h>
-
-void usage (void);
-gboolean recurse_riff_chunks (IpatchRiff *riff, char *indent,
+static gboolean recurse_riff_chunks (IpatchRiff *riff, char *indent,
 			      GError **err);
-void display_chunk (IpatchRiff *riff, char *indent);
-gboolean dump_chunk (IpatchRiff *riff, GError **err);
+static void display_chunk (IpatchRiff *riff, char *indent);
+static gboolean dump_chunk (IpatchRiff *riff, GError **err);
 
-/* chunk index - so commands can be run on specific chunks */
-int chunk_index = 0;
-int dump_index = -1;	 /* set to chunk index if chunk dump requested */
-char *dump_type = NULL;	/* set to 4 char string if dumping a chunk type */
-gboolean raw_dump = FALSE;	/* set to TRUE for raw byte dumps */
-gboolean display = TRUE;      /* set to FALSE to not display chunks */
-gboolean stop = FALSE;		/* set to TRUE to stop recursion */
+/* options arguments (global for convenience)*/
+static gint dump_index = -1;      /* set to chunk index if chunk dump requested */
+static gchar *dump_type = NULL;   /* set to 4 char string if dumping a chunk type */
+static gboolean raw_dump = FALSE; /* set to TRUE for raw byte dumps */
 
-extern char *optarg;
-extern int optind, opterr, optopt;
+/* dislaying variables (global for convenience)*/
+static int chunk_index = 0;       /* current index */
+static gboolean display = TRUE;   /* set to FALSE to not display chunks */
+static gboolean stop = FALSE;     /* set to TRUE to stop recursion */
 
 int
 main (int argc, char *argv[])
 {
-  IpatchRiff *riff;
-  IpatchRiffChunk *chunk;
-  IpatchFile *file;
-  IpatchFileHandle *fhandle;
-  char indent_buf[256] = "";
-  GError *err = NULL;
-  char *file_name = NULL;
-  int option_index = 0;
-  int c;
+	/* riff file variables */
+	char *file_name = NULL; /* file name */
+    IpatchFile *riff_file; /* riff file to open */
+    IpatchFileHandle *fhandle = NULL; /* riff file file handle */
+    IpatchRiff *riff;
+    IpatchRiffChunk *chunk;
+    char indent_buf[256] = ""; /* indentation buffer */
 
-  static struct option long_options[] =
+    GError *err = NULL;
+    static gchar **file_arg = NULL; /* file name argument */
+
+	/* parsing context variables */
+    GOptionContext *context = NULL; /* parsing context */
+	
+	/* option entries to parse */
+	static GOptionEntry entries[] =
     {
-      {"dump", 1, 0, 'd'},
-      {"dump-type", 1, 0, 't'},
-      {"raw", 0, 0, 'r'},
-      {NULL, 0, NULL, 0}
+        { "dump", 'd', 0, G_OPTION_ARG_INT, &dump_index, "Dump a chunk by CHUNK_INDEX index", "CHUNK_INDEX" },
+        { "dump-type", 't', 0, G_OPTION_ARG_STRING, &dump_type, "Dump a chunk by RIFF FOURCC CHNK", "CHNK" },
+        { "raw", 'r', 0, G_OPTION_ARG_NONE, &raw_dump, "Do raw dump rather than formatted hex dump", NULL },
+        { G_OPTION_REMAINING, '\0', 0, G_OPTION_ARG_FILENAME_ARRAY, &file_arg, NULL, "file.sf2" },
+        { NULL }
     };
-
-  while (TRUE)
+ 
+	/* parse option in command line */
+    context = g_option_context_new (NULL);
+    g_option_context_add_main_entries (context, entries, NULL);
+    if (!g_option_context_parse (context, &argc, &argv, &err))
     {
-      c = getopt_long (argc, argv, "rd:t:", long_options, &option_index);
-      if (c == -1) break;
+        g_print ("option parsing failed: %s\n", err->message);
+		g_error_free (err);
+        g_strfreev (file_arg);
+        g_free(dump_type);
+        return (1);
+    }
 
-      switch (c)
+	/* prepare variable for displaying */
+    if (dump_index >=0)
+    {
+        display = FALSE;  /* we enable display when we find chunk */
+    }
+    else if (dump_type)
+    {
+        display = FALSE;
+    }
+
+	/* take the file name argument */
+  	if(file_arg)
 	{
-	case 'd':		/* dump chunk? */
-	  dump_index = atoi (optarg); /* get chunk index */
-	  display = FALSE;  /* we enable display when we find chunk */
-	  break;
-	case 't':
-	  dump_type = g_strndup (optarg, 4);
-	  display = FALSE;
-	  break;
-	case 'r':
-	  raw_dump = TRUE;
-	  break;
-	case ':':		/* missing option */
-	  fprintf (stderr, "Missing parameter for option '-%c, %s'\n",
-		   (char)(long_options[option_index].val),
-		   long_options[option_index].name);
-	  usage();
-	  exit (1);
-	  break;
-	case '?':		/* unknown switch */
-	  usage();
-	  exit(1);
-	  break;
-	default:
-	  fprintf (stderr, "Unknown getopt return val '%d'\n", c);
-	  exit (1);
-	  break;
+	    file_name = *file_arg;
 	}
-    }
 
-  if (optind >= argc)
-    {
-      usage ();
-      exit (1);
-    }
-
-  file_name = argv[optind];
-
-  g_type_init ();
+	/* libinstpatch initialization */
   ipatch_init ();
 
-  file = ipatch_file_new ();
-  if (!(fhandle = ipatch_file_open (file, file_name, "r", &err)))
+  riff_file = ipatch_file_new ();
+  if(file_name) fhandle = ipatch_file_open (riff_file, file_name, "r", &err);
+    if (!(fhandle))
     {
       fprintf (stderr, "Failed to open file '%s': %s\n",
 	       file_name, err ? err->message : "<no details>");
-      exit (1);
+      g_free(dump_type);
+        g_strfreev (file_arg);
+      return (1);
     }
 
   riff = ipatch_riff_new (fhandle);
 
+	/* start reading chunk */
   if (!(chunk = ipatch_riff_start_read (riff, &err)))
     {
       fprintf (stderr, "Failed to start RIFF parse of file '%s': %s\n",
 	       file_name, err ? err->message : "<no details>");
-      exit (1);
+      g_free(dump_type);
+        g_strfreev (file_arg);
+      return (1);
     }
 
   /* if a dump of chunk 0 requested or type matches, display everything */
@@ -125,28 +125,23 @@ main (int argc, char *argv[])
   chunk_index++;
   strcat (indent_buf, "  ");
 
+	/* continue to read by recursion */
   if (!recurse_riff_chunks (riff, indent_buf, &err))
     {
       fprintf (stderr, "%s\n", ipatch_riff_message_detail
 	       (riff, -1, "Error while parsing RIFF file '%s': %s",
 		file_name, err ? err->message : "<no details>"));
-      exit (1);
+        g_free(dump_type);
+        g_strfreev (file_arg);
+      return (1);
     }
 
-  exit (0);
-}
+  g_free(dump_type); /* free dump type */
+  dump_type = NULL;  /* not needed but a good practice */
+  g_strfreev (file_arg); /* free file arguments array */
+  file_arg = NULL;   /* not needed but a good practice */
 
-void
-usage (void)
-{
-  fprintf (stderr, "Usage: riff_dump [OPTION]... FILE\n");
-  fprintf (stderr, "  -d, --dump=CHUNK_INDEX       "
-	   "Dump a chunk by index\n");
-  fprintf (stderr, "  -t, --dump-type='CHNK'       "
-	   "Dump a chunk by RIFF FOURCC ID\n");
-  fprintf (stderr, "  -r, --raw                    "
-	   "Do raw dump rather than formatted hex dump\n\n");
-  fprintf (stderr, "CHUNK_INDEX - The chunk index (number in brackets [])\n");
+  return (0);
 }
 
 gboolean
