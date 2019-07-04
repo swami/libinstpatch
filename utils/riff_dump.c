@@ -124,9 +124,6 @@ main (int argc, char *argv[])
       || (dump_type && strncmp (dump_type, chunk->idstr, 4) == 0))
     display = TRUE;
 
-//  g_free(dump_type);
-//  dump_type = NULL;
-
   if (display) display_chunk (riff, indent_buf);
   chunk_index++;
   strcat (indent_buf, "  ");
