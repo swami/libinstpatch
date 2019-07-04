@@ -152,14 +152,14 @@ ipatch_init(void)
     /* set up current locale.
 
        Warning: This ensures that when loading preferences, decimal floating values are
-       properly decoded accordling to the LC_NUMERIC separator.
+       properly decoded according to the LC_NUMERIC separator.
 
        When using ipatch_xml_xxxx_decode_xxxx_func(),this will ensure that when decoding
      float numbers, decimal part values are properly decoded. Otherwise there is risk
      that decimal part will be ignored, leading in previous float preferences being
      read as integer value.
     */
-    if(! setlocale(LC_ALL, ""))
+    if(!setlocale(LC_ALL, ""))
     {
         g_critical("Error setting locale");
     }
