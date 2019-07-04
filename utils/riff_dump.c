@@ -92,7 +92,6 @@ main (int argc, char *argv[])
 	    file_name = *file_arg;
 	}
 
-  g_type_init ();
 	/* libinstpatch initialization */
   ipatch_init ();
 
