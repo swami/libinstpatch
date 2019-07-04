@@ -41,7 +41,7 @@ gboolean stop = FALSE;     /* set to TRUE to stop recursion */
 
 int
 main (int argc, char *argv[])
-{   
+{
 	/* riff file variables */
 	char *file_name = NULL; /* file name */
     IpatchFile *riff_file; /* riff file to open */
@@ -51,7 +51,7 @@ main (int argc, char *argv[])
     char indent_buf[256] = ""; /* indentation buffer */
 
     GError *err = NULL;
-    gchar **file_arg = NULL; /* file name argument */
+    static gchar **file_arg = NULL; /* file name argument */
 
 	/* parsing context variables */
     GOptionContext *context = NULL; /* parsing context */
@@ -73,6 +73,8 @@ main (int argc, char *argv[])
     {
         g_print ("option parsing failed: %s\n", err->message);
 		g_error_free (err);
+        g_strfreev (file_arg);
+        g_free(dump_type);
         return (1);
     }
 
@@ -91,8 +93,6 @@ main (int argc, char *argv[])
 	{
 	    file_name = *file_arg;
 	}
-    g_strfreev (file_arg); /* free file arguments array */
-    file_arg = NULL;
 
   g_type_init ();
 	/* libinstpatch initialization */
@@ -105,6 +105,7 @@ main (int argc, char *argv[])
       fprintf (stderr, "Failed to open file '%s': %s\n",
 	       file_name, err ? err->message : "<no details>");
       g_free(dump_type);
+        g_strfreev (file_arg);
       return (1);
     }
 
@@ -116,6 +117,7 @@ main (int argc, char *argv[])
       fprintf (stderr, "Failed to start RIFF parse of file '%s': %s\n",
 	       file_name, err ? err->message : "<no details>");
       g_free(dump_type);
+        g_strfreev (file_arg);
       return (1);
     }
 
@@ -137,8 +139,12 @@ main (int argc, char *argv[])
       fprintf (stderr, "%s\n", ipatch_riff_message_detail
 	       (riff, -1, "Error while parsing RIFF file '%s': %s",
 		file_name, err ? err->message : "<no details>"));
+        g_strfreev (file_arg);
       return (1);
     }
+
+  g_strfreev (file_arg); /* free file arguments array */
+  file_arg = NULL;
 
   return (0);
 }
