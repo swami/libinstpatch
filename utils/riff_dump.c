@@ -124,8 +124,8 @@ main (int argc, char *argv[])
       || (dump_type && strncmp (dump_type, chunk->idstr, 4) == 0))
     display = TRUE;
 
-  g_free(dump_type);
-  dump_type = NULL;
+//  g_free(dump_type);
+//  dump_type = NULL;
 
   if (display) display_chunk (riff, indent_buf);
   chunk_index++;
@@ -137,12 +137,15 @@ main (int argc, char *argv[])
       fprintf (stderr, "%s\n", ipatch_riff_message_detail
 	       (riff, -1, "Error while parsing RIFF file '%s': %s",
 		file_name, err ? err->message : "<no details>"));
+        g_free(dump_type);
         g_strfreev (file_arg);
       return (1);
     }
 
+  g_free(dump_type); /* free dump type */
+  dump_type = NULL;  /* not needed but a good practice */
   g_strfreev (file_arg); /* free file arguments array */
-  file_arg = NULL;
+  file_arg = NULL;   /* not needed but a good practice */
 
   return (0);
 }
