@@ -24,20 +24,20 @@
 
 #define _GNU_SOURCE
 
-gboolean recurse_riff_chunks (IpatchRiff *riff, char *indent,
+static gboolean recurse_riff_chunks (IpatchRiff *riff, char *indent,
 			      GError **err);
-void display_chunk (IpatchRiff *riff, char *indent);
-gboolean dump_chunk (IpatchRiff *riff, GError **err);
+static void display_chunk (IpatchRiff *riff, char *indent);
+static gboolean dump_chunk (IpatchRiff *riff, GError **err);
 
 /* options arguments (global for convenience)*/
-gint dump_index = -1;      /* set to chunk index if chunk dump requested */
-gchar *dump_type = NULL;   /* set to 4 char string if dumping a chunk type */
-gboolean raw_dump = FALSE; /* set to TRUE for raw byte dumps */
+static gint dump_index = -1;      /* set to chunk index if chunk dump requested */
+static gchar *dump_type = NULL;   /* set to 4 char string if dumping a chunk type */
+static gboolean raw_dump = FALSE; /* set to TRUE for raw byte dumps */
 
 /* dislaying variables (global for convenience)*/
-int chunk_index = 0;       /* current index */
-gboolean display = TRUE;   /* set to FALSE to not display chunks */
-gboolean stop = FALSE;     /* set to TRUE to stop recursion */
+static int chunk_index = 0;       /* current index */
+static gboolean display = TRUE;   /* set to FALSE to not display chunks */
+static gboolean stop = FALSE;     /* set to TRUE to stop recursion */
 
 int
 main (int argc, char *argv[])
