@@ -185,9 +185,9 @@ if ( UNIX OR MINGW OR WIN32)
     else(MINGW OR WIN32)
         set ( lib_output_name instpatch )
     endif(MINGW OR WIN32)
-    configure_file ( libinstpatch.pc.in
-        ${CMAKE_BINARY_DIR}/libinstpatch.pc IMMEDIATE @ONLY )
-    install ( FILES ${CMAKE_BINARY_DIR}/libinstpatch.pc
+    configure_file ( libinstpatch-1.0.pc.in
+        ${CMAKE_BINARY_DIR}/libinstpatch-1.0.pc IMMEDIATE @ONLY )
+    install ( FILES ${CMAKE_BINARY_DIR}/libinstpatch-1.0.pc
               DESTINATION ${LIB_INSTALL_DIR}${LIB_SUFFIX}/pkgconfig )
 endif ( UNIX OR MINGW OR WIN32)
 
