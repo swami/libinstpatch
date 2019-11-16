@@ -164,12 +164,19 @@ typedef enum
     IPATCH_SF2_GEN_ROOT_NOTE_OVERRIDE = 58	/* root note override */
 } IpatchSF2GenType;
 
-/* Flags for IPATCH_SF2_GEN_SAMPLE_MODES generator */
+/* Flags for IPATCH_SF2_GEN_SAMPLE_MODES generator
+   sfspec24.pdf - p 36 - generator sampleModes (54)
+*/
 typedef enum
 {
-    IPATCH_SF2_GEN_SAMPLE_MODE_NOLOOP = 0,
-    IPATCH_SF2_GEN_SAMPLE_MODE_LOOP   = 1 << 0,
-    IPATCH_SF2_GEN_SAMPLE_MODE_LOOP_RELEASE = 1 << 1
+  IPATCH_SF2_GEN_SAMPLE_MODE_NOLOOP, /* no loop */
+  IPATCH_SF2_GEN_SAMPLE_MODE_LOOP,   /* standard loop */
+  /* not used. Should be interpreted as "no loop" */
+  IPATCH_SF2_GEN_SAMPLE_MODE_UNUSED,
+  /* loop during the depression of the key, then plays the remainder
+     of the sample.
+  */
+  IPATCH_SF2_GEN_SAMPLE_MODE_LOOP_RELEASE
 } IpatchSF2GenSampleModes;
 
 /* generator info and constraints structure */

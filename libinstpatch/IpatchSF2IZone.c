@@ -477,6 +477,11 @@ ipatch_sf2_izone_get_property(GObject *object, guint property_id,
             {
                 val = IPATCH_SAMPLE_LOOP_NONE;
             }
+            /* not used. Should be interpreted as "no loop" */
+            else if(amt.uword == IPATCH_SF2_GEN_SAMPLE_MODE_UNUSED)
+            {
+                val = IPATCH_SAMPLE_LOOP_NONE;
+            }
             else if(amt.uword == IPATCH_SF2_GEN_SAMPLE_MODE_LOOP_RELEASE)
             {
                 val = IPATCH_SAMPLE_LOOP_RELEASE;
