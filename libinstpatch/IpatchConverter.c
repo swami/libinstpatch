@@ -216,7 +216,8 @@ ipatch_convert_object_to_type_multi(GObject *object, GType type, GError **err)
 GList *
 ipatch_convert_object_to_type_multi_list(GObject *object, GType type, GError **err)
 {
-    return (ipatch_convert_object_to_type_multi_set_vlist(object, type, err, NULL, NULL));
+    va_list empty;
+    return (ipatch_convert_object_to_type_multi_set_vlist(object, type, err, NULL, empty));
 }
 
 /**
