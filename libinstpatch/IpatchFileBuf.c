@@ -496,7 +496,7 @@ ipatch_file_buf_write(IpatchFileHandle *handle, gconstpointer buf, guint size)
  * current position.  Buffer is expanded if necessary.
  */
 void
-ipatch_file_buf_memset(IpatchFileHandle *handle, char c, guint size)
+ipatch_file_buf_memset(IpatchFileHandle *handle, unsigned char c, guint size)
 {
     g_return_if_fail(handle != NULL);
 
