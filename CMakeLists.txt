@@ -16,7 +16,7 @@ set ( PACKAGE "libinstpatch" )
 # libInstPatch package version
 set ( IPATCH_VERSION_MAJOR 1 )
 set ( IPATCH_VERSION_MINOR 1 )
-set ( IPATCH_VERSION_MICRO 0 )
+set ( IPATCH_VERSION_MICRO 1 )
 set ( VERSION "${IPATCH_VERSION_MAJOR}.${IPATCH_VERSION_MINOR}.${IPATCH_VERSION_MICRO}" )
 set ( IPATCH_VERSION "\"${VERSION}\"" )
 
@@ -29,7 +29,7 @@ set ( IPATCH_VERSION "\"${VERSION}\"" )
 # if any interfaces have been added: AGE++
 # if any interfaces have been removed/changed (compatibility broken): AGE=0
 # This is not exactly the same algorithm as the libtool one, but the results are the same.
-set ( LIB_VERSION_CURRENT 1 )
+set ( LIB_VERSION_CURRENT 2 )
 set ( LIB_VERSION_AGE 0 )
 set ( LIB_VERSION_REVISION 0 )
 set ( LIB_VERSION_INFO 
