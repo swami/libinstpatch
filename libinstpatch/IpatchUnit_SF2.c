@@ -195,6 +195,25 @@ _ipatch_unit_sf2_init(void)
     (IPATCH_UNIT_TYPE_PERCENT, IPATCH_UNIT_TYPE_TENTH_PERCENT,
      ipatch_unit_percent_to_tenth_percent_value);
 
+    /* Register converter for IPATCH_UNIT_TYPE_SEMITONES and
+       IPATCH_UNIT_TYPE_CENTS. These mapping must be registered
+       in the unit domain IPATCH_UNIT_CLASS_USER.
+    */
+    /*  semitones => semitones */
+    ipatch_unit_class_register_map(IPATCH_UNIT_CLASS_USER,
+                                   IPATCH_UNIT_TYPE_SEMITONES,
+                                   IPATCH_UNIT_TYPE_SEMITONES);
+    ipatch_unit_conversion_register
+    (IPATCH_UNIT_TYPE_SEMITONES, IPATCH_UNIT_TYPE_SEMITONES,
+     NULL);
+
+    /* Cents => Cents */
+    ipatch_unit_class_register_map (IPATCH_UNIT_CLASS_USER,
+                                    IPATCH_UNIT_TYPE_CENTS,
+                                    IPATCH_UNIT_TYPE_CENTS);
+    ipatch_unit_conversion_register
+    (IPATCH_UNIT_TYPE_CENTS, IPATCH_UNIT_TYPE_CENTS,
+     NULL);
 
     ipatch_unit_class_register_map(IPATCH_UNIT_CLASS_USER,
                                    IPATCH_UNIT_TYPE_SF2_ABS_PITCH,
