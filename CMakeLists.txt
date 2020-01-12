@@ -38,10 +38,10 @@ set ( LIB_VERSION_INFO
 # Options disabled by default
 option ( enable-debug "enable debugging (default=no)" off )
 option ( GTKDOC_ENABLED "Create Gtk-Doc API reference (default=no)" off )
+option ( INTROSPECTION_ENABLED "Create GObject Introspection typelib" off )
 
 # Options enabled by default
 option ( BUILD_SHARED_LIBS "Build a shared object or DLL" on )
-option ( INTROSPECTION_ENABLED "Create GObject Introspection typelib" on )
 
 # Initialize the library directory name suffix.
 if ( CMAKE_SIZEOF_VOID_P EQUAL 8 )
