@@ -345,15 +345,15 @@ if ( MACOSX_FRAMEWORK )
 elseif( MINGW OR WIN32 )
   set_target_properties ( libinstpatch
     PROPERTIES
-      PREFIX ""
-      OUTPUT_NAME ${INSTPATCH_INSTALL_TARGET}
+      ARCHIVE_OUTPUT_NAME "instpatch-${LIB_VERSION_CURRENT}"
+      PREFIX "lib"
+      OUTPUT_NAME "instpatch-${LIB_VERSION_CURRENT}"
       VERSION ${LIB_VERSION_INFO}
   )
 else( MINGW OR WIN32 )
   set_target_properties ( libinstpatch
     PROPERTIES
-      PREFIX ""
-      OUTPUT_NAME "libinstpatch-1.0"
+      OUTPUT_NAME "instpatch-1.0"
       VERSION ${LIB_VERSION_INFO}
       SOVERSION ${LIB_VERSION_CURRENT}
   )
