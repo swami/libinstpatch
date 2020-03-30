@@ -380,12 +380,13 @@ ipatch_xml_codec_func_locale(IpatchXmlCodecFuncLocale codec,
     int oldSetting = _configthreadlocale(0);
     /* set the needed locale */
     _configthreadlocale(_ENABLE_PER_THREAD_LOCALE);
-    setlocale(LC_NUMERIC, "");
+    g_return_val_if_fail(setlocale(LC_NUMERIC, "") != NULL, FALSE);
 #else
     /* save the current task locale */
     locale_t oldLocale = uselocale((locale_t) 0);
     /* set the needed locale */
     locale_t newLocale = newlocale(LC_NUMERIC_MASK, "C", (locale_t) 0);
+    g_return_val_if_fail(newLocale != (locale_t) 0, FALSE);
     uselocale(newLocale);
 #endif
 
@@ -399,9 +400,12 @@ ipatch_xml_codec_func_locale(IpatchXmlCodecFuncLocale codec,
 #else
     /* restore the locale */
     uselocale(oldLocale);
-    freelocale(newLocale);
+    if (newLocale != LC_GLOBAL_LOCALE)
+    {
+        freelocale(newLocale);
+    }
 #endif
-	return retval;
+    return retval;
 }
 
 /**
