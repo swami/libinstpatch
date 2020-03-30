@@ -539,7 +539,7 @@ ipatch_xml_encode_property_by_name(GNode *node, GObject *object,
  *
  * Encodes a GValue to an XML node text value. If there is not
  * encoder for this GValue, ipatch_xml_default_encode_value_func()
- * defaut encoder will be used instead.
+ * default encoder will be used instead.
  *
  * Returns: TRUE on success, FALSE on error (@err may be set)
  */
@@ -725,7 +725,7 @@ ipatch_xml_decode_value(GNode *node, GValue *value, GError **err)
     return ipatch_xml_codec_func_locale(decode_func, node, NULL, NULL, value, err);
 }
 
-/*------------------- defaults XML encoder handlers -----------------------------*/
+/*------------------- default XML encoder handlers ------------------------------*/
 
 /**
  * ipatch_xml_default_encode_object_func: (type IpatchXmlEncodeFunc)
@@ -788,7 +788,7 @@ ipatch_xml_default_encode_object_func(GNode *node, GObject *object,
  * @value: Value of the property
  * @err: Location to store error value (or %NULL if ignoring)
  *
- * Default GObject property encode handler.  Useful for custom handlers to chain
+ * Default GObject property encode handler. Useful for custom handlers to chain
  * to the default if needed.
  *
  * Returns: TRUE on success, FALSE on error (@err may be set)
@@ -810,7 +810,7 @@ ipatch_xml_default_encode_property_func(GNode *node, GObject *object,
  * @err: Location to store error value (or %NULL if ignoring)
  *
  * Default GValue encode handler. Useful to chain to the default
- * when custom GValue encoder doesn't exits.
+ * when custom GValue encoder doesn't exist.
  *
  * Returns: TRUE on success, FALSE on error (@err may be set)
  */
@@ -919,7 +919,7 @@ ipatch_xml_default_encode_value_func(GNode *node, GObject *object,
     return (TRUE);
 }
 
-/*------------------- defaults XML decoder handlers -----------------------------*/
+/*------------------- default XML decoder handlers ------------------------------*/
 
 /**
  * ipatch_xml_default_decode_object_func: (type IpatchXmlDecodeFunc)
@@ -929,7 +929,7 @@ ipatch_xml_default_encode_value_func(GNode *node, GObject *object,
  * @value: Will be %NULL
  * @err: Location to store error value (or %NULL if ignoring)
  *
- * Default GObject decode handler.  Useful for custom handlers to chain to
+ * Default GObject decode handler. Useful for custom handlers to chain to
  * the default if needed.
  *
  * Returns: TRUE on success, FALSE on error (@err may be set)
