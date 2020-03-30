@@ -32,7 +32,6 @@
 #include <stdarg.h>
 #include <string.h>
 #include <errno.h>
-//#include <locale.h>
 
 /* for mkdir */
 #include <sys/stat.h>
