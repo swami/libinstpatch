@@ -37,7 +37,7 @@
  * @Functions presentation
    1) registering system for encoding/decoding handlers:
  * 1.1)First we create an internal table (xml_handlers) that will be used to
- *  register custom encoding/decoding XML handlers. This table are created by
+ *  register custom encoding/decoding XML handlers. This table is created by
  *  _ipatch_xml_object_init() during libinstpatch initialization (ipatch_init())
  *  and is owned by libinstpatch.
  *
@@ -45,7 +45,7 @@
  *  must call ipatch_xml_register_handler(). Once handlers are registered, they
  *  will be called automatically when the application will use functions to save
  *  (see 2) or load (see 3) gobjet properties, a single property or a single
- *  GValue to/from  XML tree. Note that if a custom handlers doesn't exists a
+ *  GValue to/from  XML tree. Note that if a custom handlers doesn't exist a
  *  default handler will be used instead.
  *
  * 1.3)Any custom handlers may be looked by calling patch_xml_lookup_handler(),
@@ -342,7 +342,7 @@ typedef  IpatchXmlEncodeFunc IpatchXmlCodecFuncLocale;
 
 /*
   Call codec function with parameters node, object, pspec, value, err.
-  Before calling codec, the current task locale set to LC_NUMERIC
+  Before calling codec, the current task locale is set to LC_NUMERIC
   to ensure that numeric value are properly coded/decoded
   using ipatch_xml_xxxx_decode_xxxx_func().
 
@@ -362,20 +362,29 @@ ipatch_xml_codec_func_locale(IpatchXmlCodecFuncLocale codec,
     gboolean retval;
 
 #ifdef WIN32
+    /* save the current task locale */
     char* oldLocale = setlocale(LC_NUMERIC, NULL);
     int oldSetting = _configthreadlocale(0);
+    /* set the needed locale */
     _configthreadlocale(_ENABLE_PER_THREAD_LOCALE);
     setlocale(LC_NUMERIC, "");
 #else
+    /* save the current task locale */
     locale_t oldLocale = uselocale((locale_t) 0);
+    /* set the needed locale */
     locale_t newLocale = newlocale(LC_NUMERIC_MASK, "C", (locale_t) 0);
     uselocale(newLocale);
 #endif
-	retval = codec(node, object, pspec, value, err);
+
+    /* call the encode or decode function */
+    retval = codec(node, object, pspec, value, err);
+
 #ifdef WIN32
+    /* restore the locale */
     setlocale(LC_NUMERIC, oldLocale);
     _configthreadlocale(oldSetting);
 #else
+    /* restore the locale */
     uselocale(oldLocale);
     freelocale(newLocale);
 #endif
