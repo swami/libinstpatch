@@ -85,21 +85,8 @@
  * 3.2) To load a single GValue value from an XML tree node, the application
  *   must call ipatch_xml_decode_value (node, value).
  */
-
-#include "config.h"
-
-#ifdef HAVE_STRING_H
 #include <string.h>
-#endif
-
-#ifdef HAVE_LOCALE_H
 #include <locale.h>
-#endif
-
-#ifdef HAVE_XLOCALE_H
-#include <xlocale.h>
-#endif
-
 #include "IpatchXmlObject.h"
 #include "IpatchXml.h"
 #include "IpatchParamProp.h"
@@ -374,20 +361,19 @@ ipatch_xml_codec_func_locale(IpatchXmlCodecFuncLocale codec,
 {
     gboolean retval;
 
+    /* save the current task locale and set the needed task locale */
 #ifdef WIN32
-    /* save the current task locale */
-    char* oldLocale = setlocale(LC_NUMERIC, NULL);
-    int oldSetting = _configthreadlocale(0);
-    /* set the needed locale */
-    _configthreadlocale(_ENABLE_PER_THREAD_LOCALE);
-    g_return_val_if_fail(setlocale(LC_NUMERIC, "") != NULL, FALSE);
+    char* oldLocale;
+    int oldSetting = _configthreadlocale(_ENABLE_PER_THREAD_LOCALE);
+    g_return_val_if_fail(oldSetting != -1, FALSE);
+    oldLocale = setlocale(LC_NUMERIC, NULL);
+    g_return_val_if_fail(setlocale(LC_NUMERIC, "") !=  NULL, FALSE);
 #else
-    /* save the current task locale */
-    locale_t oldLocale = uselocale((locale_t) 0);
-    /* set the needed locale */
+    locale_t oldLocale;
     locale_t newLocale = newlocale(LC_NUMERIC_MASK, "C", (locale_t) 0);
     g_return_val_if_fail(newLocale != (locale_t) 0, FALSE);
-    uselocale(newLocale);
+    oldLocale = uselocale(newLocale);
+    g_return_val_if_fail(oldLocale != (locale_t) 0, FALSE);
 #endif
 
     /* call the encode or decode function */
@@ -400,12 +386,9 @@ ipatch_xml_codec_func_locale(IpatchXmlCodecFuncLocale codec,
 #else
     /* restore the locale */
     uselocale(oldLocale);
-    if (newLocale != LC_GLOBAL_LOCALE)
-    {
-        freelocale(newLocale);
-    }
+    freelocale(newLocale);
 #endif
-    return retval;
+	return retval;
 }
 
 /**
