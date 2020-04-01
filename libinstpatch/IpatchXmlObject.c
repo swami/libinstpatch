@@ -85,8 +85,20 @@
  * 3.2) To load a single GValue value from an XML tree node, the application
  *   must call ipatch_xml_decode_value (node, value).
  */
+#include "config.h"
+
+#ifdef HAVE_STRING_H
 #include <string.h>
+#endif
+
+#ifdef HAVE_LOCALE_H
 #include <locale.h>
+#endif
+
+#ifdef HAVE_XLOCALE_H
+#include <xlocale.h>
+#endif
+
 #include "IpatchXmlObject.h"
 #include "IpatchXml.h"
 #include "IpatchParamProp.h"
@@ -388,7 +400,7 @@ ipatch_xml_codec_func_locale(IpatchXmlCodecFuncLocale codec,
     uselocale(oldLocale);
     freelocale(newLocale);
 #endif
-	return retval;
+    return retval;
 }
 
 /**
