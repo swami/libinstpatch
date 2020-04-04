@@ -216,8 +216,7 @@ ipatch_convert_object_to_type_multi(GObject *object, GType type, GError **err)
 GList *
 ipatch_convert_object_to_type_multi_list(GObject *object, GType type, GError **err)
 {
-    va_list empty;
-    return (ipatch_convert_object_to_type_multi_set_vlist(object, type, err, NULL, empty));
+    return (ipatch_convert_object_to_type_multi_set_vlist(object, type, err, NULL, NULL));
 }
 
 /**
@@ -295,7 +294,8 @@ ipatch_convert_object_to_type_multi_set_vlist(GObject *object, GType type, GErro
         return NULL;
     }
 
-    if(first_property_name)
+    /* assign properties (if any) */
+	if(first_property_name)
     {
         g_object_set_valist((GObject *)conv, first_property_name, args);
     }
