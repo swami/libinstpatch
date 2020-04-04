@@ -19,20 +19,93 @@
  */
 /**
  * SECTION: IpatchXmlObject
- * @short_description: GObject related XML tree functions
+ * @short_description: GObject encoding/decoding related XML tree functions
  * @see_also: IpatchXml
  * @stability: Stable
  *
- * Functions for saving/loading GObject, GValue and GObject properties
- * to/from XML trees.  Includes a system for registering custom encoding and
- * decoding handlers for objects, properties and value types.
+ * @introduction
+ * This module provides functions for saving/loading whole GObject properties,
+ * single GObject property and single GValue to/from XML trees.
+ *
+ * The module includes also a system for registering custom encoding
+ * and decoding handlers for objects properties, single property and single Galue
+ * types (see 1).
+ * Custom XML encoding handler will be used when saving to XML trees (see 2).
+ * Conversely custom XML decoding handler will be used when loading from XML
+ * trees (see 3).
+ *
+ * @Functions presentation
+   1) registering system for encoding/decoding handlers:
+ * 1.1)First we create an internal table (xml_handlers) that will be used to
+ *  register custom encoding/decoding XML handlers. This table is created by
+ *  _ipatch_xml_object_init() during libinstpatch initialization (ipatch_init())
+ *  and is owned by libinstpatch.
+ *
+ * 1.2)Then if the application need custom encoding/decoding XML handlers it
+ *  must call ipatch_xml_register_handler(). Once handlers are registered, they
+ *  will be called automatically when the application will use functions to save
+ *  (see 2) or load (see 3) gobjet properties, a single property or a single
+ *  GValue to/from  XML tree. Note that if a custom handlers doesn't exist a
+ *  default handler will be used instead.
+ *
+ * 1.3)Any custom handlers may be looked by calling patch_xml_lookup_handler(),
+ *  patch_xml_lookup_handler_by_prop_name()
+ *
+ * 2)Functions for encoding (saving) whole object properties, single GObject
+ *  property or single GValue to an XML tree node:
+ *
+ * 2.1) To save a whole object to an XML tree node, the application must call
+ *   ipatch_xml_encode_object(node, object). It is maily intended to save many
+ *   properties values belonging to the given object. Which properties are saved
+ *   depends of the behaviour of custom encoding handlers registered (if any).
+ *   Default encoding handler save all properties's value (except those which
+ *   have the #IPATCH_PARAM_NO_SAVE flag set.
+ *
+ * 2.1) To save a single property object to an XML tree node, the application
+ *   must call ipatch_xml_encode_property(node, object, pspec) or
+ *   ipatch_xml_encode_property_by_name(node, object, propname).
+ *
+ * 2.2) To save a single GValue value to an XML tree node, the application
+ *   must call ipatch_xml_encode_value (node, value).
+ *
+ * 3)Functions for decoding (loading) whole object, single GObject property or
+ *   single GValue from an XML tree node:
+ *
+ * 3.1) To load a whole object from an XML tree node, the application must call
+ *   ipatch_xml_decode_object(node, object). It is maily intended to load many
+ *   properties values belonging to the given object. Which properties are loaded
+ *   depends of the behaviour of custom decoding handlers registered (if any).
+ *   Default decoding handler load all properties's value (except those which
+ *   have the #IPATCH_PARAM_NO_SAVE flag set.
+ *
+ * 3.1) To load a single property object from an XML tree node, the application
+ *   must call ipatch_xml_decode_property(node, object, pspec) or
+ *   ipatch_xml_decode_property_by_name(node, object, propname).
+ *
+ * 3.2) To load a single GValue value from an XML tree node, the application
+ *   must call ipatch_xml_decode_value (node, value).
  */
+#include "config.h"
+
+#ifdef HAVE_STRING_H
 #include <string.h>
+#endif
+
+#ifdef HAVE_LOCALE_H
+#include <locale.h>
+#endif
+
+#ifdef HAVE_XLOCALE_H
+#include <xlocale.h>
+#endif
+
 #include "IpatchXmlObject.h"
 #include "IpatchXml.h"
 #include "IpatchParamProp.h"
 #include "misc.h"
 #include "i18n.h"
+
+/*-----(1) registering system for custom encoding/decoding handlers:---------*/
 
 /* Number of decimal places of precision for floating point numbers stored to XML */
 #define XML_FLOAT_PRECISION	6
@@ -66,6 +139,9 @@ G_LOCK_DEFINE_STATIC(xml_handlers);
 static GHashTable *xml_handlers = NULL;
 
 
+/*
+ * Initialize IpatchXmlObject loading/saving system
+ */
 void
 _ipatch_xml_object_init(void)
 {
@@ -75,6 +151,8 @@ _ipatch_xml_object_init(void)
                                          xml_handlers_value_destroy_func);
 }
 
+/* hash function for buiding hash key for xml_handlers */
+/* hash key is a combination of GParamSpec property and GType */
 static guint
 xml_handlers_hash_func(gconstpointer key)
 {
@@ -82,6 +160,8 @@ xml_handlers_hash_func(gconstpointer key)
     return (hkey->type + GPOINTER_TO_UINT(hkey->pspec));
 }
 
+/* check equal key for hash table */
+/* return TRUE when key a is equal to key b */
 static gboolean
 xml_handlers_key_equal_func(gconstpointer a, gconstpointer b)
 {
@@ -89,12 +169,14 @@ xml_handlers_key_equal_func(gconstpointer a, gconstpointer b)
     return (akey->type == bkey->type && akey->pspec == bkey->pspec);
 }
 
+/* key destroy function */
 static void
 xml_handlers_key_destroy_func(gpointer data)
 {
     g_slice_free(HandlerHashKey, data);
 }
 
+/* value destroy function */
 static void
 xml_handlers_value_destroy_func(gpointer data)
 {
@@ -150,6 +232,7 @@ ipatch_xml_register_handler_full(GType type, const char *prop_name,
     g_return_if_fail(encode_func != NULL);
     g_return_if_fail(decode_func != NULL);
 
+    /* get GParamSpec property of GObject */
     if(prop_name)
     {
         obj_class = g_type_class_peek(type);
@@ -159,16 +242,19 @@ ipatch_xml_register_handler_full(GType type, const char *prop_name,
         g_return_if_fail(pspec != NULL);
     }
 
+    /* alloc memory for hash key */
     key = g_slice_new(HandlerHashKey);
     key->type = type;
     key->pspec = pspec;
 
+    /* alloc memory for hash value */
     val = g_slice_new(HandlerHashValue);
-    val->encode_func = encode_func;
-    val->decode_func = decode_func;
-    val->notify_func = notify_func;
-    val->user_data = user_data;
+    val->encode_func = encode_func; /* object or property or GValue -> XML */
+    val->decode_func = decode_func; /* XML -> object or property or GValue */
+    val->notify_func = notify_func; /* Callback when handlers are removed */
+    val->user_data = user_data;     /* data passed to notify func */
 
+    /* put value in hash table */
     G_LOCK(xml_handlers);
     g_hash_table_insert(xml_handlers, key, val);
     G_UNLOCK(xml_handlers);
@@ -197,13 +283,16 @@ ipatch_xml_lookup_handler(GType type, GParamSpec *pspec,
 
     g_return_val_if_fail(type != 0, FALSE);
 
+    /* prepare the hash key */
     key.type = type;
     key.pspec = pspec;
 
+    /* get the xml handlers from this key */
     G_LOCK(xml_handlers);
     val = g_hash_table_lookup(xml_handlers, &key);
     G_UNLOCK(xml_handlers);
 
+    /* return the encode and  decode handlers if requested */
     if(encode_func)
     {
         *encode_func = val ? val->encode_func : NULL;
@@ -214,6 +303,7 @@ ipatch_xml_lookup_handler(GType type, GParamSpec *pspec,
         *decode_func = val ? val->decode_func : NULL;
     }
 
+    /* return True if any handlers exists */
     return (val != NULL);
 }
 
@@ -239,6 +329,7 @@ ipatch_xml_lookup_handler_by_prop_name(GType type, const char *prop_name,
 
     g_return_val_if_fail(type != 0, FALSE);
 
+    /* get GParamSpec property of GObject */
     if(prop_name)
     {
         obj_class = g_type_class_peek(type);
@@ -248,7 +339,68 @@ ipatch_xml_lookup_handler_by_prop_name(GType type, const char *prop_name,
         g_return_val_if_fail(pspec != NULL, FALSE);
     }
 
+    /* get the handler */
     return (ipatch_xml_lookup_handler(type, pspec, encode_func, decode_func));
+}
+
+/*
+ (2) function to encode (save) whole object, a single property, or a single GValue value
+     to an XML tree node
+ */
+
+/* IpatchXmlCodecFuncLocale is a pointer on IpatchXmDecodeFunc or
+   IpatchXmlEncodeFunc function */
+typedef  IpatchXmlEncodeFunc IpatchXmlCodecFuncLocale;
+
+/*
+  Call codec function with parameters node, object, pspec, value, err.
+  Before calling codec, the current task locale is set to LC_NUMERIC
+  to ensure that numeric value are properly coded/decoded
+  using ipatch_xml_xxxx_decode_xxxx_func().
+
+  This will ensure that when decoding float numbers, decimal part values are
+  properly decoded. Otherwise there is risk that decimal part will be ignored,
+  leading in previous float preferences being read as integer value.
+
+  On return, the locale is restored to the value it had before calling the
+  function.
+*/
+static gboolean
+ipatch_xml_codec_func_locale(IpatchXmlCodecFuncLocale codec,
+                              GNode *node, GObject *object,
+                              GParamSpec *pspec, GValue *value,
+                              GError **err)
+{
+    gboolean retval;
+
+    /* save the current task locale and set the needed task locale */
+#ifdef WIN32
+    char* oldLocale;
+    int oldSetting = _configthreadlocale(_ENABLE_PER_THREAD_LOCALE);
+    g_return_val_if_fail(oldSetting != -1, FALSE);
+    oldLocale = setlocale(LC_NUMERIC, NULL);
+    g_return_val_if_fail(setlocale(LC_NUMERIC, "") !=  NULL, FALSE);
+#else
+    locale_t oldLocale;
+    locale_t newLocale = newlocale(LC_NUMERIC_MASK, "C", (locale_t) 0);
+    g_return_val_if_fail(newLocale != (locale_t) 0, FALSE);
+    oldLocale = uselocale(newLocale);
+    g_return_val_if_fail(oldLocale != (locale_t) 0, FALSE);
+#endif
+
+    /* call the encode or decode function */
+    retval = codec(node, object, pspec, value, err);
+
+#ifdef WIN32
+    /* restore the locale */
+    setlocale(LC_NUMERIC, oldLocale);
+    _configthreadlocale(oldSetting);
+#else
+    /* restore the locale */
+    uselocale(oldLocale);
+    freelocale(newLocale);
+#endif
+    return retval;
 }
 
 /**
@@ -259,7 +411,8 @@ ipatch_xml_lookup_handler_by_prop_name(GType type, const char *prop_name,
  *   properties to current open element
  * @err: Location to store error info or %NULL to ignore
  *
- * Encodes an object to XML.
+ * Encodes an object to XML. It there is no encoder for this object a default
+ * encoder ipatch_xml_default_encode_object_func() will be used instead.
  *
  * Returns: %TRUE on success, %FALSE otherwise (in which case @err may be set).
  */
@@ -292,12 +445,14 @@ ipatch_xml_encode_object(GNode *node, GObject *object,
         encode_func = ipatch_xml_default_encode_object_func;
     }
 
+    /* create a new XML node element if requested */
     if(create_element)
         node = ipatch_xml_new_node(node, "obj", NULL,
                                    "type", g_type_name(type),
                                    NULL);
 
-    return (encode_func(node, object, NULL, NULL, err));
+    /* encode all object'properties in XML node */
+    return ipatch_xml_codec_func_locale(encode_func, node, object, NULL, NULL, err);
 }
 
 /**
@@ -309,7 +464,9 @@ ipatch_xml_encode_object(GNode *node, GObject *object,
  *   assign object property value to node
  * @err: Location to store error info or %NULL to ignore
  *
- * Encode an object property to an XML node.
+ * Encode an object property value to an XML node.
+ * If there is no encoder for this property, the function
+ * ipatch_xml_encode_value() will be used instead.
  *
  * Returns: %TRUE on success, %FALSE otherwise
  */
@@ -328,20 +485,26 @@ ipatch_xml_encode_property(GNode *node, GObject *object, GParamSpec *pspec,
 
     /* ++ alloc value */
     g_value_init(&value, G_PARAM_SPEC_VALUE_TYPE(pspec));
+
+    /* get property value */
     g_object_get_property(object, g_param_spec_get_name(pspec), &value);
 
+    /* create a new XML node element if requested */
     if(create_element)
     {
         node = ipatch_xml_new_node(node, "prop", NULL, "name", pspec->name, NULL);
     }
 
+    /* looking for the property's xml encoder */
     if(!ipatch_xml_lookup_handler(pspec->owner_type, pspec, &encode_func, NULL))
     {
+        /* Use default property encoder when handler not found */
         retval = ipatch_xml_encode_value(node, &value, err);
     }
     else
     {
-        retval = encode_func(node, object, pspec, &value, err);
+        /* Use handler encoder */
+        retval = ipatch_xml_codec_func_locale(encode_func, node, object, pspec, &value, err);
     }
 
     g_value_unset(&value);	/* -- free value */
@@ -364,6 +527,8 @@ ipatch_xml_encode_property(GNode *node, GObject *object, GParamSpec *pspec,
  * @err: Location to store error info or %NULL to ignore
  *
  * Encode an object property by name to an XML node.
+ * Like ipatch_xml_encode_property() but takes a @propname string instead
+ * of a GParamSpec.
  *
  * Returns: %TRUE on success, %FALSE otherwise
  */
@@ -379,9 +544,11 @@ ipatch_xml_encode_property_by_name(GNode *node, GObject *object,
     g_return_val_if_fail(propname != NULL, FALSE);
     g_return_val_if_fail(!err || !*err, FALSE);
 
+    /* looking for object's GParamSpec property */
     pspec = g_object_class_find_property(G_OBJECT_GET_CLASS(object), propname);
     g_return_val_if_fail(pspec != NULL, FALSE);
 
+    /* Encode object's property value to the XML node. */
     return (ipatch_xml_encode_property(node, object, pspec, create_element, err));
 }
 
@@ -391,7 +558,9 @@ ipatch_xml_encode_property_by_name(GNode *node, GObject *object,
  * @value: Value to encode
  * @err: Location to store error info or %NULL to ignore
  *
- * Encodes a GValue to an XML node text value.
+ * Encodes a GValue to an XML node text value. If there is not
+ * encoder for this GValue, ipatch_xml_default_encode_value_func()
+ * default encoder will be used instead.
  *
  * Returns: TRUE on success, FALSE on error (@err may be set)
  */
@@ -404,13 +573,20 @@ ipatch_xml_encode_value(GNode *node, GValue *value, GError **err)
     g_return_val_if_fail(G_IS_VALUE(value), FALSE);
     g_return_val_if_fail(!err || !*err, FALSE);
 
+    /* jjc looking for the GValue xml encoder */
     if(!ipatch_xml_lookup_handler(G_VALUE_TYPE(value), NULL, &encode_func, NULL))
     {
         encode_func = ipatch_xml_default_encode_value_func;
     }
 
-    return (encode_func(node, NULL, NULL, value, err));
+    /* Encode GValue to the XML node. */
+    return ipatch_xml_codec_func_locale(encode_func, node, NULL, NULL, value, err);
 }
+
+/*
+ (3) function to decode (load) whole object, a single proprety, or a single GValue value
+     from an xml tree node:
+ */
 
 /**
  * ipatch_xml_decode_object:
@@ -418,8 +594,10 @@ ipatch_xml_encode_value(GNode *node, GValue *value, GError **err)
  * @object: Object to decode to from XML
  * @err: Location to store error info or %NULL to ignore
  *
- * Decodes XML to an object.  The default GObject decoder will only decode
- * those properties which don't have the #IPATCH_PARAM_NO_SAVE flag set.
+ * Decodes XML to an object. If there is no decoder for this object,
+ * the default GObject decoder ipatch_xml_default_decode_object_func()
+ * will be used and will only decode those properties which don't have the
+ * #IPATCH_PARAM_NO_SAVE flag set.
  *
  * Returns: %TRUE on success, %FALSE otherwise (in which case @err may be set).
  */
@@ -451,7 +629,8 @@ ipatch_xml_decode_object(GNode *node, GObject *object, GError **err)
         decode_func = ipatch_xml_default_decode_object_func;
     }
 
-    return (decode_func(node, object, NULL, NULL, err));
+    /* decode XML node to object. */
+    return ipatch_xml_codec_func_locale(decode_func, node, object, NULL, NULL, err);
 }
 
 /**
@@ -461,8 +640,10 @@ ipatch_xml_decode_object(GNode *node, GObject *object, GError **err)
  * @pspec: Parameter specification of property to decode
  * @err: Location to store error info or %NULL to ignore
  *
- * Decode an object property from an XML node value to an object.  Note that
- * the property is NOT checked for the #IPATCH_PARAM_NO_SAVE flag.
+ * Decode an object property from an XML node value to an object. If there is
+ * no decoder for this property, ipatch_xml_decode_value() function will be
+ * used instead.
+ * The property is NOT checked for the #IPATCH_PARAM_NO_SAVE flag.
  *
  * Returns: %TRUE on success, %FALSE otherwise
  */
@@ -482,15 +663,17 @@ ipatch_xml_decode_property(GNode *node, GObject *object, GParamSpec *pspec,
     /* ++ alloc value */
     g_value_init(&value, G_PARAM_SPEC_VALUE_TYPE(pspec));
 
+    /* looking for the property xml decoder */
     if(!ipatch_xml_lookup_handler(pspec->owner_type, pspec, NULL, &decode_func))
     {
         retval = ipatch_xml_decode_value(node, &value, err);
     }
     else
     {
-        retval = decode_func(node, object, pspec, &value, err);
+        retval = ipatch_xml_codec_func_locale(decode_func, node, object, pspec, &value, err);
     }
 
+    /* set the decoded property value  */
     if(retval)
     {
         g_object_set_property(object, pspec->name, &value);
@@ -509,6 +692,8 @@ ipatch_xml_decode_property(GNode *node, GObject *object, GParamSpec *pspec,
  * @err: Location to store error info or %NULL to ignore
  *
  * Decode an object property from an XML node value to an object by property name.
+ * Like ipatch_xml_decode_property() but but takes a @propname string instead
+ * of a GParamSpec.
  * Note that the property is NOT checked for the #IPATCH_PARAM_NO_SAVE flag.
  *
  * Returns: %TRUE on success, %FALSE otherwise
@@ -524,9 +709,11 @@ ipatch_xml_decode_property_by_name(GNode *node, GObject *object,
     g_return_val_if_fail(propname != NULL, FALSE);
     g_return_val_if_fail(!err || !*err, FALSE);
 
+    /* looking for object's property */
     pspec = g_object_class_find_property(G_OBJECT_GET_CLASS(object), propname);
     g_return_val_if_fail(pspec != NULL, FALSE);
 
+    /* Decode the object property from the XML node */
     return (ipatch_xml_decode_property(node, object, pspec, err));
 }
 
@@ -549,13 +736,17 @@ ipatch_xml_decode_value(GNode *node, GValue *value, GError **err)
     g_return_val_if_fail(G_IS_VALUE(value), FALSE);
     g_return_val_if_fail(!err || !*err, FALSE);
 
+    /* jjc looking from GValue decoder */
     if(!ipatch_xml_lookup_handler(G_VALUE_TYPE(value), NULL, NULL, &decode_func))
     {
         decode_func = ipatch_xml_default_decode_value_func;
     }
 
-    return (decode_func(node, NULL, NULL, value, err));
+    /* Decode a GValue from an XML node text value. */
+    return ipatch_xml_codec_func_locale(decode_func, node, NULL, NULL, value, err);
 }
+
+/*------------------- default XML encoder handlers ------------------------------*/
 
 /**
  * ipatch_xml_default_encode_object_func: (type IpatchXmlEncodeFunc)
@@ -565,8 +756,9 @@ ipatch_xml_decode_value(GNode *node, GValue *value, GError **err)
  * @value: Will be %NULL
  * @err: Location to store error value (or %NULL if ignoring)
  *
- * Default GObject encode handler.  Useful for custom handlers to chain to
- * the default if needed.
+ * Default GObject encode handler. Useful to chain to the default if custom
+ * object handler doesn't exist. All properties belonging to object are encoded
+ * except those which have the  * #IPATCH_PARAM_NO_SAVE flag set.
  *
  * Returns: TRUE on success, FALSE on error (@err may be set)
  */
@@ -575,11 +767,12 @@ ipatch_xml_default_encode_object_func(GNode *node, GObject *object,
                                       GParamSpec *pspec, GValue *value,
                                       GError **err)
 {
-    GParamSpec **pspecs;
-    GError *local_err = NULL;
+    GParamSpec **pspecs;      /* table of object properties */
+    GError *local_err = NULL; /* number of properties in pspecs */
     guint n_props;
     guint i;
 
+    /* get table of object properties */
     pspecs = g_object_class_list_properties(G_OBJECT_GET_CLASS(object),	   /* ++ alloc */
                                             &n_props);
 
@@ -592,6 +785,7 @@ ipatch_xml_default_encode_object_func(GNode *node, GObject *object,
             continue;
         }
 
+        /* encode a property value in a new XML node with node beeing parent */
         if(!ipatch_xml_encode_property(node, object, pspecs[i], TRUE, &local_err))    /* ++ alloc */
         {
             g_warning("Failed to store property '%s' for object of type '%s': %s",
@@ -606,6 +800,7 @@ ipatch_xml_default_encode_object_func(GNode *node, GObject *object,
     return (TRUE);
 }
 
+// not used.
 /**
  * ipatch_xml_default_encode_property_func: (type IpatchXmlEncodeFunc)
  * @node: XML node to encode XML to
@@ -614,7 +809,7 @@ ipatch_xml_default_encode_object_func(GNode *node, GObject *object,
  * @value: Value of the property
  * @err: Location to store error value (or %NULL if ignoring)
  *
- * Default GObject property encode handler.  Useful for custom handlers to chain
+ * Default GObject property encode handler. Useful for custom handlers to chain
  * to the default if needed.
  *
  * Returns: TRUE on success, FALSE on error (@err may be set)
@@ -635,8 +830,8 @@ ipatch_xml_default_encode_property_func(GNode *node, GObject *object,
  * @value: Value to encode
  * @err: Location to store error value (or %NULL if ignoring)
  *
- * Default GValue encode handler.  Useful for custom handlers to chain to
- * the default if needed.
+ * Default GValue encode handler. Useful to chain to the default
+ * when custom GValue encoder doesn't exist.
  *
  * Returns: TRUE on success, FALSE on error (@err may be set)
  */
@@ -652,6 +847,7 @@ ipatch_xml_default_encode_value_func(GNode *node, GObject *object,
     g_return_val_if_fail(G_IS_VALUE(value), FALSE);
     g_return_val_if_fail(!err || !*err, FALSE);
 
+    /* get value type */
     valtype = G_VALUE_TYPE(value);
 
     switch(G_TYPE_FUNDAMENTAL(valtype))
@@ -744,6 +940,8 @@ ipatch_xml_default_encode_value_func(GNode *node, GObject *object,
     return (TRUE);
 }
 
+/*------------------- default XML decoder handlers ------------------------------*/
+
 /**
  * ipatch_xml_default_decode_object_func: (type IpatchXmlDecodeFunc)
  * @node: XML node to decode XML from
@@ -752,7 +950,7 @@ ipatch_xml_default_encode_value_func(GNode *node, GObject *object,
  * @value: Will be %NULL
  * @err: Location to store error value (or %NULL if ignoring)
  *
- * Default GObject decode handler.  Useful for custom handlers to chain to
+ * Default GObject decode handler. Useful for custom handlers to chain to
  * the default if needed.
  *
  * Returns: TRUE on success, FALSE on error (@err may be set)
@@ -776,6 +974,7 @@ ipatch_xml_default_decode_object_func(GNode *node, GObject *object,
     {
         xmlnode = (IpatchXmlNode *)(n->data);
 
+        /* get property name from child XML node */
         if(strcmp(xmlnode->name, "prop") != 0)
         {
             continue;
@@ -788,10 +987,12 @@ ipatch_xml_default_decode_object_func(GNode *node, GObject *object,
             continue;
         }
 
+        /* get GParamSpec property */
         prop = g_object_class_find_property(klass, propname);
 
         if(prop)
         {
+            /* ignore property marked with IPATCH_PARAM_NO_SAVE flag */
             if(prop->flags & IPATCH_PARAM_NO_SAVE)
             {
                 g_warning(_("Ignoring non storeable XML object property '%s' for object type '%s'"),
@@ -799,6 +1000,7 @@ ipatch_xml_default_decode_object_func(GNode *node, GObject *object,
                 continue;
             }
 
+            /* decode property value from XML node n */
             if(!ipatch_xml_decode_property(n, object, prop, &local_err))
             {
                 g_warning(_("Failed to decode object property: %s"),
@@ -814,6 +1016,7 @@ ipatch_xml_default_decode_object_func(GNode *node, GObject *object,
     return (TRUE);
 }
 
+// not used.
 /**
  * ipatch_xml_default_decode_property_func: (type IpatchXmlDecodeFunc)
  * @node: XML node to decode XML from
@@ -822,8 +1025,8 @@ ipatch_xml_default_decode_object_func(GNode *node, GObject *object,
  * @value: Initialized value to decode to
  * @err: Location to store error value (or %NULL if ignoring)
  *
- * Default GObject property decode handler.  Useful for custom handlers to chain
- * to the default if needed.
+ * Default GObject property decode handler. Useful to chain to the default
+ * if custom property handler doesn't exist.
  *
  * Returns: TRUE on success, FALSE on error (@err may be set)
  */
@@ -843,8 +1046,8 @@ ipatch_xml_default_decode_property_func(GNode *node, GObject *object,
  * @value: Value to decode to
  * @err: Location to store error value (or %NULL if ignoring)
  *
- * Default GValue decode handler.  Useful for custom handlers to chain to
- * the default if needed.
+ * Default GObject GValue decode handler. Useful to chain to the default
+ * if custom GValue handler doesn't exist.
  *
  * Returns: TRUE on success, FALSE on error (@err may be set)
  */
