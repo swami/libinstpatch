@@ -295,7 +295,7 @@ ipatch_convert_object_to_type_multi_set_vlist(GObject *object, GType type, GErro
     }
 
     /* assign properties (if any) */
-	if(first_property_name)
+    if(first_property_name)
     {
         g_object_set_valist((GObject *)conv, first_property_name, args);
     }
