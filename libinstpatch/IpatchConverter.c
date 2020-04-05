@@ -216,7 +216,7 @@ ipatch_convert_object_to_type_multi(GObject *object, GType type, GError **err)
 GList *
 ipatch_convert_object_to_type_multi_list(GObject *object, GType type, GError **err)
 {
-    /* Note: empty is intentionally not initialized. It allows to fix some on ARM and PPC.
+    /* Note: empty is intentionally not initialized. It allows to fix some build on ARM and PPC.
        It is save to use, because empty is not accessed in ipatch_convert_object_to_type_multi_set_vlist
        when the second last argument is NULL.
     */
