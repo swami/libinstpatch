@@ -65,10 +65,10 @@ typedef struct
 
 /* defined in IpatchItemProp.c */
 extern void _ipatch_item_prop_init(void);
+extern void  _ipatch_item_prop_deinit(void);
 
 /* defined in IpatchBase.c */
 extern GParamSpec *ipatch_base_pspec_changed;
-
 
 static void ipatch_item_base_init(IpatchItemClass *klass);
 static void ipatch_item_class_init(IpatchItemClass *klass);
@@ -105,12 +105,30 @@ G_LOCK_DEFINE_STATIC(unique_prop_cache);
 /* cache of IpatchItem unique properties (hash: GType => UniqueBag) */
 static GHashTable *unique_prop_cache = NULL;
 
-/* a dummy bag pointer used to indicate that an item type has no unique props */
-static UniqueBag no_unique_props;
-
 /* store title property GParamSpec as a convenience to derived types */
 /* Useful when libinstpatch library is used as a static library. */
 GParamSpec *ipatch_item_pspec_title = NULL;
+
+/* ----- Initialization/deinitialization of property change callback system -*/
+/* Initialization */
+void _ipatch_item_init(void)
+{
+    /* cache of IpatchItem unique properties (hash: GType => UniqueBag) */
+    unique_prop_cache = g_hash_table_new_full(NULL, NULL, NULL, g_free);
+
+    /* Initialize property change callback system */
+    _ipatch_item_prop_init();
+}
+
+/* Free property change callback system */
+void _ipatch_item_deinit(void)
+{
+    /* free property change callback system */
+    _ipatch_item_prop_deinit();
+    g_hash_table_destroy(unique_prop_cache);
+}
+
+/* ----- IpatchItem object functions  ---------------------------------------*/
 
 /*
  Getter function returning title property GParamSpec as a convenience to derived type.
@@ -140,11 +158,6 @@ ipatch_item_get_type(void)
 
         item_type = g_type_register_static(G_TYPE_OBJECT, "IpatchItem",
                                            &item_info, G_TYPE_FLAG_ABSTRACT);
-
-        /* create unique property cache (elements are never removed) */
-        unique_prop_cache = g_hash_table_new(NULL, NULL);
-
-        _ipatch_item_prop_init();	/* Initialize property change callback system */
     }
 
     return (item_type);
@@ -1619,9 +1632,10 @@ item_lookup_unique_bag(GType type)
 
     G_LOCK(unique_prop_cache);
 
-    unique = g_hash_table_lookup(unique_prop_cache, GUINT_TO_POINTER(type));
-
-    if(!unique)			/* has not been cached yet? */
+    /* has not been cached yet? */
+    if(! g_hash_table_lookup_extended(unique_prop_cache,
+                                      GUINT_TO_POINTER (type),
+                                      NULL, (gpointer *)&unique))
     {
         klass = g_type_class_ref(type);
         g_return_val_if_fail(klass != NULL, NULL);
@@ -1679,18 +1693,13 @@ item_lookup_unique_bag(GType type)
         }
         else
         {
-            unique = &no_unique_props;    /* indicate no unique properties */
+            unique = unique = NULL;    /* indicate no unique properties */
         }
 
         g_hash_table_insert(unique_prop_cache, GUINT_TO_POINTER(type), unique);
     }
 
     G_UNLOCK(unique_prop_cache);
-
-    if(unique == &no_unique_props)	/* no unique properties? */
-    {
-        unique = NULL;
-    }
 
     return (unique);
 }

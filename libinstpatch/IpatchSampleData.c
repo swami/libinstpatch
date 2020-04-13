@@ -64,6 +64,7 @@ typedef struct
     guint32 channel_map;
 } CachingInfo;
 
+static void _ipatch_sample_data_free_caching_info(CachingInfo *data);
 static void ipatch_sample_data_sample_iface_init(IpatchSampleIface *iface);
 static gboolean ipatch_sample_data_sample_iface_open(IpatchSampleHandle *handle,
         GError **err);
@@ -93,6 +94,31 @@ G_DEFINE_TYPE_WITH_CODE(IpatchSampleData, ipatch_sample_data, IPATCH_TYPE_ITEM,
                         G_IMPLEMENT_INTERFACE(IPATCH_TYPE_SAMPLE,
                                 ipatch_sample_data_sample_iface_init))
 
+/* ----- Initialization/deinitialization of lists ---------------------------*/
+/* Initialize lists */
+void _ipatch_sample_data_init(void)
+{
+    sample_cache_total_size = 0;     /* Total size of cached samples */
+    sample_cache_unused_size = 0;    /* Size of unused cached samples */
+    sample_data_list = NULL;
+    caching_list = NULL;
+}
+
+/* Free lists */
+void _ipatch_sample_data_deinit(void)
+{
+    g_slist_free(sample_data_list);
+    g_slist_free_full(caching_list,
+                     (GDestroyNotify)_ipatch_sample_data_free_caching_info);
+}
+
+/* free data list */
+static void _ipatch_sample_data_free_caching_info(CachingInfo *data)
+{
+    g_slice_free(CachingInfo, data);
+}
+
+/* ----- IpatchSampleData object functions  ---------------------------------*/
 
 /**
  * ipatch_get_sample_data_list:
