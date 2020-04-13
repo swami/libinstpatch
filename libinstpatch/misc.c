@@ -148,14 +148,14 @@ static gboolean initialized = FALSE;
 
 /*-----------------------------------------------------------------------------
  Initialization / deinitialization of libinstpatch library.
- Any application sould call ipatch_init() once before any others libinstpatch
+ Any application should call ipatch_init() once before any other libinstpatch
  functions.
- When the application finished it must call ipatch_close().
+ When the application is complete it must call ipatch_close().
 
  For multi task application it is best that only one task be responsible of
  initialization/closing. Typically, the main task of the application should
- call ipatch_init() before creating other tasks, then when the application
- finished, the main task should call ipatch_close() after the other tasks are
+ call ipatch_init() before creating other tasks, then when the application is
+ complete, the main task should call ipatch_close() after the other tasks are
  completed.
 -----------------------------------------------------------------------------*/
 
