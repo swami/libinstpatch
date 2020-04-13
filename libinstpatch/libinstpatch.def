@@ -1,6 +1,9 @@
 LIBRARY
 EXPORTS
 
+ipatch_close
+ipatch_deinit
+
 _ipatch_code_error
 _ipatch_code_errorv
 _ipatch_convert_DLS2_init
