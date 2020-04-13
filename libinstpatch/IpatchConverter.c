@@ -52,6 +52,7 @@ typedef struct _LogEntry
 } LogEntry;
 
 
+static void _ipatch_converter_free_converter_info(IpatchConverterInfo *data);
 static gint priority_GCompareFunc(gconstpointer a, gconstpointer b);
 static const IpatchConverterInfo *convert_lookup_map_U(GType **array, GType conv_type,
         GType src_type, GType dest_type, guint flags);
@@ -68,7 +69,29 @@ G_LOCK_DEFINE_STATIC(conv_maps);
 static GList *conv_maps = NULL;	/* list of all registered IpatchConverterInfo */
 static gpointer parent_class = NULL;
 
+/*------ Initialization/deinitialization of converter system ----------------*/
+/* Initialize converter system (conv_maps static list) */
+void _ipatch_converter_init(void)
+{
+    /* list of all registered IpatchConverterInfo */
+    conv_maps = NULL;
+}
 
+/* Free converter system */
+void _ipatch_converter_deinit(void)
+{
+    /* free list of all registered IpatchConverterInfo */
+    g_list_free_full(conv_maps,
+                     (GDestroyNotify)_ipatch_converter_free_converter_info);
+}
+
+/* free one conv_maps data */
+static void _ipatch_converter_free_converter_info(IpatchConverterInfo *data)
+{
+    g_slice_free(IpatchConverterInfo,data);
+}
+
+/*------ Converter system API ----------------------------------------------*/
 /**
  * ipatch_convert_objects:
  * @input: Input object
