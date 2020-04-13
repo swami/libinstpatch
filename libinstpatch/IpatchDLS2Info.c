@@ -42,6 +42,8 @@ typedef struct
     GHashTable *prop_hash;
 } HashListBag;
 
+static void _ipatch_DLS2_infos_free_infos(HashListBag *bag);
+
 static void install_prop_helper(GObjectClass *obj_class, guint property_id,
                                 GParamSpec *pspec, GHashTable *hash);
 
@@ -49,6 +51,28 @@ static void install_prop_helper(GObjectClass *obj_class, guint property_id,
    property notifies */
 static GSList *info_hash_list = NULL;
 
+/* ----- Initialization/deinitialization of DLS storing infos  structure ----*/
+/* Initialize list */
+void _ipatch_DLS2_infos_init(void)
+{
+    info_hash_list = NULL;
+}
+
+/* Free list */
+void _ipatch_DLS2_infos_deinit()
+{
+    g_slist_free_full(info_hash_list,
+                     (GDestroyNotify)_ipatch_DLS2_infos_free_infos);
+}
+
+/* Free list data */
+static void _ipatch_DLS2_infos_free_infos(HashListBag *bag)
+{
+    g_hash_table_destroy(bag->prop_hash);
+    g_free(bag);
+}
+
+/* ----- API for DLS storing infos  structure -------------------------------*/
 
 /**
  * ipatch_dls2_info_get:

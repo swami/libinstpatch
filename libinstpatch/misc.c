@@ -60,6 +60,7 @@ void _ipatch_sf2_voice_cache_init_SLI(void);
 void _ipatch_sf2_voice_cache_init_gig(void);
 void _ipatch_sf2_voice_cache_init_VBank(void);
 void _ipatch_container_notify_init(void);
+void _ipatch_DLS2_infos_init(void);
 
 /* private free functions in other source files */
 void _ipatch_param_deinit(void);
@@ -69,6 +70,8 @@ void _ipatch_xml_object_deinit(void);
 void _ipatch_util_deinit(void);
 void _ipatch_sf2_gen_deinit(void);
 void _ipatch_container_notify_deinit(void);
+void _ipatch_DLS2_infos_deinit(void);
+
 
 
 static gboolean ipatch_strv_xml_encode(GNode *node, GObject *object,
@@ -206,6 +209,7 @@ ipatch_init(void)
      Respective function _xxx_deinit() are called in ipatch_deinit().
     -------------------------------------------------------------------------*/
     _ipatch_container_notify_init();
+    _ipatch_DLS2_infos_init();
 
     /*-------------------------------------------------------------------------
      initialize interfaces type before objects
@@ -489,6 +493,9 @@ ipatch_deinit(void)
     -------------------------------------------------------------------------*/
     /* Free container subsystem */
     _ipatch_container_notify_deinit();
+
+    /* Free DLS2 subsystem */
+    _ipatch_DLS2_infos_deinit();
 }
 
 /**
