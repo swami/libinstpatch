@@ -66,6 +66,7 @@ void _ipatch_type_prop_deinit(void);
 void _ipatch_unit_deinit(void);
 void _ipatch_xml_object_deinit(void);
 void _ipatch_util_deinit(void);
+void _ipatch_sf2_gen_deinit(void);
 
 
 static gboolean ipatch_strv_xml_encode(GNode *node, GObject *object,
@@ -191,6 +192,8 @@ ipatch_init(void)
 
     /* Initialize GValue constant values */
     _ipatch_util_init();
+
+    /* Initialize 'SoundFont generators' subsystem */
     _ipatch_sf2_gen_init();
 
     /* initialize interfaces before objects */
@@ -457,6 +460,9 @@ ipatch_deinit(void)
 
     /* Free GValue constant values */
     _ipatch_util_deinit();
+
+    /* Free 'SoundFont generators' subsystem */
+    _ipatch_sf2_gen_deinit();
 }
 
 /**

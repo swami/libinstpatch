@@ -55,6 +55,10 @@ guint64 ipatch_sf2_gen_add_mask;
 /* array of property names by generator ID */
 static const char **gen_property_names = NULL; /* names [IPATCH_SF2_GEN_COUNT] */
 
+/*-----------------------------------------------------------------------------
+  Initialization/deinitialization of the generator subsystem
+ ----------------------------------------------------------------------------*/
+
 /**
  * _ipatch_sf2_gen_init: (skip)
  *
@@ -160,6 +164,19 @@ _ipatch_sf2_gen_init(void)
         enum_val = g_enum_get_value(enum_class, i);
         gen_property_names[i] = enum_val ? enum_val->value_nick : NULL;
     }
+}
+
+/**
+ * _ipatch_sf2_gen_deinit:
+ *
+ * Feeing SoundFont generator subsystem.
+ */
+void
+_ipatch_sf2_gen_deinit (void)
+{
+    g_free((gpointer)gen_property_names);
+    ipatch_sf2_gen_array_free(ipatch_sf2_gen_ofs_array);
+    ipatch_sf2_gen_array_free(ipatch_sf2_gen_abs_array);
 }
 
 /**
