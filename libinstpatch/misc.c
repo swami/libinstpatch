@@ -65,6 +65,7 @@ void _ipatch_DLS2_sample_init(void);
 void _ipatch_file_init(void);
 void _ipatch_item_init(void);
 void _ipatch_sample_data_init(void);
+void _ipatch_sample_store_swap_recover_init(void);
 
 /* private free functions in other source files */
 void _ipatch_param_deinit(void);
@@ -79,6 +80,7 @@ void _ipatch_DLS2_sample_deinit(void);
 void _ipatch_file_deinit(void);
 void _ipatch_item_deinit(void);
 void _ipatch_sample_data_deinit(void);
+void _ipatch_sample_store_swap_recover_deinit(void);
 
 static gboolean ipatch_strv_xml_encode(GNode *node, GObject *object,
                                        GParamSpec *pspec, GValue *value,
@@ -220,6 +222,7 @@ ipatch_init(void)
     _ipatch_file_init();
     _ipatch_item_init();
     _ipatch_sample_data_init();
+    _ipatch_sample_store_swap_recover_init();
 
     /*-------------------------------------------------------------------------
      initialize interfaces type before objects
@@ -518,6 +521,9 @@ ipatch_deinit(void)
 
     /* Free Sample data subsystem */
     _ipatch_sample_data_deinit();
+
+    /* Free Sample store swap recovery subsystem */
+    _ipatch_sample_store_swap_recover_deinit();
 }
 
 /**
