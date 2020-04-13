@@ -53,6 +53,21 @@ _ipatch_util_init(void)
 }
 
 /**
+ * _ipatch_util_deinit
+ *
+ * Free GValue values
+ */
+void
+_ipatch_util_deinit(void)
+{
+    g_value_unset(ipatch_util_value_bool_true);
+    g_value_unset(ipatch_util_value_bool_false);
+
+    g_free(ipatch_util_value_bool_true);
+    g_free(ipatch_util_value_bool_false);
+}
+
+/**
  * ipatch_util_value_hash:
  * @val: GValue to hash
  *

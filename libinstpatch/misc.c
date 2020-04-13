@@ -65,6 +65,7 @@ void _ipatch_param_deinit(void);
 void _ipatch_type_prop_deinit(void);
 void _ipatch_unit_deinit(void);
 void _ipatch_xml_object_deinit(void);
+void _ipatch_util_deinit(void);
 
 
 static gboolean ipatch_strv_xml_encode(GNode *node, GObject *object,
@@ -187,6 +188,8 @@ ipatch_init(void)
 
     /* Initialize object's properties 'encoding/decoding XML handlers' system */
     _ipatch_xml_object_init();
+
+    /* Initialize GValue constant values */
     _ipatch_util_init();
     _ipatch_sf2_gen_init();
 
@@ -451,6 +454,9 @@ ipatch_deinit(void)
 
     /* Free object's properties 'encoding/decoding XML handlers' system */
     _ipatch_xml_object_deinit();
+
+    /* Free GValue constant values */
+    _ipatch_util_deinit();
 }
 
 /**
