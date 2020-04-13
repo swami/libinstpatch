@@ -469,7 +469,7 @@ ipatch_init(void)
  * Free libInstPatch library. Should be called when the application have
  * finished.
  */
-void
+static void
 ipatch_deinit(void)
 {
     if (!initialized)
