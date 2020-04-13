@@ -68,8 +68,6 @@ ipatch_container_get_type(void)
 
         item_type = g_type_register_static(IPATCH_TYPE_ITEM, "IpatchContainer",
                                            &item_info, G_TYPE_FLAG_ABSTRACT);
-
-        _ipatch_container_notify_init();  /* init container add/remove notify system */
     }
 
     return (item_type);
