@@ -34,6 +34,12 @@ typedef struct
     guint handler_id;		/* unique handler ID */
 } ContainerCallback;
 
+static void
+_ipatch_container_free_container_callback(ContainerCallback *cb);
+static void
+_ipatch_container_free_gslist(GSList *list);
+static gboolean
+_ipatch_container_callback_hash_free_value(gpointer key, gpointer value, gpointer user_data);
 
 static guint
 ipatch_container_real_add_connect(IpatchContainer *container,
@@ -77,17 +83,71 @@ static GHashTable *remove_container_callback_hash;  /* IpatchContainer -> GSList
 static GHashTable *remove_child_callback_hash;  /* IpatchItem -> GSList<ContainerCallback> */
 static GSList *remove_wild_callback_list = NULL;  /* container add wildcard cbs */
 
+/* - Initialization/deinitialization of 'container add/remove notify system' */
+
 /**
  * _ipatch_container_notify_init: (skip)
  */
-void
-_ipatch_container_notify_init(void)
+void _ipatch_container_notify_init (void)
 {
     /* one time hash init for container callbacks */
-    add_callback_hash = g_hash_table_new(NULL, NULL);
-    remove_container_callback_hash = g_hash_table_new(NULL, NULL);
-    remove_child_callback_hash = g_hash_table_new(NULL, NULL);
+
+    /* callback pool on action: add to container */
+    add_callback_next_id = 1;
+    add_callback_hash = g_hash_table_new (NULL, NULL);
+    add_wild_callback_list = NULL;
+
+    /* callback pool on action: remove out of container */
+    remove_callback_next_id = 1;
+    remove_container_callback_hash = g_hash_table_new (NULL, NULL);
+    remove_child_callback_hash = g_hash_table_new (NULL, NULL);
+    remove_wild_callback_list = NULL;
 }
+
+/* free calback pool of 'container add/remove notify system' */
+void _ipatch_container_notify_deinit(void)
+{
+    /* free calback pool of 'container add notify system' */
+    g_hash_table_foreach_remove(add_callback_hash,
+                                _ipatch_container_callback_hash_free_value,
+                                NULL);
+    g_hash_table_destroy(add_callback_hash);
+    _ipatch_container_free_gslist(add_wild_callback_list);
+
+    /* free calback pool of 'container remove notify system' */
+    g_hash_table_foreach_remove(remove_container_callback_hash,
+                                _ipatch_container_callback_hash_free_value,
+                                NULL);
+    g_hash_table_destroy(remove_container_callback_hash);
+    g_hash_table_foreach_remove(remove_child_callback_hash,
+                                _ipatch_container_callback_hash_free_value,
+                                NULL);
+    g_hash_table_destroy(remove_child_callback_hash);
+    _ipatch_container_free_gslist(remove_wild_callback_list);
+}
+
+/* free hash value entry */
+static gboolean
+_ipatch_container_callback_hash_free_value(gpointer key, gpointer value, gpointer user_data)
+{
+  _ipatch_container_free_gslist((GSList *)value);
+  return TRUE;
+}
+
+/* free GSList */
+static void
+_ipatch_container_free_gslist(GSList *list)
+{
+    g_slist_free_full(list, (GDestroyNotify)_ipatch_container_free_container_callback);
+}
+
+static void
+_ipatch_container_free_container_callback(ContainerCallback *cb)
+{
+    g_slice_free(ContainerCallback, cb);
+}
+
+/* ----------- API of 'container add/remove notify system' ------------------*/
 
 /**
  * ipatch_container_add_notify:

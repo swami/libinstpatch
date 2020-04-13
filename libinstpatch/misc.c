@@ -59,6 +59,7 @@ void _ipatch_sf2_voice_cache_init_SF2(void);
 void _ipatch_sf2_voice_cache_init_SLI(void);
 void _ipatch_sf2_voice_cache_init_gig(void);
 void _ipatch_sf2_voice_cache_init_VBank(void);
+void _ipatch_container_notify_init(void);
 
 /* private free functions in other source files */
 void _ipatch_param_deinit(void);
@@ -67,6 +68,7 @@ void _ipatch_unit_deinit(void);
 void _ipatch_xml_object_deinit(void);
 void _ipatch_util_deinit(void);
 void _ipatch_sf2_gen_deinit(void);
+void _ipatch_container_notify_deinit(void);
 
 
 static gboolean ipatch_strv_xml_encode(GNode *node, GObject *object,
@@ -196,6 +198,18 @@ ipatch_init(void)
     /* Initialize 'SoundFont generators' subsystem */
     _ipatch_sf2_gen_init();
 
+    /*------------------------------------------------------------------------
+     Initialize object subsystem (list, hash) before objects type.
+     These list or hash are specfific to the respective object.
+     Initialization/free functions are in the respective object module file
+     Here initialization function _xxx_init() are called.
+     Respective function _xxx_deinit() are called in ipatch_deinit().
+    -------------------------------------------------------------------------*/
+    _ipatch_container_notify_init();
+
+    /*-------------------------------------------------------------------------
+     initialize interfaces type before objects
+    --------------------------------------------------------------------------*/
     /* initialize interfaces before objects */
     ipatch_sample_get_type();
     ipatch_sf2_gen_item_get_type();
@@ -463,6 +477,18 @@ ipatch_deinit(void)
 
     /* Free 'SoundFont generators' subsystem */
     _ipatch_sf2_gen_deinit();
+
+    /*-------------------------------------------------------------------------
+     Free object subsystem (list, hash).
+     These list or hash are specfific to the respective object.
+     Initialization/deinitialization functions are in the respective object
+     module file.
+     Here deinitialization functions  _xxx_deinit() are called.
+     Respective initialization functions _xxx_init() are called in
+     ipatch_init().
+    -------------------------------------------------------------------------*/
+    /* Free container subsystem */
+    _ipatch_container_notify_deinit();
 }
 
 /**
