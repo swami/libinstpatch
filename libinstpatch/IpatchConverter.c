@@ -52,7 +52,8 @@ typedef struct _LogEntry
 } LogEntry;
 
 
-static void _ipatch_converter_free_converter_info(IpatchConverterInfo *data);
+static void _ipatch_converter_free_converter_info(IpatchConverterInfo *data,
+                                                  gpointer user_data);
 static gint priority_GCompareFunc(gconstpointer a, gconstpointer b);
 static const IpatchConverterInfo *convert_lookup_map_U(GType **array, GType conv_type,
         GType src_type, GType dest_type, guint flags);
@@ -81,12 +82,14 @@ void _ipatch_converter_init(void)
 void _ipatch_converter_deinit(void)
 {
     /* free list of all registered IpatchConverterInfo */
-    g_list_free_full(conv_maps,
-                     (GDestroyNotify)_ipatch_converter_free_converter_info);
+    g_list_foreach(conv_maps,
+                   (GFunc)_ipatch_converter_free_converter_info, NULL);
+    g_list_free(conv_maps);
 }
 
 /* free one conv_maps data */
-static void _ipatch_converter_free_converter_info(IpatchConverterInfo *data)
+static void _ipatch_converter_free_converter_info(IpatchConverterInfo *data,
+                                                  gpointer user_data)
 {
     g_slice_free(IpatchConverterInfo,data);
 }
