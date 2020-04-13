@@ -64,6 +64,7 @@ void _ipatch_sf2_voice_cache_init_VBank(void);
 void _ipatch_param_deinit(void);
 void _ipatch_type_prop_deinit(void);
 void _ipatch_unit_deinit(void);
+void _ipatch_xml_object_deinit(void);
 
 
 static gboolean ipatch_strv_xml_encode(GNode *node, GObject *object,
@@ -183,6 +184,8 @@ ipatch_init(void)
 
     /* Initialize 'unit conversion' system */
     _ipatch_unit_init();
+
+    /* Initialize object's properties 'encoding/decoding XML handlers' system */
     _ipatch_xml_object_init();
     _ipatch_util_init();
     _ipatch_sf2_gen_init();
@@ -445,6 +448,9 @@ ipatch_deinit(void)
 
     /* Free 'unit conversion' system */
     _ipatch_unit_deinit();
+
+    /* Free object's properties 'encoding/decoding XML handlers' system */
+    _ipatch_xml_object_deinit();
 }
 
 /**
