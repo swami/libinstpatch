@@ -111,6 +111,23 @@ G_DEFINE_TYPE(IpatchFile, ipatch_file, IPATCH_TYPE_ITEM);
 G_LOCK_DEFINE_STATIC(ipatch_file_pool);
 static GHashTable *ipatch_file_pool = NULL;     // Hash of fileNames -> GWeakRef(IpatchFile)
 
+/* Initialise static hash and create IpatchFile class */
+/* ----- Initialization/deinitialization of ipatch_file pool  ---------------*/
+/* Initialise static hash  */
+void _ipatch_file_init(void)
+{
+    /* create file pool has table */
+    ipatch_file_pool = g_hash_table_new_full (g_str_hash, g_str_equal,
+                                              g_free, ipatch_util_weakref_destroy);
+}
+
+/* Free static hash  */
+void _ipatch_file_deinit(void)
+{
+    g_hash_table_destroy(ipatch_file_pool);
+}
+
+/* ----- IpatchFileHandle object functions  ---------------------------------*/
 
 static IpatchFileHandle *
 ipatch_file_handle_duplicate(IpatchFileHandle *handle)
@@ -176,9 +193,6 @@ ipatch_file_class_init(IpatchFileClass *klass)
                                             "File Name",
                                             NULL,
                                             G_PARAM_READWRITE));
-
-    ipatch_file_pool = g_hash_table_new_full(g_str_hash, g_str_equal,
-                       g_free, ipatch_util_weakref_destroy);
 }
 
 static void
