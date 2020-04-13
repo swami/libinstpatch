@@ -61,6 +61,7 @@ void _ipatch_sf2_voice_cache_init_gig(void);
 void _ipatch_sf2_voice_cache_init_VBank(void);
 void _ipatch_container_notify_init(void);
 void _ipatch_DLS2_infos_init(void);
+void _ipatch_DLS2_sample_init(void);
 
 /* private free functions in other source files */
 void _ipatch_param_deinit(void);
@@ -71,6 +72,7 @@ void _ipatch_util_deinit(void);
 void _ipatch_sf2_gen_deinit(void);
 void _ipatch_container_notify_deinit(void);
 void _ipatch_DLS2_infos_deinit(void);
+void _ipatch_DLS2_sample_deinit(void);
 
 
 
@@ -210,6 +212,7 @@ ipatch_init(void)
     -------------------------------------------------------------------------*/
     _ipatch_container_notify_init();
     _ipatch_DLS2_infos_init();
+    _ipatch_DLS2_sample_init();
 
     /*-------------------------------------------------------------------------
      initialize interfaces type before objects
@@ -496,6 +499,9 @@ ipatch_deinit(void)
 
     /* Free DLS2 subsystem */
     _ipatch_DLS2_infos_deinit();
+
+    /* Free DLS2 sample subsystem */
+    _ipatch_DLS2_sample_deinit();
 }
 
 /**
