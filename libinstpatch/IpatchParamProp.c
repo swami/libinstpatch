@@ -54,6 +54,7 @@ G_LOCK_DEFINE_STATIC(param_prop_hash);
 /* GParamSpec GValue property hash */
 static GHashTable *param_prop_hash = NULL;
 
+/* Initialization/deinitialization of GParamSpec extended properties system */
 
 /**
  * _ipatch_param_init: (skip)
@@ -89,6 +90,15 @@ _ipatch_param_init(void)
     (g_param_spec_uint("unit-type", _("Units"),
                        _("Type of units used"), 0, G_MAXUINT, 0, G_PARAM_READWRITE));
 }
+
+/* Freeing GParamSpec extended properties  system */
+void
+_ipatch_param_deinit(void)
+{
+	g_hash_table_destroy(param_prop_hash);
+}
+
+/* -- API of GParamSpec extended properties  system ---------------------*/
 
 /**
  * ipatch_param_install_property:

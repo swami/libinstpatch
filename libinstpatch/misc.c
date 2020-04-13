@@ -60,6 +60,10 @@ void _ipatch_sf2_voice_cache_init_SLI(void);
 void _ipatch_sf2_voice_cache_init_gig(void);
 void _ipatch_sf2_voice_cache_init_VBank(void);
 
+/* private free functions in other source files */
+void _ipatch_param_deinit(void);
+
+
 static gboolean ipatch_strv_xml_encode(GNode *node, GObject *object,
                                        GParamSpec *pspec, GValue *value,
                                        GError **err);
@@ -120,6 +124,21 @@ static TypePropInit type_props[] =
 /* name of application using libInstPatch (for saving to files) */
 char *ipatch_application_name = NULL;
 
+static gboolean initialized = FALSE;
+
+/*-----------------------------------------------------------------------------
+ Initialization / deinitialization of libinstpatch library.
+ Any application sould call ipatch_init() once before any others libinstpatch
+ functions.
+ When the application finished it must call ipatch_close().
+
+ For multi task application it is best that only one task be responsible of
+ initialization/closing. Typically, the main task of the application should
+ call ipatch_init() before creating other tasks, then when the application
+ finished, the main task should call ipatch_close() after the other tasks are
+ completed.
+-----------------------------------------------------------------------------*/
+
 /**
  * ipatch_init:
  *
@@ -129,7 +148,6 @@ char *ipatch_application_name = NULL;
 void
 ipatch_init(void)
 {
-    static gboolean initialized = FALSE;
     TypePropInit *prop_info;
     GType type;
     int i;
@@ -395,6 +413,27 @@ ipatch_init(void)
 }
 
 /**
+ * ipatch_deinit:
+ *
+ * Free libInstPatch library. Should be called when the application have
+ * finished.
+ */
+void
+ipatch_deinit(void)
+{
+    if (!initialized)
+    {
+        return;
+    }
+    initialized = FALSE;
+    /*-------------------------------------------------------------------------
+      Free internal systems
+    -------------------------------------------------------------------------*/
+    /* Free 'GParamSpec extended properties' system */
+    _ipatch_param_deinit();
+}
+
+/**
  * ipatch_close:
  *
  * Perform cleanup of libInstPatch prior to application close.  Such as deleting
@@ -406,6 +445,7 @@ void
 ipatch_close(void)
 {
     ipatch_sample_store_swap_close();
+    ipatch_deinit();
 }
 
 static gboolean
