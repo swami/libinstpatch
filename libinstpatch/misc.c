@@ -63,6 +63,7 @@ void _ipatch_sf2_voice_cache_init_VBank(void);
 /* private free functions in other source files */
 void _ipatch_param_deinit(void);
 void _ipatch_type_prop_deinit(void);
+void _ipatch_unit_deinit(void);
 
 
 static gboolean ipatch_strv_xml_encode(GNode *node, GObject *object,
@@ -179,6 +180,8 @@ ipatch_init(void)
 
     /* Initialize the 'GObject style properties' system for GTypes */
     _ipatch_type_prop_init();
+
+    /* Initialize 'unit conversion' system */
     _ipatch_unit_init();
     _ipatch_xml_object_init();
     _ipatch_util_init();
@@ -439,6 +442,9 @@ ipatch_deinit(void)
 
     /* Free the 'GObject style properties' system for GTypes */
     _ipatch_type_prop_deinit();
+
+    /* Free 'unit conversion' system */
+    _ipatch_unit_deinit();
 }
 
 /**

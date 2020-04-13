@@ -65,27 +65,51 @@ void _ipatch_unit_generic_init(void);
 void _ipatch_unit_dls_init(void);
 void _ipatch_unit_sf2_init(void);
 
-
+/*-----------------------------------------------------------------------------
+  Initialization/deinitialization of Unit conversion system
+ ----------------------------------------------------------------------------*/
 /**
  * _ipatch_unit_init: (skip)
  *
  * Initialize unit system
  */
-void
-_ipatch_unit_init(void)
+void _ipatch_unit_init (void)
 {
-    unit_id_hash = g_hash_table_new(NULL, NULL);
-    unit_name_hash = g_hash_table_new(g_str_hash, g_str_equal);
-    class_map_hash = g_hash_table_new(NULL, NULL);
-    conversion_hash = g_hash_table_new_full(NULL, NULL, NULL,
-                                            ipatch_unit_conversion_hash_val_destroy);
+    last_unit_id = IPATCH_UNIT_TYPE_FIRST_DYNAMIC_ID;
+
+    /* Create hash table to register unit by id */
+    unit_id_hash = g_hash_table_new_full(
+                                NULL, NULL, NULL,
+                                (GDestroyNotify)ipatch_unit_info_free);
+
+    /* Create hash table to register unit by name */
+    unit_name_hash = g_hash_table_new (g_str_hash, g_str_equal);
+    class_map_hash = g_hash_table_new (NULL, NULL);
+
+    /* Create the conversion hash table to register conversion function */
+    conversion_hash = g_hash_table_new_full (NULL, NULL, NULL,
+                                             ipatch_unit_conversion_hash_val_destroy);
 
     /* initialize unit types and conversion handlers */
-
-    _ipatch_unit_generic_init();
-    _ipatch_unit_dls_init();
-    _ipatch_unit_sf2_init();
+    _ipatch_unit_generic_init ();
+    _ipatch_unit_dls_init ();
+    _ipatch_unit_sf2_init ();
 }
+
+/**
+ * _ipatch_unit_deinit: (skip)
+ *
+ * Free unit system
+ */
+void _ipatch_unit_deinit(void)
+{
+    g_hash_table_destroy(unit_id_hash);
+    g_hash_table_destroy(unit_name_hash);
+    g_hash_table_destroy(class_map_hash);
+    g_hash_table_destroy(conversion_hash);
+}
+
+/* ----- Unit convertion system functions  ---------------------------------*/
 
 static void
 ipatch_unit_conversion_hash_val_destroy(gpointer data)
