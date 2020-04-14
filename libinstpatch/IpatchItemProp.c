@@ -45,6 +45,11 @@ typedef struct
     guint handler_id;		/* unique handler ID */
 } PropCallback;
 
+static void _ipatch_item_prop_free_prop_callback(PropCallback *cb);
+static void _free_gslist_prop_callback(GSList *list);
+static gboolean
+_ipatch_item_prop_free_hash_value(gpointer key, gpointer value, gpointer user_data);
+
 static void prop_match_key_free(gpointer data);
 static guint prop_callback_hash_func(gconstpointer key);
 static gboolean prop_callback_equal_func(gconstpointer a, gconstpointer b);
@@ -75,16 +80,55 @@ static GHashTable *prop_callback_hash;
 /* wildcard callbacks (item and property are wildcard) */
 static GSList *wild_prop_callback_list = NULL;
 
+/* Initialization/deinitialization of 'IpatchItem property change callback' system */
 
-/* called by ipatch_init() */
-void
-_ipatch_item_prop_init(void)
+/* initialization system  */
+void _ipatch_item_prop_init (void)
 {
+    /* next handler ID */
+    prop_callback_next_id = 1;
+
     /* create IpatchItem property callback hash */
-    prop_callback_hash
-        = g_hash_table_new_full(prop_callback_hash_func, prop_callback_equal_func,
-                                prop_match_key_free, NULL);
+    prop_callback_hash = g_hash_table_new_full(prop_callback_hash_func,
+                                               prop_callback_equal_func,
+                                               prop_match_key_free, NULL);
+
+    /* wildcard callbacks (item and property are wildcard) */
+    wild_prop_callback_list = NULL;
 }
+
+/* Freeing system  */
+void _ipatch_item_prop_deinit(void)
+{
+    /* free prop_callback_hash */
+    g_hash_table_foreach_remove (prop_callback_hash, _ipatch_item_prop_free_hash_value, NULL);
+    g_hash_table_destroy(prop_callback_hash);
+
+    /* free wild_prop_callback_list */
+    _free_gslist_prop_callback(wild_prop_callback_list);
+}
+
+/* free hash entry */
+static gboolean
+_ipatch_item_prop_free_hash_value(gpointer key, gpointer value, gpointer user_data)
+{
+  _free_gslist_prop_callback((GSList *)value);
+  return TRUE;
+}
+
+static void
+_free_gslist_prop_callback(GSList *list)
+{
+    g_slist_free_full(list, (GDestroyNotify)_ipatch_item_prop_free_prop_callback);
+}
+
+static void
+_ipatch_item_prop_free_prop_callback(PropCallback *cb)
+{
+    g_slice_free(PropCallback, cb);
+}
+
+/*--- API of 'IpatchItem property change callback' system -------------------*/
 
 /* GDestroyNotify function to free prop_callback_hash keys */
 static void

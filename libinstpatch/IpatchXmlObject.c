@@ -138,7 +138,9 @@ G_LOCK_DEFINE_STATIC(xml_handlers);
 /* hash of XML handlers (HandlerHashKey -> HandlerHashValue) */
 static GHashTable *xml_handlers = NULL;
 
-
+/*-----------------------------------------------------------------------------
+  1) Initialization/deinitialization of loading/saving system
+ ----------------------------------------------------------------------------*/
 /*
  * Initialize IpatchXmlObject loading/saving system
  */
@@ -181,6 +183,15 @@ static void
 xml_handlers_value_destroy_func(gpointer data)
 {
     g_slice_free(HandlerHashValue, data);
+}
+
+/*
+ * Free IpatchXmlObject loading/saving system
+ */
+void
+_ipatch_xml_object_deinit(void)
+{
+    g_hash_table_destroy(xml_handlers);
 }
 
 /**

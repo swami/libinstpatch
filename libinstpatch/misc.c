@@ -59,6 +59,30 @@ void _ipatch_sf2_voice_cache_init_SF2(void);
 void _ipatch_sf2_voice_cache_init_SLI(void);
 void _ipatch_sf2_voice_cache_init_gig(void);
 void _ipatch_sf2_voice_cache_init_VBank(void);
+void _ipatch_container_notify_init(void);
+void _ipatch_DLS2_infos_init(void);
+void _ipatch_DLS2_sample_init(void);
+void _ipatch_file_init(void);
+void _ipatch_item_init(void);
+void _ipatch_sample_data_init(void);
+void _ipatch_sample_store_swap_recover_init(void);
+void _ipatch_converter_init(void);
+
+/* private free functions in other source files */
+void _ipatch_param_deinit(void);
+void _ipatch_type_prop_deinit(void);
+void _ipatch_unit_deinit(void);
+void _ipatch_xml_object_deinit(void);
+void _ipatch_util_deinit(void);
+void _ipatch_sf2_gen_deinit(void);
+void _ipatch_container_notify_deinit(void);
+void _ipatch_DLS2_infos_deinit(void);
+void _ipatch_DLS2_sample_deinit(void);
+void _ipatch_file_deinit(void);
+void _ipatch_item_deinit(void);
+void _ipatch_sample_data_deinit(void);
+void _ipatch_sample_store_swap_recover_deinit(void);
+void _ipatch_converter_deinit(void);
 
 static gboolean ipatch_strv_xml_encode(GNode *node, GObject *object,
                                        GParamSpec *pspec, GValue *value,
@@ -120,6 +144,21 @@ static TypePropInit type_props[] =
 /* name of application using libInstPatch (for saving to files) */
 char *ipatch_application_name = NULL;
 
+static gboolean initialized = FALSE;
+
+/*-----------------------------------------------------------------------------
+ Initialization / deinitialization of libinstpatch library.
+ Any application should call ipatch_init() once before any other libinstpatch
+ functions.
+ When the application is complete it must call ipatch_close().
+
+ For multi task application it is best that only one task be responsible of
+ initialization/closing. Typically, the main task of the application should
+ call ipatch_init() before creating other tasks, then when the application is
+ complete, the main task should call ipatch_close() after the other tasks are
+ completed.
+-----------------------------------------------------------------------------*/
+
 /**
  * ipatch_init:
  *
@@ -129,7 +168,6 @@ char *ipatch_application_name = NULL;
 void
 ipatch_init(void)
 {
-    static gboolean initialized = FALSE;
     TypePropInit *prop_info;
     GType type;
     int i;
@@ -154,13 +192,44 @@ ipatch_init(void)
 #endif
 
     /* Must be done before other types since they may be dependent */
+
+    /* Initialize 'GParamSpec extended properties' system */
     _ipatch_param_init();
+
+    /* Initialize the 'GObject style properties' system for GTypes */
     _ipatch_type_prop_init();
+
+    /* Initialize 'unit conversion' system */
     _ipatch_unit_init();
+
+    /* Initialize object's properties 'encoding/decoding XML handlers' system */
     _ipatch_xml_object_init();
+
+    /* Initialize GValue constant values */
     _ipatch_util_init();
+
+    /* Initialize 'SoundFont generators' subsystem */
     _ipatch_sf2_gen_init();
 
+    /*------------------------------------------------------------------------
+     Initialize object subsystem (list, hash) before objects type.
+     These list or hash are specfific to the respective object.
+     Initialization/free functions are in the respective object module file
+     Here initialization function _xxx_init() are called.
+     Respective function _xxx_deinit() are called in ipatch_deinit().
+    -------------------------------------------------------------------------*/
+    _ipatch_container_notify_init();
+    _ipatch_DLS2_infos_init();
+    _ipatch_DLS2_sample_init();
+    _ipatch_file_init();
+    _ipatch_item_init();
+    _ipatch_sample_data_init();
+    _ipatch_sample_store_swap_recover_init();
+    _ipatch_converter_init();
+
+    /*-------------------------------------------------------------------------
+     initialize interfaces type before objects
+    --------------------------------------------------------------------------*/
     /* initialize interfaces before objects */
     ipatch_sample_get_type();
     ipatch_sf2_gen_item_get_type();
@@ -395,6 +464,75 @@ ipatch_init(void)
 }
 
 /**
+ * ipatch_deinit:
+ *
+ * Free libInstPatch library. Should be called when the application have
+ * finished.
+ */
+static void
+ipatch_deinit(void)
+{
+    if (!initialized)
+    {
+        return;
+    }
+    initialized = FALSE;
+    /*-------------------------------------------------------------------------
+      Free internal systems
+    -------------------------------------------------------------------------*/
+    /* Free 'GParamSpec extended properties' system */
+    _ipatch_param_deinit();
+
+    /* Free the 'GObject style properties' system for GTypes */
+    _ipatch_type_prop_deinit();
+
+    /* Free 'unit conversion' system */
+    _ipatch_unit_deinit();
+
+    /* Free object's properties 'encoding/decoding XML handlers' system */
+    _ipatch_xml_object_deinit();
+
+    /* Free GValue constant values */
+    _ipatch_util_deinit();
+
+    /* Free 'SoundFont generators' subsystem */
+    _ipatch_sf2_gen_deinit();
+
+    /*-------------------------------------------------------------------------
+     Free object subsystem (list, hash).
+     These list or hash are specfific to the respective object.
+     Initialization/deinitialization functions are in the respective object
+     module file.
+     Here deinitialization functions  _xxx_deinit() are called.
+     Respective initialization functions _xxx_init() are called in
+     ipatch_init().
+    -------------------------------------------------------------------------*/
+    /* Free container subsystem */
+    _ipatch_container_notify_deinit();
+
+    /* Free DLS2 subsystem */
+    _ipatch_DLS2_infos_deinit();
+
+    /* Free DLS2 sample subsystem */
+    _ipatch_DLS2_sample_deinit();
+
+    /* Free File subsystem */
+    _ipatch_file_deinit();
+
+    /* Free Item propterty subsystem */
+    _ipatch_item_deinit();
+
+    /* Free Sample data subsystem */
+    _ipatch_sample_data_deinit();
+
+    /* Free Sample store swap recovery subsystem */
+    _ipatch_sample_store_swap_recover_deinit();
+
+    /* Free converter subsytem */
+    _ipatch_converter_deinit();
+}
+
+/**
  * ipatch_close:
  *
  * Perform cleanup of libInstPatch prior to application close.  Such as deleting
@@ -406,6 +544,7 @@ void
 ipatch_close(void)
 {
     ipatch_sample_store_swap_close();
+    ipatch_deinit();
 }
 
 static gboolean

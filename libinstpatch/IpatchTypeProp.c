@@ -77,6 +77,9 @@ static GHashTable *type_prop_hash = NULL;
 /* hash of all GType property values (GType:GParamSpec -> GValue) */
 static GHashTable *type_prop_value_hash = NULL;
 
+/*-----------------------------------------------------------------------------
+  Initialization/deinitialization of GType property system
+ ----------------------------------------------------------------------------*/
 /**
  * _ipatch_type_prop_init: (skip)
  *
@@ -182,7 +185,10 @@ type_prop_value_destroy(gpointer user_data)
 {
     TypePropValueVal *val = (TypePropValueVal *)user_data;
 
-    g_value_unset(&val->value);
+    if(G_IS_VALUE(&val->value))
+    {
+        g_value_unset(&val->value);
+    }
 
     if(val->notify_func)
     {
@@ -190,6 +196,18 @@ type_prop_value_destroy(gpointer user_data)
     }
 
     g_slice_free(TypePropValueVal, val);
+}
+
+/**
+ * _ipatch_type_prop_deinit
+ *
+ * Free GType property system
+ */
+void
+_ipatch_type_prop_deinit (void)
+{
+    g_hash_table_destroy(type_prop_hash);
+    g_hash_table_destroy(type_prop_value_hash);
 }
 
 /**

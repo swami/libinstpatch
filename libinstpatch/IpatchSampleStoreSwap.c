@@ -69,6 +69,7 @@ typedef struct
 } SwapRecover;
 
 
+static void ipatch_sample_store_swap_recover_free(SwapRecover *recover);
 static gint ipatch_sample_store_swap_recover_size_sort_func(gconstpointer a, gconstpointer b);
 static void ipatch_sample_store_swap_sample_iface_init(IpatchSampleIface *iface);
 static gboolean ipatch_sample_store_swap_sample_iface_open(IpatchSampleHandle *handle,
@@ -103,6 +104,31 @@ G_DEFINE_TYPE_WITH_CODE(IpatchSampleStoreSwap, ipatch_sample_store_swap,
                         G_IMPLEMENT_INTERFACE(IPATCH_TYPE_SAMPLE,
                                 ipatch_sample_store_swap_sample_iface_init))
 
+/* ----- Initialization/deinitialization of lists ---------------------------*/
+/* Initialize lists */
+void _ipatch_sample_store_swap_recover_init(void)
+{
+    swap_fd = -1;
+    swap_file_name = NULL;
+    swap_position = 0;             // Current position in swap file, for new sample data
+    swap_unused_size = 0;          // Amount of wasted space (unused samples)
+    swap_ram_used = 0;             // Amount of RAM memory used for swap
+    swap_ram_max = MAX_RAM_SWAP;   // Maximum amount of RAM swap storage
+    swap_list = NULL;
+    swap_recover_list = NULL;
+    swap_recover_loc_list = NULL;
+}
+
+/* Free lists */
+void _ipatch_sample_store_swap_recover_deinit(void)
+{
+    g_slist_free_full (swap_recover_list,
+		               (GDestroyNotify)ipatch_sample_store_swap_recover_free);
+    g_slist_free (swap_recover_loc_list);
+    g_free(swap_file_name);
+}
+
+/* ----- IpatchSampleStoreSwap object functions  ----------------------------*/
 static SwapRecover *
 ipatch_sample_store_swap_recover_new(void)
 {

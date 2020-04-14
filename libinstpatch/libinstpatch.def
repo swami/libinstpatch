@@ -1,6 +1,8 @@
 LIBRARY
 EXPORTS
 
+ipatch_close
+
 _ipatch_code_error
 _ipatch_code_errorv
 _ipatch_convert_DLS2_init
@@ -53,6 +55,7 @@ ipatch_base_set_file_name
 
 ipatch_container_add_unique
 ipatch_container_add_connect
+ipatch_container_add_disconnect_matched
 ipatch_container_append
 ipatch_container_count
 ipatch_container_get_child_types
@@ -66,6 +69,7 @@ ipatch_container_make_unique
 ipatch_container_remove
 ipatch_container_remove_all
 ipatch_container_remove_connect
+ipatch_container_remove_disconnect_matched
 ipatch_container_remove_iter
 ;ipatch_container_set_add_hook
 ;ipatch_container_set_remove_hook

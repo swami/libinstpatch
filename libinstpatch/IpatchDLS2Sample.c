@@ -102,6 +102,19 @@ G_DEFINE_TYPE_WITH_CODE(IpatchDLS2Sample, ipatch_dls2_sample,
                         G_IMPLEMENT_INTERFACE(IPATCH_TYPE_SAMPLE,
                                 ipatch_dls2_sample_iface_init))
 
+/* ----- Initialization/deinitialization of ClassPropBag list ---------------*/
+void _ipatch_DLS2_sample_init(void)
+{
+    info_pspec_list = NULL;
+}
+
+void _ipatch_DLS2_sample_deinit()
+{
+    g_slist_free_full(info_pspec_list, g_free);
+}
+
+/* ----- IpatchDSL2SAmple object functions  ---------------------------------*/
+
 /* sample interface initialization */
 static void
 ipatch_dls2_sample_iface_init(IpatchSampleIface *sample_iface)
