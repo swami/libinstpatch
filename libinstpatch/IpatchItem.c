@@ -70,6 +70,8 @@ extern void  _ipatch_item_prop_deinit(void);
 /* defined in IpatchBase.c */
 extern GParamSpec *ipatch_base_pspec_changed;
 
+static gboolean
+_ipatch_item_hash_free_value(gpointer key, UniqueBag *value, gpointer user_data);
 static void ipatch_item_base_init(IpatchItemClass *klass);
 static void ipatch_item_class_init(IpatchItemClass *klass);
 static void ipatch_item_set_property(GObject *object, guint property_id,
@@ -114,7 +116,7 @@ GParamSpec *ipatch_item_pspec_title = NULL;
 void _ipatch_item_init(void)
 {
     /* cache of IpatchItem unique properties (hash: GType => UniqueBag) */
-    unique_prop_cache = g_hash_table_new_full(NULL, NULL, NULL, g_free);
+    unique_prop_cache = g_hash_table_new (NULL, NULL);
 
     /* Initialize property change callback system */
     _ipatch_item_prop_init();
@@ -125,7 +127,19 @@ void _ipatch_item_deinit(void)
 {
     /* free property change callback system */
     _ipatch_item_prop_deinit();
+    g_hash_table_foreach_remove(unique_prop_cache,
+                               (GHRFunc)_ipatch_item_hash_free_value,
+                                NULL);
     g_hash_table_destroy(unique_prop_cache);
+}
+
+/* free hash value entry */
+static gboolean
+_ipatch_item_hash_free_value(gpointer key, UniqueBag *value, gpointer user_data)
+{
+    g_free(value->pspecs);
+    g_free(value);
+    return TRUE;
 }
 
 /* ----- IpatchItem object functions  ---------------------------------------*/
@@ -1637,11 +1651,11 @@ item_lookup_unique_bag(GType type)
                                       GUINT_TO_POINTER (type),
                                       NULL, (gpointer *)&unique))
     {
-        klass = g_type_class_ref(type);
+        klass = g_type_class_ref(type); /* ++ref */
         g_return_val_if_fail(klass != NULL, NULL);
 
         /* get property list and add unique properties to speclist */
-        pspecs = g_object_class_list_properties(klass, &n_props);
+        pspecs = g_object_class_list_properties(klass, &n_props); /* alloc */
 
         for(i = 0, count = 0; i < n_props; i++)
         {
@@ -1656,7 +1670,8 @@ item_lookup_unique_bag(GType type)
             }
         }
 
-        g_free(pspecs);
+        g_free(pspecs); /* free */
+        g_type_class_unref(klass); /* --ref */
 
         if(speclist)	/* any unique properties? */
         {
