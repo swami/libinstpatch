@@ -130,13 +130,13 @@ ipatch_sf2_voice_cache_finalize(GObject *gobject)
 
     g_free(cache->sel_info);
 
-	/*-------- free IpatchSF2Voice field members -------------------------------*/
+    /*-------- free IpatchSF2Voice field members -------------------------------*/
     for(i = 0; i < cache->voices->len; i++)
     {
         voice = &g_array_index(cache->voices, IpatchSF2Voice, i);
 
         /* running voice_user_data_destroy() function first ensures that the
-           function could expect that any IpatchSF2Voice field members is
+           function could expect that any IpatchSF2Voice field member is
            still valid. This is necessarry if the parameter voice->user_data
            is a pointer to one of this field.
         */
