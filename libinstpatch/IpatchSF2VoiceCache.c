@@ -130,9 +130,20 @@ ipatch_sf2_voice_cache_finalize(GObject *gobject)
 
     g_free(cache->sel_info);
 
+	/*-------- free IpatchSF2Voice field members -------------------------------*/
     for(i = 0; i < cache->voices->len; i++)
     {
         voice = &g_array_index(cache->voices, IpatchSF2Voice, i);
+
+        /* running voice_user_data_destroy() function first ensures that the
+           function could expect that any IpatchSF2Voice field members is
+           still valid. This is necessarry if the parameter voice->user_data
+           is a pointer to one of this field.
+        */
+        if(cache->voice_user_data_destroy && voice->user_data)
+        {
+            cache->voice_user_data_destroy(voice->user_data);
+        }
 
         if(voice->sample_data)	/* -- unref sample data */
         {
@@ -148,14 +159,21 @@ ipatch_sf2_voice_cache_finalize(GObject *gobject)
         {
             ipatch_sf2_mod_list_free(voice->mod_list, TRUE);
         }
-
-        if(cache->voice_user_data_destroy && voice->user_data)
-        {
-            cache->voice_user_data_destroy(voice->user_data);
-        }
     }
 
     g_array_free(cache->voices, TRUE);
+
+    /*-------- free IpatchSF2VoiceCache field members -----------------------*/
+
+    /* running user_data_destroy() function first ensures that the
+       function could expect that any IpatchSF2VoiceCache field member
+       is still valid. This is necessarry if the parameter cache->user_data
+       is a pointer to one of this field.
+    */
+    if(cache->user_data_destroy && cache->user_data)
+    {
+        cache->user_data_destroy(cache->user_data);
+    }
 
     if(cache->ranges)
     {
@@ -167,9 +185,9 @@ ipatch_sf2_voice_cache_finalize(GObject *gobject)
         ipatch_sf2_mod_list_free(cache->default_mods, TRUE);
     }
 
-    if(cache->user_data_destroy && cache->user_data)
+    if(cache->override_mods)
     {
-        cache->user_data_destroy(cache->user_data);
+        ipatch_sf2_mod_list_free(cache->override_mods, TRUE);
     }
 
     if(G_OBJECT_CLASS(parent_class)->finalize)
