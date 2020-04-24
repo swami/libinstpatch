@@ -67,6 +67,9 @@ void _ipatch_item_init(void);
 void _ipatch_sample_data_init(void);
 void _ipatch_sample_store_swap_recover_init(void);
 void _ipatch_converter_init(void);
+void _ipatch_sample_transform_init();
+void _ipatch_sf2_mod_list_init();
+void _ipatch_paste_init(void);
 
 /* private free functions in other source files */
 void _ipatch_param_deinit(void);
@@ -83,6 +86,9 @@ void _ipatch_item_deinit(void);
 void _ipatch_sample_data_deinit(void);
 void _ipatch_sample_store_swap_recover_deinit(void);
 void _ipatch_converter_deinit(void);
+void _ipatch_sample_transform_deinit(void);
+void _ipatch_sf2_mod_list_deinit(void);
+void _ipatch_paste_deinit(void);
 
 static gboolean ipatch_strv_xml_encode(GNode *node, GObject *object,
                                        GParamSpec *pspec, GValue *value,
@@ -226,6 +232,9 @@ ipatch_init(void)
     _ipatch_sample_data_init();
     _ipatch_sample_store_swap_recover_init();
     _ipatch_converter_init();
+    _ipatch_sample_transform_init();
+    _ipatch_sf2_mod_list_init();
+    _ipatch_paste_init();
 
     /*-------------------------------------------------------------------------
      initialize interfaces type before objects
@@ -530,6 +539,15 @@ ipatch_deinit(void)
 
     /* Free converter subsytem */
     _ipatch_converter_deinit();
+
+    /* Free Audio format conversion subsytem */
+    _ipatch_sample_transform_deinit();
+
+    /* Free default mod list */
+    _ipatch_sf2_mod_list_deinit();
+
+    /* Free paste handlers list */
+    _ipatch_paste_deinit();
 }
 
 /**

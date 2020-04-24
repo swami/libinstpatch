@@ -46,6 +46,23 @@ static IpatchSF2Mod default_mods[] =
     //    { 0x020E, InitialPitch WTF?, 12700, 0x0010, 0 },
 };
 
+static GSList *list = NULL; /* list of default modulators */
+
+/* ----- Initialization/deinitialization of list ----------------------------*/
+/* Initialize list */
+void _ipatch_sf2_mod_list_init(void)
+{
+    list = NULL;
+}
+
+/* Free list */
+void _ipatch_sf2_mod_list_deinit(void)
+{
+    g_slist_free(list);
+}
+
+/*------ IpatchSF2ModList object functions  ---------------------------------*/
+
 GType
 ipatch_sf2_mod_list_get_type(void)
 {
@@ -404,7 +421,6 @@ ipatch_sf2_mod_list_change(GSList *mods, const IpatchSF2Mod *oldvals,
 G_CONST_RETURN GSList *
 ipatch_sf2_mod_list_get_default(void)
 {
-    static GSList *list = NULL;
     int i;
 
     if(!list)

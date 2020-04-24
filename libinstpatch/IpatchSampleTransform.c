@@ -38,6 +38,32 @@
 G_LOCK_DEFINE_STATIC(transform_pool);
 static GList *transform_pool = NULL;
 
+static void _ipatch_sample_transform_free_transform(IpatchSampleTransform *data,
+                                                    gpointer user_data);
+
+/* ----- Initialization/deinitialization of list ----------------------------*/
+/* Initialize transform_pool */
+void _ipatch_sample_transform_init(void)
+{
+    transform_pool = NULL;
+}
+
+/* Free transform_pool */
+void _ipatch_sample_transform_deinit(void)
+{
+    g_list_foreach(transform_pool,
+                   (GFunc)_ipatch_sample_transform_free_transform, NULL);
+    g_list_free(transform_pool);
+}
+
+/* free one conv_maps data */
+static void _ipatch_sample_transform_free_transform(IpatchSampleTransform *data,
+                                                    gpointer user_data)
+{
+    ipatch_sample_transform_free(data);
+}
+
+/*------ IpatchSampleTransform object funtions -------------------------------*/
 
 GType
 ipatch_sample_transform_get_type(void)
