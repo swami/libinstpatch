@@ -1163,7 +1163,6 @@ ipatch_item_copy_link_func(IpatchItem *dest, IpatchItem *src,
 
     g_return_if_fail(IPATCH_IS_ITEM(dest));
     g_return_if_fail(IPATCH_IS_ITEM(src));
-    g_return_if_fail(link_func != NULL);
 
     dest_type = G_OBJECT_TYPE(dest);
     src_type = G_OBJECT_TYPE(src);
