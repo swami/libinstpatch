@@ -68,6 +68,7 @@ typedef struct
     IpatchItem *to;		/* object to link to */
 } LinkItemBag;
 
+static void _ipatch_paste_free_handler(PasteHandler *data);
 static gint handler_priority_GCompareFunc(gconstpointer a, gconstpointer b);
 static void ipatch_paste_class_init(IpatchPasteClass *klass);
 static void ipatch_paste_init(IpatchPaste *paste);
@@ -89,6 +90,27 @@ static int ipatch_paste_handler_id = 0;         // handler ID counter
 
 static gpointer parent_class = NULL;
 
+/* ----- Initialization/deinitialization of list ----------------------------*/
+/* Initialize handlers list */
+void _ipatch_paste_init(void)
+{
+    paste_handlers = NULL;
+    ipatch_paste_handler_id = 0;
+}
+
+/* Free list */
+void _ipatch_paste_deinit(void)
+{
+    g_slist_free_full(paste_handlers, (GDestroyNotify)_ipatch_paste_free_handler);
+}
+
+/* free paste handler data */
+static void _ipatch_paste_free_handler(PasteHandler *data)
+{
+    g_slice_free(PasteHandler,data);
+}
+
+/*------ IpatchPaste object functions  --------------------------------------*/
 
 /**
  * ipatch_register_paste_handler: (skip)
