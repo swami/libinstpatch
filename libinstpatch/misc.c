@@ -481,12 +481,6 @@ ipatch_init(void)
 static void
 ipatch_deinit(void)
 {
-    if (!initialized)
-    {
-        return;
-    }
-    initialized = FALSE;
-
     g_free(ipatch_application_name);
 
     /*-------------------------------------------------------------------------
@@ -564,6 +558,12 @@ ipatch_deinit(void)
 void
 ipatch_close(void)
 {
+    if (!initialized)
+    {
+        return;
+    }
+
+    initialized = FALSE;
     ipatch_sample_store_swap_close();
     ipatch_deinit();
 }
