@@ -559,10 +559,14 @@ ipatch_deinit(void)
 /**
  * ipatch_close:
  *
- * Perform cleanup of libInstPatch prior to application close.  Such as deleting
- * temporary files.
- * Does nothing if the library is already deinitialized or if the library
- * is still owned (see ipatch_init()).
+ * This should be called prior to application close.
+ *
+ * Decrement the reference counter and if it reaches 0 performs cleanup of
+ * libInstPatch, such as deleting temporary files and internal caches.
+ * If the counter is still > 0, the function return without doing cleanup
+ * (the library is still owned).
+ *
+ * Does nothing if the library is already deinitialized (or was not initialized).
  * Since: 1.1.0
  */
 void
@@ -573,7 +577,7 @@ ipatch_close(void)
     init_counter--;
     if(init_counter != 0)
     {
-        /* library still owned by a task, do noth */
+        /* library still owned by a task, do nothing */
         if(init_counter < 0)
         {
             init_counter = 0;
