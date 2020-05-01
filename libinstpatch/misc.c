@@ -486,6 +486,9 @@ ipatch_deinit(void)
         return;
     }
     initialized = FALSE;
+
+    g_free(ipatch_application_name);
+
     /*-------------------------------------------------------------------------
       Free internal systems
     -------------------------------------------------------------------------*/
