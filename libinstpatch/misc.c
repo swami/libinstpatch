@@ -150,7 +150,8 @@ static TypePropInit type_props[] =
 /* name of application using libInstPatch (for saving to files) */
 char *ipatch_application_name = NULL;
 
-static gboolean initialized = FALSE;
+G_LOCK_DEFINE_STATIC(lock_init);
+static int init_counter = 0;
 
 /*-----------------------------------------------------------------------------
  Initialization / deinitialization of libinstpatch library.
@@ -163,6 +164,9 @@ static gboolean initialized = FALSE;
  call ipatch_init() before creating other tasks, then when the application is
  complete, the main task should call ipatch_close() after the other tasks are
  completed.
+
+ If the application make use of multiple libraries each dependent of libinstpatch,
+ for each call to ipatch_init() these libraries should call ipatch_close().
 -----------------------------------------------------------------------------*/
 
 /**
@@ -178,12 +182,15 @@ ipatch_init(void)
     GType type;
     int i;
 
-    if(initialized)
+    /* do nothing if the library is already initialized */
+    G_LOCK(lock_init);
+    init_counter++;
+    if(init_counter > 1)
     {
+        /* library already initialized */
+        G_UNLOCK(lock_init);
         return;
     }
-
-    initialized = TRUE;
 
     g_type_init();
 
@@ -470,6 +477,8 @@ ipatch_init(void)
                     "mime-type", "audio/x-gigasampler", NULL);
     ipatch_type_set(IPATCH_TYPE_SLI_FILE,
                     "mime-type", "audio/x-spectralis", NULL);
+
+    G_UNLOCK(lock_init);
 }
 
 /**
@@ -481,11 +490,8 @@ ipatch_init(void)
 static void
 ipatch_deinit(void)
 {
-    if (!initialized)
-    {
-        return;
-    }
-    initialized = FALSE;
+    g_free(ipatch_application_name);
+
     /*-------------------------------------------------------------------------
       Free internal systems
     -------------------------------------------------------------------------*/
@@ -553,16 +559,37 @@ ipatch_deinit(void)
 /**
  * ipatch_close:
  *
- * Perform cleanup of libInstPatch prior to application close.  Such as deleting
- * temporary files.
+ * This should be called prior to application close.
  *
+ * Decrement the reference counter and if it reaches 0 performs cleanup of
+ * libInstPatch, such as deleting temporary files and internal caches.
+ * If the counter is still > 0, the function return without doing cleanup
+ * (the library is still owned).
+ *
+ * Does nothing if the library is already deinitialized (or was not initialized).
  * Since: 1.1.0
  */
 void
 ipatch_close(void)
 {
+    /* do nothing if the library is already deinitialized */
+    G_LOCK(lock_init);
+    init_counter--;
+    if(init_counter != 0)
+    {
+        /* library still owned by a task, do nothing */
+        if(init_counter < 0)
+        {
+            init_counter = 0;
+        }
+        G_UNLOCK(lock_init);
+        return;
+    }
+
     ipatch_sample_store_swap_close();
     ipatch_deinit();
+
+    G_UNLOCK(lock_init);
 }
 
 static gboolean
