@@ -665,8 +665,11 @@ sfload_phdrs(IpatchSF2Reader *reader, GError **err)
     }
 
     /* initialize iterator to SoundFont preset list */
-    ipatch_container_init_iter(IPATCH_CONTAINER(reader->sf), &preset_iter,
-                               IPATCH_TYPE_SF2_PRESET);
+    if(!ipatch_container_init_iter(IPATCH_CONTAINER(reader->sf), &preset_iter,
+                                   IPATCH_TYPE_SF2_PRESET))
+    {
+        return (FALSE);
+    }
 
     /* loop over all preset headers (including dummy terminal record) */
     i = chunk->size / IPATCH_SFONT_PHDR_SIZE;
@@ -709,8 +712,12 @@ sfload_phdrs(IpatchSF2Reader *reader, GError **err)
             }
 
             /* init iterator to list of zones */
-            ipatch_container_init_iter((IpatchContainer *)prev, &zone_iter,
-                                       IPATCH_TYPE_SF2_PZONE);
+            if(!ipatch_container_init_iter((IpatchContainer *)prev, &zone_iter,
+                                           IPATCH_TYPE_SF2_PZONE))
+            {
+                return (FALSE);
+            }
+
             i2 = zndx - pzndx;	/* # of zones in last preset */
 
             while(i2--)		/* create zones for last preset */
@@ -1060,8 +1067,11 @@ sfload_ihdrs(IpatchSF2Reader *reader, GError **err)
     }
 
     /* initialize iterator to instrument list */
-    ipatch_container_init_iter(IPATCH_CONTAINER(reader->sf), &inst_iter,
-                               IPATCH_TYPE_SF2_INST);
+    if(!ipatch_container_init_iter(IPATCH_CONTAINER(reader->sf), &inst_iter,
+                                   IPATCH_TYPE_SF2_INST))
+    {
+        return (FALSE);
+    }
 
     i = chunk->size / IPATCH_SFONT_INST_SIZE; /* instrument count + 1 EOI */
     reader->inst_count = i - 1;
@@ -1103,8 +1113,11 @@ sfload_ihdrs(IpatchSF2Reader *reader, GError **err)
             }
 
             /* initialize iterator to instrument zone list */
-            ipatch_container_init_iter((IpatchContainer *)prev, &zone_iter,
-                                       IPATCH_TYPE_SF2_IZONE);
+            if(!ipatch_container_init_iter((IpatchContainer *)prev, &zone_iter,
+                                            IPATCH_TYPE_SF2_IZONE))
+            {
+                return (FALSE);
+            }
 
             i2 = zndx - pzndx;	/* # of zones in last instrument */
 
@@ -1465,8 +1478,11 @@ sfload_shdrs(IpatchSF2Reader *reader, GError **err)
     }
 
     /* initialize iterator to sample list */
-    ipatch_container_init_iter(IPATCH_CONTAINER(reader->sf), &iter,
-                               IPATCH_TYPE_SF2_SAMPLE);
+    if(!ipatch_container_init_iter(IPATCH_CONTAINER(reader->sf), &iter,
+                                   IPATCH_TYPE_SF2_SAMPLE))
+    {
+        return (FALSE);
+    }
 
     /* get number of sample headers */
     count = chunk->size / IPATCH_SFONT_SHDR_SIZE - 1;

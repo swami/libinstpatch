@@ -254,12 +254,18 @@ ipatch_sli_load_level_0(IpatchSLIReader *reader, GError **err)
     IpatchSLISample **sample_map;
 
     /* initialize iterator to instrument list */
-    ipatch_container_init_iter(IPATCH_CONTAINER(reader->sli), &inst_iter,
-                               IPATCH_TYPE_SLI_INST);
+    if(!ipatch_container_init_iter(IPATCH_CONTAINER(reader->sli), &inst_iter,
+                               IPATCH_TYPE_SLI_INST))
+    {
+        return (FALSE);
+    }
 
     /* initialize iterator to sample list */
-    ipatch_container_init_iter(IPATCH_CONTAINER(reader->sli), &smpl_iter,
-                               IPATCH_TYPE_SLI_SAMPLE);
+    if(!ipatch_container_init_iter(IPATCH_CONTAINER(reader->sli), &smpl_iter,
+                                   IPATCH_TYPE_SLI_SAMPLE))
+    {
+        return (FALSE);
+    }
 
     /* clear siig just to silence the compiler */
     memset(&siig, 0, sizeof(siig));
@@ -323,8 +329,11 @@ ipatch_sli_load_level_0(IpatchSLIReader *reader, GError **err)
             g_object_unref(inst);  /* -- unref new instrument */
 
             /* initialize iterator to instrument zone list */
-            ipatch_container_init_iter((IpatchContainer *)inst, &zone_iter,
-                                       IPATCH_TYPE_SLI_ZONE);
+            if(!ipatch_container_init_iter((IpatchContainer *)inst, &zone_iter,
+                                            IPATCH_TYPE_SLI_ZONE))
+            {
+                return (FALSE);
+            }
 
             for(z = 0; z < ihdr.zones_num; z++)
             {

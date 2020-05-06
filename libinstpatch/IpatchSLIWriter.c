@@ -359,10 +359,13 @@ ipatch_sli_writer_create_stores(IpatchSLIWriter *writer)
         return (g_object_ref(writer->store_list));    /* ++ ref for caller */
     }
 
-    list = ipatch_list_new();   /* ++ ref list */
+    if(!ipatch_container_init_iter(IPATCH_CONTAINER(writer->sli), &iter,
+                                   IPATCH_TYPE_SLI_SAMPLE))
+    {
+        return (NULL);
+    }
 
-    ipatch_container_init_iter(IPATCH_CONTAINER(writer->sli), &iter,
-                               IPATCH_TYPE_SLI_SAMPLE);
+    list = ipatch_list_new();   /* ++ ref list */
 
     /* traverse samples */
     for(sample = ipatch_sli_sample_first(&iter); sample;
@@ -427,8 +430,11 @@ ipatch_sli_writer_find_groups(IpatchSLI *sli)
     IpatchList *inst_zones, *zlist;
     IpatchSLIZone *iz, *z;
 
-    ipatch_container_init_iter((IpatchContainer *)sli, &inst_iter,
-                               IPATCH_TYPE_SLI_INST);
+    if(!ipatch_container_init_iter((IpatchContainer *)sli, &inst_iter,
+                                    IPATCH_TYPE_SLI_INST))
+    {
+        return (NULL);
+    }
 
     for(item = ipatch_iter_first(&inst_iter);
             item;

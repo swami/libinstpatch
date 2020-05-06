@@ -585,7 +585,11 @@ ipatch_item_recursive_base_set(IpatchContainer *container, SetParentBag *bag)
     while(*types)		/* loop over list types */
     {
         /* initialize iterator to child list */
-        ipatch_container_init_iter(container, &iter, *types);
+        if(!ipatch_container_init_iter(container, &iter, *types))
+        {
+            return;
+        }
+
         child = ipatch_iter_first(&iter);
 
         while(child)		/* loop over child list */
@@ -669,7 +673,11 @@ ipatch_item_recursive_base_unset(IpatchContainer *container)
     while(*types)		/* loop over list types */
     {
         /* initialize iterator to child list */
-        ipatch_container_init_iter(container, &iter, *types);
+        if(!ipatch_container_init_iter(container, &iter, *types))
+        {
+            return;
+        }
+
         child = ipatch_iter_first(&iter);
 
         while(child)		/* loop over child list */
