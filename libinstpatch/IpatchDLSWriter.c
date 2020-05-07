@@ -331,10 +331,13 @@ ipatch_dls_writer_create_stores(IpatchDLSWriter *writer)
 
     save_file = IPATCH_RIFF(writer)->handle->file;
 
-    list = ipatch_list_new();             // ++ ref list
+    if(!ipatch_container_init_iter(IPATCH_CONTAINER(writer->dls), &iter,
+                                   IPATCH_TYPE_DLS2_SAMPLE))
+    {
+        return (NULL);
+    }
 
-    ipatch_container_init_iter(IPATCH_CONTAINER(writer->dls), &iter,
-                               IPATCH_TYPE_DLS2_SAMPLE);
+    list = ipatch_list_new();             // ++ ref list
 
     /* traverse samples */
     for(sample = ipatch_dls2_sample_first(&iter); sample;
@@ -438,8 +441,11 @@ ipatch_dls_write_level_0(IpatchDLSWriter *writer, GError **err)
         return (FALSE);
     }
 
-    ipatch_container_init_iter(IPATCH_CONTAINER(writer->dls), &iter,
-                               IPATCH_TYPE_DLS2_INST);
+    if(!ipatch_container_init_iter(IPATCH_CONTAINER(writer->dls), &iter,
+                                   IPATCH_TYPE_DLS2_INST))
+    {
+        return (FALSE);
+    }
 
     if(!ipatch_file_write_u32(riff->handle, ipatch_iter_count(&iter), err))
     {
@@ -459,8 +465,12 @@ ipatch_dls_write_level_0(IpatchDLSWriter *writer, GError **err)
         }
 
     /* create hash of samples -> indexes */
-    ipatch_container_init_iter(IPATCH_CONTAINER(writer->dls), &iter,
-                               IPATCH_TYPE_DLS2_SAMPLE);
+    if(!ipatch_container_init_iter(IPATCH_CONTAINER(writer->dls), &iter,
+                                   IPATCH_TYPE_DLS2_SAMPLE))
+    {
+        return (FALSE);
+    }
+
     sample = ipatch_dls2_sample_first(&iter);
     index = 1;		   /* index + 1 to catch NULL in hash table */
 
@@ -722,8 +732,12 @@ dls_write_inst_list(IpatchDLSWriter *writer, GError **err)
     guint32 uint;
     gboolean retval;
 
-    ipatch_container_init_iter(IPATCH_CONTAINER(writer->dls), &iter,
-                               IPATCH_TYPE_DLS2_INST);
+    if(!ipatch_container_init_iter(IPATCH_CONTAINER(writer->dls), &iter,
+                                   IPATCH_TYPE_DLS2_INST))
+    {
+        return (FALSE);
+    }
+
     inst = ipatch_dls2_inst_first(&iter);
 
     while(inst)			/* loop over instruments */
@@ -794,11 +808,21 @@ dls_write_inst_list(IpatchDLSWriter *writer, GError **err)
 
         /* region count */
         if(!writer->is_gig)
-            ipatch_container_init_iter((IpatchContainer *)inst, &region_iter,
-                                       IPATCH_TYPE_DLS2_REGION);
+        {
+            if(!ipatch_container_init_iter((IpatchContainer *)inst, &region_iter,
+                                            IPATCH_TYPE_DLS2_REGION))
+            {
+                return (FALSE);
+            }
+        }
         else
-            ipatch_container_init_iter((IpatchContainer *)inst, &region_iter,
-                                       IPATCH_TYPE_GIG_REGION);
+        {
+            if(!ipatch_container_init_iter((IpatchContainer *)inst, &region_iter,
+                                            IPATCH_TYPE_GIG_REGION))
+            {
+                return (FALSE);
+            }
+        }
 
         ipatch_file_buf_write_u32(riff->handle, ipatch_iter_count(&region_iter));
 
@@ -929,8 +953,11 @@ dls_write_region_list(IpatchDLSWriter *writer, IpatchDLS2Inst *inst,
     IpatchDLS2Region *region;
     IpatchIter iter;
 
-    ipatch_container_init_iter((IpatchContainer *)inst, &iter,
-                               IPATCH_TYPE_DLS2_REGION);
+    if(!ipatch_container_init_iter((IpatchContainer *)inst, &iter,
+                                    IPATCH_TYPE_DLS2_REGION))
+    {
+        return (FALSE);
+    }
 
     region = ipatch_dls2_region_first(&iter);
 
@@ -1064,8 +1091,11 @@ gig_write_region_list(IpatchDLSWriter *writer, IpatchGigInst *giginst,
     IpatchGigSubRegion *subregion;
     IpatchIter iter;
 
-    ipatch_container_init_iter((IpatchContainer *)inst, &iter,
-                               IPATCH_TYPE_GIG_REGION);
+    if(!ipatch_container_init_iter((IpatchContainer *)inst, &iter,
+                                    IPATCH_TYPE_GIG_REGION))
+    {
+        return (FALSE);
+    }
 
     region = ipatch_gig_region_first(&iter);
 
@@ -1673,8 +1703,12 @@ dls_write_wave_pool(IpatchDLSWriter *writer, GError **err)
     /* start position of wave pool chunk */
     start = ipatch_file_get_position(riff->handle);
 
-    ipatch_container_init_iter(IPATCH_CONTAINER(writer->dls), &iter,
-                               IPATCH_TYPE_DLS2_SAMPLE);
+    if(!ipatch_container_init_iter(IPATCH_CONTAINER(writer->dls), &iter,
+                                   IPATCH_TYPE_DLS2_SAMPLE))
+    {
+        return (FALSE);
+    }
+
     sample = ipatch_dls2_sample_first(&iter);
 
     for(index = 0; sample; index++, sample = ipatch_dls2_sample_next(&iter))

@@ -193,7 +193,13 @@ ipatch_container_get_children_by_type(IpatchContainer *container, GType type)
         if(g_type_is_a(*child_types, type))   /* child type matches type? */
         {
             IPATCH_ITEM_RLOCK(container);
-            ipatch_container_init_iter(container, &iter, *child_types);
+            if(!ipatch_container_init_iter(container, &iter, *child_types))
+            {
+                ipatch_glist_unref_free(list);
+                IPATCH_ITEM_RUNLOCK(container);
+                return (NULL);
+            }
+
             obj = ipatch_iter_first(&iter);
 
             while(obj)		/* add object list to children list */
@@ -347,7 +353,11 @@ ipatch_container_insert(IpatchContainer *container, IpatchItem *item, int pos)
     if(*child_types)	/* matching child type found? */
     {
         IPATCH_ITEM_WLOCK(container);
-        ipatch_container_init_iter(container, &iter, *child_types);
+        if(!ipatch_container_init_iter(container, &iter, *child_types))
+        {
+            IPATCH_ITEM_WUNLOCK(container);
+            return;
+        }
 
         /* if position is less than 1 or off the end, get last object */
         if(pos < 0 || !ipatch_iter_index(&iter, pos))
@@ -438,7 +448,11 @@ ipatch_container_remove(IpatchContainer *container, IpatchItem *item)
         if(g_type_is_a(type, *child_types))   /* item type matches child type? */
         {
             IPATCH_ITEM_WLOCK(container);
-            ipatch_container_init_iter(container, &iter, *child_types);
+            if(!ipatch_container_init_iter(container, &iter, *child_types))
+            {
+                IPATCH_ITEM_WUNLOCK(container);
+                return;
+            }
 
             /* search for @item */
             obj = ipatch_iter_first(&iter);
@@ -528,7 +542,12 @@ ipatch_container_count(IpatchContainer *container, GType type)
         if(g_type_is_a(*child_types, type))   /* child type matches type? */
         {
             IPATCH_ITEM_RLOCK(container);
-            ipatch_container_init_iter(container, &iter, *child_types);
+            if(!ipatch_container_init_iter(container, &iter, *child_types))
+            {
+                IPATCH_ITEM_RUNLOCK(container);
+                return 0;
+            }
+
             count += ipatch_iter_count(&iter);
             IPATCH_ITEM_RUNLOCK(container);
         }

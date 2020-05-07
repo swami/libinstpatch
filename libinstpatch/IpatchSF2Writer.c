@@ -389,10 +389,13 @@ ipatch_sf2_writer_create_stores(IpatchSF2Writer *writer)
     save_file = IPATCH_RIFF(writer)->handle->file;
     smpl24 = (ipatch_item_get_flags(writer->sf) & IPATCH_SF2_SAMPLES_24BIT) != 0;
 
-    list = ipatch_list_new();             // ++ ref list
+    if(!ipatch_container_init_iter(IPATCH_CONTAINER(writer->sf), &iter,
+                                   IPATCH_TYPE_SF2_SAMPLE))
+    {
+        return (NULL);
+    }
 
-    ipatch_container_init_iter(IPATCH_CONTAINER(writer->sf), &iter,
-                               IPATCH_TYPE_SF2_SAMPLE);
+    list = ipatch_list_new();             // ++ ref list
 
     /* traverse samples */
     for(sample = ipatch_sf2_sample_first(&iter); sample;
@@ -632,8 +635,12 @@ ipatch_sf2_write_level_0(IpatchSF2Writer *writer, GError **err)
 
 
     /* generate instrument pointer => index hash, used by preset generators */
-    ipatch_container_init_iter(IPATCH_CONTAINER(writer->sf), &iter,
-                               IPATCH_TYPE_SF2_INST);
+    if(!ipatch_container_init_iter(IPATCH_CONTAINER(writer->sf), &iter,
+                                   IPATCH_TYPE_SF2_INST))
+    {
+        return (FALSE);
+    }
+
     inst = ipatch_sf2_inst_first(&iter);
     index = 1;
 
@@ -1028,8 +1035,11 @@ sfont_write_samples(IpatchSF2Writer *writer, GError **err)
     /* set the sample position in the IpatchSF2File */
     ipatch_sf2_file_set_sample_pos(file, ipatch_riff_get_position(riff));
 
-    ipatch_container_init_iter(IPATCH_CONTAINER(writer->sf), &iter,
-                               IPATCH_TYPE_SF2_SAMPLE);
+    if(!ipatch_container_init_iter(IPATCH_CONTAINER(writer->sf), &iter,
+                                   IPATCH_TYPE_SF2_SAMPLE))
+    {
+        return (FALSE);
+    }
 
     /* traverse samples */
     for(sample = ipatch_sf2_sample_first(&iter); sample;
@@ -1132,8 +1142,11 @@ sfont_write_samples24(IpatchSF2Writer *writer, GError **err)
     /* set the sample position in the IpatchSF2File */
     ipatch_sf2_file_set_sample_pos(file, ipatch_riff_get_position(riff));
 
-    ipatch_container_init_iter(IPATCH_CONTAINER(writer->sf), &iter,
-                               IPATCH_TYPE_SF2_SAMPLE);
+    if(!ipatch_container_init_iter(IPATCH_CONTAINER(writer->sf), &iter,
+                                   IPATCH_TYPE_SF2_SAMPLE))
+    {
+        goto error;
+    }
 
     /* calc total size of smpl chunk, so we can write sm24 chunk simultaneously */
     sample = ipatch_sf2_sample_first(&iter);
@@ -1339,8 +1352,12 @@ sfont_write_phdrs(IpatchSF2Writer *writer, GError **err)
     IpatchIter iter, zone_iter;
     guint16 pbagndx = 0;
 
-    ipatch_container_init_iter(IPATCH_CONTAINER(writer->sf), &iter,
-                               IPATCH_TYPE_SF2_PRESET);
+    if(!ipatch_container_init_iter(IPATCH_CONTAINER(writer->sf), &iter,
+                                   IPATCH_TYPE_SF2_PRESET))
+    {
+        return (FALSE);
+    }
+
     preset = ipatch_sf2_preset_first(&iter);
 
     while(preset)		/* loop over all presets */
@@ -1361,8 +1378,12 @@ sfont_write_phdrs(IpatchSF2Writer *writer, GError **err)
         }
 
         /* get count of preset zones */
-        ipatch_container_init_iter((IpatchContainer *)preset, &zone_iter,
-                                   IPATCH_TYPE_SF2_PZONE);
+        if(!ipatch_container_init_iter((IpatchContainer *)preset, &zone_iter,
+                                        IPATCH_TYPE_SF2_PZONE))
+        {
+            return (FALSE);
+        }
+
         pbagndx += ipatch_iter_count(&zone_iter);
 
         /* if any global generators or modulators then add 1 for global zone */
@@ -1400,14 +1421,21 @@ sfont_write_pbags(IpatchSF2Writer *writer, GError **err)
     IpatchIter iter, zone_iter;
     guint16 genndx = 0, modndx = 0;
 
-    ipatch_container_init_iter(IPATCH_CONTAINER(writer->sf), &iter,
-                               IPATCH_TYPE_SF2_PRESET);
+    if(!ipatch_container_init_iter(IPATCH_CONTAINER(writer->sf), &iter,
+                                   IPATCH_TYPE_SF2_PRESET))
+    {
+        return (FALSE);
+    }
+
     preset = ipatch_sf2_preset_first(&iter);
 
     while(preset)		/* traverse through presets */
     {
-        ipatch_container_init_iter((IpatchContainer *)preset, &zone_iter,
-                                   IPATCH_TYPE_SF2_PZONE);
+        if(!ipatch_container_init_iter((IpatchContainer *)preset, &zone_iter,
+                                        IPATCH_TYPE_SF2_PZONE))
+        {
+            return (FALSE);
+        }
 
         /* process global zone if any global modulators or generators */
         if(preset->genarray.flags || preset->mods)
@@ -1485,8 +1513,12 @@ sfont_write_pmods(IpatchSF2Writer *writer, GError **err)
     IpatchIter iter, zone_iter;
     GSList *p;
 
-    ipatch_container_init_iter(IPATCH_CONTAINER(writer->sf), &iter,
-                               IPATCH_TYPE_SF2_PRESET);
+    if(!ipatch_container_init_iter(IPATCH_CONTAINER(writer->sf), &iter,
+                                   IPATCH_TYPE_SF2_PRESET))
+    {
+        return (FALSE);
+    }
+
     preset = ipatch_sf2_preset_first(&iter);
 
     while(preset)		/* traverse through all presets */
@@ -1494,8 +1526,11 @@ sfont_write_pmods(IpatchSF2Writer *writer, GError **err)
         zone = NULL;
         p = preset->mods;	/* first is the global modulators */
 
-        ipatch_container_init_iter((IpatchContainer *)preset, &zone_iter,
-                                   IPATCH_TYPE_SF2_PZONE);
+        if(!ipatch_container_init_iter((IpatchContainer *)preset, &zone_iter,
+                                        IPATCH_TYPE_SF2_PZONE))
+        {
+            return (FALSE);
+        }
 
         do
         {
@@ -1556,8 +1591,12 @@ sfont_write_pgens(IpatchSF2Writer *writer, GError **err)
     guint64 flags;
     int i;
 
-    ipatch_container_init_iter(IPATCH_CONTAINER(writer->sf), &iter,
-                               IPATCH_TYPE_SF2_PRESET);
+    if(!ipatch_container_init_iter(IPATCH_CONTAINER(writer->sf), &iter,
+                                   IPATCH_TYPE_SF2_PRESET))
+    {
+        return (FALSE);
+    }
+
     preset = ipatch_sf2_preset_first(&iter);
 
     while(preset)		/* traverse through all presets */
@@ -1566,8 +1605,11 @@ sfont_write_pgens(IpatchSF2Writer *writer, GError **err)
         genarray = &preset->genarray;
         zone = NULL;
 
-        ipatch_container_init_iter((IpatchContainer *)preset, &zone_iter,
-                                   IPATCH_TYPE_SF2_PZONE);
+        if(!ipatch_container_init_iter((IpatchContainer *)preset, &zone_iter,
+                                        IPATCH_TYPE_SF2_PZONE))
+        {
+            return (FALSE);
+        }
 
         do
         {
@@ -1672,8 +1714,12 @@ sfont_write_ihdrs(IpatchSF2Writer *writer, GError **err)
     IpatchIter iter, zone_iter;
     guint16 ibagndx = 0;
 
-    ipatch_container_init_iter(IPATCH_CONTAINER(writer->sf), &iter,
-                               IPATCH_TYPE_SF2_INST);
+    if(!ipatch_container_init_iter(IPATCH_CONTAINER(writer->sf), &iter,
+                                   IPATCH_TYPE_SF2_INST))
+    {
+        return (FALSE);
+    }
+
     inst = ipatch_sf2_inst_first(&iter);
 
     while(inst)			/* loop over all instruments */
@@ -1687,8 +1733,12 @@ sfont_write_ihdrs(IpatchSF2Writer *writer, GError **err)
             return (FALSE);
         }
 
-        ipatch_container_init_iter((IpatchContainer *)inst, &zone_iter,
-                                   IPATCH_TYPE_SF2_IZONE);
+        if(!ipatch_container_init_iter((IpatchContainer *)inst, &zone_iter,
+                                        IPATCH_TYPE_SF2_IZONE))
+        {
+            return (FALSE);
+        }
+
         ibagndx += ipatch_iter_count(&zone_iter);
 
         /* if any global generators or modulators then add 1 for global zone */
@@ -1725,14 +1775,21 @@ sfont_write_ibags(IpatchSF2Writer *writer, GError **err)
     IpatchIter iter, zone_iter;
     guint16 genndx = 0, modndx = 0;
 
-    ipatch_container_init_iter(IPATCH_CONTAINER(writer->sf), &iter,
-                               IPATCH_TYPE_SF2_INST);
+    if(!ipatch_container_init_iter(IPATCH_CONTAINER(writer->sf), &iter,
+                                   IPATCH_TYPE_SF2_INST))
+    {
+        return (FALSE);
+    }
+
     inst = ipatch_sf2_inst_first(&iter);
 
     while(inst)			/* traverse through instruments */
     {
-        ipatch_container_init_iter((IpatchContainer *)inst, &zone_iter,
-                                   IPATCH_TYPE_SF2_IZONE);
+        if(!ipatch_container_init_iter((IpatchContainer *)inst, &zone_iter,
+                                        IPATCH_TYPE_SF2_IZONE))
+        {
+            return (FALSE);
+        }
 
         /* process global zone if any global modulators or generators */
         if(inst->genarray.flags || inst->mods)
@@ -1810,8 +1867,12 @@ sfont_write_imods(IpatchSF2Writer *writer, GError **err)
     IpatchIter iter, zone_iter;
     GSList *p;
 
-    ipatch_container_init_iter(IPATCH_CONTAINER(writer->sf), &iter,
-                               IPATCH_TYPE_SF2_INST);
+    if(!ipatch_container_init_iter(IPATCH_CONTAINER(writer->sf), &iter,
+                                   IPATCH_TYPE_SF2_INST))
+    {
+        return (FALSE);
+    }
+
     inst = ipatch_sf2_inst_first(&iter);
 
     while(inst)			/* traverse through all instruments */
@@ -1819,8 +1880,11 @@ sfont_write_imods(IpatchSF2Writer *writer, GError **err)
         zone = NULL;
         p = inst->mods;	/* first is the global modulators */
 
-        ipatch_container_init_iter((IpatchContainer *)inst, &zone_iter,
-                                   IPATCH_TYPE_SF2_IZONE);
+        if(!ipatch_container_init_iter((IpatchContainer *)inst, &zone_iter,
+                                        IPATCH_TYPE_SF2_IZONE))
+        {
+            return (FALSE);
+        }
 
         do
         {
@@ -1881,8 +1945,12 @@ sfont_write_igens(IpatchSF2Writer *writer, GError **err)
     guint64 flags;
     int i;
 
-    ipatch_container_init_iter(IPATCH_CONTAINER(writer->sf), &iter,
-                               IPATCH_TYPE_SF2_INST);
+    if(!ipatch_container_init_iter(IPATCH_CONTAINER(writer->sf), &iter,
+                                   IPATCH_TYPE_SF2_INST))
+    {
+        return (FALSE);
+    }
+
     inst = ipatch_sf2_inst_first(&iter);
 
     while(inst)			/* traverse through all instruments */
@@ -1891,8 +1959,11 @@ sfont_write_igens(IpatchSF2Writer *writer, GError **err)
         genarray = &inst->genarray;
         zone = NULL;
 
-        ipatch_container_init_iter((IpatchContainer *)inst, &zone_iter,
-                                   IPATCH_TYPE_SF2_IZONE);
+        if(!ipatch_container_init_iter((IpatchContainer *)inst, &zone_iter,
+                                        IPATCH_TYPE_SF2_IZONE))
+        {
+            return (FALSE);
+        }
 
         do
         {
@@ -1999,8 +2070,11 @@ sfont_write_shdrs(IpatchSF2Writer *writer, GError **err)
     int location;
     int untitled = 0;
 
-    ipatch_container_init_iter(IPATCH_CONTAINER(writer->sf), &iter,
-                               IPATCH_TYPE_SF2_SAMPLE);
+    if(!ipatch_container_init_iter(IPATCH_CONTAINER(writer->sf), &iter,
+                                   IPATCH_TYPE_SF2_SAMPLE))
+    {
+        return (FALSE);
+    }
 
     /* traverse all samples */
     for(sample = ipatch_sf2_sample_first(&iter); sample;

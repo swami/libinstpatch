@@ -426,14 +426,22 @@ ipatch_dls_reader_fixup(IpatchDLSReader *reader, GError **err)
     if(!reader->is_gig)		/* regular DLS file? (not GigaSampler) */
     {
         /* fixup DLS region sample indexes */
-        ipatch_container_init_iter((IpatchContainer *)(reader->dls), &inst_iter,
-                                   IPATCH_TYPE_DLS2_INST);
+        if(!ipatch_container_init_iter((IpatchContainer *)(reader->dls), &inst_iter,
+                                       IPATCH_TYPE_DLS2_INST))
+        {
+            return (FALSE);
+        }
+
         inst = ipatch_dls2_inst_first(&inst_iter);
 
         while(inst)		/* loop over instruments */
         {
-            ipatch_container_init_iter((IpatchContainer *)inst, &region_iter,
-                                       IPATCH_TYPE_DLS2_REGION);
+            if(!ipatch_container_init_iter((IpatchContainer *)inst, &region_iter,
+                                           IPATCH_TYPE_DLS2_REGION))
+            {
+                return (FALSE);
+            }
+
             region = ipatch_dls2_region_first(&region_iter);
 
             while(region)	/* loop over instrument regions */
@@ -467,14 +475,21 @@ ipatch_dls_reader_fixup(IpatchDLSReader *reader, GError **err)
     }
     else /* reader->is_gig - fixup GigaSampler sub region sample indexes */
     {
-        ipatch_container_init_iter((IpatchContainer *)(reader->dls), &inst_iter,
-                                   IPATCH_TYPE_GIG_INST);
+        if(!ipatch_container_init_iter((IpatchContainer *)(reader->dls), &inst_iter,
+                                        IPATCH_TYPE_GIG_INST))
+        {
+            return (FALSE);
+        }
+
         inst = ipatch_dls2_inst_first(&inst_iter);
 
         while(inst)		/* loop over instruments */
         {
-            ipatch_container_init_iter((IpatchContainer *)inst, &region_iter,
-                                       IPATCH_TYPE_GIG_REGION);
+            if(!ipatch_container_init_iter((IpatchContainer *)inst, &region_iter,
+                                           IPATCH_TYPE_GIG_REGION))
+            {
+                return (FALSE);
+            }
             gig_region = ipatch_gig_region_first(&region_iter);
 
             while(gig_region)	/* loop over instrument regions */
@@ -528,16 +543,24 @@ ipatch_dls_nullify_fixups(IpatchDLSReader *reader)
     IpatchIter inst_iter, region_iter;
     int i;
 
-    ipatch_container_init_iter((IpatchContainer *)(reader->dls), &inst_iter,
+    if(!ipatch_container_init_iter((IpatchContainer *)(reader->dls), &inst_iter,
                                reader->is_gig ? IPATCH_TYPE_GIG_INST
-                               : IPATCH_TYPE_DLS2_INST);
+                               : IPATCH_TYPE_DLS2_INST))
+    {
+        return;
+    }
+
     inst = ipatch_dls2_inst_first(&inst_iter);
 
     while(inst)			/* loop over instruments */
     {
-        ipatch_container_init_iter((IpatchContainer *)inst, &region_iter,
+        if(!ipatch_container_init_iter((IpatchContainer *)inst, &region_iter,
                                    reader->is_gig ? IPATCH_TYPE_GIG_REGION
-                                   : IPATCH_TYPE_DLS2_REGION);
+                                   : IPATCH_TYPE_DLS2_REGION))
+        {
+            return;
+        }
+
         region = ipatch_dls2_region_first(&region_iter);
 
         while(region)		/* loop over instrument regions */
@@ -744,9 +767,12 @@ ipatch_dls_reader_load_inst_list(IpatchDLSReader *reader, GError **err)
     g_return_val_if_fail(!err || !*err, FALSE);
 
     /* initialize iterator to instrument list */
-    ipatch_container_init_iter(IPATCH_CONTAINER(reader->dls), &iter,
+    if(!ipatch_container_init_iter(IPATCH_CONTAINER(reader->dls), &iter,
                                reader->is_gig ? IPATCH_TYPE_GIG_INST
-                               : IPATCH_TYPE_DLS2_INST);
+                               : IPATCH_TYPE_DLS2_INST))
+    {
+        return (FALSE);
+    }
 
     while((chunk = ipatch_riff_read_chunk(riff, err)))
     {
@@ -923,8 +949,11 @@ ipatch_dls_reader_load_region_list(IpatchDLSReader *reader,
     g_return_val_if_fail(!err || !*err, FALSE);
 
     /* initialize iterator to DLS2 region list */
-    ipatch_container_init_iter(IPATCH_CONTAINER(inst), &iter,
-                               IPATCH_TYPE_DLS2_REGION);
+    if(!ipatch_container_init_iter(IPATCH_CONTAINER(inst), &iter,
+                                   IPATCH_TYPE_DLS2_REGION))
+    {
+        return (FALSE);
+    }
 
     while((chunk = ipatch_riff_read_chunk(riff, err)))
     {
@@ -1076,8 +1105,11 @@ ipatch_gig_reader_load_region_list(IpatchDLSReader *reader,
     inst = IPATCH_DLS2_INST(giginst);
 
     /* initialize iterator to Gig region list */
-    ipatch_container_init_iter(IPATCH_CONTAINER(inst), &iter,
-                               IPATCH_TYPE_GIG_REGION);
+    if(!ipatch_container_init_iter(IPATCH_CONTAINER(inst), &iter,
+                                   IPATCH_TYPE_GIG_REGION))
+    {
+        return (FALSE);
+    }
 
     while((chunk = ipatch_riff_read_chunk(riff, err)))
     {
@@ -1283,8 +1315,11 @@ ipatch_dls_reader_load_wave_pool(IpatchDLSReader *reader, GError **err)
     g_return_val_if_fail(!err || !*err, FALSE);
 
     /* initialize iterator to sample list */
-    ipatch_container_init_iter(IPATCH_CONTAINER(reader->dls), &iter,
-                               IPATCH_TYPE_DLS2_SAMPLE);
+    if(!ipatch_container_init_iter(IPATCH_CONTAINER(reader->dls), &iter,
+                                   IPATCH_TYPE_DLS2_SAMPLE))
+    {
+        return (FALSE);
+    }
 
     while((chunk = ipatch_riff_read_chunk(riff, err)))
     {
