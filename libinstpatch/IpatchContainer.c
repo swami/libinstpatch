@@ -355,6 +355,7 @@ ipatch_container_insert(IpatchContainer *container, IpatchItem *item, int pos)
         IPATCH_ITEM_WLOCK(container);
         if(!ipatch_container_init_iter(container, &iter, *child_types))
         {
+            IPATCH_ITEM_WUNLOCK(container);
             return;
         }
 
@@ -449,6 +450,7 @@ ipatch_container_remove(IpatchContainer *container, IpatchItem *item)
             IPATCH_ITEM_WLOCK(container);
             if(!ipatch_container_init_iter(container, &iter, *child_types))
             {
+                IPATCH_ITEM_WUNLOCK(container);
                 return;
             }
 
@@ -542,6 +544,7 @@ ipatch_container_count(IpatchContainer *container, GType type)
             IPATCH_ITEM_RLOCK(container);
             if(!ipatch_container_init_iter(container, &iter, *child_types))
             {
+                IPATCH_ITEM_RUNLOCK(container);
                 return 0;
             }
 
