@@ -134,7 +134,7 @@ ipatch_sf2_class_init(IpatchSF2Class *klass)
     IpatchBaseClass *base_class = IPATCH_BASE_CLASS(klass);
     GParamSpec **sp = &info_prop_pspecs[0];
 
-    parent_class = g_type_class_ref(IPATCH_TYPE_BASE);
+    parent_class = g_type_class_peek_parent(klass);
 
     obj_class->finalize = ipatch_sf2_finalize;
     obj_class->get_property = ipatch_sf2_get_property;

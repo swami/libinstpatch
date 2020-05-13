@@ -127,7 +127,7 @@ ipatch_sf2_inst_class_init(IpatchSF2InstClass *klass)
     IpatchItemClass *item_class = IPATCH_ITEM_CLASS(klass);
     IpatchContainerClass *container_class = IPATCH_CONTAINER_CLASS(klass);
 
-    parent_class = g_type_class_ref(IPATCH_TYPE_CONTAINER);
+    parent_class = g_type_class_peek_parent(klass);
 
     obj_class->finalize = ipatch_sf2_inst_finalize;
     obj_class->get_property = ipatch_sf2_inst_get_property;
