@@ -713,7 +713,7 @@ ipatch_sf2_gen_item_iface_install_properties(GObjectClass *klass,
             }
             else if(unit == IPATCH_UNIT_TYPE_SF2_ABS_TIME)
             {
-                unit = IPATCH_UNIT_TYPE_SF2_OFS_PITCH;
+                unit = IPATCH_UNIT_TYPE_SF2_OFS_TIME;
             }
         }
 
