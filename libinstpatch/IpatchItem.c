@@ -276,7 +276,7 @@ ipatch_item_class_init(IpatchItemClass *klass)
     g_object_class_install_property(obj_class, PROP_FLAGS,
                                     g_param_spec_uint("flags", _("Flags"), _("Flags"),
                                             0, G_MAXUINT, 0,
-                                            G_PARAM_READABLE | IPATCH_PARAM_HIDE
+                                            G_PARAM_READWRITE | IPATCH_PARAM_HIDE
                                             | IPATCH_PARAM_NO_SAVE_CHANGE
                                             | IPATCH_PARAM_NO_SAVE));
     g_object_class_install_property(obj_class, PROP_PARENT,
