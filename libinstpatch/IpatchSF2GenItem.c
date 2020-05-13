@@ -640,7 +640,7 @@ ipatch_sf2_gen_item_iface_install_properties(GObjectClass *klass,
     ispreset = propstype & 1;
 
     /* get generator type GObject enum */
-    enum_class = g_type_class_ref(IPATCH_TYPE_SF2_GEN_TYPE);
+    enum_class = g_type_class_ref(IPATCH_TYPE_SF2_GEN_TYPE); /* ++ref */
     g_return_if_fail(enum_class != NULL);
 
     *specs = g_new(GParamSpec *, IPATCH_SF2_GEN_COUNT);
@@ -713,7 +713,7 @@ ipatch_sf2_gen_item_iface_install_properties(GObjectClass *klass,
             }
             else if(unit == IPATCH_UNIT_TYPE_SF2_ABS_TIME)
             {
-                unit = IPATCH_UNIT_TYPE_SF2_OFS_PITCH;
+                unit = IPATCH_UNIT_TYPE_SF2_OFS_TIME;
             }
         }
 
@@ -731,6 +731,8 @@ ipatch_sf2_gen_item_iface_install_properties(GObjectClass *klass,
         /* install "-set" property */
         g_object_class_install_property(klass, i + IPATCH_SF2_GEN_ITEM_FIRST_PROP_SET_ID, pspec);
     } /* for loop */
+
+    g_type_class_unref(enum_class); /* --ref */
 }
 
 /**

@@ -232,14 +232,19 @@ const GType *
 ipatch_container_get_child_types(IpatchContainer *container)
 {
     IpatchContainerClass *klass;
-    const GType *types;
 
     g_return_val_if_fail(IPATCH_IS_CONTAINER(container), 0);
 
     klass = IPATCH_CONTAINER_GET_CLASS(container);
-    types = klass->child_types();
 
-    return (types);
+    if(klass->child_types)
+    {
+        return(klass->child_types());
+    }
+    else
+    {
+        return(NULL);
+    }
 }
 
 /**

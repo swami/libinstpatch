@@ -67,9 +67,6 @@ static gpointer parent_class = NULL;
 static GType sli_child_types[3] = { 0 };
 static GType sli_virt_types[3] = { 0 };
 
-/* for chaining to original file-name property */
-static IpatchItemClass *base_item_class;
-
 
 /* Spectralis item type creation function */
 GType
@@ -101,9 +98,6 @@ ipatch_sli_class_init(IpatchSLIClass *klass)
     GObjectClass *obj_class = G_OBJECT_CLASS(klass);
     IpatchItemClass *item_class = IPATCH_ITEM_CLASS(klass);
     IpatchContainerClass *container_class = IPATCH_CONTAINER_CLASS(klass);
-
-    /* save original base class for chaining file-name property */
-    base_item_class = IPATCH_ITEM_CLASS(g_type_class_ref(IPATCH_TYPE_BASE));
 
     parent_class = g_type_class_peek_parent(klass);
 

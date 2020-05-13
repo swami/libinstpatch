@@ -74,9 +74,6 @@ static gpointer parent_class = NULL;
 static GType dls2_child_types[3] = { 0 };
 static GType dls2_virt_types[4] = { 0 };
 
-/* for chaining to original file-name property */
-static IpatchItemClass *base_item_class;
-
 
 
 /* SoundFont item type creation function */
@@ -110,9 +107,6 @@ ipatch_dls2_class_init(IpatchDLS2Class *klass)
     IpatchItemClass *item_class = IPATCH_ITEM_CLASS(klass);
     IpatchContainerClass *container_class = IPATCH_CONTAINER_CLASS(klass);
     IpatchBaseClass *base_class = IPATCH_BASE_CLASS(klass);
-
-    /* save original base class for chaining file-name property */
-    base_item_class = IPATCH_ITEM_CLASS(g_type_class_ref(IPATCH_TYPE_BASE));
 
     parent_class = g_type_class_peek_parent(klass);
 

@@ -147,7 +147,7 @@ _ipatch_sf2_gen_init(void)
 
     gen_property_names = g_malloc(sizeof(char *) * IPATCH_SF2_GEN_COUNT);
 
-    enum_class = g_type_class_ref(IPATCH_TYPE_SF2_GEN_TYPE);
+    enum_class = g_type_class_ref(IPATCH_TYPE_SF2_GEN_TYPE); /* ++ref */
 
     if(log_if_fail(enum_class != NULL))	/* shouldn't happen.. just in case */
     {
@@ -155,15 +155,15 @@ _ipatch_sf2_gen_init(void)
         {
             gen_property_names[i] = NULL;
         }
-
-        return;
     }
-
-    for(i = 0; i < IPATCH_SF2_GEN_COUNT; i++)
+    else for(i = 0; i < IPATCH_SF2_GEN_COUNT; i++)
     {
         enum_val = g_enum_get_value(enum_class, i);
         gen_property_names[i] = enum_val ? enum_val->value_nick : NULL;
     }
+
+    g_type_class_unref(enum_class); /* --ref */
+
 }
 
 /**

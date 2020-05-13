@@ -97,7 +97,6 @@ static void ipatch_sf2_foreach_info_GHFunc(gpointer key, gpointer value,
 static int ipatch_sf2_info_array_qsort(const void *a, const void *b);
 
 static gpointer parent_class = NULL;
-static IpatchItemClass *base_item_class;
 
 static GType sf2_child_types[4] = { 0 };
 static GType sf2_virt_types[6] = { 0 };
@@ -135,10 +134,7 @@ ipatch_sf2_class_init(IpatchSF2Class *klass)
     IpatchBaseClass *base_class = IPATCH_BASE_CLASS(klass);
     GParamSpec **sp = &info_prop_pspecs[0];
 
-    /* save original base class for chaining file-name property */
-    base_item_class = IPATCH_ITEM_CLASS(g_type_class_ref(IPATCH_TYPE_BASE));
-
-    parent_class = g_type_class_ref(IPATCH_TYPE_BASE);
+    parent_class = g_type_class_peek_parent(klass);
 
     obj_class->finalize = ipatch_sf2_finalize;
     obj_class->get_property = ipatch_sf2_get_property;
