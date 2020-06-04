@@ -359,6 +359,23 @@ ipatch_sample_store_swap_sample_iface_open(IpatchSampleHandle *handle,
 }
 
 /* Opens swap file (either assigned file name or temporary file) */
+/*
+ The application could set the swap file name calling following functions:
+ 1)ipatch_set_sample_store_swap_file_name(swap_filename)
+
+ 2)However, when multiple applications are calling libinstpatch it
+ is best for each application to call ipatch_set_application_name().
+ In this case, if the application do not call ipatch_set_sample_store_swap_file_name(),
+ a swap file name is build using application name as prefix of swap file name.
+ For example calling ipatch_set_sample_store_swap_file_name("swami") leads
+ to a default swap file "swami-swap_XXXXXX"
+
+ 3)If ipatch_set_sample_store_swap_file_name() or ipatch_set_application_name()
+   are not called, the default file name is "libInstPatch-swap_XXXXXX"
+
+ In case 2 and 3, the swap file directory is the one used for temporary files
+ returned by g_get_tmp_dir().
+*/
 static void
 ipatch_sample_store_swap_open_file(void)
 {
