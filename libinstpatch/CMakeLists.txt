@@ -372,6 +372,9 @@ install ( TARGETS libinstpatch
   BUNDLE DESTINATION ${BUNDLE_INSTALL_DIR}
 )
 
+install(FILES $<TARGET_PDB_FILE:libinstpatch> DESTINATION ${BIN_INSTALL_DIR} OPTIONAL)
+
+
 macro(_list_prefix _outvar _listvar _prefix)
   set(${_outvar})
   foreach(_item IN LISTS ${_listvar})
