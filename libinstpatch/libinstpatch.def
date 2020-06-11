@@ -60,6 +60,7 @@ ipatch_container_append
 ipatch_container_count
 ipatch_container_get_child_types
 ipatch_container_get_children
+ipatch_container_get_children_list
 ipatch_container_get_type
 ipatch_container_get_virtual_types
 ipatch_container_init_iter
@@ -365,6 +366,7 @@ ipatch_file_write_u64
 ipatch_file_write_u8
 ipatch_find_converter
 ;ipatch_find_paste_handler
+ipatch_glist_unref_free
 ipatch_gerror_message
 ;ipatch_get_conversion_dest_types
 ;ipatch_get_conversion_src_types
