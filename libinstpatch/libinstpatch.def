@@ -885,9 +885,13 @@ ipatch_sf2_zone_next
 ipatch_strconcat_num
 
 ipatch_sli_get_type
-ipatch_sli_inst_cat_strings
+;ipatch_sli_inst_cat_strings
+;getter fonction that returns pointer on ipatch_sli_inst_cat_strings table
+ipatch_sli_inst_get_cat_strings
 ipatch_sli_sample_get_type
-ipatch_sli_inst_cat_map
+;ipatch_sli_inst_cat_map
+;getter fonction that returns pointer on ipatch_sli_inst_cat_map table
+ipatch_sli_inst_get_cat_map
 ipatch_sli_inst_get_category_as_path
 ipatch_sli_inst_get_type
 ipatch_sli_zone_get_type
