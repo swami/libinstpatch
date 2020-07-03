@@ -286,6 +286,11 @@ ipatch_dls_writer_save(IpatchDLSWriter *writer, GError **err)
         goto err;
     }
 
+    /* reset flag "changed" to false. set flag "saved" to true */
+    g_object_set (writer->orig_dls,
+                  "changed", FALSE, /* file and object are in sync */
+                  "saved", TRUE,    /* has now been saved */
+                  NULL);
     /* </DLS > */
 
     return (TRUE);
