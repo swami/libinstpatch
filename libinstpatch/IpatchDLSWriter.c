@@ -106,7 +106,7 @@ static gboolean gig_write_dimension_info(IpatchDLSWriter *writer,
 static gboolean gig_write_group_names(IpatchDLSWriter *writer, GError **err);
 
 
-G_DEFINE_TYPE(IpatchDLSWriter, ipatch_dls_writer, IPATCH_TYPE_RIFF);
+G_DEFINE_TYPE(IpatchDLSWriter, ipatch_dls_writer, IPATCH_TYPE_RIFF)
 
 
 static void
