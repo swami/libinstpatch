@@ -159,7 +159,7 @@ endif ()
 
 # Check for Gtk-Doc
 if (GTKDOC_ENABLED)
-  include (FindGtkDoc)
+  find_package(GtkDoc)
 endif ()
 
 # General configuration file
