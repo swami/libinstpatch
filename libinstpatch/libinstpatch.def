@@ -1,4 +1,3 @@
-LIBRARY  INSTPATCH.dll
 EXPORTS
 
 ipatch_close
