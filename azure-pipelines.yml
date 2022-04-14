@@ -59,6 +59,8 @@ jobs:
         platform: 'Win32'
         toolset: 'v141_xp'
         artifactName: 'libinstpatch-XP-x86'
+        CFLAGS: '/arch:IA32'
+        CXXFLAGS: '/arch:IA32'
       XP_x64:
         gtk-bundle: 'http://ftp.gnome.org/pub/gnome/binaries/win64/gtk+/2.22/gtk+-bundle_2.22.1-20101229_win64.zip'
         libsndfile-url: 'http://www.mega-nerd.com/libsndfile/files/libsndfile-1.0.28-w64.zip'
