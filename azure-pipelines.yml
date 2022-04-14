@@ -46,19 +46,19 @@ jobs:
         libsndfile-url: 'http://www.mega-nerd.com/libsndfile/files/libsndfile-1.0.28-w32.zip'
         platform: 'Win32'
         toolset: 'v142'
-        artifactName: 'libinstpatch-x86'
+        artifactName: 'libinstpatch-$(platform)'
       x64:
         gtk-bundle: 'http://ftp.gnome.org/pub/gnome/binaries/win64/gtk+/2.22/gtk+-bundle_2.22.1-20101229_win64.zip'
         libsndfile-url: 'http://www.mega-nerd.com/libsndfile/files/libsndfile-1.0.28-w64.zip'
         platform: 'x64'
         toolset: 'v142'
-        artifactName: 'libinstpatch-x64'
+        artifactName: 'libinstpatch-$(platform)'
       XP_x86:
         gtk-bundle: 'http://ftp.gnome.org/pub/gnome/binaries/win32/gtk+/2.24/gtk+-bundle_2.24.10-20120208_win32.zip'
         libsndfile-url: 'http://www.mega-nerd.com/libsndfile/files/libsndfile-1.0.28-w32.zip'
         platform: 'Win32'
         toolset: 'v141_xp'
-        artifactName: 'libinstpatch-XP-x86'
+        artifactName: 'libinstpatch-XP-$(platform)'
         CFLAGS: '/arch:IA32'
         CXXFLAGS: '/arch:IA32'
       XP_x64:
@@ -66,7 +66,7 @@ jobs:
         libsndfile-url: 'http://www.mega-nerd.com/libsndfile/files/libsndfile-1.0.28-w64.zip'
         platform: 'x64'
         toolset: 'v141_xp'
-        artifactName: 'libinstpatch-XP-x64'
+        artifactName: 'libinstpatch-XP-$(platform)'
   steps:
     - script: |
         @ECHO ON
