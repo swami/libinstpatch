@@ -85,7 +85,7 @@ jobs:
         SET "PATH=d:\deps\bin;%PATH%"
         DEL /F C:\Strawberry\perl\bin\pkg-config.bat
         mkdir build && cd build || exit -1
-        cmake -G "Visual Studio 16 2019" -T $(toolset) -A $(platform) -DLIB_SUFFIX="" -DCMAKE_INSTALL_PREFIX=$(Build.ArtifactStagingDirectory) -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_VERBOSE_MAKEFILE=0 .. || exit -1
+        cmake -G "Visual Studio 16 2019" -T $(toolset) -A $(platform) -DLIB_SUFFIX="" -DCMAKE_INSTALL_PREFIX=$(Build.ArtifactStagingDirectory) -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_VERBOSE_MAKEFILE=1 .. || exit -1
         cmake --build . --config RelWithDebInfo --target install || exit -1
         del $(Build.ArtifactStagingDirectory)\bin\concrt*.dll
         del $(Build.ArtifactStagingDirectory)\bin\vcruntime*.dll
