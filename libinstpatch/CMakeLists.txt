@@ -236,7 +236,7 @@ link_directories (
     ${SNDFILE_LIBRARY_DIRS}
 )
 
-add_definitions ( -DLOCALEDIR="${CMAKE_INSTALL_DATADIR}/locale" )
+add_definitions ( -DLOCALEDIR="${CMAKE_INSTALL_LOCALEDIR}" )
 
 
 set (DEFINITION_FILE "")
