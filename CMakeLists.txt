@@ -49,9 +49,9 @@ if ( CMAKE_SIZEOF_VOID_P EQUAL 8 )
 else ( CMAKE_SIZEOF_VOID_P EQUAL 8 )
   set ( _init_lib_suffix "" )
 endif ( CMAKE_SIZEOF_VOID_P EQUAL 8 )
-set ( LIB_SUFFIX ${_init_lib_suffix} CACHE STRING 
-      "library directory name suffix (32/64/nothing)" )
-mark_as_advanced ( LIB_SUFFIX )
+
+# Sane defaults for CMAKE_INSTALL_*
+include ( GNUInstallDirs )
 
 # Default install directory names
 include ( DefaultDirs )
@@ -177,18 +177,6 @@ set (INSTPATCH_INSTALL_TARGET "libinstpatch-${LIB_VERSION_CURRENT}")
 
 # pkg-config support
 if ( UNIX OR MINGW OR WIN32)
-    set ( prefix "${CMAKE_INSTALL_PREFIX}" )
-    set ( exec_prefix "\${prefix}" )
-    if ( IS_ABSOLUTE "${LIB_INSTALL_DIR}" )
-      set ( libdir "${LIB_INSTALL_DIR}" )
-    else ()
-      set ( libdir "\${exec_prefix}/${LIB_INSTALL_DIR}" )
-    endif ()
-    if ( IS_ABSOLUTE "${INCLUDE_INSTALL_DIR}" )
-      set ( includedir "${INCLUDE_INSTALL_DIR}/${INSTPATCH_INSTALL_TARGET}" )
-    else ()
-      set ( includedir "\${prefix}/${INCLUDE_INSTALL_DIR}/${INSTPATCH_INSTALL_TARGET}" )
-    endif ()
     # stamp library name with version current value (for Windows only)
     if(MINGW OR WIN32)
         set ( lib_version_suffix ${LIB_VERSION_CURRENT} )
@@ -198,7 +186,7 @@ if ( UNIX OR MINGW OR WIN32)
     configure_file ( libinstpatch-1.0.pc.in
         ${CMAKE_BINARY_DIR}/libinstpatch-1.0.pc IMMEDIATE @ONLY )
     install ( FILES ${CMAKE_BINARY_DIR}/libinstpatch-1.0.pc
-              DESTINATION ${LIB_INSTALL_DIR}/pkgconfig )
+              DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig )
 endif ( UNIX OR MINGW OR WIN32)
 
 # Extra targets for Unix build environments
