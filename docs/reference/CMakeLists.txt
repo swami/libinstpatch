@@ -36,7 +36,7 @@ if (GTKDOC_FOUND)
     IGNOREHEADERS ${ignore_headers}
     SCANOPTS ${CMAKE_CURRENT_BINARY_DIR}/../../libinstpatch/version.h
     SCANOBJOPTS --type-init-func=ipatch_init\(\)
-    CFLAGS -I${CMAKE_SOURCE_DIR}
+    CFLAGS -I${CMAKE_SOURCE_DIR} -include libinstpatch/misc.h
     LDFLAGS -L${CMAKE_CURRENT_BINARY_DIR}/../../libinstpatch -linstpatch-1.0
     LDPATH ${CMAKE_CURRENT_BINARY_DIR}/../../libinstpatch
     DEPENDS instpatch-1.0
