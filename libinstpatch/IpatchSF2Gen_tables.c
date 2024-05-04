@@ -200,7 +200,7 @@ const IpatchSF2GenInfo ipatch_sf2_gen_info[] =
     /* Velocity */
     { {-1}, {127}, {-1}, IPATCH_UNIT_TYPE_INT, N_("Fixed Velocity"), NULL},
     /* InitAttenuation */
-    {   {0}, {1440}, {0}, IPATCH_UNIT_TYPE_CENTIBELS, N_("Attenuation"),
+    {   {0}, {3600}, {0}, IPATCH_UNIT_TYPE_SF2_ATTENUATION, N_("Attenuation"),
         N_("Volume attenuation")
     },
     /* Reserved2 */

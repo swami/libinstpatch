@@ -74,6 +74,12 @@ ipatch_unit_tenth_percent_to_percent_value(const GValue *src_val,
 static void
 ipatch_unit_percent_to_tenth_percent_value(const GValue *src_val,
         GValue *dest_val);
+static void
+ipatch_unit_sf2_attenuation_to_decibels_value(const GValue *src_val,
+                                              GValue *dest_val);
+static void
+ipatch_unit_decibels_to_sf2_attenuation_value(const GValue *src_val,
+                                              GValue *dest_val);
 
 
 /**
@@ -120,6 +126,12 @@ _ipatch_unit_sf2_init(void)
     info->id = IPATCH_UNIT_TYPE_TENTH_PERCENT;
     info->name = "TenthPercent";
     ipatch_unit_register(info);
+
+    info->id = IPATCH_UNIT_TYPE_SF2_ATTENUATION;
+    info->flags = IPATCH_UNIT_LOGARITHMIC;
+    info->name = "SF2Attenuation";
+    ipatch_unit_register(info);
+    info->flags = 0;
 
     ipatch_unit_info_free(info);	/* done with info structure, free it */
 
@@ -195,6 +207,14 @@ _ipatch_unit_sf2_init(void)
     (IPATCH_UNIT_TYPE_PERCENT, IPATCH_UNIT_TYPE_TENTH_PERCENT,
      ipatch_unit_percent_to_tenth_percent_value);
 
+    /* SF2 attenuation <==> Decibels  */
+    ipatch_unit_conversion_register
+    (IPATCH_UNIT_TYPE_SF2_ATTENUATION, IPATCH_UNIT_TYPE_DECIBELS,
+     ipatch_unit_sf2_attenuation_to_decibels_value);
+    ipatch_unit_conversion_register
+    (IPATCH_UNIT_TYPE_DECIBELS, IPATCH_UNIT_TYPE_SF2_ATTENUATION,
+     ipatch_unit_decibels_to_sf2_attenuation_value);
+
     /* Register converter for IPATCH_UNIT_TYPE_SEMITONES and
        IPATCH_UNIT_TYPE_CENTS. These mapping must be registered
        in the unit domain IPATCH_UNIT_CLASS_USER.
@@ -245,6 +265,10 @@ _ipatch_unit_sf2_init(void)
     ipatch_unit_class_register_map(IPATCH_UNIT_CLASS_USER,
                                    IPATCH_UNIT_TYPE_TENTH_PERCENT,
                                    IPATCH_UNIT_TYPE_PERCENT);
+
+    ipatch_unit_class_register_map(IPATCH_UNIT_CLASS_USER,
+                                   IPATCH_UNIT_TYPE_SF2_ATTENUATION,
+                                   IPATCH_UNIT_TYPE_DECIBELS);
 }
 
 /**
@@ -653,4 +677,20 @@ ipatch_unit_percent_to_tenth_percent_value(const GValue *src_val,
 {
     double percent = g_value_get_double(src_val);
     g_value_set_int(dest_val, (gint)(percent * 10.0 + 0.5));
+}
+
+static void
+ipatch_unit_sf2_attenuation_to_decibels_value(const GValue *src_val,
+                                              GValue *dest_val)
+{
+    int attenuation = g_value_get_int(src_val);
+    g_value_set_double(dest_val, (double)attenuation / 25.0);
+}
+
+static void
+ipatch_unit_decibels_to_sf2_attenuation_value(const GValue *src_val,
+                                              GValue *dest_val)
+{
+    double db = g_value_get_double(src_val);
+    g_value_set_int(dest_val, (gint)(db * 25.0 + 0.5));
 }
