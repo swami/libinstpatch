@@ -22,7 +22,7 @@ jobs:
 
 - job: macOS
   pool:
-    vmImage: 'macos-11'
+    vmImage: 'macos-14'
   steps:
     - script: |
         brew update || brew update
