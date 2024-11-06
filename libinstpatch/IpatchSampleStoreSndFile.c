@@ -27,6 +27,7 @@
 #include <string.h>
 #include <glib.h>
 #include <glib-object.h>
+#include <sndfile.h>
 
 #include "IpatchSampleStoreSndFile.h"
 #include "IpatchSampleStore.h"
