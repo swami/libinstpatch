@@ -24,8 +24,6 @@
 #include <glib-object.h>
 #include <libinstpatch/IpatchFile.h>
 
-#include <sndfile.h>
-
 typedef struct _IpatchSndFile IpatchSndFile;
 typedef struct _IpatchSndFileClass IpatchSndFileClass;
 
