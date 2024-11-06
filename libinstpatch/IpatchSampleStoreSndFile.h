@@ -24,8 +24,6 @@
 #include <glib-object.h>
 #include <libinstpatch/IpatchSampleStore.h>
 
-#include <sndfile.h>
-
 /* forward type declarations */
 
 typedef struct _IpatchSampleStoreSndFile IpatchSampleStoreSndFile;
