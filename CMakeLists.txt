@@ -152,6 +152,9 @@ include ( UnsetPkgConfig )
 
 # Check for libsndfile
 find_package ( SndFile 1.2.1 )
+if ( SNDFILE_FOUND )
+  pkg_check_modules ( SNDFILE REQUIRED sndfile>=1.2.1 )
+endif()
 
 # Check for GObjectIntrospection binding
 if (INTROSPECTION_ENABLED)
