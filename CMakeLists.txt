@@ -151,7 +151,7 @@ add_definitions ( -DGLIB_DISABLE_DEPRECATION_WARNINGS )
 include ( UnsetPkgConfig )
 
 # Check for libsndfile
-pkg_check_modules ( SNDFILE REQUIRED sndfile>=1.0.0 )
+find_package ( SndFile 1.2.1 )
 
 # Check for GObjectIntrospection binding
 if (INTROSPECTION_ENABLED)
