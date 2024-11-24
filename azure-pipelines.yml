@@ -43,19 +43,19 @@ jobs:
     matrix:
       x86:
         gtk-bundle: 'http://ftp.gnome.org/pub/gnome/binaries/win32/gtk+/2.24/gtk+-bundle_2.24.10-20120208_win32.zip'
-        libsndfile-url: 'http://www.mega-nerd.com/libsndfile/files/libsndfile-1.0.28-w32.zip'
+        libsndfile-url: 'https://github.com/libsndfile/libsndfile/releases/download/1.2.2/libsndfile-1.2.2-win32.zip'
         platform: 'Win32'
         toolset: 'v142'
         artifactName: 'libinstpatch-$(platform)'
       x64:
         gtk-bundle: 'http://ftp.gnome.org/pub/gnome/binaries/win64/gtk+/2.22/gtk+-bundle_2.22.1-20101229_win64.zip'
-        libsndfile-url: 'http://www.mega-nerd.com/libsndfile/files/libsndfile-1.0.28-w64.zip'
+        libsndfile-url: 'https://github.com/libsndfile/libsndfile/releases/download/1.2.2/libsndfile-1.2.2-win64.zip'
         platform: 'x64'
         toolset: 'v142'
         artifactName: 'libinstpatch-$(platform)'
       XP_x86:
         gtk-bundle: 'http://ftp.gnome.org/pub/gnome/binaries/win32/gtk+/2.24/gtk+-bundle_2.24.10-20120208_win32.zip'
-        libsndfile-url: 'http://www.mega-nerd.com/libsndfile/files/libsndfile-1.0.28-w32.zip'
+        libsndfile-url: 'https://github.com/libsndfile/libsndfile/releases/download/1.2.2/libsndfile-1.2.2-win32.zip'
         platform: 'Win32'
         toolset: 'v141_xp'
         artifactName: 'libinstpatch-XP-$(platform)'
@@ -63,7 +63,7 @@ jobs:
         CXXFLAGS: '/arch:IA32'
       XP_x64:
         gtk-bundle: 'http://ftp.gnome.org/pub/gnome/binaries/win64/gtk+/2.22/gtk+-bundle_2.22.1-20101229_win64.zip'
-        libsndfile-url: 'http://www.mega-nerd.com/libsndfile/files/libsndfile-1.0.28-w64.zip'
+        libsndfile-url: 'https://github.com/libsndfile/libsndfile/releases/download/1.2.2/libsndfile-1.2.2-win64.zip'
         platform: 'x64'
         toolset: 'v141_xp'
         artifactName: 'libinstpatch-XP-$(platform)'
@@ -76,9 +76,11 @@ jobs:
         curl -LfsS -o libsndfile-dev.zip $(libsndfile-url) || exit -1
         7z x -aos -- gtk-bundle-dev.zip > NUL || exit -1
         7z x -aos -- libsndfile-dev.zip > NUL || exit -1
-        REM need to fix the naming of libsndfile otherwise the linker won't find it
-        mv lib\libsndfile-1.lib lib\sndfile.lib || exit -1
-        mv lib\libsndfile-1.def lib\sndfile.def || exit -1
+        rm *.zip
+        cd libsndfile-*
+        cp -rf * ..
+        cd ..
+        rm -rf libsndfile-*
       displayName: 'Prerequisites'
     - script: |
         @ECHO ON
