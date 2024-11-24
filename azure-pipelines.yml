@@ -6,7 +6,7 @@
 jobs:
 - job: Linux
   pool:
-    vmImage: 'ubuntu-latest'
+    vmImage: 'ubuntu-24.04'
   steps:
     - script: |
         sudo apt-get update
@@ -22,7 +22,7 @@ jobs:
 
 - job: macOS
   pool:
-    vmImage: 'macos-14'
+    vmImage: 'macos-15'
   steps:
     - script: |
         brew update || brew update
@@ -96,7 +96,7 @@ jobs:
     - bash: |
         set -ex
         art_dir=$(echo "$(Build.ArtifactStagingDirectory)" | sed 's/\\/\//g' | sed 's|\([a-zA-Z]\):|/\1|')
-        cp d:/deps/bin/libglib*.dll d:/deps/bin/libgobject*.dll d:/deps/bin/libgthread*.dll d:/deps/bin/*intl*.dll d:/deps/bin/libsndfile*.dll $art_dir/bin
+        cp d:/deps/bin/libglib*.dll d:/deps/bin/libgobject*.dll d:/deps/bin/libgthread*.dll d:/deps/bin/*intl*.dll d:/deps/bin/sndfile*.dll $art_dir/bin
       displayName: 'Copy Artifacts'
     - task: PublishBuildArtifacts@1
       inputs:
