@@ -301,7 +301,7 @@ ipatch_gig_region_get_property(GObject *object, guint property_id,
 {
     IpatchGigRegion *region = IPATCH_GIG_REGION(object);
     IpatchRange range;
-    gboolean bool, retval;
+    gboolean flag, retval;
 
     switch(property_id)
     {
@@ -344,21 +344,21 @@ ipatch_gig_region_get_property(GObject *object, guint property_id,
         break;
 
     case PROP_SELF_NON_EXCLUSIVE:
-        bool = (ipatch_item_get_flags(IPATCH_ITEM(object))
+        flag = (ipatch_item_get_flags(IPATCH_ITEM(object))
                 & IPATCH_GIG_REGION_SELF_NON_EXCLUSIVE) > 0;
-        g_value_set_boolean(value, bool);
+        g_value_set_boolean(value, flag);
         break;
 
     case PROP_PHASE_MASTER:
-        bool = (ipatch_item_get_flags(IPATCH_ITEM(object))
+        flag = (ipatch_item_get_flags(IPATCH_ITEM(object))
                 & IPATCH_GIG_REGION_PHASE_MASTER) > 0;
-        g_value_set_boolean(value, bool);
+        g_value_set_boolean(value, flag);
         break;
 
     case PROP_MULTI_CHANNEL:
-        bool = (ipatch_item_get_flags(IPATCH_ITEM(object))
+        flag = (ipatch_item_get_flags(IPATCH_ITEM(object))
                 & IPATCH_GIG_REGION_MULTI_CHANNEL) > 0;
-        g_value_set_boolean(value, bool);
+        g_value_set_boolean(value, flag);
         break;
 
     default:
