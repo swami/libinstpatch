@@ -436,7 +436,7 @@ ipatch_dls2_region_get_property(GObject *object, guint property_id,
     IpatchDLS2Region *region = IPATCH_DLS2_REGION(object);
     IpatchDLS2Sample *sample = NULL;
     IpatchRange range;
-    gboolean bool, retval = 0;
+    gboolean flag, retval = 0;
     gboolean get_from_sample = FALSE;
 
     switch(property_id)
@@ -489,21 +489,21 @@ ipatch_dls2_region_get_property(GObject *object, guint property_id,
         break;
 
     case PROP_SELF_NON_EXCLUSIVE:
-        bool = (ipatch_item_get_flags(IPATCH_ITEM(object))
+        flag = (ipatch_item_get_flags(IPATCH_ITEM(object))
                 & IPATCH_DLS2_REGION_SELF_NON_EXCLUSIVE) > 0;
-        g_value_set_boolean(value, bool);
+        g_value_set_boolean(value, flag);
         break;
 
     case PROP_PHASE_MASTER:
-        bool = (ipatch_item_get_flags(IPATCH_ITEM(object))
+        flag = (ipatch_item_get_flags(IPATCH_ITEM(object))
                 & IPATCH_DLS2_REGION_PHASE_MASTER) > 0;
-        g_value_set_boolean(value, bool);
+        g_value_set_boolean(value, flag);
         break;
 
     case PROP_MULTI_CHANNEL:
-        bool = (ipatch_item_get_flags(IPATCH_ITEM(object))
+        flag = (ipatch_item_get_flags(IPATCH_ITEM(object))
                 & IPATCH_DLS2_REGION_MULTI_CHANNEL) > 0;
-        g_value_set_boolean(value, bool);
+        g_value_set_boolean(value, flag);
         break;
 
     case PROP_SAMPLE_SIZE:
