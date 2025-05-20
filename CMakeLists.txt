@@ -17,7 +17,7 @@ set ( PACKAGE "libinstpatch" )
 # libInstPatch package version
 set ( IPATCH_VERSION_MAJOR 1 )
 set ( IPATCH_VERSION_MINOR 1 )
-set ( IPATCH_VERSION_MICRO 6 )
+set ( IPATCH_VERSION_MICRO 7 )
 set ( VERSION "${IPATCH_VERSION_MAJOR}.${IPATCH_VERSION_MINOR}.${IPATCH_VERSION_MICRO}" )
 set ( IPATCH_VERSION "\"${VERSION}\"" )
 
@@ -32,7 +32,7 @@ set ( IPATCH_VERSION "\"${VERSION}\"" )
 # This is not exactly the same algorithm as the libtool one, but the results are the same.
 set ( LIB_VERSION_CURRENT 2 )
 set ( LIB_VERSION_AGE 2 )
-set ( LIB_VERSION_REVISION 0 )
+set ( LIB_VERSION_REVISION 1 )
 set ( LIB_VERSION_INFO 
       "${LIB_VERSION_CURRENT}.${LIB_VERSION_AGE}.${LIB_VERSION_REVISION}" )
 
