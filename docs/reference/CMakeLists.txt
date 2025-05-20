@@ -39,7 +39,7 @@ if (GTKDOC_FOUND)
     CFLAGS -I${CMAKE_SOURCE_DIR} -include libinstpatch/misc.h
     LDFLAGS -L${CMAKE_CURRENT_BINARY_DIR}/../../libinstpatch -linstpatch-1.0
     LDPATH ${CMAKE_CURRENT_BINARY_DIR}/../../libinstpatch
-    DEPENDS instpatch-1.0
+    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/../../libinstpatch/libinstpatch-1.0.so
   )
 
   add_custom_target(documentation ALL DEPENDS doc-libinstpatch)
