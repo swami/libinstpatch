@@ -36,6 +36,7 @@
 #include "compat.h"
 #include "ipatch_priv.h"
 #include "i18n.h"
+#include "util.h"
 
 /* NOTICE: A duplicate SLI object is used for saving. This
  * solves all multi-thread issues and allows one to continue editing
@@ -530,7 +531,7 @@ ipatch_sli_writer_write_group(IpatchSLIWriter *writer, GPtrArray *ig, GError **e
         ipatch_list_init_iter(inst_zones, &iz_iter);
         cnt = ipatch_iter_count(&iz_iter);
         /* write instrument header */
-        strncpy(ihdr.name, inst->name, IPATCH_SLI_NAME_SIZE);
+        ipatch_util_strncpy_pad(ihdr.name, inst->name, IPATCH_SLI_NAME_SIZE);
         ihdr.sound_id = (inst->sound_id ? inst->sound_id : g_str_hash(inst->name));
         ihdr.unused1 = 0;
         ihdr.category = inst->category;
@@ -928,7 +929,7 @@ ipatch_sli_writer_write_sample_header(IpatchFileHandle *handle,
 {
     char sname[IPATCH_SLI_NAME_SIZE];
 
-    strncpy(sname, sample->name, IPATCH_SLI_NAME_SIZE);
+    ipatch_util_strncpy_pad(sname, sample->name, IPATCH_SLI_NAME_SIZE);
     ipatch_file_buf_write(handle, sname, IPATCH_SLI_NAME_SIZE);
     ipatch_file_buf_write_u32(handle, sample_info->offset);
     ipatch_file_buf_write_u32(handle, sample_info->offset + sample_info->length);

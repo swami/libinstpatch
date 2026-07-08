@@ -38,6 +38,7 @@
 #include "IpatchGigInst.h"
 #include "IpatchGigSample.h"
 #include "IpatchItem.h"
+#include "util.h"
 #include "IpatchSampleData.h"
 #include "IpatchSampleStoreFile.h"
 #include "IpatchSample.h"
@@ -2204,7 +2205,7 @@ gig_write_group_names(IpatchDLSWriter *writer, GError **err)
         }
 
         /* write the sample group name */
-        strncpy(name, (char *)(p->data), IPATCH_GIG_3GNM_SIZE);
+        ipatch_util_strncpy_pad(name, (char *)(p->data), IPATCH_GIG_3GNM_SIZE);
 
         if(!ipatch_file_write(riff->handle, name, IPATCH_GIG_3GNM_SIZE, err))
         {

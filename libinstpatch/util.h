@@ -65,4 +65,26 @@ guint64 ipatch_util_file_size(const char *fname, GError **err);
 char *ipatch_util_abs_filename(const char *filename);
 void ipatch_util_weakref_destroy(gpointer value);
 
+/**
+ * ipatch_util_strncpy_pad:
+ * @dest: Destination buffer of exactly @n bytes
+ * @src: Source string to copy (may be %NULL, treated as empty)
+ * @n: Size of @dest in bytes
+ *
+ * Copy up to @n bytes of @src into @dest: like strncpy(dest, src, n),
+ * truncating without a trailing NUL if @src is @n bytes or longer, and
+ * zero-padding the remainder of @dest if @src is shorter than @n bytes.
+ * Used when writing fixed-width name fields into binary file formats
+ * (SoundFont, DLS, GigaSampler, Spectralis) where truncation without a
+ * trailing NUL is valid/expected once the field is exactly full.
+ *
+ * Implemented without calling strncpy() directly so this deliberate
+ * truncate-and-pad usage doesn't trip GCC's -Wstringop-truncation, which
+ * otherwise (correctly, in general, but not for this specific idiom)
+ * flags any strncpy() call where the bound equals the destination size.
+ *
+ * Since: 1.1.1
+ */
+void ipatch_util_strncpy_pad(char *dest, const char *src, gsize n);
+
 #endif
