@@ -594,7 +594,8 @@ ipatch_file_buf_seek(IpatchFileHandle *handle, int offset, GSeekType type)
 
     if(type == G_SEEK_CUR)
     {
-        g_return_if_fail(handle->buf_position + offset >= 0);
+        /* Cast to gssize to allow signed comparison with offset */
+        g_return_if_fail((gssize)handle->buf_position + offset >= 0);
         g_return_if_fail(handle->buf_position + offset < handle->buf->len);
         handle->buf_position += offset;
         handle->position += offset;
@@ -607,7 +608,8 @@ ipatch_file_buf_seek(IpatchFileHandle *handle, int offset, GSeekType type)
     }
     else if(type == G_SEEK_END)
     {
-        g_return_if_fail(handle->buf->len + offset >= 0);
+        /* Cast to gssize to allow signed comparison with offset */
+        g_return_if_fail((gssize)handle->buf->len + offset >= 0);
         g_return_if_fail(handle->buf->len + offset < handle->buf->len);
         handle->position = (handle->buf->len + offset) - handle->buf_position;
         handle->buf_position = handle->buf->len + offset;

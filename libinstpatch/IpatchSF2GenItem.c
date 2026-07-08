@@ -74,13 +74,19 @@ ipatch_sf2_gen_item_get_type(void)
 
     if(!itype)
     {
+
         static const GTypeInfo info =
         {
             sizeof(IpatchSF2GenItemIface),
-            NULL,			/* base_init */
-            NULL,			/* base_finalize */
+            NULL,           /* base_init */
+            NULL,           /* base_finalize */
             (GClassInitFunc) NULL,
-            (GClassFinalizeFunc) NULL
+            (GClassFinalizeFunc) NULL,
+            NULL,           /* class_data */
+            0,              /* instance_size */
+            0,              /* n_preallocs */
+            NULL,           /* instance_init */
+            NULL            /* value_table */
         };
 
         itype = g_type_register_static(G_TYPE_INTERFACE, "IpatchSF2GenItem",
@@ -147,8 +153,9 @@ ipatch_sf2_gen_item_set_amount(IpatchSF2GenItem *item, guint genid,
 {
     IpatchSF2GenItemIface *iface;
     IpatchSF2GenArray *genarray;
-    IpatchSF2GenType propstype;
+    IpatchSF2GenPropsType propstype; /* Changed from IpatchSF2GenType */
     GParamSpec *pspec;
+    
     IpatchSF2GenAmount oldamt;
     GValue oldval = { 0 }, newval = { 0 };
     gboolean valchanged = FALSE, oldset;
@@ -244,8 +251,9 @@ ipatch_sf2_gen_item_set_gen_flag_no_notify(IpatchSF2GenItem *item, guint genid,
 {
     IpatchSF2GenItemIface *iface;
     IpatchSF2GenArray *genarray;
-    IpatchSF2GenType propstype;
+    IpatchSF2GenPropsType propstype; /* Changed from IpatchSF2GenType */
     GParamSpec *pspec;
+    
     IpatchSF2GenAmount oldamt, defamt;
     GValue newval = { 0 }, oldval = { 0 };
     gboolean valchanged = FALSE, oldset;
@@ -628,10 +636,12 @@ ipatch_sf2_gen_item_iface_install_properties(GObjectClass *klass,
 {
     GEnumClass *enum_class;
     GEnumValue *enum_value;
+
     GParamSpec *pspec;
     char *set_name;
     const IpatchSF2GenInfo *gen_info;
-    int nonrt_index = 0;		/* non realtime generator array index */
+    /* non realtime generator array index: */
+    guint nonrt_index = 0;      /* Changed from int to guint */  
     gboolean ispreset;
     int i, diff, unit;
 

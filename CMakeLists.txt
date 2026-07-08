@@ -117,7 +117,7 @@ if ( CMAKE_COMPILER_IS_GNUCC )
     set ( CMAKE_SHARED_LINKER_FLAGS 
           "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--no-undefined" )
   endif ( NOT APPLE )
-  set ( GNUCC_WARNING_FLAGS "-Wall -Wextra -Wfatal-errors")
+  set ( GNUCC_WARNING_FLAGS "-Wall -Wextra -Wfatal-errors -Wno-unused-parameter  ")
   set ( CMAKE_C_FLAGS "-std=gnu17 ${CMAKE_C_FLAGS}" )   # note: -pedantic removed , for cleaner log 
   set ( CMAKE_C_FLAGS_DEBUG " -ggdb  -DDEBUG -fsanitize=undefined ${GNUCC_WARNING_FLAGS} ${CMAKE_C_FLAGS_DEBUG}" )
   set ( CMAKE_C_FLAGS_RELEASE " -O2  -DNDEBUG ${GNUCC_WARNING_FLAGS} ${CMAKE_C_FLAGS_RELEASE}" )

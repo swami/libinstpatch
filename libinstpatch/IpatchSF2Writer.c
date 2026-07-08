@@ -2103,7 +2103,8 @@ sfont_write_shdrs(IpatchSF2Writer *writer, GError **err)
         }
         else
         {
-            snprintf(shdr.name, IPATCH_SFONT_NAME_SIZE, _("untitled-%d"), ++untitled);    /* i18n: Should be less than 16 chars! */
+            /* i18n: Should be less than 16 chars! */
+            snprintf(shdr.name, IPATCH_SFONT_NAME_SIZE, _("untitled-%04d"), (++untitled) % 10000); 
         }
 
         start /= 2;		/* convert start from bytes to samples */

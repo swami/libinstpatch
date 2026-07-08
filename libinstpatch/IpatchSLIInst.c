@@ -455,7 +455,7 @@ ipatch_sli_inst_get_category_as_path(IpatchSLIInst *inst)
         }
 
         for(i = 0; catmap[i].code != '@'; i++)
-            if((cat & 0xff) == catmap[i].code)
+            if((cat & 0xff) == (guint)catmap[i].code)
             {
                 break;    /* from inner loop */
             }

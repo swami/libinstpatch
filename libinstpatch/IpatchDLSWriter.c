@@ -629,7 +629,8 @@ gig_write_file_info(IpatchDLSWriter *writer, GSList *info_list, GError **err)
     IpatchRiff *riff = IPATCH_RIFF(writer);
     IpatchDLS2InfoBag *bag;
     char *buf;
-    int i, size;
+    guint i =0;
+    guint size =0;
     guint32 order[] =
     {
         IPATCH_DLS_FOURCC_IARL, IPATCH_DLS_FOURCC_IART, IPATCH_DLS_FOURCC_ICMS,

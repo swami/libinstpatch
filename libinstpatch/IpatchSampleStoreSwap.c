@@ -473,10 +473,10 @@ ipatch_sample_store_swap_sample_iface_read(IpatchSampleHandle *handle,
         guint offset, guint frames,
         gpointer buf, GError **err)
 {
-    unsigned int retval;
+    gssize retval; /* Changed from unsigned int to gssize */
     IpatchSampleStoreSwap *store = (IpatchSampleStoreSwap *)(handle->sample);
     guint8 frame_size = GPOINTER_TO_UINT(handle->data1);
-
+    
     if(store->ram_location)
     {
         memcpy(buf, ((guint8 *)store->ram_location) + offset * frame_size, frames * frame_size);
@@ -498,26 +498,27 @@ ipatch_sample_store_swap_sample_iface_read(IpatchSampleHandle *handle,
     if(retval == -1)
         g_set_error(err, G_FILE_ERROR, g_file_error_from_errno(errno),
                     _("Error reading from sample store swap file: %s"), g_strerror(errno));
-    else if(retval < frames * frame_size)
+    else if(retval < (gssize)(frames * frame_size)) /* Added cast to avoid sign mismatch */
         g_set_error(err, IPATCH_ERROR, IPATCH_ERROR_IO,
                     _("Short read from sample store swap file, expected %u but got %u"),
-                    frames * frame_size, retval);
+                    frames * frame_size, (guint)retval);
+                    
 
     G_UNLOCK(swap);     // -- unlock swap
 
     return (retval == frames * frame_size);
 }
 
+
 static gboolean
 ipatch_sample_store_swap_sample_iface_write(IpatchSampleHandle *handle,
         guint offset, guint frames,
         gconstpointer buf, GError **err)
 {
-    unsigned int retval;
-
+    gssize retval; /* Changed from unsigned int to gssize */
     IpatchSampleStoreSwap *store = (IpatchSampleStoreSwap *)(handle->sample);
     guint8 frame_size = GPOINTER_TO_UINT(handle->data1);
-
+    
     if(store->ram_location)
     {
         memcpy(((guint8 *)store->ram_location) + offset * frame_size, buf, frames * frame_size);
@@ -539,10 +540,10 @@ ipatch_sample_store_swap_sample_iface_write(IpatchSampleHandle *handle,
     if(retval == -1)
         g_set_error(err, G_FILE_ERROR, g_file_error_from_errno(errno),
                     _("Error writing to sample store swap file: %s"), g_strerror(errno));
-    else if(retval < frames * frame_size)
+    else if(retval < (gssize)(frames * frame_size)) /* Added cast to avoid sign mismatch */
         g_set_error(err, IPATCH_ERROR, IPATCH_ERROR_IO,
                     _("Short write to sample store swap file, expected %u but got %u"),
-                    frames * frame_size, retval);
+                    frames * frame_size, (guint)retval);
 
     G_UNLOCK(swap);     // -- unlock swap
 

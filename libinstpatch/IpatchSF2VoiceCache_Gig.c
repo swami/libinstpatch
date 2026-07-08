@@ -159,7 +159,7 @@ _gig_inst_to_sf2_voice_cache_convert(IpatchConverter *converter, GError **err)
             }
 
             /* advance if selection criteria stored */
-            if(infop->type != -1)
+            if((int)infop->type != -1)
             {
                 /* add to dim_type -> index hash + 1 (sel_count already + 1) */
                 g_hash_table_insert(sel_index_hash, GINT_TO_POINTER(dim_type),

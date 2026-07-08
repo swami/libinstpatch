@@ -765,7 +765,7 @@ check_item_conflicts_GHFunc(gpointer key, gpointer value,
         /* loop over unique property groups */
         for(i = 0, ps = pspecs;   ;   i++, ps++, groups >>= 1)
         {
-            if(!*ps || lastbit != (groups & 1))	/* last val or end of group? */
+            if(!*ps || lastbit != (int)(groups & 1)) /* last val or end of group? */
             {
                 /* initialize the static hash key */
                 skey.valarray = valarray;

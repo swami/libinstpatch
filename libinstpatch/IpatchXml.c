@@ -360,7 +360,8 @@ ipatch_xml_copy(GNode *node)
 {
     g_return_val_if_fail(node != NULL, NULL);
 
-    return (g_node_copy_deep(node, (GCopyFunc)ipatch_xml_node_duplicate, NULL));
+    /* Cast through void * to silence strict function cast warnings */
+    return (g_node_copy_deep(node, (GCopyFunc)(void *)ipatch_xml_node_duplicate, NULL));
 }
 
 /**
@@ -751,6 +752,7 @@ ipatch_xml_find_by_path(GNode *node, const char *path)
     return (ipatch_xml_find_by_path_recurse(node, path));
 }
 
+
 static GNode *
 ipatch_xml_find_by_path_recurse(GNode *node, const char *path)
 {
@@ -760,8 +762,9 @@ ipatch_xml_find_by_path_recurse(GNode *node, const char *path)
     GNode *n;
 
     dot = strchr(path, '.');
-    len = dot ? dot - path : strlen(path);
-
+    /* Cast operands to int to match the type of 'len' */
+    len = dot ? (int)(dot - path) : (int)strlen(path);
+    
     for(n = node->children; n; n = n->next)
     {
         xmlnode = (IpatchXmlNode *)(n->data);
@@ -923,7 +926,9 @@ ipatch_xml_from_str(const char *str, GError **err)
     {
         xml_start_element,
         xml_end_element,
-        xml_text
+        xml_text,
+        NULL,           /* passthrough */
+        NULL            /* error */
     };
 
     GNode *root = NULL;

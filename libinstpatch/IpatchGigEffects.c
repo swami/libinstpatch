@@ -398,6 +398,6 @@ ipatch_gig_to_sf2_timecents(gint32 gig_tc)
 guint16
 ipatch_gig_volsust_to_sf2_centibels(guint gig_tperc)
 {
-    gig_tperc = CLAMP(gig_tperc, 0, 1000);
+    gig_tperc = MIN(gig_tperc, 1000);
     return (1000 - gig_tperc);	/* FIXME - probably wrong! */
 }

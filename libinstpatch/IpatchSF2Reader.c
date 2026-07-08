@@ -219,7 +219,8 @@ ipatch_sf2_reader_load(IpatchSF2Reader *reader, GError **err)
         g_warning("SoundFont file size check failed: %s", ipatch_gerror_message(local_err));
         g_clear_error(&local_err);
     }
-    else if(size != chunk->size + IPATCH_RIFF_HEADER_SIZE)
+    /* Cast size to guint32 */
+    else if((guint32)size != chunk->size + IPATCH_RIFF_HEADER_SIZE)
     {
         g_set_error(err, IPATCH_RIFF_ERROR,
                     IPATCH_RIFF_ERROR_SIZE_MISMATCH,

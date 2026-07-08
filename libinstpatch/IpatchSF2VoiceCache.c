@@ -46,8 +46,8 @@ static IpatchSF2Voice def_voice;	/* default voice structure */
 /* default selection info */
 static IpatchSF2VoiceSelInfo default_sel_info[] =
 {
-    { IPATCH_SF2_VOICE_SEL_NOTE },
-    { IPATCH_SF2_VOICE_SEL_VELOCITY }
+    { IPATCH_SF2_VOICE_SEL_NOTE, 0, 0},
+    { IPATCH_SF2_VOICE_SEL_VELOCITY, 0, 0 }
 };
 
 G_DEFINE_TYPE(IpatchSF2VoiceCache, ipatch_sf2_voice_cache, G_TYPE_OBJECT)
@@ -597,7 +597,8 @@ ipatch_sf2_voice_cache_dump(IpatchSF2VoiceCache *cache, int start, int count)
     IpatchSF2Voice *voice;
     char *selnames[] = { "Note", "Vel", "AftTch", "CC" };
     int *range;
-    int i, si;
+    gint i =0;
+    gint si =0;
 
     g_return_if_fail(IPATCH_IS_SF2_VOICE_CACHE(cache));
 
