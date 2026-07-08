@@ -372,8 +372,9 @@ ipatch_item_init(GTypeInstance *instance, gpointer g_class)
 
     /* always assign a mutex, will be freed and set to parent's mutex if the
        class has mutex_slave set (during ipatch_item_set_parent) */
-    item->mutex = g_malloc(sizeof(GStaticRecMutex));
-    g_static_rec_mutex_init(item->mutex);
+    item->mutex = g_new(IpatchItemRecMutex, 1);
+    g_rec_mutex_init(&item->mutex->mutex);
+    item->mutex->depth = 0;
 
     ipatch_item_set_flags(item, IPATCH_ITEM_FREE_MUTEX);
 }
@@ -385,7 +386,7 @@ ipatch_item_finalize(GObject *object)
 
     if(ipatch_item_get_flags(item) & IPATCH_ITEM_FREE_MUTEX)
     {
-        g_static_rec_mutex_free(item->mutex);
+        g_rec_mutex_clear(&item->mutex->mutex);
         g_free(item->mutex);
     }
 
@@ -530,23 +531,33 @@ ipatch_item_set_parent(IpatchItem *item, IpatchItem *parent)
 
     if(klass->mutex_slave)
     {
-        depth = g_static_rec_mutex_unlock_full(item->mutex);
+        /* GRecMutex (unlike the deprecated GStaticRecMutex) has no public
+         * API to query or restore recursion depth in one call, so we use
+         * our own tracked depth and unlock/relock that many times to
+         * transfer the calling thread's recursion depth onto the new
+         * (parent's) mutex. */
+        depth = item->mutex->depth;
+
+        for(i = 0; i < depth; i++)
+        {
+            ipatch_item_rec_mutex_unlock(item->mutex);
+        }
 
         if(ipatch_item_get_flags(item) & IPATCH_ITEM_FREE_MUTEX)
         {
-            g_static_rec_mutex_free(item->mutex);
+            g_rec_mutex_clear(&item->mutex->mutex);
             g_free(item->mutex);
         }
 
         item->mutex = parent->mutex;
         ipatch_item_clear_flags(item, IPATCH_ITEM_FREE_MUTEX);
 
-        /* lock it the number of times old mutex was locked, we don't use
-        g_static_rec_mutex_lock_full because it could set depth rather than
-         add to it */
+        /* lock it the number of times old mutex was locked, one at a time
+        (rather than in a single call) since GRecMutex has no equivalent
+         of g_static_rec_mutex_lock_full() to set the depth directly */
         for(i = 0; i < depth; i++)
         {
-            g_static_rec_mutex_lock(item->mutex);
+            ipatch_item_rec_mutex_lock(item->mutex);
         }
     }
 
@@ -1495,25 +1506,29 @@ ipatch_item_type_get_unique_specs(GType item_type, guint32 *groups)
 }
 
 /**
- * ipatch_item_get_unique_props:
+ * ipatch_item_get_unique_props_array:
  * @item: Item to get unique properties of
  *
  * Get the values of the unique properties for @item.  This is useful when
  * doing conflict detection processing and more flexibility is desired than
  * with ipatch_item_test_conflict().
  *
- * Returns: GValueArray of the unique property values of @item in the same
- * order as the parameter specs returned by ipatch_item_type_get_unique_specs().
+ * Returns: (element-type GValue) (transfer full): #GArray of #GValue holding
+ * the unique property values of @item in the same order as the parameter
+ * specs returned by ipatch_item_type_get_unique_specs().
  * %NULL is returned if @item doesn't have any unique properties.
- * Use g_value_array_free() to free the array when finished using it.
+ * Free the array with g_array_unref() when finished using it (each
+ * contained GValue is automatically unset, since a clear function is set
+ * on the returned array).
+ *
+ * Since: 1.1.1
  */
-GValueArray *
-ipatch_item_get_unique_props(IpatchItem *item)
+GArray *
+ipatch_item_get_unique_props_array(IpatchItem *item)
 {
     GParamSpec **ps;
     UniqueBag *unique;
-    GValueArray *vals;
-    GValue *value;
+    GArray *vals;
     int count, i;
 
     g_return_val_if_fail(IPATCH_IS_ITEM(item), NULL);
@@ -1529,15 +1544,67 @@ ipatch_item_get_unique_props(IpatchItem *item)
     /* count param specs */
     for(count = 0, ps = unique->pspecs; *ps; count++, ps++);
 
-    vals = g_value_array_new(count);
+    /* clear_ = TRUE zero-inits new elements, giving us 'count' unset
+     * GValues to fill in below (mirrors the old code appending NULL to
+     * a GValueArray, which likewise appends an unset value) */
+    vals = g_array_sized_new(FALSE, TRUE, sizeof(GValue), count);
+    g_array_set_clear_func(vals, (GDestroyNotify)g_value_unset);
+    g_array_set_size(vals, count);
 
     for(i = 0, ps = unique->pspecs; i < count; i++, ps++)
     {
-        /* NULL will append an unset value, saves a value copy operation */
-        g_value_array_append(vals, NULL);
-        value = g_value_array_get_nth(vals, i);
-        ipatch_item_get_property_fast(item, *ps, value);
+        ipatch_item_get_property_fast(item, *ps, &g_array_index(vals, GValue, i));
     }
+
+    return (vals);
+}
+
+/**
+ * ipatch_item_get_unique_props:
+ * @item: Item to get unique properties of
+ *
+ * Get the values of the unique properties for @item.  This is useful when
+ * doing conflict detection processing and more flexibility is desired than
+ * with ipatch_item_test_conflict().
+ *
+ * Returns: GValueArray of the unique property values of @item in the same
+ * order as the parameter specs returned by ipatch_item_type_get_unique_specs().
+ * %NULL is returned if @item doesn't have any unique properties.
+ * Use g_value_array_free() to free the array when finished using it.
+ *
+ * Deprecated: 1.1.1: Use ipatch_item_get_unique_props_array() instead,
+ * since #GValueArray is deprecated in GLib.
+ */
+GValueArray *
+ipatch_item_get_unique_props(IpatchItem *item)
+{
+    GArray *arr;
+    GValueArray *vals;
+    guint i;
+
+    arr = ipatch_item_get_unique_props_array(item);	/* ++ ref new array */
+
+    if(!arr)
+    {
+        return (NULL);
+    }
+
+    /* this shim's whole purpose is to keep producing a GValueArray for
+     * old callers, so it must keep using the deprecated GValueArray API
+     * itself - silence the resulting self-inflicted deprecation warnings */
+    G_GNUC_BEGIN_IGNORE_DEPRECATIONS
+
+    vals = g_value_array_new(arr->len);
+
+    for(i = 0; i < arr->len; i++)
+    {
+        /* copies the value into the GValueArray */
+        g_value_array_append(vals, &g_array_index(arr, GValue, i));
+    }
+
+    G_GNUC_END_IGNORE_DEPRECATIONS
+
+    g_array_unref(arr);		/* -- unref array (unsets each GValue via clear func) */
 
     return (vals);
 }

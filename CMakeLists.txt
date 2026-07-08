@@ -117,11 +117,13 @@ if ( CMAKE_COMPILER_IS_GNUCC )
     set ( CMAKE_SHARED_LINKER_FLAGS 
           "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--no-undefined" )
   endif ( NOT APPLE )
-  set ( GNUCC_WARNING_FLAGS "-Wall -Wextra -Wfatal-errors -Wno-unused-parameter  ")
+  set ( GNUCC_WARNING_FLAGS "-Wall -Wextra -Wfatal-errors  ")
   set ( CMAKE_C_FLAGS "-std=gnu17 ${CMAKE_C_FLAGS}" )   # note: -pedantic removed , for cleaner log 
-  set ( CMAKE_C_FLAGS_DEBUG " -ggdb  -DDEBUG -fsanitize=undefined ${GNUCC_WARNING_FLAGS} ${CMAKE_C_FLAGS_DEBUG}" )
+  set ( CMAKE_C_FLAGS_DEBUG " -ggdb -Wno-unused-parameter  -DDEBUG -fsanitize=address -fno-omit-frame-pointer  ${GNUCC_WARNING_FLAGS} ${CMAKE_C_FLAGS_DEBUG}" )
+  # alternative: 
+  #set ( CMAKE_C_FLAGS_DEBUG " -ggdb -Wno-unused-parameter  -DDEBUG -fsanitize=undefined ${GNUCC_WARNING_FLAGS} ${CMAKE_C_FLAGS_DEBUG}" )
   set ( CMAKE_C_FLAGS_RELEASE " -O2  -DNDEBUG ${GNUCC_WARNING_FLAGS} ${CMAKE_C_FLAGS_RELEASE}" )
-  set ( CMAKE_C_FLAGS_RELWITHDEBINFO "-ggdb -O2  -DNDEBUG ${GNUCC_WARNING_FLAGS} ${CMAKE_C_FLAGS_RELWITHDEBINFO}" )
+  set ( CMAKE_C_FLAGS_RELWITHDEBINFO "-ggdb -Wno-unused-parameter   -O2  -DNDEBUG ${GNUCC_WARNING_FLAGS} ${CMAKE_C_FLAGS_RELWITHDEBINFO}" )
 endif ( CMAKE_COMPILER_IS_GNUCC )
 
 if ( MSVC )

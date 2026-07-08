@@ -65,6 +65,12 @@ _ipatch_util_deinit(void)
     g_free(ipatch_util_value_bool_false);
 }
 
+/* forward decl: actual hash loop shared by ipatch_util_garray_value_hash()
+ * and the deprecated ipatch_util_value_array_hash() further below; used
+ * directly here too so this internal dispatch doesn't trigger our own
+ * deprecated-function warning */
+static guint value_array_hash_raw(GValue *values, guint n_values);
+
 /**
  * ipatch_util_value_hash:
  * @val: GValue to hash
@@ -145,7 +151,7 @@ ipatch_util_value_hash(GValue *val)
         if(valtype == G_TYPE_VALUE_ARRAY)	/* value array? */
         {
             valarray = g_value_get_boxed(val);
-            return (ipatch_util_value_array_hash(valarray));
+            return valarray ? value_array_hash_raw(valarray->values, valarray->n_values) : 0;
         }
         else
         {
@@ -164,6 +170,46 @@ ipatch_util_value_hash(GValue *val)
     }
 }
 
+/* actual hash loop, shared by both the GArray-based and deprecated
+ * GValueArray-based public entry points below */
+static guint
+value_array_hash_raw(GValue *values, guint n_values)
+{
+    guint hashval = 0;
+    guint i;
+
+    for(i = 0; i < n_values; i++)
+    {
+        hashval += ipatch_util_value_hash(&values[i]);
+    }
+
+    return (hashval);
+}
+
+/**
+ * ipatch_util_garray_value_hash:
+ * @valarray: (element-type GValue): GArray of GValue to hash
+ *
+ * Hash a #GArray of #GValue elements (as returned by
+ * ipatch_item_get_unique_props_array()). The hash value can then be used
+ * in a #GHashTable for example.
+ *
+ * Returns: Hash value corresponding to the sum of all values returned
+ * by ipatch_util_value_hash() for each GValue in the array.
+ *
+ * Since: 1.1.1
+ */
+guint
+ipatch_util_garray_value_hash(GArray *valarray)
+{
+    if(!valarray)
+    {
+        return (0);
+    }
+
+    return value_array_hash_raw((GValue *)valarray->data, valarray->len);
+}
+
 /**
  * ipatch_util_value_array_hash:
  * @valarray: GValueArray to hash
@@ -173,26 +219,22 @@ ipatch_util_value_hash(GValue *val)
  *
  * Returns: Hash value corresponding to the sum of all values returned
  * by ipatch_util_value_hash() for each GValue in the array.
+ *
+ * Deprecated: 1.1.1: Use ipatch_util_garray_value_hash() instead, since
+ * #GValueArray is deprecated in GLib.
  */
 guint
 ipatch_util_value_array_hash(GValueArray *valarray)
 {
-    GValue *value;
-    guint hashval = 0;
-    guint i;
-
     if(!valarray)
     {
         return (0);
     }
 
-    for(i = 0; i < valarray->n_values; i++)
-    {
-        value = g_value_array_get_nth(valarray, i);
-        hashval += ipatch_util_value_hash(value);
-    }
-
-    return (hashval);
+    /* n_values/values are the public fields of GValueArray - same
+     * contiguous-GValue layout as a GArray, so we can share the raw loop
+     * above without going through any deprecated GValueArray accessors */
+    return value_array_hash_raw(valarray->values, valarray->n_values);
 }
 
 /**

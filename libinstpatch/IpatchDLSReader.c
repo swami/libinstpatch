@@ -2621,7 +2621,7 @@ ipatch_gig_load_group_names(IpatchRiff *riff, GSList **name_list,
 
             if(size > 0)
             {
-                name = g_memdup(buf, size + 1);
+                name = g_memdup2(buf, size + 1);
                 *name_list = g_slist_append(*name_list, name);
             }
         }

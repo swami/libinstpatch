@@ -302,7 +302,7 @@ ipatch_dls2_inst_item_copy(IpatchItem *dest, IpatchItem *src,
 
     if(src_inst->dlid)
     {
-        dest_inst->dlid = g_memdup(src_inst->dlid, IPATCH_DLS_DLID_SIZE);
+        dest_inst->dlid = g_memdup2(src_inst->dlid, IPATCH_DLS_DLID_SIZE);
     }
 
     p = src_inst->regions;

@@ -86,7 +86,7 @@ ipatch_sf2_voice_cache_class_init(IpatchSF2VoiceCacheClass *klass)
 static void
 ipatch_sf2_voice_cache_init(IpatchSF2VoiceCache *cache)
 {
-    cache->sel_info = g_memdup(default_sel_info, sizeof(default_sel_info));
+    cache->sel_info = g_memdup2(default_sel_info, sizeof(default_sel_info));
     cache->sel_count = 2;		/* default for velocity and note selection */
     cache->voices = g_array_new(FALSE, FALSE, sizeof(IpatchSF2Voice));
     cache->ranges = NULL;		/* initialized later */
@@ -200,7 +200,7 @@ ipatch_sf2_voice_cache_new(IpatchSF2VoiceSelInfo *info, int sel_count)
     if(info)
     {
         g_free(cache->sel_info);
-        cache->sel_info = g_memdup(info, sizeof(IpatchSF2VoiceSelInfo) * sel_count);
+        cache->sel_info = g_memdup2(info, sizeof(IpatchSF2VoiceSelInfo) * sel_count);
         cache->sel_count = sel_count;
     }
 
@@ -629,7 +629,7 @@ ipatch_sf2_voice_cache_dump(IpatchSF2VoiceCache *cache, int start, int count)
         }
     }
 
-    for(i = start; i < start + count && i < cache->voices->len; i++)
+    for(i = start; i < start + count && i < (gint)cache->voices->len; i++)
     {
         voice = &g_array_index(cache->voices, IpatchSF2Voice, i);
 

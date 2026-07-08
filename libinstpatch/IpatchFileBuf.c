@@ -651,15 +651,17 @@ ipatch_file_buf_read_u8(IpatchFileHandle *handle)
 guint16
 ipatch_file_buf_read_u16(IpatchFileHandle *handle)
 {
-    guint16 *val;
+    guint16 val;
 
     g_return_val_if_fail(handle != NULL, 0);
     g_return_val_if_fail(handle->buf_position + 2 <= handle->buf->len, 0);
 
-    val = (guint16 *)(handle->buf->data + handle->buf_position);
+    /* memcpy avoids dereferencing a misaligned pointer into the byte
+     * buffer (buf_position is a byte offset with no alignment guarantee) */
+    memcpy(&val, handle->buf->data + handle->buf_position, 2);
     handle->buf_position += 2;
     handle->position += 2;
-    return (IPATCH_FILE_SWAP16(handle->file, val));
+    return (IPATCH_FILE_SWAP16(handle->file, &val));
 }
 
 /**
@@ -674,15 +676,17 @@ ipatch_file_buf_read_u16(IpatchFileHandle *handle)
 guint32
 ipatch_file_buf_read_u32(IpatchFileHandle *handle)
 {
-    guint32 *val;
+    guint32 val;
 
     g_return_val_if_fail(handle != NULL, 0);
     g_return_val_if_fail(handle->buf_position + 4 <= handle->buf->len, 0);
 
-    val = (guint32 *)(handle->buf->data + handle->buf_position);
+    /* memcpy avoids dereferencing a misaligned pointer into the byte
+     * buffer (buf_position is a byte offset with no alignment guarantee) */
+    memcpy(&val, handle->buf->data + handle->buf_position, 4);
     handle->buf_position += 4;
     handle->position += 4;
-    return (IPATCH_FILE_SWAP32(handle->file, val));
+    return (IPATCH_FILE_SWAP32(handle->file, &val));
 }
 
 /**
@@ -697,15 +701,17 @@ ipatch_file_buf_read_u32(IpatchFileHandle *handle)
 guint64
 ipatch_file_buf_read_u64(IpatchFileHandle *handle)
 {
-    guint64 *val;
+    guint64 val;
 
     g_return_val_if_fail(handle != NULL, 0);
     g_return_val_if_fail(handle->buf_position + 8 <= handle->buf->len, 0);
 
-    val = (guint64 *)(handle->buf->data + handle->buf_position);
+    /* memcpy avoids dereferencing a misaligned pointer into the byte
+     * buffer (buf_position is a byte offset with no alignment guarantee) */
+    memcpy(&val, handle->buf->data + handle->buf_position, 8);
     handle->buf_position += 8;
     handle->position += 8;
-    return (IPATCH_FILE_SWAP64(handle->file, val));
+    return (IPATCH_FILE_SWAP64(handle->file, &val));
 }
 
 /**
@@ -743,15 +749,17 @@ ipatch_file_buf_read_s8(IpatchFileHandle *handle)
 gint16
 ipatch_file_buf_read_s16(IpatchFileHandle *handle)
 {
-    gint16 *val;
+    gint16 val;
 
     g_return_val_if_fail(handle != NULL, 0);
     g_return_val_if_fail(handle->buf_position + 2 <= handle->buf->len, 0);
 
-    val = (gint16 *)(handle->buf->data + handle->buf_position);
+    /* memcpy avoids dereferencing a misaligned pointer into the byte
+     * buffer (buf_position is a byte offset with no alignment guarantee) */
+    memcpy(&val, handle->buf->data + handle->buf_position, 2);
     handle->buf_position += 2;
     handle->position += 2;
-    return (IPATCH_FILE_SWAP16(handle->file, val));
+    return (IPATCH_FILE_SWAP16(handle->file, &val));
 }
 
 /**
@@ -766,15 +774,17 @@ ipatch_file_buf_read_s16(IpatchFileHandle *handle)
 gint32
 ipatch_file_buf_read_s32(IpatchFileHandle *handle)
 {
-    gint32 *val;
+    gint32 val;
 
     g_return_val_if_fail(handle != NULL, 0);
     g_return_val_if_fail(handle->buf_position + 4 <= handle->buf->len, 0);
 
-    val = (gint32 *)(handle->buf->data + handle->buf_position);
+    /* memcpy avoids dereferencing a misaligned pointer into the byte
+     * buffer (buf_position is a byte offset with no alignment guarantee) */
+    memcpy(&val, handle->buf->data + handle->buf_position, 4);
     handle->buf_position += 4;
     handle->position += 4;
-    return (IPATCH_FILE_SWAP32(handle->file, val));
+    return (IPATCH_FILE_SWAP32(handle->file, &val));
 }
 
 /**
@@ -789,15 +799,17 @@ ipatch_file_buf_read_s32(IpatchFileHandle *handle)
 gint64
 ipatch_file_buf_read_s64(IpatchFileHandle *handle)
 {
-    gint64 *val;
+    gint64 val;
 
     g_return_val_if_fail(handle != NULL, 0);
     g_return_val_if_fail(handle->buf_position + 8 <= handle->buf->len, 0);
 
-    val = (gint64 *)(handle->buf->data + handle->buf_position);
+    /* memcpy avoids dereferencing a misaligned pointer into the byte
+     * buffer (buf_position is a byte offset with no alignment guarantee) */
+    memcpy(&val, handle->buf->data + handle->buf_position, 8);
     handle->buf_position += 8;
     handle->position += 8;
-    return (IPATCH_FILE_SWAP64(handle->file, val));
+    return (IPATCH_FILE_SWAP64(handle->file, &val));
 }
 
 /**
@@ -835,6 +847,8 @@ ipatch_file_buf_write_u8(IpatchFileHandle *handle, guint8 val)
 void
 ipatch_file_buf_write_u16(IpatchFileHandle *handle, guint16 val)
 {
+    guint16 swapped;
+
     g_return_if_fail(handle != NULL);
 
     if(handle->buf_position + 2 > handle->buf->len)
@@ -842,8 +856,10 @@ ipatch_file_buf_write_u16(IpatchFileHandle *handle, guint16 val)
         g_byte_array_set_size(handle->buf, handle->buf_position + 2);
     }
 
-    *(guint16 *)(handle->buf->data + handle->buf_position)
-        = IPATCH_FILE_SWAP16(handle->file, &val);
+    swapped = IPATCH_FILE_SWAP16(handle->file, &val);
+    /* memcpy avoids dereferencing a misaligned pointer into the byte
+     * buffer (buf_position is a byte offset with no alignment guarantee) */
+    memcpy(handle->buf->data + handle->buf_position, &swapped, 2);
     handle->buf_position += 2;
     handle->position += 2;
 }
@@ -860,6 +876,8 @@ ipatch_file_buf_write_u16(IpatchFileHandle *handle, guint16 val)
 void
 ipatch_file_buf_write_u32(IpatchFileHandle *handle, guint32 val)
 {
+    guint32 swapped;
+
     g_return_if_fail(handle != NULL);
 
     if(handle->buf_position + 4 > handle->buf->len)
@@ -867,8 +885,10 @@ ipatch_file_buf_write_u32(IpatchFileHandle *handle, guint32 val)
         g_byte_array_set_size(handle->buf, handle->buf_position + 4);
     }
 
-    *(guint32 *)(handle->buf->data + handle->buf_position)
-        = IPATCH_FILE_SWAP32(handle->file, &val);
+    swapped = IPATCH_FILE_SWAP32(handle->file, &val);
+    /* memcpy avoids dereferencing a misaligned pointer into the byte
+     * buffer (buf_position is a byte offset with no alignment guarantee) */
+    memcpy(handle->buf->data + handle->buf_position, &swapped, 4);
     handle->buf_position += 4;
     handle->position += 4;
 }
@@ -885,6 +905,8 @@ ipatch_file_buf_write_u32(IpatchFileHandle *handle, guint32 val)
 void
 ipatch_file_buf_write_u64(IpatchFileHandle *handle, guint64 val)
 {
+    guint64 swapped;
+
     g_return_if_fail(handle != NULL);
 
     if(handle->buf_position + 8 > handle->buf->len)
@@ -892,8 +914,10 @@ ipatch_file_buf_write_u64(IpatchFileHandle *handle, guint64 val)
         g_byte_array_set_size(handle->buf, handle->buf_position + 8);
     }
 
-    *(guint64 *)(handle->buf->data + handle->buf_position)
-        = IPATCH_FILE_SWAP64(handle->file, &val);
+    swapped = IPATCH_FILE_SWAP64(handle->file, &val);
+    /* memcpy avoids dereferencing a misaligned pointer into the byte
+     * buffer (buf_position is a byte offset with no alignment guarantee) */
+    memcpy(handle->buf->data + handle->buf_position, &swapped, 8);
     handle->buf_position += 8;
     handle->position += 8;
 }
@@ -933,6 +957,8 @@ ipatch_file_buf_write_s8(IpatchFileHandle *handle, gint8 val)
 void
 ipatch_file_buf_write_s16(IpatchFileHandle *handle, gint16 val)
 {
+    gint16 swapped;
+
     g_return_if_fail(handle != NULL);
 
     if(handle->buf_position + 2 > handle->buf->len)
@@ -940,8 +966,10 @@ ipatch_file_buf_write_s16(IpatchFileHandle *handle, gint16 val)
         g_byte_array_set_size(handle->buf, handle->buf_position + 2);
     }
 
-    *(gint16 *)(handle->buf->data + handle->buf_position)
-        = IPATCH_FILE_SWAP16(handle->file, &val);
+    swapped = IPATCH_FILE_SWAP16(handle->file, &val);
+    /* memcpy avoids dereferencing a misaligned pointer into the byte
+     * buffer (buf_position is a byte offset with no alignment guarantee) */
+    memcpy(handle->buf->data + handle->buf_position, &swapped, 2);
     handle->buf_position += 2;
     handle->position += 2;
 }
@@ -958,6 +986,8 @@ ipatch_file_buf_write_s16(IpatchFileHandle *handle, gint16 val)
 void
 ipatch_file_buf_write_s32(IpatchFileHandle *handle, gint32 val)
 {
+    gint32 swapped;
+
     g_return_if_fail(handle != NULL);
 
     if(handle->buf_position + 4 > handle->buf->len)
@@ -965,8 +995,10 @@ ipatch_file_buf_write_s32(IpatchFileHandle *handle, gint32 val)
         g_byte_array_set_size(handle->buf, handle->buf_position + 4);
     }
 
-    *(gint32 *)(handle->buf->data + handle->buf_position)
-        = IPATCH_FILE_SWAP32(handle->file, &val);
+    swapped = IPATCH_FILE_SWAP32(handle->file, &val);
+    /* memcpy avoids dereferencing a misaligned pointer into the byte
+     * buffer (buf_position is a byte offset with no alignment guarantee) */
+    memcpy(handle->buf->data + handle->buf_position, &swapped, 4);
     handle->buf_position += 4;
     handle->position += 4;
 }
@@ -983,6 +1015,8 @@ ipatch_file_buf_write_s32(IpatchFileHandle *handle, gint32 val)
 void
 ipatch_file_buf_write_s64(IpatchFileHandle *handle, gint64 val)
 {
+    gint64 swapped;
+
     g_return_if_fail(handle != NULL);
 
     if(handle->buf_position + 8 > handle->buf->len)
@@ -990,8 +1024,10 @@ ipatch_file_buf_write_s64(IpatchFileHandle *handle, gint64 val)
         g_byte_array_set_size(handle->buf, handle->buf_position + 8);
     }
 
-    *(gint64 *)(handle->buf->data + handle->buf_position)
-        = IPATCH_FILE_SWAP64(handle->file, &val);
+    swapped = IPATCH_FILE_SWAP64(handle->file, &val);
+    /* memcpy avoids dereferencing a misaligned pointer into the byte
+     * buffer (buf_position is a byte offset with no alignment guarantee) */
+    memcpy(handle->buf->data + handle->buf_position, &swapped, 8);
     handle->buf_position += 8;
     handle->position += 8;
 }

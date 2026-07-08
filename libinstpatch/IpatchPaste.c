@@ -80,7 +80,7 @@ static IpatchItem *paste_copy_link_func_deep(IpatchItem *item,
         IpatchItem *link,
         gpointer user_data);
 
-static GStaticRecMutex paste_handlers_m = G_STATIC_REC_MUTEX_INIT;
+static GRecMutex paste_handlers_m;  /* zero-initialized static storage is a valid unlocked GRecMutex; g_rec_mutex_init() called explicitly in _ipatch_paste_init() below for clarity/consistency */
 static GSList *paste_handlers = NULL;	/* list of PasteHandler structs */
 static int ipatch_paste_handler_id = 0;         // handler ID counter
 
@@ -88,6 +88,7 @@ static int ipatch_paste_handler_id = 0;         // handler ID counter
 /* Initialize handlers list */
 void _ipatch_paste_init(void)
 {
+    g_rec_mutex_init(&paste_handlers_m);
     paste_handlers = NULL;
     ipatch_paste_handler_id = 0;
 }
@@ -96,6 +97,7 @@ void _ipatch_paste_init(void)
 void _ipatch_paste_deinit(void)
 {
     g_slist_free_full(paste_handlers, (GDestroyNotify)_ipatch_paste_free_handler);
+    g_rec_mutex_clear(&paste_handlers_m);
 }
 
 /* free paste handler data */
@@ -166,12 +168,12 @@ ipatch_register_paste_handler_full(IpatchPasteTestFunc test_func,
     handler->user_data = user_data;
     handler->flags = flags;
 
-    g_static_rec_mutex_lock(&paste_handlers_m);
+    g_rec_mutex_lock(&paste_handlers_m);
     id = ++ipatch_paste_handler_id;
     handler->id = id;
     paste_handlers = g_slist_insert_sorted(paste_handlers, handler,
                                            handler_priority_GCompareFunc);
-    g_static_rec_mutex_unlock(&paste_handlers_m);
+    g_rec_mutex_unlock(&paste_handlers_m);
 
     return (id);
 }
@@ -204,7 +206,7 @@ ipatch_unregister_paste_handler(int id)
     gpointer user_data;
     GSList *p;
 
-    g_static_rec_mutex_lock(&paste_handlers_m);
+    g_rec_mutex_lock(&paste_handlers_m);
 
     for(p = paste_handlers; p; p = p->next)
     {
@@ -219,7 +221,7 @@ ipatch_unregister_paste_handler(int id)
         }
     }
 
-    g_static_rec_mutex_unlock(&paste_handlers_m);
+    g_rec_mutex_unlock(&paste_handlers_m);
 
     if(notify_func)
     {
@@ -290,7 +292,7 @@ ipatch_is_paste_possible(IpatchItem *dest, IpatchItem *src)
     g_return_val_if_fail(IPATCH_IS_ITEM(dest), FALSE);
     g_return_val_if_fail(IPATCH_IS_ITEM(src), FALSE);
 
-    g_static_rec_mutex_lock(&paste_handlers_m);
+    g_rec_mutex_lock(&paste_handlers_m);
 
     for(p = paste_handlers; p; p = p->next)
     {
@@ -302,7 +304,7 @@ ipatch_is_paste_possible(IpatchItem *dest, IpatchItem *src)
         }
     }
 
-    g_static_rec_mutex_unlock(&paste_handlers_m);
+    g_rec_mutex_unlock(&paste_handlers_m);
 
     return (p != NULL);
 }
@@ -404,7 +406,7 @@ ipatch_paste_objects(IpatchPaste *paste, IpatchItem *dest, IpatchItem *src,
     g_return_val_if_fail(IPATCH_IS_ITEM(src), FALSE);
     g_return_val_if_fail(!err || !*err, FALSE);
 
-    g_static_rec_mutex_lock(&paste_handlers_m);
+    g_rec_mutex_lock(&paste_handlers_m);
 
     for(p = paste_handlers; p; p = p->next)
     {
@@ -416,7 +418,7 @@ ipatch_paste_objects(IpatchPaste *paste, IpatchItem *dest, IpatchItem *src,
         }
     }
 
-    g_static_rec_mutex_unlock(&paste_handlers_m);
+    g_rec_mutex_unlock(&paste_handlers_m);
 
     if(!p)
     {
@@ -436,7 +438,7 @@ typedef struct
     /* NOTE: item and parent are ref'd by paste->add_list, no need here */
     IpatchItem *item;		/* item for these property values */
     IpatchContainer *parent;	/* parent of item (or proposed parent) */
-    GValueArray *valarray;	/* array of all of item's unique prop. values */
+    GArray *valarray;	/* array of GValue of all of item's unique prop. values */
     GParamSpec **pspecs;	/* parameter specs for these properties (NULL term.) */
     guint8 index;		/* index to first value/pspec of this unique group */
     guint8 count;		/* # of values/pspecs in this unique prop group */
@@ -480,7 +482,7 @@ ipatch_paste_resolve(IpatchPaste *paste, IpatchPasteResolveFunc resolve_func,
     AddItemBag *addbag, *confl_addbag;
     ResolveHashKey *key, skey;
     CheckBag checkbag;
-    GValueArray *valarray;
+    GArray *valarray;
     gboolean free_valarray;
     guint32 groups;
     GSList *p;
@@ -505,7 +507,7 @@ ipatch_paste_resolve(IpatchPaste *paste, IpatchPasteResolveFunc resolve_func,
         addbag = (AddItemBag *)(p->data);
 
         /* get item's unique property values (if any) */
-        valarray = ipatch_item_get_unique_props(addbag->additem);
+        valarray = ipatch_item_get_unique_props_array(addbag->additem);
 
         if(!valarray)
         {
@@ -520,7 +522,7 @@ ipatch_paste_resolve(IpatchPaste *paste, IpatchPasteResolveFunc resolve_func,
 
         if(!pspecs)	/* should never happen! */
         {
-            g_value_array_free(valarray);
+            g_array_unref(valarray);
             continue;
         }
 
@@ -531,7 +533,7 @@ ipatch_paste_resolve(IpatchPaste *paste, IpatchPasteResolveFunc resolve_func,
         /* loop over unique property groups */
         for(i = 0, ps = pspecs;   ;   i++, ps++, groups >>= 1)
         {
-            if(!*ps || lastbit != (groups & 1))	/* last val or end of group? */
+            if(!*ps || lastbit != (int)(groups & 1))	/* last val or end of group? */
             {
                 /* initialize the static hash key */
                 skey.valarray = valarray;
@@ -595,7 +597,7 @@ ipatch_paste_resolve(IpatchPaste *paste, IpatchPasteResolveFunc resolve_func,
         /* if valarray was not used in hash, then free it here */
         if(free_valarray)
         {
-            g_value_array_free(valarray);
+            g_array_unref(valarray);
         }
     }
 
@@ -623,7 +625,7 @@ static guint
 resolve_hash_func(gconstpointer key)
 {
     ResolveHashKey *rkey = (ResolveHashKey *)key;
-    GValueArray *valarray;
+    GArray *valarray;
     GValue *value;
     guint hashval;
     int i, end;
@@ -641,7 +643,7 @@ resolve_hash_func(gconstpointer key)
 
     for(; i < end; i++)	/* hash the property values for this group */
     {
-        value = g_value_array_get_nth(valarray, i);
+        value = &g_array_index(valarray, GValue, i);
         hashval += ipatch_util_value_hash(value);
     }
 
@@ -669,8 +671,8 @@ resolve_equal_func(gconstpointer a, gconstpointer b)
 
     for(; i < end; i++)	/* see if the property values are the same */
     {
-        aval = g_value_array_get_nth(akey->valarray, i);
-        bval = g_value_array_get_nth(bkey->valarray, i);
+        aval = &g_array_index(akey->valarray, GValue, i);
+        bval = &g_array_index(bkey->valarray, GValue, i);
 
         if(g_param_values_cmp(akey->pspecs[i], aval, bval) != 0)
         {
@@ -688,7 +690,7 @@ resolve_key_destroy_func(gpointer data)
 
     if(rkey->free_valarray)
     {
-        g_value_array_free(rkey->valarray);
+        g_array_unref(rkey->valarray);
     }
 
     g_free(rkey);
@@ -726,7 +728,7 @@ check_item_conflicts_GHFunc(gpointer key, gpointer value,
     IpatchPasteResolveFunc resolve_func = checkbag->resolve_func;
     AddItemBag *confl_addbag;
     GParamSpec **pspecs, **ps;
-    GValueArray *valarray;
+    GArray *valarray;
     guint32 groups;
     IpatchIter iter;
     IpatchItem *item;
@@ -751,7 +753,7 @@ check_item_conflicts_GHFunc(gpointer key, gpointer value,
     for(item = ipatch_item_first(&iter); item; item = ipatch_item_next(&iter))
     {
         /* get item's unique property values */
-        valarray = ipatch_item_get_unique_props(item);
+        valarray = ipatch_item_get_unique_props_array(item);
 
         if(!valarray)
         {
@@ -787,13 +789,18 @@ check_item_conflicts_GHFunc(gpointer key, gpointer value,
                     if(choice == IPATCH_PASTE_CHOICE_CANCEL)
                     {
                         checkbag->cancel = TRUE;
-                        g_value_array_free(valarray);
+                        g_array_unref(valarray);
                         g_object_unref(list);	/* -- unref list */
                         return;
                     }
 
                     confl_addbag->conflict = g_object_ref(item);
                     confl_addbag->choice = choice;
+                }
+
+                if(!*ps)
+                {
+                    break;    /* NULL pspec terminator? */
                 }
 
                 index = i;	/* next group index */
@@ -804,10 +811,9 @@ check_item_conflicts_GHFunc(gpointer key, gpointer value,
             {
                 count++;    /* not end of group, increment current val count */
             }
-
-            g_value_array_free(valarray);
-
         }	/* for each unique parameter group */
+
+        g_array_unref(valarray);
 
     }	/* for container items */
 

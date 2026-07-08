@@ -788,13 +788,13 @@ ipatch_sf2_set_info(IpatchSF2 *sf, IpatchSF2InfoType id, const char *val)
 
     g_return_if_fail(IPATCH_IS_SF2(sf));
 
-    for(i = 0; i < G_N_ELEMENTS(info_ids); i++)
+    for(i = 0; i < (int)G_N_ELEMENTS(info_ids); i++)
         if(info_ids[i] == id)
         {
             break;
         }
 
-    if(i == G_N_ELEMENTS(info_ids))
+    if(i == (int)G_N_ELEMENTS(info_ids))
     {
         g_return_if_fail(ipatch_sf2_info_id_is_valid(id));    /* for debugging */
         return;
@@ -935,13 +935,13 @@ ipatch_sf2_info_array_qsort(const void *a, const void *b)
     int andx, bndx;
 
     /* find index in info ID array */
-    for(andx = 0; andx < G_N_ELEMENTS(info_ids); andx++)
+    for(andx = 0; andx < (int)G_N_ELEMENTS(info_ids); andx++)
         if(info_ids[andx] == ainfo->id)
         {
             break;
         }
 
-    for(bndx = 0; bndx < G_N_ELEMENTS(info_ids); bndx++)
+    for(bndx = 0; bndx < (int)G_N_ELEMENTS(info_ids); bndx++)
         if(info_ids[bndx] == binfo->id)
         {
             break;
@@ -983,7 +983,7 @@ ipatch_sf2_info_id_is_valid(guint32 id)
 {
     int i;
 
-    for(i = 0; i < G_N_ELEMENTS(info_ids) ; i++)
+    for(i = 0; i < (int)G_N_ELEMENTS(info_ids) ; i++)
         if(info_ids[i] == id)
         {
             return (TRUE);

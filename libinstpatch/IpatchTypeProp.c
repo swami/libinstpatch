@@ -86,7 +86,14 @@ static GHashTable *type_prop_value_hash = NULL;
 void
 _ipatch_type_prop_init(void)
 {
-    type_prop_hash = g_hash_table_new(NULL, NULL);
+    /* Value destroy notifier unrefs the GParamSpec that
+     * ipatch_type_install_property() took ownership of (g_param_spec_ref()
+     * + g_param_spec_sink()) - without this, g_hash_table_destroy() in
+     * _ipatch_type_prop_deinit() only freed the hash table's bookkeeping
+     * and leaked every registered GParamSpec (and its name/nick/blurb
+     * strings) for the lifetime of the process. */
+    type_prop_hash = g_hash_table_new_full(NULL, NULL, NULL,
+                                           (GDestroyNotify)g_param_spec_unref);
 
     type_prop_value_hash =
         g_hash_table_new_full(type_prop_value_GHashFunc,

@@ -30,7 +30,37 @@ extern GValue *ipatch_util_value_bool_false;
   ((b) ? ipatch_util_value_bool_true : ipatch_util_value_bool_false)
 
 guint ipatch_util_value_hash(GValue *val);
-guint ipatch_util_value_array_hash(GValueArray *valarray);
+
+/**
+ * ipatch_util_garray_value_hash:
+ * @valarray: (element-type GValue): GArray of GValue to hash
+ *
+ * Hash a #GArray of #GValue elements (as returned by
+ * ipatch_item_get_unique_props_array()). The hash value can then be used
+ * in a #GHashTable for example.
+ *
+ * Returns: Hash value corresponding to the sum of all values returned
+ * by ipatch_util_value_hash() for each GValue in the array.
+ *
+ * Since: 1.1.1
+ */
+guint ipatch_util_garray_value_hash(GArray *valarray);
+
+/**
+ * ipatch_util_value_array_hash:
+ * @valarray: GValueArray to hash
+ *
+ * Hash a GValueArray.  The hash value can then be used in a GHashTable for
+ * example.
+ *
+ * Returns: Hash value corresponding to the sum of all values returned
+ * by ipatch_util_value_hash() for each GValue in the array.
+ *
+ * Deprecated: 1.1.1: Use ipatch_util_garray_value_hash() instead, since
+ * #GValueArray is deprecated in GLib.
+ */
+guint ipatch_util_value_array_hash(GValueArray *valarray) G_GNUC_DEPRECATED_FOR(ipatch_util_garray_value_hash);
+
 guint64 ipatch_util_file_size(const char *fname, GError **err);
 char *ipatch_util_abs_filename(const char *filename);
 void ipatch_util_weakref_destroy(gpointer value);
