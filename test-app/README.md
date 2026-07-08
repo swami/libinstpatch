@@ -6,8 +6,9 @@ a sf2 file from **hardcoded** directory using
 libinstpatch DLL **from ../build/ folder** (not system).
 
 
-**NOTE:** Makefile expects a build of libinstpatch in ../build directory 
-
+**NOTE:** 
+- Makefile expects a build of libinstpatch in ../build directory 
+- install liblsan / libasan
 
 NOTES:  (skip, **done** by Makefile already) 
 before compiling update include files: 
