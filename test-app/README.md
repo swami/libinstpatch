@@ -6,9 +6,13 @@ a sf2 file from **hardcoded** directory using
 libinstpatch DLL **from ../build/ folder** (not system).
 
 
-NOTE: 
+**NOTE:** Makefile expects a build of libinstpatch in ../build directory 
+
+
+NOTES:  (skip, **done** by Makefile already) 
 before compiling update include files: 
   cp ../libinstpatch/*.h  ./include/libinstpatch/ 
   # and:
   cp ../build/libinstpatch/*.h  ./include/libinstpatch/
 
+update DLL in ./lib/  
