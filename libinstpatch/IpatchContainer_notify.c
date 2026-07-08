@@ -128,6 +128,8 @@ void _ipatch_container_notify_deinit(void)
 static gboolean
 _ipatch_container_callback_hash_free_value(gpointer key, gpointer value, gpointer user_data)
 {
+  (void)key;
+  (void)user_data;
   _ipatch_container_free_gslist((GSList *)value);
   return TRUE;
 }
@@ -438,6 +440,13 @@ ipatch_container_real_add_connect(IpatchContainer *container,
     GSList *cblist;
     guint handler_id;
 
+    /* FIXME: notify_func is accepted but never stored in ContainerCallback
+       or invoked anywhere below - possible latent bug (dropped on the floor).
+       Marking unused for now rather than guessing at the intended storage/
+       invocation without visibility into how ContainerCallback entries are
+       torn down. */
+    (void)notify_func;
+
     g_return_val_if_fail(!container || IPATCH_IS_CONTAINER(container), 0);
     g_return_val_if_fail(callback != NULL, 0);
 
@@ -474,9 +483,9 @@ ipatch_container_real_add_connect(IpatchContainer *container,
  * ipatch_container_remove_connect: (skip)
  * @container: (nullable): Container to match (%NULL for wildcard)
  * @child: (nullable): Child item to match (%NULL for wildcard)
- * @callback: Callback function to call on match
+ * @callback: (closure user_data): Callback function to call on match
  * @disconnect: (nullable): Function to call when callback is disconnected or %NULL
- * @user_data: (closure): User defined data pointer to pass to @callback and @disconnect
+ * @user_data: User defined data pointer to pass to @callback and @disconnect
  *
  * Adds a callback which gets called when a container item remove operation
  * occurs and the container matches @container and child item matches @child.
@@ -866,7 +875,7 @@ ipatch_container_real_disconnect(guint handler_id, IpatchContainer *container,
                        isadd ? "add" : "remove", handler_id);
         else
             g_critical(G_STRLOC ": Failed to find %s container handler with criteria %p:%p:%p:%p",
-                       isadd ? "add" : "remove", container, child, callback, user_data);
+                       isadd ? "add" : "remove", (void *)container, (void *)child, (void *)callback, user_data);
     }
 
     /* see if callback found and it had a disconnect func */

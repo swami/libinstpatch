@@ -8,13 +8,25 @@
 #  include <libintl.h>
 #  define _(x) dgettext(PACKAGE, x)
 #  ifdef gettext_noop
+/**
+ * N_: (skip)
+ */
 #    define N_(String) gettext_noop (String)
 #  else
+/**
+ * N_: (skip)
+ */
 #    define N_(String) (String)
 #  endif
 #else
+/**
+ * N_: (skip)
+ */
 #  define N_(String) (String)
 #  define _(x) (x)
+/**
+ * gettext: (skip)
+ */
 #  define gettext(x) (x)
 #endif
 #endif

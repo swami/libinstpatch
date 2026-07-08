@@ -46,8 +46,6 @@ enum
     PROP_CATEGORY
 };
 
-static void ipatch_sli_inst_class_init(IpatchSLIInstClass *klass);
-static void ipatch_sli_inst_init(IpatchSLIInst *inst);
 static void ipatch_sli_inst_finalize(GObject *gobject);
 static void ipatch_sli_inst_set_property(GObject *object,
         guint property_id,
@@ -69,32 +67,10 @@ static void ipatch_sli_inst_real_set_name(IpatchSLIInst *inst,
         const char *name,
         gboolean name_notify);
 
-static gpointer parent_class = NULL;
 static GType inst_child_types[2] = { 0 };
 static GParamSpec *name_pspec;
 
-
-GType
-ipatch_sli_inst_get_type(void)
-{
-    static GType item_type = 0;
-
-    if(!item_type)
-    {
-        static const GTypeInfo item_info =
-        {
-            sizeof(IpatchSLIInstClass), NULL, NULL,
-            (GClassInitFunc)ipatch_sli_inst_class_init, NULL, NULL,
-            sizeof(IpatchSLIInst), 0,
-            (GInstanceInitFunc)ipatch_sli_inst_init,
-        };
-
-        item_type = g_type_register_static(IPATCH_TYPE_CONTAINER,
-                                           "IpatchSLIInst", &item_info, 0);
-    }
-
-    return (item_type);
-}
+G_DEFINE_TYPE(IpatchSLIInst, ipatch_sli_inst, IPATCH_TYPE_CONTAINER)
 
 static void
 ipatch_sli_inst_class_init(IpatchSLIInstClass *klass)
@@ -102,8 +78,6 @@ ipatch_sli_inst_class_init(IpatchSLIInstClass *klass)
     GObjectClass *obj_class = G_OBJECT_CLASS(klass);
     IpatchItemClass *item_class = IPATCH_ITEM_CLASS(klass);
     IpatchContainerClass *container_class = IPATCH_CONTAINER_CLASS(klass);
-
-    parent_class = g_type_class_peek_parent(klass);
 
     obj_class->finalize = ipatch_sli_inst_finalize;
     obj_class->get_property = ipatch_sli_inst_get_property;
@@ -155,9 +129,9 @@ ipatch_sli_inst_finalize(GObject *gobject)
 
     IPATCH_ITEM_WUNLOCK(inst);
 
-    if(G_OBJECT_CLASS(parent_class)->finalize)
+    if(G_OBJECT_CLASS(ipatch_sli_inst_parent_class)->finalize)
     {
-        G_OBJECT_CLASS(parent_class)->finalize(gobject);
+        G_OBJECT_CLASS(ipatch_sli_inst_parent_class)->finalize(gobject);
     }
 }
 

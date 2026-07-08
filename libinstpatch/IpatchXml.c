@@ -475,7 +475,7 @@ ipatch_xml_take_value(GNode *node, char *value)
  *
  * Returns: Name of XML node which is internal and should not be modified or freed.
  */
-G_CONST_RETURN char *
+const char *
 ipatch_xml_get_name(GNode *node)
 {
     g_return_val_if_fail(node != NULL, NULL);
@@ -513,7 +513,7 @@ ipatch_xml_test_name(GNode *node, const char *cmpname)
  * Returns: Value of XML node or %NULL, which is internal and should not be
  *   modified or freed.
  */
-G_CONST_RETURN char *
+const char *
 ipatch_xml_get_value(GNode *node)
 {
     g_return_val_if_fail(node != NULL, NULL);
@@ -655,7 +655,7 @@ ipatch_xml_set_attributes(GNode *node, const char *attr_name,
  * Returns: Value of the named attribute or %NULL if not found, value is internal
  *   and should not be modified or freed.
  */
-G_CONST_RETURN char *
+const char *
 ipatch_xml_get_attribute(GNode *node, const char *attr_name)
 {
     IpatchXmlAttr *attr;
@@ -755,7 +755,7 @@ static GNode *
 ipatch_xml_find_by_path_recurse(GNode *node, const char *path)
 {
     IpatchXmlNode *xmlnode;
-    char *dot;
+    const char *dot;
     int len;
     GNode *n;
 

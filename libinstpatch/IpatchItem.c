@@ -70,8 +70,8 @@ extern GParamSpec *ipatch_base_pspec_changed;
 
 static gboolean
 _ipatch_item_hash_free_value(gpointer key, UniqueBag *value, gpointer user_data);
-static void ipatch_item_base_init(IpatchItemClass *klass);
-static void ipatch_item_class_init(IpatchItemClass *klass);
+static void ipatch_item_base_init(gpointer g_class);
+static void ipatch_item_class_init(gpointer g_class, gpointer class_data);
 static void ipatch_item_set_property(GObject *object, guint property_id,
                                      const GValue *value, GParamSpec *pspec);
 static void ipatch_item_get_property(GObject *object, guint property_id,
@@ -80,7 +80,7 @@ static void ipatch_item_set_property_override(GObject *object,
         guint property_id,
         const GValue *value,
         GParamSpec *pspec);
-static void ipatch_item_init(IpatchItem *item);
+static void ipatch_item_init(GTypeInstance *instance, gpointer g_class);
 static void ipatch_item_finalize(GObject *object);
 static void ipatch_item_item_remove_full(IpatchItem *item, gboolean full);
 static void ipatch_item_recursive_base_set(IpatchContainer *container,
@@ -162,10 +162,11 @@ ipatch_item_get_type(void)
         static const GTypeInfo item_info =
         {
             sizeof(IpatchItemClass),
-            (GBaseInitFunc) ipatch_item_base_init, NULL,
-            (GClassInitFunc) ipatch_item_class_init, NULL, NULL,
+            ipatch_item_base_init, NULL,
+            ipatch_item_class_init, NULL, NULL,
             sizeof(IpatchItem), 0,
-            (GInstanceInitFunc)ipatch_item_init,
+            ipatch_item_init,
+            NULL,
         };
 
         item_type = g_type_register_static(G_TYPE_OBJECT, "IpatchItem",
@@ -176,8 +177,9 @@ ipatch_item_get_type(void)
 }
 
 static void
-ipatch_item_base_init(IpatchItemClass *klass)
+ipatch_item_base_init(gpointer g_class)
 {
+    IpatchItemClass *klass = (IpatchItemClass *)g_class;
     GObjectClass *obj_class = G_OBJECT_CLASS(klass);
 
     /* override the set property method for all derived IpatchItem types */
@@ -257,9 +259,11 @@ ipatch_item_set_property_override(GObject *object, guint property_id,
 }
 
 static void
-ipatch_item_class_init(IpatchItemClass *klass)
+ipatch_item_class_init(gpointer g_class, gpointer class_data)
 {
+    IpatchItemClass *klass = (IpatchItemClass *)g_class;
     GObjectClass *obj_class = G_OBJECT_CLASS(klass);
+    (void)class_data;
 
     real_item_class = klass;
     parent_class = g_type_class_peek_parent(klass);
@@ -361,8 +365,11 @@ ipatch_item_get_property(GObject *object, guint property_id,
 }
 
 static void
-ipatch_item_init(IpatchItem *item)
+ipatch_item_init(GTypeInstance *instance, gpointer g_class)
 {
+    IpatchItem *item = (IpatchItem *)instance;
+    (void)g_class;
+
     /* always assign a mutex, will be freed and set to parent's mutex if the
        class has mutex_slave set (during ipatch_item_set_parent) */
     item->mutex = g_malloc(sizeof(GStaticRecMutex));

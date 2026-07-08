@@ -68,8 +68,6 @@ typedef struct
 
 static void _ipatch_paste_free_handler(PasteHandler *data);
 static gint handler_priority_GCompareFunc(gconstpointer a, gconstpointer b);
-static void ipatch_paste_class_init(IpatchPasteClass *klass);
-static void ipatch_paste_init(IpatchPaste *paste);
 static void ipatch_paste_finalize(GObject *gobject);
 static guint resolve_hash_func(gconstpointer key);
 static gboolean resolve_equal_func(gconstpointer a, gconstpointer b);
@@ -85,8 +83,6 @@ static IpatchItem *paste_copy_link_func_deep(IpatchItem *item,
 static GStaticRecMutex paste_handlers_m = G_STATIC_REC_MUTEX_INIT;
 static GSList *paste_handlers = NULL;	/* list of PasteHandler structs */
 static int ipatch_paste_handler_id = 0;         // handler ID counter
-
-static gpointer parent_class = NULL;
 
 /* ----- Initialization/deinitialization of list ----------------------------*/
 /* Initialize handlers list */
@@ -311,40 +307,19 @@ ipatch_is_paste_possible(IpatchItem *dest, IpatchItem *src)
     return (p != NULL);
 }
 
-GType
-ipatch_paste_get_type(void)
-{
-    static GType obj_type = 0;
-
-    if(!obj_type)
-    {
-        static const GTypeInfo obj_info =
-        {
-            sizeof(IpatchPasteClass), NULL, NULL,
-            (GClassInitFunc)ipatch_paste_class_init, NULL, NULL,
-            sizeof(IpatchPaste), 0,
-            (GInstanceInitFunc)ipatch_paste_init,
-        };
-
-        obj_type = g_type_register_static(G_TYPE_OBJECT, "IpatchPaste",
-                                          &obj_info, 0);
-
-        /* register the default handler */
-        ipatch_register_paste_handler(ipatch_paste_default_test_func,
-                                      ipatch_paste_default_exec_func, 0);
-    }
-
-    return (obj_type);
-}
+G_DEFINE_TYPE(IpatchPaste, ipatch_paste, G_TYPE_OBJECT)
 
 static void
 ipatch_paste_class_init(IpatchPasteClass *klass)
 {
     GObjectClass *obj_class = G_OBJECT_CLASS(klass);
 
-    parent_class = g_type_class_peek_parent(klass);
-
     obj_class->finalize = ipatch_paste_finalize;
+
+    /* register the default handler (runs once, at first type registration,
+       same as the old lazy g_type_register_static() block did) */
+    ipatch_register_paste_handler(ipatch_paste_default_test_func,
+                                  ipatch_paste_default_exec_func, 0);
 }
 
 static void
@@ -383,9 +358,9 @@ ipatch_paste_finalize(GObject *gobject)
         g_object_unref(linkbag->to);
     }
 
-    if(G_OBJECT_CLASS(parent_class)->finalize)
+    if(G_OBJECT_CLASS(ipatch_paste_parent_class)->finalize)
     {
-        G_OBJECT_CLASS(parent_class)->finalize(gobject);
+        G_OBJECT_CLASS(ipatch_paste_parent_class)->finalize(gobject);
     }
 }
 
@@ -748,7 +723,7 @@ check_item_conflicts_GHFunc(gpointer key, gpointer value,
     CheckBag *checkbag = (CheckBag *)user_data;
     ResolveHashKey *rkey = (ResolveHashKey *)key;
     ResolveHashKey skey;	/* static key */
-    IpatchPasteResolveFunc resolve_func = (IpatchPasteResolveFunc)user_data;
+    IpatchPasteResolveFunc resolve_func = checkbag->resolve_func;
     AddItemBag *confl_addbag;
     GParamSpec **pspecs, **ps;
     GValueArray *valarray;

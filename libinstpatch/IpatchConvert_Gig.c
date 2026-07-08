@@ -147,7 +147,7 @@ _file_to_gig_convert(IpatchConverter *converter, GError **err)
 CONVERTER_CLASS_INIT(gig_to_file)
 CONVERTER_GET_TYPE(gig_to_file, GigToFile)
 
-CONVERTER_CLASS_INIT(file_to_gig);
+CONVERTER_CLASS_INIT(file_to_gig)
 CONVERTER_GET_TYPE(file_to_gig, FileToGig)
 
 CONVERTER_CLASS_INIT(file_to_gig_sample)

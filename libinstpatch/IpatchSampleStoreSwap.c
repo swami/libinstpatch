@@ -500,7 +500,7 @@ ipatch_sample_store_swap_sample_iface_read(IpatchSampleHandle *handle,
                     _("Error reading from sample store swap file: %s"), g_strerror(errno));
     else if(retval < frames * frame_size)
         g_set_error(err, IPATCH_ERROR, IPATCH_ERROR_IO,
-                    _("Short read from sample store swap file, expected %d but got %" G_GSSIZE_FORMAT),
+                    _("Short read from sample store swap file, expected %u but got %u"),
                     frames * frame_size, retval);
 
     G_UNLOCK(swap);     // -- unlock swap
@@ -541,7 +541,7 @@ ipatch_sample_store_swap_sample_iface_write(IpatchSampleHandle *handle,
                     _("Error writing to sample store swap file: %s"), g_strerror(errno));
     else if(retval < frames * frame_size)
         g_set_error(err, IPATCH_ERROR, IPATCH_ERROR_IO,
-                    _("Short write to sample store swap file, expected %d but got %" G_GSSIZE_FORMAT),
+                    _("Short write to sample store swap file, expected %u but got %u"),
                     frames * frame_size, retval);
 
     G_UNLOCK(swap);     // -- unlock swap
@@ -927,7 +927,7 @@ ipatch_sample_store_swap_dump(void)
                      NULL);
 
         printf("  Store %p: loc=%u title='%s' size=%u fmt=0x%X rate=%d ltype=%d lstart=%u lend=%u root=%d fine=%d\n",
-               swap_store, swap_store->location, title, sample_size, sample_format,
+               (void *)swap_store, swap_store->location, title, sample_size, sample_format,
                sample_rate, loop_type, loop_start, loop_end, root_note, fine_tune);
 
         g_free(title);                                      // -- free title

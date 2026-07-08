@@ -1611,7 +1611,7 @@ ipatch_sample_data_dump(void)
                          NULL);
 
             printf("  Store %p (%s): title='%s' size=%u fmt=0x%X rate=%d ltype=%d lstart=%u lend=%u root=%d fine=%d\n",
-                   store, g_type_name(G_OBJECT_TYPE(store)), title, sample_size, sample_format,
+                   (void *)store, g_type_name(G_OBJECT_TYPE(store)), title, sample_size, sample_format,
                    sample_rate, loop_type, loop_start, loop_end, root_note, fine_tune);
 
             g_free(title);                                    // -- free title
@@ -1630,7 +1630,7 @@ ipatch_sample_data_dump(void)
                     filename = ipatch_file_get_name(file);    // ++ alloc file name
                 }
 
-                printf("    File %p (%s): filename='%s' location=%u\n", file, g_type_name(G_OBJECT_TYPE(file)),
+                printf("    File %p (%s): filename='%s' location=%u\n", (void *)file, g_type_name(G_OBJECT_TYPE(file)),
                        filename, location);
 
                 g_free(filename);                                                       // -- free file name

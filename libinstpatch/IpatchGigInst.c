@@ -39,8 +39,6 @@ enum
     PROP_0
 };
 
-static void ipatch_gig_inst_class_init(IpatchGigInstClass *klass);
-static void ipatch_gig_inst_init(IpatchGigInst *inst);
 static void ipatch_gig_inst_set_property(GObject *object,
         guint property_id,
         const GValue *value,
@@ -58,31 +56,9 @@ static gboolean
 ipatch_gig_inst_container_init_iter(IpatchContainer *container,
                                     IpatchIter *iter, GType type);
 
-static gpointer parent_class = NULL;
 static GType inst_child_types[2] = { 0 };
 
-
-GType
-ipatch_gig_inst_get_type(void)
-{
-    static GType item_type = 0;
-
-    if(!item_type)
-    {
-        static const GTypeInfo item_info =
-        {
-            sizeof(IpatchGigInstClass), NULL, NULL,
-            (GClassInitFunc)ipatch_gig_inst_class_init, NULL, NULL,
-            sizeof(IpatchGigInst), 0,
-            (GInstanceInitFunc)ipatch_gig_inst_init,
-        };
-
-        item_type = g_type_register_static(IPATCH_TYPE_DLS2_INST,
-                                           "IpatchGigInst", &item_info, 0);
-    }
-
-    return (item_type);
-}
+G_DEFINE_TYPE(IpatchGigInst, ipatch_gig_inst, IPATCH_TYPE_DLS2_INST)
 
 static void
 ipatch_gig_inst_class_init(IpatchGigInstClass *klass)
@@ -90,8 +66,6 @@ ipatch_gig_inst_class_init(IpatchGigInstClass *klass)
     GObjectClass *obj_class = G_OBJECT_CLASS(klass);
     IpatchItemClass *item_class = IPATCH_ITEM_CLASS(klass);
     IpatchContainerClass *container_class = IPATCH_CONTAINER_CLASS(klass);
-
-    parent_class = g_type_class_peek_parent(klass);
 
     obj_class->get_property = ipatch_gig_inst_get_property;
 
@@ -158,7 +132,7 @@ ipatch_gig_inst_item_copy(IpatchItem *dest, IpatchItem *src,
     dest_inst = IPATCH_GIG_INST(dest);
 
     /* call IpatchDLS2Inst class copy function */
-    IPATCH_ITEM_CLASS(parent_class)->copy(dest, src, link_func, user_data);
+    IPATCH_ITEM_CLASS(ipatch_gig_inst_parent_class)->copy(dest, src, link_func, user_data);
 
     /* don't need to lock for this stuff */
     dest_inst->attenuate = src_inst->attenuate;

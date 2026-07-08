@@ -852,6 +852,9 @@ ipatch_xml_default_encode_value_func(GNode *node, GObject *object,
     GType valtype;
     const char *s;
 
+    (void)object;
+    (void)pspec;
+
     g_return_val_if_fail(node != NULL, FALSE);
     g_return_val_if_fail(G_IS_VALUE(value), FALSE);
     g_return_val_if_fail(!err || !*err, FALSE);
@@ -1076,6 +1079,9 @@ ipatch_xml_default_decode_value_func(GNode *node, GObject *object,
     double d;
     const char *xml;
     char *endptr;
+
+    (void)object;
+    (void)pspec;
 
     valtype = G_VALUE_TYPE(value);
 

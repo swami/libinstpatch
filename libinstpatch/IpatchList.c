@@ -28,39 +28,19 @@
 #include <glib-object.h>
 #include "IpatchList.h"
 
-static void ipatch_list_class_init(IpatchListClass *klass);
 static void ipatch_list_finalize(GObject *gobject);
 
-static GObjectClass *parent_class = NULL;
+G_DEFINE_TYPE(IpatchList, ipatch_list, G_TYPE_OBJECT)
 
-
-GType
-ipatch_list_get_type(void)
+static void
+ipatch_list_init(IpatchList *list)
 {
-    static GType item_type = 0;
-
-    if(!item_type)
-    {
-        static const GTypeInfo item_info =
-        {
-            sizeof(IpatchListClass), NULL, NULL,
-            (GClassInitFunc) ipatch_list_class_init, NULL, NULL,
-            sizeof(IpatchList), 0,
-            (GInstanceInitFunc) NULL,
-        };
-
-        item_type = g_type_register_static(G_TYPE_OBJECT, "IpatchList",
-                                           &item_info, 0);
-    }
-
-    return (item_type);
 }
 
 static void
 ipatch_list_class_init(IpatchListClass *klass)
 {
     GObjectClass *obj_class = G_OBJECT_CLASS(klass);
-    parent_class = g_type_class_peek_parent(klass);
     obj_class->finalize = ipatch_list_finalize;
 }
 
@@ -80,9 +60,9 @@ ipatch_list_finalize(GObject *gobject)
 
     list->items = NULL;
 
-    if(parent_class->finalize)
+    if(G_OBJECT_CLASS(ipatch_list_parent_class)->finalize)
     {
-        parent_class->finalize(gobject);
+        G_OBJECT_CLASS(ipatch_list_parent_class)->finalize(gobject);
     }
 }
 

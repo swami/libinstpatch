@@ -234,6 +234,6 @@ gboolean ipatch_sf2_gen_range_intersect(IpatchSF2GenAmount *dst,
 gboolean ipatch_sf2_gen_range_intersect_test(const IpatchSF2GenAmount *amt1,
         const IpatchSF2GenAmount *amt2);
 
-G_CONST_RETURN char *ipatch_sf2_gen_get_prop_name(guint genid);
+const char *ipatch_sf2_gen_get_prop_name(guint genid);
 
 #endif

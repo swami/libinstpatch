@@ -637,7 +637,7 @@ ipatch_sample_list_dump(IpatchSampleList *list)
         }
 
         printf("%02d-%06x size=%d ofs=%d chan=%d sample=(%p format %03x size=%d)\n",
-               i, startofs, item->size, item->ofs, item->channel, item->sample,
+               i, startofs, item->size, item->ofs, item->channel, (void *)item->sample,
                sample_format, sample_size);
         startofs += item->size;
     }

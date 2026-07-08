@@ -6,7 +6,7 @@
 # See COPYING license file for distribution details
 #
 
-cmake_minimum_required ( VERSION 3.6 )
+cmake_minimum_required ( VERSION 3.10 )
 project ( libInstPatch C )
 
 set ( CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake )
@@ -80,6 +80,35 @@ endif( WIN32 )
 unset ( IPATCH_CPPFLAGS CACHE )
 unset ( IPATCH_LIBS CACHE )
 
+
+
+
+
+
+option(ENABLE_LSAN "Enable LeakSanitizer (AddressSanitizer)" OFF)
+
+if(ENABLE_LSAN)
+    message(STATUS "LeakSanitizer enabled")
+
+    # Compiler flags
+    set(SAN_FLAGS "-fsanitize=address -fno-omit-frame-pointer")
+
+    # Add to C flags
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${SAN_FLAGS}")
+    set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} ${SAN_FLAGS}")
+    set(CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELWITHDEBINFO} ${SAN_FLAGS}")
+
+    # Linker flags
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${SAN_FLAGS}")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${SAN_FLAGS}")
+
+    # Optional: runtime LSAN options
+    set(ENV{LSAN_OPTIONS} "verbosity=1:log_threads=1")
+endif()
+
+
+
+
 # Options for the GNU C compiler only
 if ( CMAKE_COMPILER_IS_GNUCC )
   if ( NOT APPLE )
@@ -88,11 +117,11 @@ if ( CMAKE_COMPILER_IS_GNUCC )
     set ( CMAKE_SHARED_LINKER_FLAGS 
           "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--no-undefined" )
   endif ( NOT APPLE )
-  set ( GNUCC_WARNING_FLAGS "-Wall")
-  set ( CMAKE_C_FLAGS "-pedantic ${CMAKE_C_FLAGS}" )
-  set ( CMAKE_C_FLAGS_DEBUG "-g -DDEBUG -fsanitize=undefined ${GNUCC_WARNING_FLAGS} ${CMAKE_C_FLAGS_DEBUG}" )
-  set ( CMAKE_C_FLAGS_RELEASE "-O2 -DNDEBUG ${GNUCC_WARNING_FLAGS} ${CMAKE_C_FLAGS_RELEASE}" )
-  set ( CMAKE_C_FLAGS_RELWITHDEBINFO "-O2 -g -DNDEBUG ${GNUCC_WARNING_FLAGS} ${CMAKE_C_FLAGS_RELWITHDEBINFO}" )
+  set ( GNUCC_WARNING_FLAGS "-Wall -Wextra -Wfatal-errors")
+  set ( CMAKE_C_FLAGS "-std=gnu17 ${CMAKE_C_FLAGS}" )   # note: -pedantic removed , for cleaner log 
+  set ( CMAKE_C_FLAGS_DEBUG " -ggdb  -DDEBUG -fsanitize=undefined ${GNUCC_WARNING_FLAGS} ${CMAKE_C_FLAGS_DEBUG}" )
+  set ( CMAKE_C_FLAGS_RELEASE " -O2  -DNDEBUG ${GNUCC_WARNING_FLAGS} ${CMAKE_C_FLAGS_RELEASE}" )
+  set ( CMAKE_C_FLAGS_RELWITHDEBINFO "-ggdb -O2  -DNDEBUG ${GNUCC_WARNING_FLAGS} ${CMAKE_C_FLAGS_RELWITHDEBINFO}" )
 endif ( CMAKE_COMPILER_IS_GNUCC )
 
 if ( MSVC )

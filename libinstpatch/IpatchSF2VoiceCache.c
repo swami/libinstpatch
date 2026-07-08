@@ -38,11 +38,8 @@
 #define VOICE_SAMPLE_FORMAT  \
     (IPATCH_SAMPLE_16BIT | IPATCH_SAMPLE_MONO | IPATCH_SAMPLE_ENDIAN_HOST)
 
-static void ipatch_sf2_voice_cache_class_init(IpatchSF2VoiceCacheClass *klass);
-static void ipatch_sf2_voice_cache_init(IpatchSF2VoiceCache *cache);
 static void ipatch_sf2_voice_cache_finalize(GObject *gobject);
 
-static gpointer parent_class = NULL;
 static IpatchSF2Voice def_voice;	/* default voice structure */
 
 
@@ -53,42 +50,21 @@ static IpatchSF2VoiceSelInfo default_sel_info[] =
     { IPATCH_SF2_VOICE_SEL_VELOCITY }
 };
 
-GType
-ipatch_sf2_voice_cache_get_type(void)
-{
-    static GType item_type = 0;
-
-    if(!item_type)
-    {
-        static const GTypeInfo item_info =
-        {
-            sizeof(IpatchSF2VoiceCacheClass), NULL, NULL,
-            (GClassInitFunc)ipatch_sf2_voice_cache_class_init, NULL, NULL,
-            sizeof(IpatchSF2VoiceCache),
-            0,
-            (GInstanceInitFunc)ipatch_sf2_voice_cache_init,
-        };
-
-        item_type = g_type_register_static(G_TYPE_OBJECT,
-                                           "IpatchSF2VoiceCache", &item_info, 0);
-
-        /* install voice update function type property */
-        ipatch_type_install_property
-        (g_param_spec_pointer("sf2voice-update-func", "sf2voice-update-func",
-                              "sf2voice-update-func", G_PARAM_READWRITE));
-    }
-
-    return (item_type);
-}
+G_DEFINE_TYPE(IpatchSF2VoiceCache, ipatch_sf2_voice_cache, G_TYPE_OBJECT)
 
 static void
 ipatch_sf2_voice_cache_class_init(IpatchSF2VoiceCacheClass *klass)
 {
     GObjectClass *obj_class = G_OBJECT_CLASS(klass);
 
-    parent_class = g_type_class_peek_parent(klass);
-
     obj_class->finalize = ipatch_sf2_voice_cache_finalize;
+
+    /* install voice update function type property (runs once, at first
+       type registration, same as the old lazy g_type_register_static()
+       block did) */
+    ipatch_type_install_property
+    (g_param_spec_pointer("sf2voice-update-func", "sf2voice-update-func",
+                          "sf2voice-update-func", G_PARAM_READWRITE));
 
     /* initialize default voice structure */
     def_voice.sample_data = NULL;
@@ -188,9 +164,9 @@ ipatch_sf2_voice_cache_finalize(GObject *gobject)
         ipatch_sf2_mod_list_free(cache->override_mods, TRUE);
     }
 
-    if(G_OBJECT_CLASS(parent_class)->finalize)
+    if(G_OBJECT_CLASS(ipatch_sf2_voice_cache_parent_class)->finalize)
     {
-        G_OBJECT_CLASS(parent_class)->finalize(gobject);
+        G_OBJECT_CLASS(ipatch_sf2_voice_cache_parent_class)->finalize(gobject);
     }
 }
 
@@ -657,7 +633,7 @@ ipatch_sf2_voice_cache_dump(IpatchSF2VoiceCache *cache, int start, int count)
         voice = &g_array_index(cache->voices, IpatchSF2Voice, i);
 
         printf("%d (S:%d,SD:%p,SS:%p) L:%d-%d R:%d RN:%d T:%d\n ",
-               i, voice->sample_size, voice->sample_data, voice->sample_store,
+               i, voice->sample_size, (void *)voice->sample_data, (void *)voice->sample_store,
                voice->loop_start, voice->loop_end, voice->rate, voice->root_note,
                voice->fine_tune);
 
@@ -706,7 +682,7 @@ ipatch_sf2_voice_cache_dump_select(IpatchSF2VoiceCache *cache, ...)
         voice = &g_array_index(cache->voices, IpatchSF2Voice, vindex);
 
         printf("%d (S:%d,SD:%p,SS:%p) L:%d-%d R:%d RN:%d T:%d\n ",
-               vindex, voice->sample_size, voice->sample_data, voice->sample_store,
+               vindex, voice->sample_size, (void *)voice->sample_data, (void *)voice->sample_store,
                voice->loop_start, voice->loop_end, voice->rate, voice->root_note,
                voice->fine_tune);
 

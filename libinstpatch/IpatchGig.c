@@ -32,7 +32,6 @@
 #include "IpatchVirtualContainer_types.h"
 #include "i18n.h"
 
-static void ipatch_gig_class_init(IpatchGigClass *klass);
 static void ipatch_gig_finalize(GObject *object);
 static void ipatch_gig_item_copy(IpatchItem *dest, IpatchItem *src,
                                  IpatchItemCopyLinkFunc link_func,
@@ -40,31 +39,14 @@ static void ipatch_gig_item_copy(IpatchItem *dest, IpatchItem *src,
 static const GType *ipatch_gig_container_child_types(void);
 static const GType *ipatch_gig_container_virtual_types(void);
 
-static GObjectClass *parent_class = NULL;
 static GType gig_child_types[3] = { 0 };
 static GType gig_virt_types[4] = { 0 };
 
+G_DEFINE_TYPE(IpatchGig, ipatch_gig, IPATCH_TYPE_DLS2)
 
-GType
-ipatch_gig_get_type(void)
+static void
+ipatch_gig_init(IpatchGig *gig)
 {
-    static GType item_type = 0;
-
-    if(!item_type)
-    {
-        static const GTypeInfo item_info =
-        {
-            sizeof(IpatchGigClass), NULL, NULL,
-            (GClassInitFunc) ipatch_gig_class_init, NULL, NULL,
-            sizeof(IpatchGig), 0,
-            (GInstanceInitFunc) NULL,
-        };
-
-        item_type = g_type_register_static(IPATCH_TYPE_DLS2,
-                                           "IpatchGig", &item_info, 0);
-    }
-
-    return (item_type);
 }
 
 static void
@@ -73,8 +55,6 @@ ipatch_gig_class_init(IpatchGigClass *klass)
     GObjectClass *obj_class = G_OBJECT_CLASS(klass);
     IpatchItemClass *item_class = IPATCH_ITEM_CLASS(klass);
     IpatchContainerClass *container_class = IPATCH_CONTAINER_CLASS(klass);
-
-    parent_class = g_type_class_peek_parent(klass);
 
     obj_class->finalize = ipatch_gig_finalize;
 
@@ -110,7 +90,7 @@ ipatch_gig_finalize(GObject *object)
 
     IPATCH_ITEM_WUNLOCK(object);
 
-    parent_class->finalize(object);
+    G_OBJECT_CLASS(ipatch_gig_parent_class)->finalize(object);
 }
 
 static void
@@ -124,7 +104,7 @@ ipatch_gig_item_copy(IpatchItem *dest, IpatchItem *src,
     src_gig = IPATCH_GIG(src);
     dest_gig = IPATCH_GIG(dest);
 
-    IPATCH_ITEM_CLASS(parent_class)->copy(dest, src, link_func, user_data);
+    IPATCH_ITEM_CLASS(ipatch_gig_parent_class)->copy(dest, src, link_func, user_data);
 
     IPATCH_ITEM_RLOCK(src_gig);
 

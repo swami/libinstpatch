@@ -55,7 +55,7 @@ static void _ipatch_converter_free_converter_info(IpatchConverterInfo *data,
 static gint priority_GCompareFunc(gconstpointer a, gconstpointer b);
 static const IpatchConverterInfo *convert_lookup_map_U(GType **array, GType conv_type,
         GType src_type, GType dest_type, guint flags);
-static void ipatch_converter_class_init(IpatchConverterClass *klass);
+static void ipatch_converter_class_init(gpointer g_class, gpointer class_data);
 static void ipatch_converter_finalize(GObject *gobject);
 static void ipatch_converter_set_property(GObject *object, guint property_id,
         const GValue *value,
@@ -89,6 +89,7 @@ void _ipatch_converter_deinit(void)
 static void _ipatch_converter_free_converter_info(IpatchConverterInfo *data,
                                                   gpointer user_data)
 {
+    (void)user_data;
     g_slice_free(IpatchConverterInfo,data);
 }
 
@@ -775,9 +776,9 @@ ipatch_converter_get_type(void)
         static const GTypeInfo obj_info =
         {
             sizeof(IpatchConverterClass), NULL, NULL,
-            (GClassInitFunc)ipatch_converter_class_init, NULL, NULL,
+            ipatch_converter_class_init, NULL, NULL,
             sizeof(IpatchConverter), 0,
-            (GInstanceInitFunc) NULL,
+            NULL, NULL,
         };
 
         obj_type = g_type_register_static(G_TYPE_OBJECT, "IpatchConverter",
@@ -788,9 +789,11 @@ ipatch_converter_get_type(void)
 }
 
 static void
-ipatch_converter_class_init(IpatchConverterClass *klass)
+ipatch_converter_class_init(gpointer g_class, gpointer class_data)
 {
+    IpatchConverterClass *klass = (IpatchConverterClass *)g_class;
     GObjectClass *obj_class = G_OBJECT_CLASS(klass);
+    (void)class_data;
 
     parent_class = g_type_class_peek_parent(klass);
 

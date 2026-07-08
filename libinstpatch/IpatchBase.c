@@ -137,6 +137,7 @@ ipatch_base_class_init(IpatchBaseClass *klass)
 static void
 ipatch_base_init(IpatchBase *base)
 {
+    (void)base;
 }
 
 /* function called when a patch is being destroyed */
@@ -487,6 +488,8 @@ remove_created_stores(gpointer data, gpointer user_data)
 {
     IpatchSampleStore *store = data;
     IpatchSampleData *sampledata;
+
+    (void)user_data;
 
     sampledata = (IpatchSampleData *)ipatch_item_get_parent((IpatchItem *)store);         // ++ ref parent sampledata
 

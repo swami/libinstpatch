@@ -51,6 +51,7 @@ ipatch_dls_file_class_init(IpatchDLSFileClass *klass)
 static void
 ipatch_dls_file_init(IpatchDLSFile *file)
 {
+    (void)file;
 }
 
 /* DLS/gig file identification function */

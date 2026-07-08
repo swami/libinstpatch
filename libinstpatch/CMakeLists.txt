@@ -403,13 +403,28 @@ if (INTROSPECTION_FOUND)
 
   include(GObjectIntrospectionMacros)
   set(INTROSPECTION_GIRS)
-  set(INTROSPECTION_SCANNER_ARGS "--add-include-path=${CMAKE_CURRENT_SOURCE_DIR}")
+  set(INTROSPECTION_SCANNER_ARGS "--add-include-path=${CMAKE_CURRENT_SOURCE_DIR}" "-L${CMAKE_CURRENT_BINARY_DIR}")
   set(INTROSPECTION_COMPILER_ARGS "--includedir=${CMAKE_CURRENT_SOURCE_DIR}")
 
   set(introspection_files ${instpatch_SOURCES} ${instpatch_public_HEADERS})
   set(Ipatch_1_1_gir ${INSTPATCH_INSTALL_TARGET})
   set(Ipatch_1_1_gir_INCLUDES GObject-2.0)
-  set(Ipatch_1_1_gir_LIBS ${INSTPATCH_INSTALL_TARGET})
+  # g-ir-scanner resolves this via --library=<name>, expecting the *output*
+  # library filename (liblibinstpatch.so would be wrong) - must match
+  # OUTPUT_NAME "instpatch-1.0" set below, not the CMake target "libinstpatch"
+  set(Ipatch_1_1_gir_LIBS instpatch-1.0)
+
+  # gir_add_introspections() reuses ${name}_LIBS both as the g-ir-scanner
+  # --library= value (wants the linker name "instpatch-1.0") AND as a literal
+  # DEPENDS entry for the custom command (wants a buildable target/file).
+  # No single value satisfies both since OUTPUT_NAME != the CMake target name,
+  # so provide a phony target under that exact name that just chains to the
+  # real target, purely so `make` has something to resolve for DEPENDS.
+  if (NOT TARGET instpatch-1.0)
+    add_custom_target(instpatch-1.0 DEPENDS libinstpatch)
+  endif ()
+
+  # set(Ipatch_1_1_gir_LIBS ${INSTPATCH_INSTALL_TARGET})  # produces wrong version suffix
   get_directory_property(_tmp_includes INCLUDE_DIRECTORIES)
   _list_prefix(_includes _tmp_includes "-I")
   set(Ipatch_1_1_gir_CFLAGS ${_includes})

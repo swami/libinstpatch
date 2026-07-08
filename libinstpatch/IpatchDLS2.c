@@ -43,8 +43,6 @@ enum
     PROP_VERSION
 };
 
-static void ipatch_dls2_class_init(IpatchDLS2Class *klass);
-static void ipatch_dls2_init(IpatchDLS2 *dls);
 static void ipatch_dls2_finalize(GObject *gobject);
 static void ipatch_dls2_set_property(GObject *object, guint property_id,
                                      const GValue *value, GParamSpec *pspec);
@@ -68,35 +66,10 @@ static int locale_gcompare_func(gconstpointer a, gconstpointer b);
 static IpatchItem *
 ipatch_dls2_base_find_item_by_locale(IpatchBase *base, int bank, int program);
 
-static gpointer parent_class = NULL;
 static GType dls2_child_types[3] = { 0 };
 static GType dls2_virt_types[4] = { 0 };
 
-
-
-/* SoundFont item type creation function */
-GType
-ipatch_dls2_get_type(void)
-{
-    static GType item_type = 0;
-
-    if(!item_type)
-    {
-        static const GTypeInfo item_info =
-        {
-            sizeof(IpatchDLS2Class), NULL, NULL,
-            (GClassInitFunc)ipatch_dls2_class_init, NULL, NULL,
-            sizeof(IpatchDLS2),
-            0,
-            (GInstanceInitFunc)ipatch_dls2_init,
-        };
-
-        item_type = g_type_register_static(IPATCH_TYPE_BASE, "IpatchDLS2",
-                                           &item_info, 0);
-    }
-
-    return (item_type);
-}
+G_DEFINE_TYPE(IpatchDLS2, ipatch_dls2, IPATCH_TYPE_BASE)
 
 static void
 ipatch_dls2_class_init(IpatchDLS2Class *klass)
@@ -105,8 +78,6 @@ ipatch_dls2_class_init(IpatchDLS2Class *klass)
     IpatchItemClass *item_class = IPATCH_ITEM_CLASS(klass);
     IpatchContainerClass *container_class = IPATCH_CONTAINER_CLASS(klass);
     IpatchBaseClass *base_class = IPATCH_BASE_CLASS(klass);
-
-    parent_class = g_type_class_peek_parent(klass);
 
     obj_class->finalize = ipatch_dls2_finalize;
     obj_class->get_property = ipatch_dls2_get_property;
@@ -169,9 +140,9 @@ ipatch_dls2_finalize(GObject *gobject)
 
     IPATCH_ITEM_WUNLOCK(dls);
 
-    if(G_OBJECT_CLASS(parent_class)->finalize)
+    if(G_OBJECT_CLASS(ipatch_dls2_parent_class)->finalize)
     {
-        G_OBJECT_CLASS(parent_class)->finalize(gobject);
+        G_OBJECT_CLASS(ipatch_dls2_parent_class)->finalize(gobject);
     }
 }
 
@@ -287,6 +258,9 @@ ipatch_dls2_item_copy(IpatchItem *dest, IpatchItem *src,
     IpatchItem *newitem;
     GHashTable *repl_samples;
     GSList *p;
+
+    (void)link_func;
+    (void)user_data;
 
     src_dls = IPATCH_DLS2(src);
     dest_dls = IPATCH_DLS2(dest);
@@ -455,6 +429,8 @@ ipatch_dls2_base_find_unused_locale(IpatchBase *base, int *bank,
     GSList *p;
     guint32 b, n;			/* Stores current bank and preset number */
     guint32 lbank, lprogram;
+
+    (void)percussion;
 
     /* fill array with bank and preset numbers */
     IPATCH_ITEM_RLOCK(dls);

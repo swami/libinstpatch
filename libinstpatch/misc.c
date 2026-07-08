@@ -178,7 +178,7 @@ ipatch_init(void)
 {
     TypePropInit *prop_info;
     GType type;
-    int i;
+    guint i;
 
     /* do nothing if the library is already initialized */
     G_LOCK(lock_init);
@@ -596,6 +596,10 @@ ipatch_strv_xml_encode(GNode *node, GObject *object, GParamSpec *pspec,
 {
     GStrv strv;
 
+    (void)object;
+    (void)pspec;
+    (void)err;
+
     g_return_val_if_fail(G_VALUE_HOLDS(value, G_TYPE_STRV), FALSE);
 
     strv = g_value_get_boxed(value);
@@ -621,6 +625,10 @@ ipatch_strv_xml_decode(GNode *node, GObject *object, GParamSpec *pspec,
     GStrv strv;
     GNode *n;
     int i;
+
+    (void)object;
+    (void)pspec;
+    (void)err;
 
     g_return_val_if_fail(G_VALUE_HOLDS(value, G_TYPE_STRV), FALSE);
 
@@ -663,6 +671,9 @@ virtual_parent_dls2_inst(GType type, GParamSpec *spec, GValue *value,
 {
     gboolean percuss = FALSE;
 
+    (void)type;
+    (void)spec;
+
     if(object)
     {
         g_object_get(object, "percussion", &percuss, NULL);
@@ -683,6 +694,9 @@ virtual_parent_gig_inst(GType type, GParamSpec *spec, GValue *value,
                         GObject *object)
 {
     gboolean percuss = FALSE;
+
+    (void)type;
+    (void)spec;
 
     if(object)
     {
@@ -705,6 +719,9 @@ virtual_parent_sf2_preset(GType type, GParamSpec *spec, GValue *value,
 {
     gboolean percuss = FALSE;
 
+    (void)type;
+    (void)spec;
+
     if(object)
     {
         g_object_get(object, "percussion", &percuss, NULL);
@@ -725,6 +742,9 @@ virtual_parent_sf2_sample(GType type, GParamSpec *spec, GValue *value,
                           GObject *object)
 {
     gboolean rom = FALSE;
+
+    (void)type;
+    (void)spec;
 
     if(object)
     {
@@ -849,7 +869,7 @@ _ret_g_log(const gchar *log_domain, GLogLevelFlags log_level,
  *
  * Returns: The GError's message or a "&lt;No detailed error information&gt;" string.
  */
-G_CONST_RETURN char *
+const char *
 ipatch_gerror_message(GError *err)
 {
     return ((err) ? (err)->message : _("<No detailed error information>"));
@@ -971,7 +991,7 @@ ipatch_dump_object(GObject *object, gboolean recursive, FILE *file)
     {
         dump_object_info(object, indent_buf, file);
         fprintf(file, "</%s addr=%p>\n",
-                g_type_name(G_TYPE_FROM_INSTANCE(object)), object);
+                g_type_name(G_TYPE_FROM_INSTANCE(object)), (void *)object);
     }
     else
     {
@@ -1027,7 +1047,7 @@ dump_object_info(GObject *object, char *indent, FILE *file)
     char *contents;
 
     fprintf(file, "%s<%s addr=%p>\n", indent,
-            g_type_name(G_TYPE_FROM_INSTANCE(object)), object);
+            g_type_name(G_TYPE_FROM_INSTANCE(object)), (void *)object);
 
     fprintf(file, "%s  refcount = %u\n", indent, object->ref_count);
 
@@ -1055,6 +1075,17 @@ dump_object_info(GObject *object, char *indent, FILE *file)
     g_free(pspecs);
 }
 
+/* GFunc wrapper for g_object_unref, used by ipatch_glist_unref_free() since
+   g_object_unref's real signature (gpointer) doesn't match GFunc's
+   (gpointer, gpointer) and casting between them is an unsafe function
+   pointer type mismatch */
+static void
+unref_gfunc_wrapper(gpointer data, gpointer user_data)
+{
+    (void)user_data;
+    g_object_unref(data);
+}
+
 /**
  * ipatch_glist_unref_free: (skip)
  * @objlist: List of GObjects
@@ -1066,6 +1097,6 @@ dump_object_info(GObject *object, char *indent, FILE *file)
 void
 ipatch_glist_unref_free(GList *objlist)
 {
-    g_list_foreach(objlist, (GFunc) g_object_unref, NULL);
+    g_list_foreach(objlist, unref_gfunc_wrapper, NULL);
     g_list_free(objlist);
 }

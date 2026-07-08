@@ -34,8 +34,16 @@ typedef GSList IpatchSF2ModList;
 GType ipatch_sf2_mod_list_get_type(void);
 
 GSList *ipatch_sf2_mod_list_duplicate(const GSList *list);
+/* Not introspectable due to the ambiguous ownership semantics of @copy;
+   use ipatch_sf2_mod_list_override_copy() from bindings instead.
+   (skip) annotation and full docs are on the definition in
+   IpatchSF2ModList.c to avoid duplicate gtk-doc blocks. */
 GSList *ipatch_sf2_mod_list_override(const GSList *alist,
                                      const GSList *blist, gboolean copy);
+
+/* Like ipatch_sf2_mod_list_override() with @copy set to TRUE. Full docs
+   are on the definition in IpatchSF2ModList.c to avoid duplicate
+   gtk-doc blocks. */
 GSList *ipatch_sf2_mod_list_override_copy(const GSList *alist, const GSList *blist);
 void ipatch_sf2_mod_list_free(GSList *list, gboolean free_mods);
 void ipatch_sf2_mod_list_boxed_free(GSList *list);
@@ -45,6 +53,6 @@ GSList *ipatch_sf2_mod_list_remove(GSList *mods, const IpatchSF2Mod *modvals,
 gboolean ipatch_sf2_mod_list_change(GSList *mods, const IpatchSF2Mod *oldvals,
                                     const IpatchSF2Mod *newvals);
 GSList *ipatch_sf2_mod_list_offset(const GSList *alist, const GSList *blist);
-G_CONST_RETURN GSList *ipatch_sf2_mod_list_get_default(void);
+const GSList *ipatch_sf2_mod_list_get_default(void);
 
 #endif

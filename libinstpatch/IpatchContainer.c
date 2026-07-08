@@ -38,46 +38,28 @@ extern void ipatch_container_add_notify(IpatchContainer *container,
 extern void ipatch_container_remove_notify(IpatchContainer *container,
         IpatchItem *child);
 
-static void ipatch_container_init_class(IpatchContainerClass *klass);
 static void ipatch_container_dispose(GObject *object);
 static void ipatch_container_item_remove_full(IpatchItem *item, gboolean full);
-
-static GObjectClass *parent_class = NULL;
 
 /* for fast hook method access */
 static IpatchContainerClass *real_container_class = NULL;
 
 
 
-GType
-ipatch_container_get_type(void)
+G_DEFINE_ABSTRACT_TYPE(IpatchContainer, ipatch_container, IPATCH_TYPE_ITEM)
+
+static void
+ipatch_container_init(IpatchContainer *container)
 {
-    static GType item_type = 0;
-
-    if(!item_type)
-    {
-        static const GTypeInfo item_info =
-        {
-            sizeof(IpatchContainerClass), NULL, NULL,
-            (GClassInitFunc) ipatch_container_init_class, NULL, NULL,
-            sizeof(IpatchContainer), 0,
-            (GInstanceInitFunc) NULL,
-        };
-
-        item_type = g_type_register_static(IPATCH_TYPE_ITEM, "IpatchContainer",
-                                           &item_info, G_TYPE_FLAG_ABSTRACT);
-    }
-
-    return (item_type);
+    (void)container;
 }
 
 static void
-ipatch_container_init_class(IpatchContainerClass *klass)
+ipatch_container_class_init(IpatchContainerClass *klass)
 {
     GObjectClass *obj_class = G_OBJECT_CLASS(klass);
     IpatchItemClass *item_class = IPATCH_ITEM_CLASS(klass);
 
-    parent_class = g_type_class_peek_parent(klass);
     real_container_class = klass;
 
     obj_class->dispose = ipatch_container_dispose;
@@ -94,9 +76,9 @@ ipatch_container_dispose(GObject *object)
 
     ipatch_container_remove_all(IPATCH_CONTAINER(object));
 
-    if(parent_class->dispose)
+    if(G_OBJECT_CLASS(ipatch_container_parent_class)->dispose)
     {
-        parent_class->dispose(object);
+        G_OBJECT_CLASS(ipatch_container_parent_class)->dispose(object);
     }
 }
 
@@ -108,9 +90,9 @@ ipatch_container_item_remove_full(IpatchItem *item, gboolean full)
         ipatch_container_remove_all(IPATCH_CONTAINER(item));
     }
 
-    if(IPATCH_ITEM_CLASS(parent_class)->remove_full)
+    if(IPATCH_ITEM_CLASS(ipatch_container_parent_class)->remove_full)
     {
-        IPATCH_ITEM_CLASS(parent_class)->remove_full(item, full);
+        IPATCH_ITEM_CLASS(ipatch_container_parent_class)->remove_full(item, full);
     }
 }
 

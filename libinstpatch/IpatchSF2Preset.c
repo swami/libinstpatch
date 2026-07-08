@@ -54,10 +54,9 @@ enum
 
 static void ipatch_sf2_preset_class_init(IpatchSF2PresetClass *klass);
 static void
-ipatch_sf2_preset_gen_item_iface_init(IpatchSF2GenItemIface *genitem_iface);
+ipatch_sf2_preset_gen_item_iface_init(gpointer g_iface, gpointer iface_data);
 static void
-ipatch_sf2_preset_mod_item_iface_init(IpatchSF2ModItemIface *moditem_iface);
-static void ipatch_sf2_preset_init(IpatchSF2Preset *preset);
+ipatch_sf2_preset_mod_item_iface_init(gpointer g_iface, gpointer iface_data);
 static void ipatch_sf2_preset_finalize(GObject *gobject);
 static void ipatch_sf2_preset_set_property(GObject *object,
         guint property_id,
@@ -79,7 +78,6 @@ static void ipatch_sf2_preset_real_set_name(IpatchSF2Preset *preset,
         const char *name,
         gboolean name_notify);
 
-static gpointer parent_class = NULL;
 static GType preset_child_types[2] = { 0 };
 static GParamSpec *name_pspec, *bank_pspec, *program_pspec, *percuss_pspec;
 
@@ -90,38 +88,11 @@ static GParamSpec **gen_item_setspecs = NULL;
 /* For passing between class init and mod item interface init */
 static GParamSpec *modulators_spec = NULL;
 
-
-GType
-ipatch_sf2_preset_get_type(void)
-{
-    static GType item_type = 0;
-
-    if(!item_type)
-    {
-        static const GTypeInfo item_info =
-        {
-            sizeof(IpatchSF2PresetClass), NULL, NULL,
-            (GClassInitFunc)ipatch_sf2_preset_class_init, NULL, NULL,
-            sizeof(IpatchSF2Preset), 0,
-            (GInstanceInitFunc)ipatch_sf2_preset_init,
-        };
-        static const GInterfaceInfo genitem_iface =
-        {
-            (GInterfaceInitFunc) ipatch_sf2_preset_gen_item_iface_init, NULL, NULL
-        };
-        static const GInterfaceInfo moditem_iface =
-        {
-            (GInterfaceInitFunc) ipatch_sf2_preset_mod_item_iface_init, NULL, NULL
-        };
-
-        item_type = g_type_register_static(IPATCH_TYPE_CONTAINER,
-                                           "IpatchSF2Preset", &item_info, 0);
-        g_type_add_interface_static(item_type, IPATCH_TYPE_SF2_GEN_ITEM, &genitem_iface);
-        g_type_add_interface_static(item_type, IPATCH_TYPE_SF2_MOD_ITEM, &moditem_iface);
-    }
-
-    return (item_type);
-}
+G_DEFINE_TYPE_WITH_CODE(IpatchSF2Preset, ipatch_sf2_preset, IPATCH_TYPE_CONTAINER,
+                        G_IMPLEMENT_INTERFACE(IPATCH_TYPE_SF2_GEN_ITEM,
+                                              ipatch_sf2_preset_gen_item_iface_init)
+                        G_IMPLEMENT_INTERFACE(IPATCH_TYPE_SF2_MOD_ITEM,
+                                              ipatch_sf2_preset_mod_item_iface_init))
 
 static void
 ipatch_sf2_preset_class_init(IpatchSF2PresetClass *klass)
@@ -129,8 +100,6 @@ ipatch_sf2_preset_class_init(IpatchSF2PresetClass *klass)
     GObjectClass *obj_class = G_OBJECT_CLASS(klass);
     IpatchItemClass *item_class = IPATCH_ITEM_CLASS(klass);
     IpatchContainerClass *container_class = IPATCH_CONTAINER_CLASS(klass);
-
-    parent_class = g_type_class_peek_parent(klass);
 
     obj_class->finalize = ipatch_sf2_preset_finalize;
     obj_class->get_property = ipatch_sf2_preset_get_property;
@@ -210,8 +179,11 @@ ipatch_sf2_preset_class_init(IpatchSF2PresetClass *klass)
 
 /* gen item interface initialization */
 static void
-ipatch_sf2_preset_gen_item_iface_init(IpatchSF2GenItemIface *genitem_iface)
+ipatch_sf2_preset_gen_item_iface_init(gpointer g_iface, gpointer iface_data)
 {
+    IpatchSF2GenItemIface *genitem_iface = (IpatchSF2GenItemIface *)g_iface;
+    (void)iface_data;
+
     genitem_iface->genarray_ofs = G_STRUCT_OFFSET(IpatchSF2Preset, genarray);
     genitem_iface->propstype = IPATCH_SF2_GEN_PROPS_PRESET_GLOBAL;
 
@@ -226,8 +198,11 @@ ipatch_sf2_preset_gen_item_iface_init(IpatchSF2GenItemIface *genitem_iface)
 
 /* mod item interface initialization */
 static void
-ipatch_sf2_preset_mod_item_iface_init(IpatchSF2ModItemIface *moditem_iface)
+ipatch_sf2_preset_mod_item_iface_init(gpointer g_iface, gpointer iface_data)
 {
+    IpatchSF2ModItemIface *moditem_iface = (IpatchSF2ModItemIface *)g_iface;
+    (void)iface_data;
+
     moditem_iface->modlist_ofs = G_STRUCT_OFFSET(IpatchSF2Preset, mods);
 
     /* cache the modulators property for fast notifications */
@@ -260,9 +235,9 @@ ipatch_sf2_preset_finalize(GObject *gobject)
 
     IPATCH_ITEM_WUNLOCK(preset);
 
-    if(G_OBJECT_CLASS(parent_class)->finalize)
+    if(G_OBJECT_CLASS(ipatch_sf2_preset_parent_class)->finalize)
     {
-        G_OBJECT_CLASS(parent_class)->finalize(gobject);
+        G_OBJECT_CLASS(ipatch_sf2_preset_parent_class)->finalize(gobject);
     }
 }
 

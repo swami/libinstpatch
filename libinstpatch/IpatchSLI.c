@@ -44,7 +44,6 @@ enum
     PROP_TITLE
 };
 
-static void ipatch_sli_class_init(IpatchSLIClass *klass);
 static void ipatch_sli_init(IpatchSLI *sli);
 static void ipatch_sli_get_title(IpatchSLI *sli, GValue *value);
 static void ipatch_sli_get_property(GObject *object, guint property_id,
@@ -61,34 +60,10 @@ static void ipatch_sli_container_make_unique(IpatchContainer *container,
         IpatchItem *item);
 static void ipatch_sli_parent_file_prop_notify(IpatchItemPropNotify *info);
 
-static gpointer parent_class = NULL;
 static GType sli_child_types[3] = { 0 };
 static GType sli_virt_types[3] = { 0 };
 
-
-/* Spectralis item type creation function */
-GType
-ipatch_sli_get_type(void)
-{
-    static GType item_type = 0;
-
-    if(!item_type)
-    {
-        static const GTypeInfo item_info =
-        {
-            sizeof(IpatchSLIClass), NULL, NULL,
-            (GClassInitFunc)ipatch_sli_class_init, NULL, NULL,
-            sizeof(IpatchSLI),
-            0,
-            (GInstanceInitFunc)ipatch_sli_init,
-        };
-
-        item_type = g_type_register_static(IPATCH_TYPE_BASE, "IpatchSLI",
-                                           &item_info, 0);
-    }
-
-    return (item_type);
-}
+G_DEFINE_TYPE(IpatchSLI, ipatch_sli, IPATCH_TYPE_BASE)
 
 static void
 ipatch_sli_class_init(IpatchSLIClass *klass)
@@ -96,8 +71,6 @@ ipatch_sli_class_init(IpatchSLIClass *klass)
     GObjectClass *obj_class = G_OBJECT_CLASS(klass);
     IpatchItemClass *item_class = IPATCH_ITEM_CLASS(klass);
     IpatchContainerClass *container_class = IPATCH_CONTAINER_CLASS(klass);
-
-    parent_class = g_type_class_peek_parent(klass);
 
     obj_class->get_property = ipatch_sli_get_property;
 
