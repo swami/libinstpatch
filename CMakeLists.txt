@@ -179,7 +179,7 @@ endif ( CMAKE_BUILD_TYPE MATCHES "Debug" )
 find_package ( PkgConfig REQUIRED )
 
 # Mandatory libraries: gobject, glib and gthread
-pkg_check_modules ( GOBJECT REQUIRED gobject-2.0>=2.12 glib-2.0>=2.12 gthread-2.0>=2.12 )
+pkg_check_modules ( GOBJECT REQUIRED gobject-2.0>=2.68 glib-2.0>=2.68 gthread-2.0>=2.68 ) # v2.68 for g_memdup2 
 
 # Disable deprecation warnings for now (fixed in master)
 add_definitions ( -DGLIB_DISABLE_DEPRECATION_WARNINGS )
