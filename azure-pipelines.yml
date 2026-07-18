@@ -45,28 +45,14 @@ jobs:
         gtk-bundle: 'http://ftp.gnome.org/pub/gnome/binaries/win32/gtk+/2.24/gtk+-bundle_2.24.10-20120208_win32.zip'
         libsndfile-url: 'https://github.com/libsndfile/libsndfile/releases/download/1.2.2/libsndfile-1.2.2-win32.zip'
         platform: 'Win32'
-        toolset: 'v142'
+        toolset: 'v143'
         artifactName: 'libinstpatch-$(platform)'
       x64:
         gtk-bundle: 'http://ftp.gnome.org/pub/gnome/binaries/win64/gtk+/2.22/gtk+-bundle_2.22.1-20101229_win64.zip'
         libsndfile-url: 'https://github.com/libsndfile/libsndfile/releases/download/1.2.2/libsndfile-1.2.2-win64.zip'
         platform: 'x64'
-        toolset: 'v142'
+        toolset: 'v143'
         artifactName: 'libinstpatch-$(platform)'
-      XP_x86:
-        gtk-bundle: 'http://ftp.gnome.org/pub/gnome/binaries/win32/gtk+/2.24/gtk+-bundle_2.24.10-20120208_win32.zip'
-        libsndfile-url: 'https://github.com/libsndfile/libsndfile/releases/download/1.2.2/libsndfile-1.2.2-win32.zip'
-        platform: 'Win32'
-        toolset: 'v141_xp'
-        artifactName: 'libinstpatch-XP-$(platform)'
-        CFLAGS: '/arch:IA32'
-        CXXFLAGS: '/arch:IA32'
-      XP_x64:
-        gtk-bundle: 'http://ftp.gnome.org/pub/gnome/binaries/win64/gtk+/2.22/gtk+-bundle_2.22.1-20101229_win64.zip'
-        libsndfile-url: 'https://github.com/libsndfile/libsndfile/releases/download/1.2.2/libsndfile-1.2.2-win64.zip'
-        platform: 'x64'
-        toolset: 'v141_xp'
-        artifactName: 'libinstpatch-XP-$(platform)'
   steps:
     - script: |
         @ECHO ON
@@ -87,7 +73,7 @@ jobs:
         SET "PATH=d:\deps\bin;%PATH%"
         DEL /F C:\Strawberry\perl\bin\pkg-config.bat
         mkdir build && cd build || exit -1
-        cmake -G "Visual Studio 16 2019" -T $(toolset) -A $(platform) -DLIB_SUFFIX="" -DCMAKE_INSTALL_PREFIX=$(Build.ArtifactStagingDirectory) -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_VERBOSE_MAKEFILE=1 .. || exit -1
+        cmake -G "Visual Studio 17 2022" -T $(toolset) -A $(platform) -DLIB_SUFFIX="" -DCMAKE_INSTALL_PREFIX=$(Build.ArtifactStagingDirectory) -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_VERBOSE_MAKEFILE=1 .. || exit -1
         cmake --build . --config RelWithDebInfo --target install || exit -1
         del $(Build.ArtifactStagingDirectory)\bin\concrt*.dll
         del $(Build.ArtifactStagingDirectory)\bin\vcruntime*.dll
