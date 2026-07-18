@@ -211,7 +211,7 @@ ipatch_sli_reader_load(IpatchSLIReader *reader, GError **err)
                   ipatch_gerror_message(local_err));
         g_clear_error(&local_err);
     }
-    else if(size != buf[1])
+    else if((guint32)size != buf[1])
     {
         g_set_error(err, ipatch_sli_reader_error_quark(),
                     IPATCH_RIFF_ERROR_SIZE_MISMATCH,

@@ -31,25 +31,14 @@
 #include "IpatchVirtualContainer.h"
 #include "IpatchTypeProp.h"
 
-GType
-ipatch_virtual_container_get_type(void)
+G_DEFINE_ABSTRACT_TYPE(IpatchVirtualContainer, ipatch_virtual_container, IPATCH_TYPE_ITEM)
+
+static void
+ipatch_virtual_container_init(IpatchVirtualContainer *container)
 {
-    static GType item_type = 0;
+}
 
-    if(!item_type)
-    {
-        static const GTypeInfo item_info =
-        {
-            sizeof(IpatchVirtualContainerClass), NULL, NULL,
-            (GClassInitFunc) NULL, NULL, NULL,
-            sizeof(IpatchVirtualContainer), 0,
-            (GInstanceInitFunc) NULL,
-        };
-
-        item_type = g_type_register_static(IPATCH_TYPE_ITEM,
-                                           "IpatchVirtualContainer",
-                                           &item_info, G_TYPE_FLAG_ABSTRACT);
-    }
-
-    return (item_type);
+static void
+ipatch_virtual_container_class_init(IpatchVirtualContainerClass *klass)
+{
 }

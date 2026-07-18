@@ -219,7 +219,8 @@ ipatch_sf2_reader_load(IpatchSF2Reader *reader, GError **err)
         g_warning("SoundFont file size check failed: %s", ipatch_gerror_message(local_err));
         g_clear_error(&local_err);
     }
-    else if(size != chunk->size + IPATCH_RIFF_HEADER_SIZE)
+    /* Cast size to guint32 */
+    else if((guint32)size != chunk->size + IPATCH_RIFF_HEADER_SIZE)
     {
         g_set_error(err, IPATCH_RIFF_ERROR,
                     IPATCH_RIFF_ERROR_SIZE_MISMATCH,
@@ -1571,10 +1572,10 @@ sfload_shdrs(IpatchSF2Reader *reader, GError **err)
                         ipatch_sf2_sample_set_linked(sample, link_sample);
                         ipatch_sf2_sample_set_linked(link_sample, sample);
 
-                        if(ipatch_item_get_flags(link_sample) & (1 << 31))
+                        if(ipatch_item_get_flags(link_sample) & (1U << 31))
                         {
                             openlink_count--;
-                            ipatch_item_clear_flags(link_sample, 1 << 31);
+                            ipatch_item_clear_flags(link_sample, 1U << 31);
                         }
                     }
                     else	/* sample is already linked */
@@ -1585,7 +1586,7 @@ sfload_shdrs(IpatchSF2Reader *reader, GError **err)
                 else /* could not fixup stereo link, do later (below) */
                 {
                     openlink_count++;
-                    ipatch_item_set_flags(sample, 1 << 31);
+                    ipatch_item_set_flags(sample, 1U << 31);
                 }
             }
 
@@ -1662,7 +1663,7 @@ sfload_shdrs(IpatchSF2Reader *reader, GError **err)
         {
             sample = reader->sample_table[i];
 
-            if((ipatch_item_get_flags(sample) & (1 << 31)) && !ipatch_sf2_sample_peek_linked(sample))
+            if((ipatch_item_get_flags(sample) & (1U << 31)) && !ipatch_sf2_sample_peek_linked(sample))
             {
                 g_warning(_("Invalid stereo link for sample '%s'"), sample->name);
                 sample->channel = IPATCH_SF2_SAMPLE_CHANNEL_MONO;

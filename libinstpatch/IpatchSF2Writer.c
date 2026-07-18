@@ -47,6 +47,7 @@
 #include "i18n.h"
 #include "ipatch_priv.h"
 #include "misc.h"
+#include "util.h"
 #include "version.h"
 
 /* NOTICE: A duplicate SoundFont object is used for saving. This
@@ -1360,7 +1361,7 @@ sfont_write_phdrs(IpatchSF2Writer *writer, GError **err)
 
     while(preset)		/* loop over all presets */
     {
-        strncpy(phdr.name, preset->name, IPATCH_SFONT_NAME_SIZE);
+        ipatch_util_strncpy_pad(phdr.name, preset->name, IPATCH_SFONT_NAME_SIZE);
         phdr.program = preset->program;
         phdr.bank = preset->bank;
         phdr.bag_index = pbagndx;
@@ -1722,7 +1723,7 @@ sfont_write_ihdrs(IpatchSF2Writer *writer, GError **err)
 
     while(inst)			/* loop over all instruments */
     {
-        strncpy(ihdr.name, inst->name, IPATCH_SFONT_NAME_SIZE);
+        ipatch_util_strncpy_pad(ihdr.name, inst->name, IPATCH_SFONT_NAME_SIZE);
         ihdr.bag_index = ibagndx;
         ipatch_sf2_write_ihdr(riff->handle, &ihdr);
 
@@ -2103,7 +2104,8 @@ sfont_write_shdrs(IpatchSF2Writer *writer, GError **err)
         }
         else
         {
-            sprintf(shdr.name, _("untitled-%d"), ++untitled);    /* i18n: Should be less than 16 chars! */
+            /* i18n: Should be less than 16 chars! */
+            snprintf(shdr.name, IPATCH_SFONT_NAME_SIZE, _("untitled-%04d"), (++untitled) % 10000); 
         }
 
         start /= 2;		/* convert start from bytes to samples */

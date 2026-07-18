@@ -111,7 +111,7 @@ ipatch_dls2_info_get(IpatchDLS2Info *info, guint32 fourcc)
  * Returns: (transfer none): Info string value or %NULL if the specified info is not
  * set. Value is internal and should not be modified or freed.
  */
-G_CONST_RETURN char *
+const char *
 ipatch_dls2_info_peek(IpatchDLS2Info *info, guint32 fourcc)
 {
     GSList *p = info;

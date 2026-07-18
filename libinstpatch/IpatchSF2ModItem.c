@@ -31,7 +31,7 @@
 #include "IpatchSF2Gen.h"
 #include "ipatch_priv.h"
 
-static void ipatch_sf2_mod_item_iface_init(IpatchSF2ModItemIface *iface);
+static void ipatch_sf2_mod_item_iface_init(gpointer g_iface, gpointer iface_data);
 
 
 GType
@@ -46,8 +46,13 @@ ipatch_sf2_mod_item_get_type(void)
             sizeof(IpatchSF2ModItemIface),
             NULL,			/* base_init */
             NULL,			/* base_finalize */
-            (GClassInitFunc) ipatch_sf2_mod_item_iface_init,
-            (GClassFinalizeFunc) NULL
+            ipatch_sf2_mod_item_iface_init,
+            NULL,			/* class_finalize */
+            NULL,			/* class_data */
+            0,				/* instance_size */
+            0,				/* n_preallocs */
+            NULL,			/* instance_init */
+            NULL,			/* value_table */
         };
 
         itype = g_type_register_static(G_TYPE_INTERFACE, "IpatchSF2ModItem",
@@ -61,8 +66,11 @@ ipatch_sf2_mod_item_get_type(void)
 }
 
 static void
-ipatch_sf2_mod_item_iface_init(IpatchSF2ModItemIface *iface)
+ipatch_sf2_mod_item_iface_init(gpointer g_iface, gpointer iface_data)
 {
+    IpatchSF2ModItemIface *iface = (IpatchSF2ModItemIface *)g_iface;
+    (void)iface_data;
+
     /**
      * IpatchSF2ModItem:modulators: (type GSList(Ipatch.SF2Mod))
      *
@@ -186,7 +194,7 @@ ipatch_sf2_mod_item_set_mods(IpatchSF2ModItem *item, GSList *mod_list, int flags
 }
 
 /**
- * ipatch_sf2_mod_item_set_mods_copy: (rename-to ipatch_sf2_mod_item_set_mods)
+ * ipatch_sf2_mod_item_set_mods_copy:
  * @item: Item with modulators
  * @mod_list: (element-type Ipatch.SF2Mod) (transfer none) (nullable): Modulator list to assign to zone.
  *

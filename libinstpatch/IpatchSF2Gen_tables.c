@@ -180,7 +180,7 @@ const IpatchSF2GenInfo ipatch_sf2_gen_info[] =
         N_("MIDI note to volume envelope decay")
     },
     /* Instrument */
-    { {0}, {UMAX}, {0}, IPATCH_UNIT_TYPE_UINT, N_("Instrument ID"), NULL},
+    { {0}, {.uword = UMAX}, {0}, IPATCH_UNIT_TYPE_UINT, N_("Instrument ID"), NULL},
     /* Reserved1 */
     { {0}, {0}, {0}, IPATCH_UNIT_TYPE_NONE, NULL, NULL},
     /* NoteRange */
@@ -212,7 +212,7 @@ const IpatchSF2GenInfo ipatch_sf2_gen_info[] =
     /* FineTune */
     { {-99}, {99}, {0}, IPATCH_UNIT_TYPE_CENTS, N_("Fine Tune"), NULL},
     /* sampleId */
-    { {0}, {UMAX}, {0}, IPATCH_UNIT_TYPE_UINT, N_("Sample ID"), NULL},
+    { {0}, {.uword = UMAX}, {0}, IPATCH_UNIT_TYPE_UINT, N_("Sample ID"), NULL},
     /* SampleModes */
     { {0}, {3}, {0}, IPATCH_UNIT_TYPE_UINT, N_("Sample Modes"), NULL},
     /* Reserved3 */

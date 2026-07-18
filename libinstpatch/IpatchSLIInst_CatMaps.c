@@ -160,8 +160,11 @@ const IpatchSLIInstCatMapEntry ipatch_sli_inst_cat_map[] =
 };
 
 /**
- * Getter fonction to access ipatch_sli_inst_cat_map[] table
- * @return pointer on ipatch_sli_inst_cat_map[] table
+ * ipatch_sli_inst_get_cat_map:
+ *
+ * Getter function to access the #ipatch_sli_inst_cat_map[] table.
+ *
+ * Returns: (transfer none): Pointer to the ipatch_sli_inst_cat_map[] table.
  */
 const IpatchSLIInstCatMapEntry * ipatch_sli_inst_get_cat_map(void)
 {
@@ -169,8 +172,11 @@ const IpatchSLIInstCatMapEntry * ipatch_sli_inst_get_cat_map(void)
 }
 
 /**
- * Getter fonction to access ipatch_sli_inst_cat_map[] table
- * @return pointer on ipatch_sli_inst_cat_strings[] table
+ * ipatch_sli_inst_get_cat_strings:
+ *
+ * Getter function to access the ipatch_sli_inst_cat_strings[] table.
+ *
+ * Returns: (transfer none): Pointer to the ipatch_sli_inst_cat_strings[] table.
  */
 const char **ipatch_sli_inst_get_cat_strings(void)
 {

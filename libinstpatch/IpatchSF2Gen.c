@@ -628,7 +628,7 @@ ipatch_sf2_gen_range_intersect_test(const IpatchSF2GenAmount *amt1,
  * Returns: Property name or %NULL if no property name for @genid.
  * The returned string is internal and should not be modified or freed.
  */
-G_CONST_RETURN char *
+const char *
 ipatch_sf2_gen_get_prop_name(guint genid)
 {
     g_return_val_if_fail(genid < IPATCH_SF2_GEN_COUNT, NULL);

@@ -62,8 +62,6 @@ static GParamSpec *info_prop_pspecs[IPATCH_SF2_INFO_COUNT];
 
 #define ERR_MSG_INVALID_INFO_ID_1 "Invalid SoundFont info ID (%d)"
 
-static void ipatch_sf2_class_init(IpatchSF2Class *klass);
-static void ipatch_sf2_init(IpatchSF2 *sfont);
 static void ipatch_sf2_finalize(GObject *gobject);
 static void ipatch_sf2_set_property(GObject *object, guint property_id,
                                     const GValue *value, GParamSpec *pspec);
@@ -94,34 +92,10 @@ static void ipatch_sf2_foreach_info_GHFunc(gpointer key, gpointer value,
         gpointer data);
 static int ipatch_sf2_info_array_qsort(const void *a, const void *b);
 
-static gpointer parent_class = NULL;
-
 static GType sf2_child_types[4] = { 0 };
 static GType sf2_virt_types[6] = { 0 };
 
-
-/* SoundFont item type creation function */
-GType
-ipatch_sf2_get_type(void)
-{
-    static GType item_type = 0;
-
-    if(!item_type)
-    {
-        static const GTypeInfo item_info =
-        {
-            sizeof(IpatchSF2Class), NULL, NULL,
-            (GClassInitFunc)ipatch_sf2_class_init, NULL, NULL,
-            sizeof(IpatchSF2), 0,
-            (GInstanceInitFunc)ipatch_sf2_init,
-        };
-
-        item_type = g_type_register_static(IPATCH_TYPE_BASE, "IpatchSF2",
-                                           &item_info, 0);
-    }
-
-    return (item_type);
-}
+G_DEFINE_TYPE(IpatchSF2, ipatch_sf2, IPATCH_TYPE_BASE)
 
 static void
 ipatch_sf2_class_init(IpatchSF2Class *klass)
@@ -131,8 +105,6 @@ ipatch_sf2_class_init(IpatchSF2Class *klass)
     IpatchContainerClass *container_class = IPATCH_CONTAINER_CLASS(klass);
     IpatchBaseClass *base_class = IPATCH_BASE_CLASS(klass);
     GParamSpec **sp = &info_prop_pspecs[0];
-
-    parent_class = g_type_class_peek_parent(klass);
 
     obj_class->finalize = ipatch_sf2_finalize;
     obj_class->get_property = ipatch_sf2_get_property;
@@ -253,9 +225,9 @@ ipatch_sf2_finalize(GObject *gobject)
 
     IPATCH_ITEM_WUNLOCK(sf);
 
-    if(G_OBJECT_CLASS(parent_class)->finalize)
+    if(G_OBJECT_CLASS(ipatch_sf2_parent_class)->finalize)
     {
-        G_OBJECT_CLASS(parent_class)->finalize(gobject);
+        G_OBJECT_CLASS(ipatch_sf2_parent_class)->finalize(gobject);
     }
 }
 
@@ -816,13 +788,13 @@ ipatch_sf2_set_info(IpatchSF2 *sf, IpatchSF2InfoType id, const char *val)
 
     g_return_if_fail(IPATCH_IS_SF2(sf));
 
-    for(i = 0; i < G_N_ELEMENTS(info_ids); i++)
+    for(i = 0; i < (int)G_N_ELEMENTS(info_ids); i++)
         if(info_ids[i] == id)
         {
             break;
         }
 
-    if(i == G_N_ELEMENTS(info_ids))
+    if(i == (int)G_N_ELEMENTS(info_ids))
     {
         g_return_if_fail(ipatch_sf2_info_id_is_valid(id));    /* for debugging */
         return;
@@ -963,13 +935,13 @@ ipatch_sf2_info_array_qsort(const void *a, const void *b)
     int andx, bndx;
 
     /* find index in info ID array */
-    for(andx = 0; andx < G_N_ELEMENTS(info_ids); andx++)
+    for(andx = 0; andx < (int)G_N_ELEMENTS(info_ids); andx++)
         if(info_ids[andx] == ainfo->id)
         {
             break;
         }
 
-    for(bndx = 0; bndx < G_N_ELEMENTS(info_ids); bndx++)
+    for(bndx = 0; bndx < (int)G_N_ELEMENTS(info_ids); bndx++)
         if(info_ids[bndx] == binfo->id)
         {
             break;
@@ -1011,7 +983,7 @@ ipatch_sf2_info_id_is_valid(guint32 id)
 {
     int i;
 
-    for(i = 0; i < G_N_ELEMENTS(info_ids) ; i++)
+    for(i = 0; i < (int)G_N_ELEMENTS(info_ids) ; i++)
         if(info_ids[i] == id)
         {
             return (TRUE);

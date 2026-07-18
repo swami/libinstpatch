@@ -478,10 +478,10 @@ ipatch_item_prop_real_connect(IpatchItem *item, GParamSpec *pspec,
  * ipatch_item_prop_connect_by_name: (skip)
  * @item: (nullable): IpatchItem to match (or %NULL for wildcard)
  * @prop_name: Name of property of @item to match
- * @callback: Callback function
+ * @callback: (closure user_data): Callback function
  * @disconnect: (nullable): Callback disconnect function (called when the callback is
  *   disconnect) can be NULL.
- * @user_data: (closure): User defined data to pass to @callback and @disconnect function.
+ * @user_data: User defined data to pass to @callback and @disconnect function.
  *
  * Like ipatch_item_prop_add_callback() but takes the name of a property
  * instead of the parameter spec, for added convenience.
@@ -694,7 +694,7 @@ ipatch_item_prop_real_disconnect(guint handler_id, IpatchItem *item,
         }
         else
             g_critical(G_STRLOC ": Failed to find handler matching criteria %p:%p:%p:%p",
-                       item, pspec, callback, user_data);
+                       (void *)item, (void *)pspec, (void *)callback, user_data);
     }
 
     /* see if callback found and it had a disconnect func or notify_func */

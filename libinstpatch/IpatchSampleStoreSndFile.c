@@ -351,7 +351,15 @@ ipatch_sample_store_snd_file_sample_iface_open(IpatchSampleHandle *handle,
 
         if(store->raw)
         {
-            handle->data2 = sf_read_raw;    /* Just read raw data (conversions handled internally) */
+            /* data2 stores a function pointer in a gpointer field; the actual
+               libsndfile functions differ in their second parameter type per
+               sample width (short, int, float, double, or void for raw), but
+               are all called back through a single unified signature below
+               (see ipatch_sample_store_snd_file_sample_iface_read/write).
+               ISO C forbids the implicit function-pointer<->void* conversion
+               this relies on; cast explicitly to document the existing
+               intent rather than change the (working) runtime behavior. */
+            handle->data2 = (gpointer)sf_read_raw;    /* Just read raw data (conversions handled internally) */
             handle->data3 = GUINT_TO_POINTER(ipatch_sample_format_size(format));
         }
         else
@@ -359,19 +367,19 @@ ipatch_sample_store_snd_file_sample_iface_open(IpatchSampleHandle *handle,
             switch(IPATCH_SAMPLE_FORMAT_GET_WIDTH(format))
             {
             case IPATCH_SAMPLE_16BIT:
-                handle->data2 = sf_readf_short;
+                handle->data2 = (gpointer)sf_readf_short;
                 break;
 
             case IPATCH_SAMPLE_32BIT:
-                handle->data2 = sf_readf_int;
+                handle->data2 = (gpointer)sf_readf_int;
                 break;
 
             case IPATCH_SAMPLE_FLOAT:
-                handle->data2 = sf_readf_float;
+                handle->data2 = (gpointer)sf_readf_float;
                 break;
 
             case IPATCH_SAMPLE_DOUBLE:
-                handle->data2 = sf_readf_double;
+                handle->data2 = (gpointer)sf_readf_double;
                 break;
 
             default:
@@ -397,27 +405,27 @@ ipatch_sample_store_snd_file_sample_iface_open(IpatchSampleHandle *handle,
         switch(IPATCH_SAMPLE_FORMAT_GET_WIDTH(format))
         {
         case IPATCH_SAMPLE_8BIT:
-            handle->data2 = sf_write_raw;    /* Just write raw data (conversions handled internally) */
+            handle->data2 = (gpointer)sf_write_raw;    /* Just write raw data (conversions handled internally) */
             handle->data3 = GUINT_TO_POINTER(ipatch_sample_format_size(format));
             break;
 
         case IPATCH_SAMPLE_16BIT:
-            handle->data2 = sf_writef_short;
+            handle->data2 = (gpointer)sf_writef_short;
             handle->data3 = GUINT_TO_POINTER(1);
             break;
 
         case IPATCH_SAMPLE_32BIT:
-            handle->data2 = sf_writef_int;
+            handle->data2 = (gpointer)sf_writef_int;
             handle->data3 = GUINT_TO_POINTER(1);
             break;
 
         case IPATCH_SAMPLE_FLOAT:
-            handle->data2 = sf_writef_float;
+            handle->data2 = (gpointer)sf_writef_float;
             handle->data3 = GUINT_TO_POINTER(1);
             break;
 
         case IPATCH_SAMPLE_DOUBLE:
-            handle->data2 = sf_writef_double;
+            handle->data2 = (gpointer)sf_writef_double;
             handle->data3 = GUINT_TO_POINTER(1);
             break;
         }
@@ -552,7 +560,7 @@ ipatch_sample_store_snd_file_sample_iface_read(IpatchSampleHandle *handle,
 {
     IpatchSampleStoreSndFile *sample = (IpatchSampleStoreSndFile *)(handle->sample);
     SNDFILE *sfhandle = (SNDFILE *)(handle->data1);
-    sf_count_t (*readfunc)(SNDFILE * sndfile, gpointer buf, sf_count_t count) = handle->data2;
+    sf_count_t (*readfunc)(SNDFILE * sndfile, gpointer buf, sf_count_t count) = (sf_count_t (*)(SNDFILE *, gpointer, sf_count_t))handle->data2;
     guint count = frames * GPOINTER_TO_UINT(handle->data3);       /* data3 is frames multiplier */
     guint filepos = GPOINTER_TO_UINT(handle->data4);      /* data4 is current offset */
     sf_count_t read_count;
@@ -593,7 +601,7 @@ ipatch_sample_store_snd_file_sample_iface_write(IpatchSampleHandle *handle,
 {
     IpatchSampleStoreSndFile *sample = (IpatchSampleStoreSndFile *)(handle->sample);
     SNDFILE *sfhandle = (SNDFILE *)(handle->data1);
-    sf_count_t (*writefunc)(SNDFILE * sndfile, gconstpointer buf, sf_count_t count) = handle->data2;
+    sf_count_t (*writefunc)(SNDFILE * sndfile, gconstpointer buf, sf_count_t count) = (sf_count_t (*)(SNDFILE *, gconstpointer, sf_count_t))handle->data2;
     guint count = frames * GPOINTER_TO_UINT(handle->data3);       /* data3 is frames multiplier */
 
     if(sf_seek(sfhandle, offset, SEEK_SET) == -1)

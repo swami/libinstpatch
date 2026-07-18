@@ -119,6 +119,7 @@ ipatch_vbank_inst_class_init(IpatchVBankInstClass *klass)
 static void
 ipatch_vbank_inst_init(IpatchVBankInst *inst)
 {
+    (void)inst;
 }
 
 static void
@@ -238,6 +239,9 @@ ipatch_vbank_inst_item_copy(IpatchItem *dest, IpatchItem *src,
     IpatchVBankInst *src_inst, *dest_inst;
     IpatchItem *region;
     GSList *p;
+
+    (void)link_func;
+    (void)user_data;
 
     src_inst = IPATCH_VBANK_INST(src);
     dest_inst = IPATCH_VBANK_INST(dest);

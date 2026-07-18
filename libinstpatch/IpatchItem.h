@@ -59,6 +59,23 @@ typedef IpatchItem *(*IpatchItemCopyLinkFunc)(IpatchItem *item,
         IpatchItem *link,
         gpointer user_data);
 
+/**
+ * IpatchItemRecMutex: (skip)
+ *
+ * Recursive mutex used internally by #IpatchItem. GRecMutex (unlike the
+ * deprecated GStaticRecMutex it replaces) has no public API to query or
+ * restore its internal recursion depth, but ipatch_item_set_parent() needs
+ * exactly that to transfer a calling thread's recursion depth onto a new
+ * (parent's) mutex when an item becomes mutex_slave. 'depth' tracks that
+ * ourselves and is only meaningful/safe to read while the calling thread
+ * holds the lock.
+ */
+typedef struct
+{
+    GRecMutex mutex;
+    guint depth;
+} IpatchItemRecMutex;
+
 /* Base patch item object */
 struct _IpatchItem
 {
@@ -69,7 +86,7 @@ struct _IpatchItem
     int flags;		/* flag field (atomic int ops used) */
     IpatchItem *parent;	/* parent item or NULL if not parented or root */
     IpatchItem *base; 	/* base parent object or NULL */
-    GStaticRecMutex *mutex;  /* pointer to mutex (could be a parent's mutex) */
+    IpatchItemRecMutex *mutex;  /* pointer to mutex (could be a parent's mutex) */
 };
 
 /* Base patch item class */
@@ -114,12 +131,40 @@ typedef enum
 /* 2 flags + reserve 2 bits for future expansion */
 #define IPATCH_ITEM_UNUSED_FLAG_SHIFT 4
 
+/**
+ * ipatch_item_rec_mutex_lock: (skip)
+ *
+ * Locks @m and increments its recursion depth counter. Depth is only
+ * ever touched while the lock is held by the calling thread, so this is
+ * safe without extra synchronization.
+ */
+static inline void
+ipatch_item_rec_mutex_lock(IpatchItemRecMutex *m)
+{
+    g_rec_mutex_lock(&m->mutex);
+    m->depth++;
+}
+
+/**
+ * ipatch_item_rec_mutex_unlock: (skip)
+ *
+ * Decrements @m's recursion depth counter and unlocks it. Depth is
+ * decremented before the real unlock so it never observes a stale value
+ * once another thread acquires the mutex.
+ */
+static inline void
+ipatch_item_rec_mutex_unlock(IpatchItemRecMutex *m)
+{
+    m->depth--;
+    g_rec_mutex_unlock(&m->mutex);
+}
+
 /* Multi-thread locking macros. For now there is no distinction between
    write and read locking since GStaticRWLock is not recursive. */
 #define IPATCH_ITEM_WLOCK(item)	\
-    g_static_rec_mutex_lock (((IpatchItem *)(item))->mutex)
+    ipatch_item_rec_mutex_lock (((IpatchItem *)(item))->mutex)
 #define IPATCH_ITEM_WUNLOCK(item) \
-    g_static_rec_mutex_unlock (((IpatchItem *)(item))->mutex)
+    ipatch_item_rec_mutex_unlock (((IpatchItem *)(item))->mutex)
 #define IPATCH_ITEM_RLOCK(item)		IPATCH_ITEM_WLOCK(item)
 #define IPATCH_ITEM_RUNLOCK(item)	IPATCH_ITEM_WUNLOCK(item)
 
@@ -191,10 +236,15 @@ typedef void (*IpatchItemPropDisconnect)(IpatchItem *item, GParamSpec *pspec,
 /* Useful when libinstpatch library is used as a static library. */
 extern GParamSpec *ipatch_item_pspec_title;
 
-/*
- Getter function returning title property GParamSpec as a convenience to derived type.
- Useful when libinstpatch library is used as a shared library linked at load time.
-*/
+/**
+ * ipatch_item_get_pspec_title:
+ *
+ * Getter function returning title property #GParamSpec as a convenience to
+ * derived types. Useful when libinstpatch library is used as a shared
+ * library linked at load time.
+ *
+ * Returns: (transfer none): The title property #GParamSpec.
+ */
 GParamSpec *ipatch_item_get_pspec_title(void);
 
 GType ipatch_item_get_type(void);
@@ -237,7 +287,8 @@ IpatchItem *ipatch_item_copy_link_func_hash(IpatchItem *item, IpatchItem *link,
 gboolean ipatch_item_type_can_conflict(GType item_type);
 GParamSpec **ipatch_item_type_get_unique_specs(GType item_type,
         guint32 *groups);
-GValueArray *ipatch_item_get_unique_props(IpatchItem *item);
+GArray *ipatch_item_get_unique_props_array(IpatchItem *item);
+GValueArray *ipatch_item_get_unique_props(IpatchItem *item) G_GNUC_DEPRECATED_FOR(ipatch_item_get_unique_props_array);
 guint ipatch_item_test_conflict(IpatchItem *item1, IpatchItem *item2);
 void ipatch_item_set_atomic(gpointer item,
                             const char *first_property_name, ...);

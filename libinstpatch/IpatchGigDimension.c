@@ -51,44 +51,18 @@ static void ipatch_gig_dimension_get_property(GObject *object,
         GValue *value,
         GParamSpec *pspec);
 
-static void ipatch_gig_dimension_init(IpatchGigDimension *gig_dimension);
 static void ipatch_gig_dimension_finalize(GObject *gobject);
 static void ipatch_gig_dimension_item_copy(IpatchItem *dest, IpatchItem *src,
         IpatchItemCopyLinkFunc link_func,
         gpointer user_data);
 
-static GObjectClass *parent_class = NULL;
-
-
-GType
-ipatch_gig_dimension_get_type(void)
-{
-    static GType item_type = 0;
-
-    if(!item_type)
-    {
-        static const GTypeInfo item_info =
-        {
-            sizeof(IpatchGigDimensionClass), NULL, NULL,
-            (GClassInitFunc)ipatch_gig_dimension_class_init, NULL, NULL,
-            sizeof(IpatchGigDimension), 0,
-            (GInstanceInitFunc)ipatch_gig_dimension_init,
-        };
-
-        item_type = g_type_register_static(IPATCH_TYPE_ITEM,
-                                           "IpatchGigDimension", &item_info, 0);
-    }
-
-    return (item_type);
-}
+G_DEFINE_TYPE(IpatchGigDimension, ipatch_gig_dimension, IPATCH_TYPE_ITEM)
 
 static void
 ipatch_gig_dimension_class_init(IpatchGigDimensionClass *klass)
 {
     GObjectClass *obj_class = G_OBJECT_CLASS(klass);
     IpatchItemClass *item_class = IPATCH_ITEM_CLASS(klass);
-
-    parent_class = g_type_class_peek_parent(klass);
 
     obj_class->finalize = ipatch_gig_dimension_finalize;
     obj_class->get_property = ipatch_gig_dimension_get_property;
@@ -111,7 +85,7 @@ ipatch_gig_dimension_class_init(IpatchGigDimensionClass *klass)
                                             IPATCH_TYPE_GIG_DIMENSION_TYPE,
                                             IPATCH_GIG_DIMENSION_NONE,
                                             G_PARAM_READWRITE));
-    g_object_class_install_property(obj_class, PROP_TYPE,
+    g_object_class_install_property(obj_class, PROP_SPLIT_COUNT,
                                     g_param_spec_int("split-count", _("Split count"),
                                             _("Number of split bits"),
                                             1, 5, 1, G_PARAM_READWRITE));
@@ -193,9 +167,9 @@ ipatch_gig_dimension_finalize(GObject *gobject)
     dimension->name = NULL;
     IPATCH_ITEM_WUNLOCK(dimension);
 
-    if(parent_class->finalize)
+    if(G_OBJECT_CLASS(ipatch_gig_dimension_parent_class)->finalize)
     {
-        parent_class->finalize(gobject);
+        G_OBJECT_CLASS(ipatch_gig_dimension_parent_class)->finalize(gobject);
     }
 }
 

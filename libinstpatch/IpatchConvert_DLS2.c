@@ -238,9 +238,11 @@ _file_to_dls2_sample_convert(IpatchConverter *converter, GError **err)
 
 /* DLS2 -> File class is handled manually to install properties */
 static void
-_dls2_to_file_class_init(IpatchConverterClass *klass)
+_dls2_to_file_class_init(gpointer g_class, gpointer class_data)
 {
+    IpatchConverterClass *klass = (IpatchConverterClass *)g_class;
     GObjectClass *obj_class = G_OBJECT_CLASS(klass);
+    (void)class_data;
 
     obj_class->get_property = _dls2_to_file_get_property;
     obj_class->set_property = _dls2_to_file_set_property;

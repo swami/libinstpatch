@@ -86,6 +86,10 @@
 
 #ifdef __GNUC__
 
+/* __PRETTY_FUNCTION__ is a GCC extension (gives full function signature,
+   more useful for debugging than plain __func__). This intentionally
+   triggers a -Wpedantic ISO C warning under -pedantic; accepted as harmless
+   since this branch is already gated on __GNUC__. */
 #define log_if_fail(expr)  (!(expr) && \
       _ret_g_log (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL, \
 	     "file %s: line %d (%s): assertion `%s' failed.", \

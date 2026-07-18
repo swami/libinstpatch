@@ -21,6 +21,9 @@
 #ifndef __IPATCH_CONVERTER_PRIV_H__
 #define __IPATCH_CONVERTER_PRIV_H__
 
+/**
+ * CONVERTER_GET_TYPE: (skip)
+ */
 #define CONVERTER_GET_TYPE(type_under, TypeCase) \
 GType ipatch_converter_ ## type_under ## _get_type (void) \
 { \
@@ -29,9 +32,9 @@ GType ipatch_converter_ ## type_under ## _get_type (void) \
   if (!obj_type) { \
     static const GTypeInfo obj_info = { \
       sizeof (IpatchConverter ## TypeCase ## Class), NULL, NULL, \
-      (GClassInitFunc) _ ## type_under ## _class_init, NULL, NULL, \
+      _ ## type_under ## _class_init, NULL, NULL, \
       sizeof (IpatchConverter ## TypeCase), 0, \
-      (GInstanceInitFunc) NULL, \
+      NULL, NULL, \
     }; \
  \
     obj_type = g_type_register_static (IPATCH_TYPE_CONVERTER, \
@@ -42,22 +45,35 @@ GType ipatch_converter_ ## type_under ## _get_type (void) \
   return (obj_type); \
 }
 
+/**
+ * CONVERTER_CLASS_INIT: (skip)
+ */
 #define CONVERTER_CLASS_INIT(type_under) \
-static void _ ## type_under ## _class_init (IpatchConverterClass *klass) \
+static void _ ## type_under ## _class_init (gpointer g_class, gpointer class_data) \
 { \
+  IpatchConverterClass *klass = (IpatchConverterClass *) g_class; \
+  (void) class_data; \
   klass->verify = NULL; \
   klass->notes = NULL; \
   klass->convert = _ ## type_under ## _convert; \
 }
 
+/**
+ * CONVERTER_CLASS_INIT_NOTES: (skip)
+ */
 #define CONVERTER_CLASS_INIT_NOTES(type_under) \
-static void _ ## type_under ## _class_init (IpatchConverterClass *klass) \
+static void _ ## type_under ## _class_init (gpointer g_class, gpointer class_data) \
 { \
+  IpatchConverterClass *klass = (IpatchConverterClass *) g_class; \
+  (void) class_data; \
   klass->verify = NULL; \
   klass->notes = _ ## type_under ## _notes; \
   klass->convert = _ ## type_under ## _convert; \
 }
 
+/**
+ * CONVERTER_SF2_VOICE_CACHE_GET_TYPE: (skip)
+ */
 #define CONVERTER_SF2_VOICE_CACHE_GET_TYPE(type_under, TypeCase) \
 GType ipatch_converter_ ## type_under ## _get_type (void) \
 { \
@@ -66,9 +82,9 @@ GType ipatch_converter_ ## type_under ## _get_type (void) \
   if (!obj_type) { \
     static const GTypeInfo obj_info = { \
       sizeof (IpatchConverter ## TypeCase ## Class), NULL, NULL, \
-      (GClassInitFunc) _ ## type_under ## _class_init, NULL, NULL, \
+      _ ## type_under ## _class_init, NULL, NULL, \
       sizeof (IpatchConverter ## TypeCase), 0, \
-      (GInstanceInitFunc) NULL, \
+      NULL, NULL, \
     }; \
  \
     obj_type = g_type_register_static (IPATCH_TYPE_CONVERTER_SF2_VOICE_CACHE, \

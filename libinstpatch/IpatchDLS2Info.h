@@ -57,7 +57,7 @@ typedef enum
 
 
 char *ipatch_dls2_info_get(IpatchDLS2Info *info, guint32 fourcc);
-G_CONST_RETURN char *ipatch_dls2_info_peek(IpatchDLS2Info *info,
+const char *ipatch_dls2_info_peek(IpatchDLS2Info *info,
         guint32 fourcc);
 void ipatch_dls2_info_set(IpatchDLS2Info **info, guint32 fourcc,
                           const char *value);

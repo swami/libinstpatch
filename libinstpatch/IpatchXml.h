@@ -73,16 +73,16 @@ void ipatch_xml_set_value(GNode *node, const char *value);
 void ipatch_xml_set_value_printf(GNode *node, const char *format, ...);
 void ipatch_xml_take_name(GNode *node, char *name);
 void ipatch_xml_take_value(GNode *node, char *value);
-G_CONST_RETURN char *ipatch_xml_get_name(GNode *node);
+const char *ipatch_xml_get_name(GNode *node);
 gboolean ipatch_xml_test_name(GNode *node, const char *cmpname);
-G_CONST_RETURN char *ipatch_xml_get_value(GNode *node);
+const char *ipatch_xml_get_value(GNode *node);
 char *ipatch_xml_dup_value(GNode *node);
 gboolean ipatch_xml_test_value(GNode *node, const char *cmpvalue);
 void ipatch_xml_set_attribute(GNode *node, const char *attr_name,
                               const char *attr_value);
 void ipatch_xml_set_attributes(GNode *node, const char *attr_name,
                                const char *attr_value, const char *attr2_name, ...);
-G_CONST_RETURN char *ipatch_xml_get_attribute(GNode *node, const char *attr_name);
+const char *ipatch_xml_get_attribute(GNode *node, const char *attr_name);
 gboolean ipatch_xml_test_attribute(GNode *node, const char *attr_name,
                                    const char *cmpval);
 GNode *ipatch_xml_find_child(GNode *node, const char *name);

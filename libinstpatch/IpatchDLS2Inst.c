@@ -45,7 +45,6 @@ enum
     PROP_PERCUSSION
 };
 
-static void ipatch_dls2_inst_class_init(IpatchDLS2InstClass *klass);
 static void ipatch_dls2_inst_finalize(GObject *gobject);
 static void get_title(IpatchDLS2Inst *inst, GValue *value);
 static void ipatch_dls2_inst_set_property(GObject *object,
@@ -65,30 +64,14 @@ static gboolean
 ipatch_dls2_inst_container_init_iter(IpatchContainer *container,
                                      IpatchIter *iter, GType type);
 
-static gpointer parent_class = NULL;
 static GType inst_child_types[2] = { 0 };
 
+G_DEFINE_TYPE(IpatchDLS2Inst, ipatch_dls2_inst, IPATCH_TYPE_CONTAINER)
 
-GType
-ipatch_dls2_inst_get_type(void)
+static void
+ipatch_dls2_inst_init(IpatchDLS2Inst *inst)
 {
-    static GType item_type = 0;
-
-    if(!item_type)
-    {
-        static const GTypeInfo item_info =
-        {
-            sizeof(IpatchDLS2InstClass), NULL, NULL,
-            (GClassInitFunc)ipatch_dls2_inst_class_init, NULL, NULL,
-            sizeof(IpatchDLS2Inst), 0,
-            (GInstanceInitFunc) NULL,
-        };
-
-        item_type = g_type_register_static(IPATCH_TYPE_CONTAINER,
-                                           "IpatchDLS2Inst", &item_info, 0);
-    }
-
-    return (item_type);
+    (void)inst;
 }
 
 static void
@@ -98,8 +81,6 @@ ipatch_dls2_inst_class_init(IpatchDLS2InstClass *klass)
     IpatchItemClass *item_class = IPATCH_ITEM_CLASS(klass);
     IpatchContainerClass *container_class = IPATCH_CONTAINER_CLASS(klass);
     GParamSpec *pspec;
-
-    parent_class = g_type_class_peek_parent(klass);
 
     obj_class->finalize = ipatch_dls2_inst_finalize;
     obj_class->get_property = ipatch_dls2_inst_get_property;
@@ -167,9 +148,9 @@ ipatch_dls2_inst_finalize(GObject *gobject)
 
     IPATCH_ITEM_WUNLOCK(inst);
 
-    if(G_OBJECT_CLASS(parent_class)->finalize)
+    if(G_OBJECT_CLASS(ipatch_dls2_inst_parent_class)->finalize)
     {
-        G_OBJECT_CLASS(parent_class)->finalize(gobject);
+        G_OBJECT_CLASS(ipatch_dls2_inst_parent_class)->finalize(gobject);
     }
 }
 
@@ -321,7 +302,7 @@ ipatch_dls2_inst_item_copy(IpatchItem *dest, IpatchItem *src,
 
     if(src_inst->dlid)
     {
-        dest_inst->dlid = g_memdup(src_inst->dlid, IPATCH_DLS_DLID_SIZE);
+        dest_inst->dlid = g_memdup2(src_inst->dlid, IPATCH_DLS_DLID_SIZE);
     }
 
     p = src_inst->regions;

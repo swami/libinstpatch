@@ -106,6 +106,7 @@ G_BEGIN_DECLS
 #include <libinstpatch/IpatchXmlObject.h>
 #include <libinstpatch/misc.h>
 #include <libinstpatch/sample.h>
+#include <libinstpatch/util.h>
 #include <libinstpatch/version.h>
 
 G_END_DECLS

@@ -36,8 +36,6 @@ enum
     PROP_GROUP_NUMBER
 };
 
-static void ipatch_gig_sample_class_init(IpatchGigSampleClass *klass);
-static void ipatch_gig_sample_init(IpatchGigSample *sample);
 static void ipatch_gig_sample_set_property(GObject *object,
         guint property_id,
         const GValue *value,
@@ -50,38 +48,13 @@ static void ipatch_gig_sample_item_copy(IpatchItem *dest, IpatchItem *src,
                                         IpatchItemCopyLinkFunc link_func,
                                         gpointer user_data);
 
-static gpointer parent_class = NULL;
-
-
-GType
-ipatch_gig_sample_get_type(void)
-{
-    static GType item_type = 0;
-
-    if(!item_type)
-    {
-        static const GTypeInfo item_info =
-        {
-            sizeof(IpatchGigSampleClass), NULL, NULL,
-            (GClassInitFunc)ipatch_gig_sample_class_init, NULL, NULL,
-            sizeof(IpatchGigSample), 0,
-            (GInstanceInitFunc)ipatch_gig_sample_init,
-        };
-
-        item_type = g_type_register_static(IPATCH_TYPE_DLS2_SAMPLE,
-                                           "IpatchGigSample", &item_info, 0);
-    }
-
-    return (item_type);
-}
+G_DEFINE_TYPE(IpatchGigSample, ipatch_gig_sample, IPATCH_TYPE_DLS2_SAMPLE)
 
 static void
 ipatch_gig_sample_class_init(IpatchGigSampleClass *klass)
 {
     GObjectClass *obj_class = G_OBJECT_CLASS(klass);
     IpatchItemClass *item_class = IPATCH_ITEM_CLASS(klass);
-
-    parent_class = g_type_class_peek_parent(klass);
 
     obj_class->get_property = ipatch_gig_sample_get_property;
 
@@ -149,7 +122,7 @@ ipatch_gig_sample_item_copy(IpatchItem *dest, IpatchItem *src,
     dest_sample = IPATCH_GIG_SAMPLE(dest);
 
     /* call IpatchDLS2Sample class copy function */
-    IPATCH_ITEM_CLASS(parent_class)->copy(dest, src, link_func, user_data);
+    IPATCH_ITEM_CLASS(ipatch_gig_sample_parent_class)->copy(dest, src, link_func, user_data);
 
     /* don't need to lock for this stuff */
     dest_sample->group_number = src_sample->group_number;

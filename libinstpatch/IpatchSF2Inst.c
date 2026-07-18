@@ -48,10 +48,9 @@ enum
 
 static void ipatch_sf2_inst_class_init(IpatchSF2InstClass *klass);
 static void
-ipatch_sf2_inst_gen_item_iface_init(IpatchSF2GenItemIface *genitem_iface);
+ipatch_sf2_inst_gen_item_iface_init(gpointer g_iface, gpointer iface_data);
 static void
-ipatch_sf2_inst_mod_item_iface_init(IpatchSF2ModItemIface *moditem_iface);
-static void ipatch_sf2_inst_init(IpatchSF2Inst *inst);
+ipatch_sf2_inst_mod_item_iface_init(gpointer g_iface, gpointer iface_data);
 static void ipatch_sf2_inst_finalize(GObject *gobject);
 static void ipatch_sf2_inst_set_property(GObject *object,
         guint property_id,
@@ -74,7 +73,6 @@ ipatch_sf2_inst_container_init_iter(IpatchContainer *container,
 static void ipatch_sf2_inst_real_set_name(IpatchSF2Inst *inst, const char *name,
         gboolean name_notify);
 
-static gpointer parent_class = NULL;
 static GType inst_child_types[2] = { 0 };
 static GParamSpec *name_pspec;
 
@@ -85,38 +83,11 @@ static GParamSpec **gen_item_setspecs = NULL;
 /* For passing between class init and mod item interface init */
 static GParamSpec *modulators_spec = NULL;
 
-
-GType
-ipatch_sf2_inst_get_type(void)
-{
-    static GType item_type = 0;
-
-    if(!item_type)
-    {
-        static const GTypeInfo item_info =
-        {
-            sizeof(IpatchSF2InstClass), NULL, NULL,
-            (GClassInitFunc)ipatch_sf2_inst_class_init, NULL, NULL,
-            sizeof(IpatchSF2Inst), 0,
-            (GInstanceInitFunc)ipatch_sf2_inst_init,
-        };
-        static const GInterfaceInfo genitem_iface =
-        {
-            (GInterfaceInitFunc) ipatch_sf2_inst_gen_item_iface_init, NULL, NULL
-        };
-        static const GInterfaceInfo moditem_iface =
-        {
-            (GInterfaceInitFunc) ipatch_sf2_inst_mod_item_iface_init, NULL, NULL
-        };
-
-        item_type = g_type_register_static(IPATCH_TYPE_CONTAINER,
-                                           "IpatchSF2Inst", &item_info, 0);
-        g_type_add_interface_static(item_type, IPATCH_TYPE_SF2_GEN_ITEM, &genitem_iface);
-        g_type_add_interface_static(item_type, IPATCH_TYPE_SF2_MOD_ITEM, &moditem_iface);
-    }
-
-    return (item_type);
-}
+G_DEFINE_TYPE_WITH_CODE(IpatchSF2Inst, ipatch_sf2_inst, IPATCH_TYPE_CONTAINER,
+                        G_IMPLEMENT_INTERFACE(IPATCH_TYPE_SF2_GEN_ITEM,
+                                              ipatch_sf2_inst_gen_item_iface_init)
+                        G_IMPLEMENT_INTERFACE(IPATCH_TYPE_SF2_MOD_ITEM,
+                                              ipatch_sf2_inst_mod_item_iface_init))
 
 static void
 ipatch_sf2_inst_class_init(IpatchSF2InstClass *klass)
@@ -124,8 +95,6 @@ ipatch_sf2_inst_class_init(IpatchSF2InstClass *klass)
     GObjectClass *obj_class = G_OBJECT_CLASS(klass);
     IpatchItemClass *item_class = IPATCH_ITEM_CLASS(klass);
     IpatchContainerClass *container_class = IPATCH_CONTAINER_CLASS(klass);
-
-    parent_class = g_type_class_peek_parent(klass);
 
     obj_class->finalize = ipatch_sf2_inst_finalize;
     obj_class->get_property = ipatch_sf2_inst_get_property;
@@ -159,8 +128,11 @@ ipatch_sf2_inst_class_init(IpatchSF2InstClass *klass)
 
 /* gen item interface initialization */
 static void
-ipatch_sf2_inst_gen_item_iface_init(IpatchSF2GenItemIface *genitem_iface)
+ipatch_sf2_inst_gen_item_iface_init(gpointer g_iface, gpointer iface_data)
 {
+    IpatchSF2GenItemIface *genitem_iface = (IpatchSF2GenItemIface *)g_iface;
+    (void)iface_data;
+
     genitem_iface->genarray_ofs = G_STRUCT_OFFSET(IpatchSF2Inst, genarray);
     genitem_iface->propstype = IPATCH_SF2_GEN_PROPS_INST_GLOBAL;
 
@@ -175,8 +147,11 @@ ipatch_sf2_inst_gen_item_iface_init(IpatchSF2GenItemIface *genitem_iface)
 
 /* mod item interface initialization */
 static void
-ipatch_sf2_inst_mod_item_iface_init(IpatchSF2ModItemIface *moditem_iface)
+ipatch_sf2_inst_mod_item_iface_init(gpointer g_iface, gpointer iface_data)
 {
+    IpatchSF2ModItemIface *moditem_iface = (IpatchSF2ModItemIface *)g_iface;
+    (void)iface_data;
+
     moditem_iface->modlist_ofs = G_STRUCT_OFFSET(IpatchSF2Inst, mods);
 
     /* cache the modulators property for fast notifications */
@@ -206,9 +181,9 @@ ipatch_sf2_inst_finalize(GObject *gobject)
 
     IPATCH_ITEM_WUNLOCK(inst);
 
-    if(G_OBJECT_CLASS(parent_class)->finalize)
+    if(G_OBJECT_CLASS(ipatch_sf2_inst_parent_class)->finalize)
     {
-        G_OBJECT_CLASS(parent_class)->finalize(gobject);
+        G_OBJECT_CLASS(ipatch_sf2_inst_parent_class)->finalize(gobject);
     }
 }
 
@@ -333,9 +308,9 @@ ipatch_sf2_inst_item_remove_full(IpatchItem *item, gboolean full)
 
     g_object_unref(list);	/* -- unref list */
 
-    if(IPATCH_ITEM_CLASS(parent_class)->remove_full)
+    if(IPATCH_ITEM_CLASS(ipatch_sf2_inst_parent_class)->remove_full)
     {
-        IPATCH_ITEM_CLASS(parent_class)->remove_full(item, full);
+        IPATCH_ITEM_CLASS(ipatch_sf2_inst_parent_class)->remove_full(item, full);
     }
 }
 

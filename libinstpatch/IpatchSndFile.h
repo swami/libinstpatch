@@ -67,7 +67,7 @@ typedef enum
  *
  * Default file format enum for #IPATCH_TYPE_SND_FILE_FORMAT.
  */
-#define IPATCH_SND_FILE_DEFAULT_FORMAT     1 // must be the same as SF_FORMAT_WAV !
+#define IPATCH_SND_FILE_DEFAULT_FORMAT     0x010000 // must be the same as SF_FORMAT_WAV !
 
 /**
  * IPATCH_SND_FILE_DEFAULT_SUB_FORMAT:

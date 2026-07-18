@@ -360,7 +360,8 @@ ipatch_xml_copy(GNode *node)
 {
     g_return_val_if_fail(node != NULL, NULL);
 
-    return (g_node_copy_deep(node, (GCopyFunc)ipatch_xml_node_duplicate, NULL));
+    /* Cast through void * to silence strict function cast warnings */
+    return (g_node_copy_deep(node, (GCopyFunc)(void *)ipatch_xml_node_duplicate, NULL));
 }
 
 /**
@@ -475,7 +476,7 @@ ipatch_xml_take_value(GNode *node, char *value)
  *
  * Returns: Name of XML node which is internal and should not be modified or freed.
  */
-G_CONST_RETURN char *
+const char *
 ipatch_xml_get_name(GNode *node)
 {
     g_return_val_if_fail(node != NULL, NULL);
@@ -513,7 +514,7 @@ ipatch_xml_test_name(GNode *node, const char *cmpname)
  * Returns: Value of XML node or %NULL, which is internal and should not be
  *   modified or freed.
  */
-G_CONST_RETURN char *
+const char *
 ipatch_xml_get_value(GNode *node)
 {
     g_return_val_if_fail(node != NULL, NULL);
@@ -655,7 +656,7 @@ ipatch_xml_set_attributes(GNode *node, const char *attr_name,
  * Returns: Value of the named attribute or %NULL if not found, value is internal
  *   and should not be modified or freed.
  */
-G_CONST_RETURN char *
+const char *
 ipatch_xml_get_attribute(GNode *node, const char *attr_name)
 {
     IpatchXmlAttr *attr;
@@ -751,17 +752,19 @@ ipatch_xml_find_by_path(GNode *node, const char *path)
     return (ipatch_xml_find_by_path_recurse(node, path));
 }
 
+
 static GNode *
 ipatch_xml_find_by_path_recurse(GNode *node, const char *path)
 {
     IpatchXmlNode *xmlnode;
-    char *dot;
+    const char *dot;
     int len;
     GNode *n;
 
     dot = strchr(path, '.');
-    len = dot ? dot - path : strlen(path);
-
+    /* Cast operands to int to match the type of 'len' */
+    len = dot ? (int)(dot - path) : (int)strlen(path);
+    
     for(n = node->children; n; n = n->next)
     {
         xmlnode = (IpatchXmlNode *)(n->data);
@@ -923,7 +926,9 @@ ipatch_xml_from_str(const char *str, GError **err)
     {
         xml_start_element,
         xml_end_element,
-        xml_text
+        xml_text,
+        NULL,           /* passthrough */
+        NULL            /* error */
     };
 
     GNode *root = NULL;

@@ -54,9 +54,9 @@ GType type_under##_get_type (void) \
   if (!obj_type) { \
     static const GTypeInfo obj_info = { \
       sizeof (IpatchVirtualContainerClass), NULL, NULL, \
-      (GClassInitFunc) NULL, NULL, NULL, \
+      NULL, NULL, NULL, \
       sizeof (IpatchVirtualContainer), 0, \
-      (GInstanceInitFunc) NULL, \
+      NULL, NULL, \
     }; \
  \
     obj_type = g_type_register_static (IPATCH_TYPE_VIRTUAL_CONTAINER, \

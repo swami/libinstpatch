@@ -368,9 +368,11 @@ create_sf2_sample_helper(IpatchSampleStoreSndFile *store, gboolean left)
 
 /* SF2 -> File class is handled manually to install properties */
 static void
-_sf2_to_file_class_init(IpatchConverterClass *klass)
+_sf2_to_file_class_init(gpointer g_class, gpointer class_data)
 {
+    IpatchConverterClass *klass = (IpatchConverterClass *)g_class;
     GObjectClass *obj_class = G_OBJECT_CLASS(klass);
+    (void)class_data;
 
     obj_class->get_property = _sf2_to_file_get_property;
     obj_class->set_property = _sf2_to_file_set_property;

@@ -56,8 +56,7 @@ int ipatch_sample_loop_types_standard_release[] =
 };
 
 
-static void ipatch_sample_interface_init(IpatchSampleIface *sample_iface);
-
+static void ipatch_sample_default_init(gpointer g_iface, gpointer iface_data);
 
 GType
 ipatch_sample_get_type(void)
@@ -71,8 +70,13 @@ ipatch_sample_get_type(void)
             sizeof(IpatchSampleIface),
             NULL,			/* base_init */
             NULL,			/* base_finalize */
-            (GClassInitFunc) ipatch_sample_interface_init,
-            (GClassFinalizeFunc) NULL
+            ipatch_sample_default_init,
+            NULL,			/* class_finalize */
+            NULL,			/* class_data */
+            0,				/* instance_size */
+            0,				/* n_preallocs */
+            NULL,			/* instance_init */
+            NULL,			/* value_table */
         };
 
         itype = g_type_register_static(G_TYPE_INTERFACE, "IpatchSample", &info, 0);
@@ -83,8 +87,11 @@ ipatch_sample_get_type(void)
 }
 
 static void
-ipatch_sample_interface_init(IpatchSampleIface *sample_iface)
+ipatch_sample_default_init(gpointer g_iface, gpointer iface_data)
 {
+    IpatchSampleIface *sample_iface = (IpatchSampleIface *)g_iface;
+    (void)iface_data;
+
     g_object_interface_install_property(sample_iface,
                                         ipatch_sample_new_property_param_spec("sample-data",
                                                 G_PARAM_READABLE));

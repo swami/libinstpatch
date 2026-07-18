@@ -173,7 +173,7 @@ ipatch_sf2_mod_list_override(const GSList *alist, const GSList *blist,
 }
 
 /**
- * ipatch_sf2_mod_list_override_copy: (rename-to ipatch_sf2_mod_list_override)
+ * ipatch_sf2_mod_list_override_copy:
  * @alist: (element-type Ipatch.SF2Mod) (transfer none) (nullable): First modulator list
  * @blist: (element-type Ipatch.SF2Mod) (transfer none) (nullable): Second modulator list
  *
@@ -416,7 +416,7 @@ ipatch_sf2_mod_list_change(GSList *mods, const IpatchSF2Mod *oldvals,
  *   modulators. The same modulator list is returned on subsequent calls and
  *   should not be modified or freed.
  */
-G_CONST_RETURN GSList *
+const GSList *
 ipatch_sf2_mod_list_get_default(void)
 {
     int i;

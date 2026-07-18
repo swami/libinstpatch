@@ -70,8 +70,6 @@
 	       _(DLS_ERROR_MSG), \
 	       ipatch_riff_message_detail (parser, -1, "Invalid data"))
 
-static void ipatch_dls_reader_class_init(IpatchDLSReaderClass *klass);
-static void ipatch_dls_reader_init(IpatchDLSReader *reader);
 static void ipatch_dls_reader_finalize(GObject *object);
 
 static gboolean ipatch_dls_reader_start(IpatchDLSReader *reader, GError **err);
@@ -133,8 +131,6 @@ static gboolean ipatch_gig_load_group_names(IpatchRiff *riff,
 
 /* global variables */
 
-static gpointer parent_class = NULL;
-
 
 /**
  * ipatch_dls_reader_error_quark: (skip)
@@ -152,33 +148,12 @@ ipatch_dls_reader_error_quark(void)
     return (q);
 }
 
-GType
-ipatch_dls_reader_get_type(void)
-{
-    static GType obj_type = 0;
-
-    if(!obj_type)
-    {
-        static const GTypeInfo obj_info =
-        {
-            sizeof(IpatchDLSReaderClass), NULL, NULL,
-            (GClassInitFunc)ipatch_dls_reader_class_init, NULL, NULL,
-            sizeof(IpatchDLSReader), 0,
-            (GInstanceInitFunc)ipatch_dls_reader_init,
-        };
-
-        obj_type = g_type_register_static(IPATCH_TYPE_RIFF,
-                                          "IpatchDLSReader", &obj_info, 0);
-    }
-
-    return (obj_type);
-}
+G_DEFINE_TYPE(IpatchDLSReader, ipatch_dls_reader, IPATCH_TYPE_RIFF)
 
 static void
 ipatch_dls_reader_class_init(IpatchDLSReaderClass *klass)
 {
     GObjectClass *obj_class = G_OBJECT_CLASS(klass);
-    parent_class = g_type_class_peek_parent(klass);
     obj_class->finalize = ipatch_dls_reader_finalize;
 }
 
@@ -215,7 +190,7 @@ ipatch_dls_reader_finalize(GObject *object)
     g_free(reader->pool_table);
     reader->pool_table = NULL;
 
-    G_OBJECT_CLASS(parent_class)->finalize(object);
+    G_OBJECT_CLASS(ipatch_dls_reader_parent_class)->finalize(object);
 }
 
 /**
@@ -2088,7 +2063,7 @@ ipatch_dls_load_connection(IpatchRiff *riff, GSList **conn_list,
 
     count = ipatch_file_buf_read_u32(riff->handle);
 
-    if(chunk->size != header_size + count * IPATCH_DLS_CONN_SIZE)
+    if(chunk->size != (guint32)(header_size + count * IPATCH_DLS_CONN_SIZE))
     {
         /* make sure connection block count is sane */
         SET_SIZE_ERROR(riff, -1, err);
@@ -2646,7 +2621,7 @@ ipatch_gig_load_group_names(IpatchRiff *riff, GSList **name_list,
 
             if(size > 0)
             {
-                name = g_memdup(buf, size + 1);
+                name = g_memdup2(buf, size + 1);
                 *name_list = g_slist_append(*name_list, name);
             }
         }

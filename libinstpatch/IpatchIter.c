@@ -626,7 +626,8 @@ gpointer
 ipatch_iter_array_next(IpatchIter *iter)
 {
     gpointer *array;
-    guint pos, size;
+    gint pos =0;
+    guint size =0;
 
     g_return_val_if_fail(iter != NULL, NULL);
 
@@ -636,7 +637,7 @@ ipatch_iter_array_next(IpatchIter *iter)
     pos = (guint)IPATCH_ITER_ARRAY_GET_POS(iter);
     size = IPATCH_ITER_ARRAY_GET_SIZE(iter);
 
-    if(pos >= 0 && (pos + 1) < size)
+    if(pos >= 0 && (guint)(pos + 1) < size)
     {
         pos++;
     }

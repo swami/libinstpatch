@@ -41,9 +41,7 @@ enum
 };
 
 static void ipatch_sf2_pzone_gen_item_iface_init
-(IpatchSF2GenItemIface *genitem_iface);
-static void ipatch_sf2_pzone_class_init(IpatchSF2PZoneClass *klass);
-static void ipatch_sf2_pzone_init(IpatchSF2PZone *pzone);
+(gpointer g_iface, gpointer iface_data);
 static void ipatch_sf2_pzone_set_property(GObject *object,
         guint property_id,
         const GValue *value,
@@ -56,38 +54,17 @@ static void ipatch_sf2_pzone_get_property(GObject *object,
 static GParamSpec **gen_item_specs = NULL;
 static GParamSpec **gen_item_setspecs = NULL;
 
-
-GType
-ipatch_sf2_pzone_get_type(void)
-{
-    static GType item_type = 0;
-
-    if(!item_type)
-    {
-        static const GTypeInfo item_info =
-        {
-            sizeof(IpatchSF2PZoneClass), NULL, NULL,
-            (GClassInitFunc) ipatch_sf2_pzone_class_init, NULL, NULL,
-            sizeof(IpatchSF2PZone), 0,
-            (GInstanceInitFunc) ipatch_sf2_pzone_init,
-        };
-        static const GInterfaceInfo genitem_iface =
-        {
-            (GInterfaceInitFunc) ipatch_sf2_pzone_gen_item_iface_init, NULL, NULL
-        };
-
-        item_type = g_type_register_static(IPATCH_TYPE_SF2_ZONE,
-                                           "IpatchSF2PZone", &item_info, 0);
-        g_type_add_interface_static(item_type, IPATCH_TYPE_SF2_GEN_ITEM, &genitem_iface);
-    }
-
-    return (item_type);
-}
+G_DEFINE_TYPE_WITH_CODE(IpatchSF2PZone, ipatch_sf2_pzone, IPATCH_TYPE_SF2_ZONE,
+                        G_IMPLEMENT_INTERFACE(IPATCH_TYPE_SF2_GEN_ITEM,
+                                              ipatch_sf2_pzone_gen_item_iface_init))
 
 /* gen item interface initialization */
 static void
-ipatch_sf2_pzone_gen_item_iface_init(IpatchSF2GenItemIface *genitem_iface)
+ipatch_sf2_pzone_gen_item_iface_init(gpointer g_iface, gpointer iface_data)
 {
+    IpatchSF2GenItemIface *genitem_iface = (IpatchSF2GenItemIface *)g_iface;
+    (void)iface_data;
+
     genitem_iface->genarray_ofs = G_STRUCT_OFFSET(IpatchSF2Zone, genarray);
     genitem_iface->propstype = IPATCH_SF2_GEN_PROPS_PRESET;
 
