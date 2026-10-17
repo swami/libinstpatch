@@ -189,7 +189,11 @@ _ipatch_sf2_gen_deinit (void)
 gboolean
 ipatch_sf2_gen_is_valid(guint genid, IpatchSF2GenPropsType propstype)
 {
-    if(genid == IPATCH_SF2_GEN_SAMPLE_MODES
+    if(genid >= IPATCH_SF2_GEN_COUNT)
+    {
+        return (FALSE);
+    }
+    else if(genid == IPATCH_SF2_GEN_SAMPLE_MODES
             && propstype == IPATCH_SF2_GEN_PROPS_INST_GLOBAL)
     {
         return (FALSE);
