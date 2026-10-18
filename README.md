@@ -1,8 +1,12 @@
-#	libInstPatch
+#	libInstPatch - STALE PROJECT, Maintainer wanted
 ###	Copyright (C) 1999-2025 Element Green and others
 http://www.swamiproject.org
 
 [![Build Status](https://dev.azure.com/tommbrt/tommbrt/_apis/build/status/swami.libinstpatch?branchName=master)](https://dev.azure.com/tommbrt/tommbrt/_build/latest?definitionId=1&branchName=master)
+
+## 0. STALE PROJECT, Maintainer wanted
+
+This project became pretty much stale, since even fluidsynth no longer has a dependency on libinstpatch. The current maintainer does very little housekeeping here (merging PRs, addressing CVEs), so pls. don't expect anything happening here! If you're willing to maintain the project, pls. get in contact with @derselbst, thanks.
 
 ## 1. What is libInstPatch?
 
