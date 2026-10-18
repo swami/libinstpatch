@@ -22,7 +22,8 @@ jobs:
 
 - job: macOS
   pool:
-    vmImage: 'macos-15'
+    vmImage: 'macos-26'
+  timeoutInMinutes: 120
   steps:
     - script: |
         brew update || brew update
@@ -38,7 +39,7 @@ jobs:
 
 - job: Windows
   pool:
-    vmImage: 'windows-2019'
+    vmImage: 'windows-2022'
   strategy:
     matrix:
       x86:
